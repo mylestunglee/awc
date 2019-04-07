@@ -25,17 +25,12 @@ struct units {
 	unit_index grid[grid_size][grid_size];
 };
 
-void units_initialise(struct units* const);
-
-unit_index units_frees_insert(struct units* const, const struct unit* const);
+unit_type unit_get_model(const struct unit* const);
 unit_type unit_get_colour(const struct unit* const);
-unit_index units_colours_insert(struct units* const, const struct unit* const);
+
+void units_initialise(struct units* const);
 bool units_insert(struct units* const, const struct unit);
-
-void units_frees_delete(struct units* const, const unit_index);
-void units_colours_delete(struct units* const, const unit_index);
 void units_delete(struct units* const, const grid_index, const grid_index);
-
 void units_frees_print(const struct units* const);
 void units_colours_print(const struct units* const);
 void units_grid_print(const struct units* const);

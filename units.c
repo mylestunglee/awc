@@ -1,7 +1,18 @@
-#include "units.h"
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
+#include "units.h"
 
+// Get unit's model
+unit_type unit_get_model(const struct unit* const unit) {
+	return unit->type & unit_model_mask;
+}
+
+// Get unit's colour
+unit_type unit_get_colour(const struct unit* const unit) {
+	return unit->type >> unit_colour_offset;
+}
+
+// Time complexity: O(units_capacity + max_colours + grid_size^2)
 void units_initialise(struct units* const units) {
 	// Set counters
 	units->start = 0;
@@ -27,7 +38,8 @@ void units_initialise(struct units* const units) {
 	} while (y);
 }
 
-unit_index units_frees_insert(struct units* const units, const struct unit* const unit) {
+static unit_index units_frees_insert(struct units* const units, const struct unit* const unit) {
+	// Check space to insert unit
 	if (units->size == units_capacity)
 		return units_capacity;
 
@@ -39,16 +51,10 @@ unit_index units_frees_insert(struct units* const units, const struct unit* cons
 	return index;
 }
 
-// Get unit's colour
-unit_type unit_get_colour(const struct unit* const unit) {
-	return unit->type >> unit_colour_offset;
-}
-
-unit_index units_colours_insert(struct units* const units, const struct unit* const unit) {
+static unit_index units_colours_insert(struct units* const units, const struct unit* const unit) {
 	unit_index index = units_frees_insert(units, unit);
-	// No space to insert unit
+	// Propagate failure
 	if (index == units_capacity)
-		// Propagate failure
 		return units_capacity;
 
 	const unit_type colour = unit_get_colour(unit);
@@ -77,14 +83,14 @@ bool units_insert(struct units* const units, const struct unit unit) {
 	return false;
 }
 
-void units_frees_delete(struct units* const units, const unit_index index) {
+static void units_frees_delete(struct units* const units, const unit_index index) {
 	assert(units->size > 0);
 
 	units->frees[(units_capacity + units->start - units->size) % units_capacity] = index;
 	--units->size;
 }
 
-void units_colours_delete(struct units* const units, const unit_index index) {
+static void units_colours_delete(struct units* const units, const unit_index index) {
 	const unit_type colour = unit_get_colour(&units->units[index]);
 
 	// If deleting first node
@@ -112,11 +118,12 @@ void units_frees_print(const struct units* const units) {
 	assert(units_capacity > 0);
 
 	unit_index j = units->start;
-	for (unit_index i = 0; i < units_capacity; ++i) {
-		if (i < units_capacity - units->size)
-			printf(unit_index_show_format" ", units->frees[j]);
-		else
-			printf(unit_index_hide_format" ");
+	for (unit_index i = 0; i < units_capacity - units->size; ++i) {
+		if (i < verboseness || i >= units_capacity - units->size - verboseness) {
+			printf(unit_index_format" ", units->frees[j]);
+		} else if (i == 3) {
+			printf("... ");
+		}
 
 		j = (j + 1) % units_capacity;
 	}
@@ -127,15 +134,13 @@ void units_frees_print(const struct units* const units) {
 void units_colours_print(const struct units* const units) {
 	for (unit_type colour = 0; colour < max_colours; ++colour) {
 		unit_index curr = units->firsts[colour];
-		if (curr != units_capacity) {
-			printf(unit_type_format": ["unit_index_show_format"]", colour, curr);
-			while (curr != units_capacity) {
-				const unit_index next = units->nexts[curr];
-				printf("->["unit_type_format" "unit_index_show_format"]", units->units[curr].type, next);
-				curr = next;
-			}
-			printf("\n");
+		printf(unit_type_format": ["unit_index_format"]", colour, curr);
+		while (curr != units_capacity) {
+			const unit_index next = units->nexts[curr];
+			printf("->["unit_type_format": "unit_type_format" ("grid_index_format", "grid_index_format") "unit_index_format"]", curr, units->prevs[curr], units->units[curr].x, units->units[curr].y, next);
+			curr = next;
 		}
+		printf("\n");
 	}
 }
 
@@ -148,32 +153,10 @@ void units_grid_print(const struct units* const units) {
 		do
 		{
 			if (units->grid[y][x] != units_capacity)
-				printf("("grid_index_format", "grid_index_format"): "unit_index_show_format" ", x, y, units->grid[y][x]);
+				printf("("grid_index_format", "grid_index_format"): "unit_index_format" ", x, y, units->grid[y][x]);
 			++x;
 		} while (x);
 		++y;
 	} while (y);
 	printf("}\n");
-}
-
-int main() {
-	struct units units;
-	units_initialise(&units);
-
-	units_colours_print(&units);
-	units_grid_print(&units);
-
-	units_insert(&units, (struct unit){.type = '\x64', .x = 2, .y = 3});
-	units_insert(&units, (struct unit){.type = '\xf4', .x = 1, .y = 3});
-	units_insert(&units, (struct unit){.type = '\x65', .x = 0, .y = 3});
-
-	units_colours_print(&units);
-	units_grid_print(&units);
-
-	units_delete(&units, 1, 3);
-
-	units_colours_print(&units);
-	units_grid_print(&units);
-
-	return 0;
 }
