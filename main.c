@@ -19,7 +19,7 @@ int main() {
 	units_grid_print(&units);
 	printf("\n");
 
-	units_delete(&units, 1, 3);
+	units_delete(&units, 2, 1);
 
 	units_frees_print(&units);
 	units_colours_print(&units);

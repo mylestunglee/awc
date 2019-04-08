@@ -93,14 +93,15 @@ static void units_frees_delete(struct units* const units, const unit_index index
 static void units_colours_delete(struct units* const units, const unit_index index) {
 	const unit_type colour = unit_get_colour(&units->units[index]);
 
-	// If deleting first node
+	// Link firsts or prevs to skip over index
 	if (units->firsts[colour] == index) {
 		units->firsts[colour] = units->nexts[index];
-		if (units->firsts[colour] != units_capacity) {
-			units->prevs[units->nexts[index]] = units_capacity;
-		}
 	} else {
 		units->nexts[units->prevs[index]] = units->nexts[index];
+	}
+
+	// Link next's prev to skip over index
+	if (units->nexts[index] != units_capacity) {
 		units->prevs[units->nexts[index]] = units->prevs[index];
 	}
 
