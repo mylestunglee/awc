@@ -9,7 +9,10 @@ typedef uint8_t unit_type;
 
 typedef uint8_t grid_index;
 
+typedef uint8_t tile_index;
+
 #define units_capacity (unit_index)'\xff'
+#define null_unit units_capacity
 #define unit_index_format "%02X"
 #define unit_type_format "%02X"
 #define grid_index_format "%d"
@@ -17,6 +20,8 @@ typedef uint8_t grid_index;
 #define max_colours 0x8
 #define unit_colour_offset (unit_index)'\x05'
 #define unit_model_mask (unit_index)'\x1f'
+// Number of items to print before and after ellipsis
 #define verboseness 3
+
 
 #endif

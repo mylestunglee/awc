@@ -22,26 +22,22 @@ void units_initialise(struct units* const units) {
 		units->frees[i] = i;
 
 	for (unit_type i = 0; i < max_colours; ++i)
-		units->firsts[i] = units_capacity;
+		units->firsts[i] = null_unit;
 
 	// Clear grid
 	grid_index y = 0;
 	do {
 		grid_index x = 0;
-		do
-		{
-			units->grid[y][x] = units_capacity;
-			++x;
-		}
-		while (x);
-		++y;
-	} while (y);
+		do {
+			units->grid[y][x] = null_unit;
+		} while (++x);
+	} while (++y);
 }
 
 static unit_index units_frees_insert(struct units* const units, const struct unit* const unit) {
 	// Check space to insert unit
 	if (units->size == units_capacity)
-		return units_capacity;
+		return null_unit;
 
 	const unit_index index = units->start;
 	units->units[index] = *unit;
@@ -54,17 +50,17 @@ static unit_index units_frees_insert(struct units* const units, const struct uni
 static unit_index units_colours_insert(struct units* const units, const struct unit* const unit) {
 	unit_index index = units_frees_insert(units, unit);
 	// Propagate failure
-	if (index == units_capacity)
-		return units_capacity;
+	if (index == null_unit)
+		return null_unit;
 
 	const unit_type colour = unit_get_colour(unit);
 
 	// Link new node at front
 	units->nexts[index] = units->firsts[colour];
-	units->prevs[index] = units_capacity;
+	units->prevs[index] = null_unit;
 
 	// If not first unit of the colour
-	if (units->firsts[colour] != units_capacity)
+	if (units->firsts[colour] != null_unit)
 		units->prevs[units->firsts[colour]] = index;
 
 	units->firsts[colour] = index;
@@ -72,11 +68,11 @@ static unit_index units_colours_insert(struct units* const units, const struct u
 }
 
 bool units_insert(struct units* const units, const struct unit unit) {
-	if (units->grid[unit.y][unit.x] != units_capacity)
+	if (units->grid[unit.y][unit.x] != null_unit)
 		return true;
 
 	const unit_index index = units_colours_insert(units, &unit);
-	if (index == units_capacity)
+	if (index == null_unit)
 		return true;
 
 	units->grid[unit.y][unit.x] = index;
@@ -101,7 +97,7 @@ static void units_colours_delete(struct units* const units, const unit_index ind
 	}
 
 	// Link next's prev to skip over index
-	if (units->nexts[index] != units_capacity) {
+	if (units->nexts[index] != null_unit) {
 		units->prevs[units->nexts[index]] = units->prevs[index];
 	}
 
@@ -109,9 +105,9 @@ static void units_colours_delete(struct units* const units, const unit_index ind
 }
 
 void units_delete(struct units* const units, const grid_index x, const grid_index y) {
-	assert(units->grid[y][x] != units_capacity);
+	assert(units->grid[y][x] != null_unit);
 	units_colours_delete(units, units->grid[y][x]);
-	units->grid[y][x] = units_capacity;
+	units->grid[y][x] = null_unit;
 }
 
 // Prints queue of free indices
@@ -136,7 +132,7 @@ void units_colours_print(const struct units* const units) {
 	for (unit_type colour = 0; colour < max_colours; ++colour) {
 		unit_index curr = units->firsts[colour];
 		printf(unit_type_format": ["unit_index_format"]", colour, curr);
-		while (curr != units_capacity) {
+		while (curr != null_unit) {
 			const unit_index next = units->nexts[curr];
 			printf("->["unit_type_format": "unit_type_format" ("grid_index_format", "grid_index_format") "unit_index_format"]", curr, units->prevs[curr], units->units[curr].x, units->units[curr].y, next);
 			curr = next;
@@ -153,11 +149,9 @@ void units_grid_print(const struct units* const units) {
 		grid_index x = 0;
 		do
 		{
-			if (units->grid[y][x] != units_capacity)
+			if (units->grid[y][x] != null_unit)
 				printf("("grid_index_format", "grid_index_format"): "unit_index_format" ", x, y, units->grid[y][x]);
-			++x;
-		} while (x);
-		++y;
-	} while (y);
+		} while (++x);
+	} while (++y);
 	printf("}\n");
 }
