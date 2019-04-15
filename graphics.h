@@ -3,6 +3,8 @@
 
 #include "game.h"
 
-void render(struct game*);
+void render(const struct game* const);
+
+void reset_style();
 
 #endif

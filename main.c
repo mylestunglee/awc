@@ -32,6 +32,8 @@ int main() {
 
 	render(&game);
 
+	reset_style();
+
 	/*
 	printf("\e[1;%umHello, world!\n", 31); // red
 	printf("\e[1;%umHello, world!\n", 32); // green

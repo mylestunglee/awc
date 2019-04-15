@@ -22,6 +22,13 @@ typedef uint8_t tile_index;
 #define unit_model_mask (unit_index)'\x1f'
 // Number of items to print before and after ellipsis
 #define verboseness 3
+#define screen_width 4
+#define screen_height 3
+#define tile_width 8
+#define tile_height 4
+#define tile_count 10
 
+const static uint8_t tile_symbols[tile_count] = {'`', '^', '-', 'x'};
+const static uint8_t tile_styles[tile_count] = {'\xA2', '\x23', '\x78'};
 
 #endif
