@@ -22,20 +22,24 @@ typedef uint8_t tile_index;
 #define unit_model_mask (unit_index)'\x1f'
 // Number of items to print before and after ellipsis
 #define verboseness 3
-#define screen_width 4
-#define screen_height 3
+#define screen_width 5
+#define screen_height 5
+#define screen_half_width screen_width / 2
+#define screen_half_height screen_height / 2
 #define tile_width 8
 #define tile_height 4
-#define tile_count 10
+#define tile_capacity 10
 #define unit_left 1
 #define unit_top 1
 #define unit_width 6
 #define unit_height 3
 #define unit_right unit_left + unit_width
 #define unit_bottom unit_top + unit_height
+#define selection_symbol '+'
+#define selection_style '\xe2'
 
-const static uint8_t tile_symbols[tile_count] = {'`', '^', '-', 'x'};
-const static uint8_t tile_styles[tile_count] = {'\xA2', '\x23', '\x78'};
+const static uint8_t tile_symbols[tile_capacity] = {'`', '^', '-', 'x'};
+const static uint8_t tile_styles[tile_capacity] = {'\xA2', '\x23', '\x78'};
 const static uint8_t unit_textures[1][tile_height][(tile_width + 1) / 2] = {
 	{	{'\x01', '\x32', '\x03'},
 		{'\xf2', '\x24', '\x03'},

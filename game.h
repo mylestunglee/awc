@@ -12,4 +12,6 @@ struct game {
 
 void game_initialise(struct game*);
 
+void game_loop(struct game*);
+
 #endif

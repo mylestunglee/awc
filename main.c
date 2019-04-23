@@ -32,7 +32,7 @@ int main() {
 
 	units_insert(&game.units, (struct unit){.type = '\x20', .x = 0, .y = 2});
 
-	render(&game);
+	game_loop(&game);
 
 	reset_style();
 

@@ -71,30 +71,82 @@ static bool render_unit(
 	return true;
 }
 
-void render(const struct game* const game) {
-	for (grid_index grid_y = 0; grid_y < screen_height; ++grid_y) {
-		for (grid_index tile_y = 0; tile_y < tile_height; ++tile_y) {
-			uint8_t prev_style = '\0';
-			for (grid_index grid_x = 0; grid_x < screen_height; ++grid_x) {
-				for (grid_index tile_x = 0; tile_x < tile_width; ++tile_x) {
+static bool render_selection(
+	const struct game* const game,
+	const grid_index x,
+	const grid_index y,
+	const grid_index tile_x,
+	const grid_index tile_y,
+	uint8_t* const symbol,
+	uint8_t* const style) {
 
-grid_index x = game->x + grid_x;
-grid_index y = game->y + grid_y;
+	if (game->x != x || game->y != y)
+		return false;
 
-uint8_t symbol;
-uint8_t style;
-bool found = false;
-found |= render_unit(game, x, y, tile_x, tile_y, &symbol, &style);
+	if (0 < tile_x && tile_x < tile_width - 1 &&
+		0 < tile_y && tile_y < tile_height - 1)
+		return false;
 
-tile_index tile = game->map[game->y + grid_y][game->x + grid_x];
-if (!found) {
-	symbol = tile_symbols[tile];
-	style = tile_styles[tile];
+	*symbol = selection_symbol;
+	*style = selection_style;
+
+	return true;
 }
 
-render_pixel(symbol, style, prev_style);
-prev_style = style;
+static bool render_tile(
+	const struct game* const game,
+	const grid_index x,
+	const grid_index y,
+	uint8_t* const symbol,
+	uint8_t* const style) {
 
+	tile_index tile = game->map[y][x];
+	*symbol = tile_symbols[tile];
+	*style = tile_styles[tile];
+
+	return true;
+}
+
+static void reset_cursor() {
+	printf("\e[0;0H");
+}
+
+void render(const struct game* const game) {
+	reset_cursor();
+	grid_index screen_left;
+	grid_index screen_right;
+	grid_index screen_top;
+	grid_index screen_bottom;
+
+	if (game->x < screen_half_width) {
+		screen_left = 0;
+		screen_right = screen_width;
+	} else if (game->x >= grid_size - screen_half_width) {
+		screen_left = grid_size - screen_width;
+		screen_right = 255;
+	} else {
+		screen_left = game->x - screen_half_width;
+		screen_right = game->x + screen_half_width;
+	}
+
+	screen_top = 0;
+	screen_bottom = 4;
+
+	for (grid_index y = screen_top; y < screen_bottom; ++y) {
+		for (grid_index tile_y = 0; tile_y < tile_height; ++tile_y) {
+			uint8_t prev_style = '\0';
+			for (grid_index x = screen_left; x < screen_right; ++x) {
+				for (grid_index tile_x = 0; tile_x < tile_width; ++tile_x) {
+					uint8_t symbol;
+					uint8_t style;
+
+					if (render_selection(game, x, y, tile_x, tile_y, &symbol, &style) ||
+						render_unit(game, x, y, tile_x, tile_y, &symbol, &style) ||
+						render_tile(game, x, y, &symbol, &style)) {
+
+						render_pixel(symbol, style, prev_style);
+						prev_style = style;
+					}
 				}
 			}
 			reset_style();
