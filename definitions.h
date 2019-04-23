@@ -17,7 +17,7 @@ typedef uint8_t tile_index;
 #define unit_type_format "%02X"
 #define grid_index_format "%d"
 #define grid_size 0x100
-#define max_colours 0x8
+#define colours_capacity 0x8
 #define unit_colour_offset (unit_index)'\x05'
 #define unit_model_mask (unit_index)'\x1f'
 // Number of items to print before and after ellipsis
@@ -27,8 +27,22 @@ typedef uint8_t tile_index;
 #define tile_width 8
 #define tile_height 4
 #define tile_count 10
+#define unit_left 1
+#define unit_top 1
+#define unit_width 6
+#define unit_height 3
+#define unit_right unit_left + unit_width
+#define unit_bottom unit_top + unit_height
 
 const static uint8_t tile_symbols[tile_count] = {'`', '^', '-', 'x'};
 const static uint8_t tile_styles[tile_count] = {'\xA2', '\x23', '\x78'};
+const static uint8_t unit_textures[1][tile_height][(tile_width + 1) / 2] = {
+	{	{'\x01', '\x32', '\x03'},
+		{'\xf2', '\x24', '\x03'},
+		{'\x01', '\x1f', '\x03'}
+	}};
+const static uint8_t unit_symbols[16] = {'a', 'b', 'd', 'e', 'f', 'g'};
+const static uint8_t colour_style[colours_capacity] = {'\xf7', '\xe6'};
+const static uint8_t colour_symbol[colours_capacity] = {'W', 'E'};
 
 #endif

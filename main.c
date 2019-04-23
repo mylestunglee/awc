@@ -30,6 +30,8 @@ int main() {
 	units_grid_print(units);
 	*/
 
+	units_insert(&game.units, (struct unit){.type = '\x20', .x = 0, .y = 2});
+
 	render(&game);
 
 	reset_style();

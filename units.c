@@ -12,7 +12,7 @@ unit_type unit_get_colour(const struct unit* const unit) {
 	return unit->type >> unit_colour_offset;
 }
 
-// Time complexity: O(units_capacity + max_colours + grid_size^2)
+// Time complexity: O(units_capacity + colours_capacity + grid_size^2)
 void units_initialise(struct units* const units) {
 	// Set counters
 	units->start = 0;
@@ -21,7 +21,7 @@ void units_initialise(struct units* const units) {
 	for (unit_index i = 0; i < units_capacity; ++i)
 		units->frees[i] = i;
 
-	for (unit_type i = 0; i < max_colours; ++i)
+	for (unit_type i = 0; i < colours_capacity; ++i)
 		units->firsts[i] = null_unit;
 
 	// Clear grid
@@ -129,7 +129,7 @@ void units_frees_print(const struct units* const units) {
 
 // Print linked lists of index and unit type pairs across all colours
 void units_colours_print(const struct units* const units) {
-	for (unit_type colour = 0; colour < max_colours; ++colour) {
+	for (unit_type colour = 0; colour < colours_capacity; ++colour) {
 		unit_index curr = units->firsts[colour];
 		printf(unit_type_format": ["unit_index_format"]", colour, curr);
 		while (curr != null_unit) {

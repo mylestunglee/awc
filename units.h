@@ -19,7 +19,7 @@ struct units {
 	unit_index start;
 	unit_index size;
 	unit_index frees[units_capacity];
-	unit_index firsts[max_colours];
+	unit_index firsts[colours_capacity];
 	unit_index prevs[units_capacity];
 	unit_index nexts[units_capacity];
 	unit_index grid[grid_size][grid_size];
