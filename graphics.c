@@ -30,6 +30,47 @@ static void render_pixel(uint8_t symbol, const uint8_t style, const uint8_t prev
 	printf("%c", symbol);
 }
 
+// Attempt to find symbol style pair from rendering coordinates
+static bool render_unit(
+	const struct game* const game,
+	const grid_index x,
+	const grid_index y,
+	const grid_index tile_x,
+	const grid_index tile_y,
+	uint8_t* const symbol,
+	uint8_t* const style) {
+
+	if (unit_left > tile_x || tile_x >= unit_right ||
+		unit_top > tile_y || tile_y >= unit_bottom)
+		return false;
+
+	const unit_index unit = game->units.grid[y][x];
+
+	if (unit == null_unit)
+		return false;
+
+	uint8_t texture = unit_textures[unit]
+		[tile_y - unit_top][(tile_x - unit_left) / 2];
+
+	if ((tile_x - unit_left) % 2 == 0)
+		texture = texture >> 4;
+	else
+		texture = texture & 15;
+
+	if (texture == 0)
+		return false;
+
+	unit_type player = unit_get_player(&game->units.units[unit]);
+	*style = player_style[player];
+
+	if (texture == 15)
+		*symbol = player_symbol[player];
+	else
+		*symbol = unit_symbols[texture - 1];
+
+	return true;
+}
+
 void render(const struct game* const game) {
 	for (grid_index grid_y = 0; grid_y < screen_height; ++grid_y) {
 		for (grid_index tile_y = 0; tile_y < tile_height; ++tile_y) {
@@ -43,34 +84,7 @@ grid_index y = game->y + grid_y;
 uint8_t symbol;
 uint8_t style;
 bool found = false;
-
-if (unit_left <= tile_x && tile_x < unit_right &&
-	unit_top <= tile_y && tile_y < unit_bottom) {
-	unit_index unit = game->units.grid[y][x];
-	if (unit != null_unit) {
-		uint8_t texture = unit_textures[unit]
-			[tile_y - unit_top][(tile_x - unit_left) / 2];
-
-		if ((tile_x - unit_left) % 2 == 0) {
-			texture = texture >> 4;
-		} else {
-			texture = texture & 15;
-		}
-
-		if (texture != 0 && texture != 15) {
-			symbol = unit_symbols[texture - 1];
-			style = player_style[unit_get_player(&game->units.units[unit])];
-			found = true;
-		}
-
-		if (texture == 15) {
-			symbol = player_symbol[unit_get_player(&game->units.units[unit])];
-			style = player_style[unit_get_player(&game->units.units[unit])];
-			found = true;
-		}
-	}
-}
-
+found |= render_unit(game, x, y, tile_x, tile_y, &symbol, &style);
 
 tile_index tile = game->map[game->y + grid_y][game->x + grid_x];
 if (!found) {
