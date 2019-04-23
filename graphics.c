@@ -59,13 +59,13 @@ if (unit_left <= tile_x && tile_x < unit_right &&
 
 		if (texture != 0 && texture != 15) {
 			symbol = unit_symbols[texture - 1];
-			style = colour_style[unit_get_colour(&game->units.units[unit])];
+			style = player_style[unit_get_player(&game->units.units[unit])];
 			found = true;
 		}
 
 		if (texture == 15) {
-			symbol = colour_symbol[unit_get_colour(&game->units.units[unit])];
-			style = colour_style[unit_get_colour(&game->units.units[unit])];
+			symbol = player_symbol[unit_get_player(&game->units.units[unit])];
+			style = player_style[unit_get_player(&game->units.units[unit])];
 			found = true;
 		}
 	}
