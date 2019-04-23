@@ -109,6 +109,7 @@ static bool render_tile(
 
 static void reset_cursor() {
 	printf("\e[0;0H");
+	printf("\033[2J\033[1;1H");
 }
 
 void render(const struct game* const game) {
@@ -123,19 +124,27 @@ void render(const struct game* const game) {
 		screen_right = screen_width;
 	} else if (game->x >= grid_size - screen_half_width) {
 		screen_left = grid_size - screen_width;
-		screen_right = 255;
+		screen_right = 0;
 	} else {
-		screen_left = game->x - screen_half_width;
-		screen_right = game->x + screen_half_width;
+		screen_left = game->x - screen_half_width + 1;
+		screen_right = game->x + screen_half_width + 1;
 	}
 
-	screen_top = 0;
-	screen_bottom = 4;
+	if (game->y < screen_half_height) {
+		screen_top = 0;
+		screen_bottom = screen_height;
+	} else if (game->y >= grid_size - screen_half_height) {
+		screen_top = grid_size - screen_height;
+		screen_bottom = 0;
+	} else {
+		screen_top = game->y - screen_half_height + 1;
+		screen_bottom = game->y + screen_half_height + 1;
+	}
 
-	for (grid_index y = screen_top; y < screen_bottom; ++y) {
+	for (grid_index y = screen_top; y != screen_bottom; ++y) {
 		for (grid_index tile_y = 0; tile_y < tile_height; ++tile_y) {
 			uint8_t prev_style = '\0';
-			for (grid_index x = screen_left; x < screen_right; ++x) {
+			for (grid_index x = screen_left; x != screen_right; ++x) {
 				for (grid_index tile_x = 0; tile_x < tile_width; ++tile_x) {
 					uint8_t symbol;
 					uint8_t style;

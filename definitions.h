@@ -22,8 +22,8 @@ typedef uint8_t tile_index;
 #define unit_model_mask (unit_index)'\x1f'
 // Number of items to print before and after ellipsis
 #define verboseness 3
-#define screen_width 5
-#define screen_height 5
+#define screen_width 24
+#define screen_height 18
 #define screen_half_width screen_width / 2
 #define screen_half_height screen_height / 2
 #define tile_width 8
