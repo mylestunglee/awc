@@ -8,6 +8,7 @@ struct game {
 	struct units units;
 	grid_index x;
 	grid_index y;
+	unit_index selected;
 };
 
 void game_initialise(struct game*);

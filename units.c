@@ -40,7 +40,7 @@ static unit_index units_frees_insert(struct units* const units, const struct uni
 		return null_unit;
 
 	const unit_index index = units->start;
-	units->units[index] = *unit;
+	units->data[index] = *unit;
 	units->start = (units->start + 1) % units_capacity;
 	++units->size;
 
@@ -87,7 +87,7 @@ static void units_frees_delete(struct units* const units, const unit_index index
 }
 
 static void units_players_delete(struct units* const units, const unit_index index) {
-	const unit_type player = unit_get_player(&units->units[index]);
+	const unit_type player = unit_get_player(&units->data[index]);
 
 	// Link firsts or prevs to skip over index
 	if (units->firsts[player] == index) {
@@ -108,6 +108,17 @@ void units_delete(struct units* const units, const grid_index x, const grid_inde
 	assert(units->grid[y][x] != null_unit);
 	units_players_delete(units, units->grid[y][x]);
 	units->grid[y][x] = null_unit;
+}
+
+void units_move(struct units* const units, const unit_index unit, const tile_index x, const tile_index y) {
+	assert(unit != null_unit);
+	assert(units->grid[y][x] == null_unit);
+	const tile_index old_x = units->data[unit].x;
+	const tile_index old_y = units->data[unit].y;
+	units->data[unit].x = x;
+	units->data[unit].y = y;
+	units->grid[old_y][old_x] = null_unit;
+	units->grid[y][x] = unit;
 }
 
 // Prints queue of free indices
@@ -134,7 +145,7 @@ void units_players_print(const struct units* const units) {
 		printf(unit_type_format": ["unit_index_format"]", player, curr);
 		while (curr != null_unit) {
 			const unit_index next = units->nexts[curr];
-			printf("->["unit_type_format": "unit_type_format" ("grid_index_format", "grid_index_format") "unit_index_format"]", curr, units->prevs[curr], units->units[curr].x, units->units[curr].y, next);
+			printf("->["unit_type_format": "unit_type_format" ("grid_index_format", "grid_index_format") "unit_index_format"]", curr, units->prevs[curr], units->data[curr].x, units->data[curr].y, next);
 			curr = next;
 		}
 		printf("\n");

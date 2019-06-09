@@ -40,6 +40,7 @@ static bool render_unit(
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
+	// Out of bounds
 	if (unit_left > tile_x || tile_x >= unit_right ||
 		unit_top > tile_y || tile_y >= unit_bottom)
 		return false;
@@ -52,6 +53,7 @@ static bool render_unit(
 	uint8_t texture = unit_textures[unit]
 		[tile_y - unit_top][(tile_x - unit_left) / 2];
 
+	// Extract 4-bits corresponding to texture coordinate
 	if ((tile_x - unit_left) % 2 == 0)
 		texture = texture >> 4;
 	else
@@ -60,8 +62,13 @@ static bool render_unit(
 	if (texture == 0)
 		return false;
 
-	unit_type player = unit_get_player(&game->units.units[unit]);
+	unit_type player = unit_get_player(&game->units.data[unit]);
 	*style = player_style[player];
+
+	// Highlight selected unit
+	if (game->selected == unit) {
+		*style ^= 0x88;
+	}
 
 	if (texture == 15)
 		*symbol = player_symbol[player];
@@ -108,7 +115,7 @@ static bool render_tile(
 }
 
 static void reset_cursor() {
-	printf("\e[0;0H");
+	printf("\033[0;0H");
 	printf("\033[2J\033[1;1H");
 }
 

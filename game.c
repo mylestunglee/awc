@@ -26,6 +26,7 @@ void game_initialise(struct game* game) {
 	game->y = 0;
 	game_map_initialise(game->map);
 	units_initialise(&game->units);
+	game->selected = null_unit;
 }
 
 void game_loop(struct game* game) {
@@ -45,6 +46,22 @@ void game_loop(struct game* game) {
 		}
 		if (input == 's') {
 			++game->y;
+		}
+		if (input == ' ') {
+			const unit_index unit = game->units.grid[game->y][game->x];
+			if (game->selected == null_unit) {
+				if (unit != null_unit) {
+					game->selected = unit;
+				}
+			} else {
+				// Cursor over selected unit
+				if (game->selected == unit) {
+					game->selected = null_unit;
+				} else {
+					units_move(&game->units, game->selected, game->x, game->y);
+					game->selected = null_unit;
+				}
+			}
 		}
 
 		render(game);

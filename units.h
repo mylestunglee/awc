@@ -15,7 +15,7 @@ struct unit {
 };
 
 struct units {
-	struct unit units[units_capacity];
+	struct unit data[units_capacity];
 	unit_index start;
 	unit_index size;
 	unit_index frees[units_capacity];
@@ -31,6 +31,7 @@ unit_type unit_get_player(const struct unit* const);
 void units_initialise(struct units* const);
 bool units_insert(struct units* const, const struct unit);
 void units_delete(struct units* const, const grid_index, const grid_index);
+void units_move(struct units* const, const unit_index, const tile_index, const tile_index);
 void units_frees_print(const struct units* const);
 void units_players_print(const struct units* const);
 void units_grid_print(const struct units* const);
