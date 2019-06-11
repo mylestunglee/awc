@@ -20,6 +20,7 @@ typedef uint8_t tile_index;
 #define players_capacity 0x8
 #define unit_player_offset (unit_index)'\x05'
 #define unit_model_mask (unit_index)'\x1f'
+#define tile_max 0xff
 // Number of items to print before and after ellipsis
 #define verboseness 3
 #define screen_width 8

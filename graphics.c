@@ -94,7 +94,7 @@ static bool render_selection(
 		0 < tile_y && tile_y < tile_height - 1)
 		return false;
 
-	*symbol = selection_symbol;
+	*symbol = game->labels[y][x] + '0';//selection_symbol;
 	*style = selection_style;
 
 	return true;
@@ -110,6 +110,10 @@ static bool render_tile(
 	tile_index tile = game->map[y][x];
 	*symbol = tile_symbols[tile];
 	*style = tile_styles[tile];
+
+	if (game->labels[y][x] != 0) {
+		*symbol = '*';
+	}
 
 	return true;
 }

@@ -9,6 +9,7 @@ struct game {
 	grid_index x;
 	grid_index y;
 	unit_index selected;
+	uint8_t labels[grid_size][grid_size];
 };
 
 void game_initialise(struct game*);
