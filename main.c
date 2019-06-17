@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "game.h"
 #include "graphics.h"
+#include "path.h"
 
 int main() {
 	struct game game;
@@ -29,6 +30,18 @@ int main() {
 	units_colours_print(units);
 	units_grid_print(units);
 	*/
+
+	struct path path;
+	path_initialise(&path);
+	path_push(&path);
+	path_push(&path);
+	while (path.size > 0) {
+		path_print(&path);
+		path_next(&path);
+	}
+	path_print(&path);
+
+	return 0;
 
 	units_insert(&game.units, (struct unit){.type = '\x20', .x = 3, .y = 3});
 

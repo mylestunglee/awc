@@ -35,14 +35,14 @@ static bool render_unit(
 	const struct game* const game,
 	const grid_index x,
 	const grid_index y,
-	const grid_index tile_x,
-	const grid_index tile_y,
+	const grid_index grid_x,
+	const grid_index grid_y,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
 	// Out of bounds
-	if (unit_left > tile_x || tile_x >= unit_right ||
-		unit_top > tile_y || tile_y >= unit_bottom)
+	if (unit_left > grid_x || grid_x >= unit_right ||
+		unit_top > grid_y || grid_y >= unit_bottom)
 		return false;
 
 	const unit_index unit = game->units.grid[y][x];
@@ -51,10 +51,10 @@ static bool render_unit(
 		return false;
 
 	uint8_t texture = unit_textures[unit]
-		[tile_y - unit_top][(tile_x - unit_left) / 2];
+		[grid_y - unit_top][(grid_x - unit_left) / 2];
 
 	// Extract 4-bits corresponding to texture coordinate
-	if ((tile_x - unit_left) % 2 == 0)
+	if ((grid_x - unit_left) % 2 == 0)
 		texture = texture >> 4;
 	else
 		texture = texture & 15;
@@ -82,16 +82,16 @@ static bool render_selection(
 	const struct game* const game,
 	const grid_index x,
 	const grid_index y,
-	const grid_index tile_x,
-	const grid_index tile_y,
+	const grid_index grid_x,
+	const grid_index grid_y,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
 	if (game->x != x || game->y != y)
 		return false;
 
-	if (0 < tile_x && tile_x < tile_width - 1 &&
-		0 < tile_y && tile_y < tile_height - 1)
+	if (0 < grid_x && grid_x < grid_width - 1 &&
+		0 < grid_y && grid_y < grid_height - 1)
 		return false;
 
 	*symbol = game->labels[y][x] + '0';//selection_symbol;
@@ -100,16 +100,16 @@ static bool render_selection(
 	return true;
 }
 
-static bool render_tile(
+static bool render_grid(
 	const struct game* const game,
 	const grid_index x,
 	const grid_index y,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
-	tile_index tile = game->map[y][x];
-	*symbol = tile_symbols[tile];
-	*style = tile_styles[tile];
+	grid_index grid = game->map[y][x];
+	*symbol = grid_symbols[grid];
+	*style = grid_styles[grid];
 
 	if (game->labels[y][x] != 0) {
 		*symbol = '*';
@@ -153,16 +153,16 @@ void render(const struct game* const game) {
 	}
 
 	for (grid_index y = screen_top; y != screen_bottom; ++y) {
-		for (grid_index tile_y = 0; tile_y < tile_height; ++tile_y) {
+		for (grid_index grid_y = 0; grid_y < grid_height; ++grid_y) {
 			uint8_t prev_style = '\0';
 			for (grid_index x = screen_left; x != screen_right; ++x) {
-				for (grid_index tile_x = 0; tile_x < tile_width; ++tile_x) {
+				for (grid_index grid_x = 0; grid_x < grid_width; ++grid_x) {
 					uint8_t symbol;
 					uint8_t style;
 
-					if (render_selection(game, x, y, tile_x, tile_y, &symbol, &style) ||
-						render_unit(game, x, y, tile_x, tile_y, &symbol, &style) ||
-						render_tile(game, x, y, &symbol, &style)) {
+					if (render_selection(game, x, y, grid_x, grid_y, &symbol, &style) ||
+						render_unit(game, x, y, grid_x, grid_y, &symbol, &style) ||
+						render_grid(game, x, y, &symbol, &style)) {
 
 						render_pixel(symbol, style, prev_style);
 						prev_style = style;

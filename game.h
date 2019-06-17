@@ -4,7 +4,7 @@
 #include "units.h"
 
 struct game {
-	tile_index map[grid_size][grid_size];
+	grid_index map[grid_size][grid_size];
 	struct units units;
 	grid_index x;
 	grid_index y;

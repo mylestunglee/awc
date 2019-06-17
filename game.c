@@ -3,7 +3,7 @@
 #include "game.h"
 #include "graphics.h"
 
-static void game_map_initialise(tile_index map[grid_size][grid_size]) {
+static void game_map_initialise(grid_index map[grid_size][grid_size]) {
 	grid_index y = 0;
 	do {
 		grid_index x = 0;
@@ -46,8 +46,6 @@ static void game_labels_explore(const struct game* const game, uint8_t labels[gr
 		dir = 3 => up
 	*/
 
-	int visited = 0;
-
 	labels[y][x] = energy;
 
 	while (size > 0) {
@@ -61,10 +59,10 @@ static void game_labels_explore(const struct game* const game, uint8_t labels[gr
 		uint8_t cost = 1;
 		uint8_t top = stack[size - 1];
 		if (energy <= cost ||
-			top == 0 && x == tile_max ||
-			top == 1 && y == tile_max ||
-			top == 2 && x == 0 ||
-			top == 3 && y == 0) {
+			(top == 0 && x == grid_max) ||
+			(top == 1 && y == grid_max) ||
+			(top == 2 && x == 0) ||
+			(top == 3 && y == 0)) {
 			// pop
 			while (size > 0 && stack[size - 1] == 0) {
 				--size;

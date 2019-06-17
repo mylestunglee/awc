@@ -6,10 +6,7 @@
 typedef uint8_t unit_index;
 typedef uint8_t unit_health;
 typedef uint8_t unit_type;
-
 typedef uint8_t grid_index;
-
-typedef uint8_t tile_index;
 
 #define units_capacity (unit_index)'\xff'
 #define null_unit units_capacity
@@ -20,16 +17,16 @@ typedef uint8_t tile_index;
 #define players_capacity 0x8
 #define unit_player_offset (unit_index)'\x05'
 #define unit_model_mask (unit_index)'\x1f'
-#define tile_max 0xff
+#define grid_max 0xff
 // Number of items to print before and after ellipsis
 #define verboseness 3
 #define screen_width 8
 #define screen_height 6
 #define screen_half_width screen_width / 2
 #define screen_half_height screen_height / 2
-#define tile_width 8
-#define tile_height 4
-#define tile_capacity 10
+#define grid_width 8
+#define grid_height 4
+#define grid_capacity 10
 #define unit_left 1
 #define unit_top 1
 #define unit_width 6
@@ -38,10 +35,11 @@ typedef uint8_t tile_index;
 #define unit_bottom unit_top + unit_height
 #define selection_symbol '+'
 #define selection_style '\xe2'
+#define path_byte_capacity 4
 
-const static uint8_t tile_symbols[tile_capacity] = {'`', '^', '-', 'x'};
-const static uint8_t tile_styles[tile_capacity] = {'\xA2', '\x23', '\x78'};
-const static uint8_t unit_textures[1][tile_height][(tile_width + 1) / 2] = {
+const static uint8_t grid_symbols[grid_capacity] = {'`', '^', '-', 'x'};
+const static uint8_t grid_styles[grid_capacity] = {'\xA2', '\x23', '\x78'};
+const static uint8_t unit_textures[1][grid_height][(grid_width + 1) / 2] = {
 	{	{'\x01', '\x32', '\x03'},
 		{'\xf2', '\x24', '\x03'},
 		{'\x01', '\x1f', '\x03'}
