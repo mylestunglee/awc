@@ -31,6 +31,7 @@ int main() {
 	units_grid_print(units);
 	*/
 
+	/*
 	struct path path;
 	path_initialise(&path);
 	path_push(&path);
@@ -42,6 +43,7 @@ int main() {
 	path_print(&path);
 
 	return 0;
+	*/
 
 	units_insert(&game.units, (struct unit){.type = '\x20', .x = 3, .y = 3});
 

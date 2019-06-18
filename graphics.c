@@ -130,27 +130,10 @@ void render(const struct game* const game) {
 	grid_index screen_top;
 	grid_index screen_bottom;
 
-	if (game->x < screen_half_width) {
-		screen_left = 0;
-		screen_right = screen_width;
-	} else if (game->x >= grid_size - screen_half_width) {
-		screen_left = grid_size - screen_width;
-		screen_right = 0;
-	} else {
 		screen_left = game->x - screen_half_width + 1;
 		screen_right = game->x + screen_half_width + 1;
-	}
-
-	if (game->y < screen_half_height) {
-		screen_top = 0;
-		screen_bottom = screen_height;
-	} else if (game->y >= grid_size - screen_half_height) {
-		screen_top = grid_size - screen_height;
-		screen_bottom = 0;
-	} else {
 		screen_top = game->y - screen_half_height + 1;
 		screen_bottom = game->y + screen_half_height + 1;
-	}
 
 	for (grid_index y = screen_top; y != screen_bottom; ++y) {
 		for (grid_index grid_y = 0; grid_y < grid_height; ++grid_y) {

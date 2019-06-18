@@ -30,96 +30,32 @@ static void game_labels_clear(uint8_t labels[grid_size][grid_size]) {
 	} while (++y);
 }
 
-static void game_labels_explore(const struct game* const game, uint8_t labels[grid_size][grid_size]) {
-	uint8_t stack[10] = {0};
-	uint8_t size = 0;
-
-	stack[0] = 3;
-	++size;
-	uint8_t x = game->units.data[game->selected].x;
-	uint8_t y = game->units.data[game->selected].y;
-
-	uint8_t energy = 4;
-	/*	dir = 0 => right
-		dir = 1 => down
-		dir = 2 => left
-		dir = 3 => up
-	*/
-
-	labels[y][x] = energy;
-
-	while (size > 0) {
-		// print stack
-		for (int i = 0; i < size; i++) {
-			printf("%d", stack[i]);
-		}
-		printf("\n");
-	
-		// TODO
-		uint8_t cost = 1;
-		uint8_t top = stack[size - 1];
-		if (energy <= cost ||
-			(top == 0 && x == grid_max) ||
-			(top == 1 && y == grid_max) ||
-			(top == 2 && x == 0) ||
-			(top == 3 && y == 0)) {
-			// pop
-			while (size > 0 && stack[size - 1] == 0) {
-				--size;
-				top = stack[size - 1];
-				switch (top) {
-					case 0: {
-						--x;
-						break;
-					}
-					case 1: {
-						--y;
-						break;
-					}
-					case 2: {
-						++x;
-						break;
-					}
-					case 3: {
-						++y;
-					}
-				}
-				
-				energy += cost;
-			}
-			// rotate
-			if (size > 0) {
-				--stack[size - 1];
-			}
-			continue;
-		}
-		energy -= cost;
-		// if current square has better energy then go pop
-		switch (top) {
-			case 0: {
-				++x;
-				break;
-			}
-			case 1: {
-				++y;
-				break;
-			}
-			case 2: {
-				--x;
-				break;
-			}
-			case 3: {
-				--y;
-			}
-		}
-		// label
-		if (labels[y][x] < energy) {
-			labels[y][x] = energy;
-		}
-		// next
-		stack[size] = 3;
-		++size;
+static void game_labels_explore_recursive(
+	const struct game* const game,
+	uint8_t labels[grid_size][grid_size],
+	grid_index x,
+	grid_index y,
+	uint8_t energy) {
+	if (energy <= 1) {
+		return;
 	}
+	energy -= 1;
+	if (labels[y][x] > energy) {
+		return;
+	}
+	labels[y][x] = energy;
+	game_labels_explore_recursive(game, labels, x + 1, y, energy);
+	game_labels_explore_recursive(game, labels, x - 1, y, energy);
+	game_labels_explore_recursive(game, labels, x, y + 1, energy);
+	game_labels_explore_recursive(game, labels, x, y - 1, energy);
+}
+
+static void game_labels_explore(struct game* const game) {
+	game_labels_explore_recursive(
+		game,
+		game->labels,
+		game->units.data[game->selected].x,
+		game->units.data[game->selected].y, 4);
 }
 
 void game_initialise(struct game* const game) {
@@ -156,7 +92,7 @@ void game_loop(struct game* const game) {
 				// Select unit
 				if (unit != null_unit) {
 					game->selected = unit;
-					game_labels_explore(game, game->labels);
+					game_labels_explore(game);
 				}
 			} else {
 				// Cursor over selected unit
