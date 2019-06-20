@@ -94,7 +94,7 @@ static bool render_selection(
 		0 < grid_y && grid_y < grid_height - 1)
 		return false;
 
-	*symbol = game->labels[y][x] + '0';//selection_symbol;
+	*symbol = selection_symbol;
 	*style = selection_style;
 
 	return true;
@@ -111,8 +111,14 @@ static bool render_grid(
 	*symbol = grid_symbols[grid];
 	*style = grid_styles[grid];
 
-	if (game->labels[y][x] != 0) {
-		*symbol = '*';
+	if (game->labels[y][x] == 1) {
+		*symbol = '|';
+	}
+	else if (game->labels[y][x] == 3) {
+		*symbol = '+';
+	}
+	else if (game->labels[y][x] == 2) {
+		*symbol = '-';
 	}
 
 	return true;

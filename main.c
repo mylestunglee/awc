@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "game.h"
 #include "graphics.h"
-#include "path.h"
 
 int main() {
 	struct game game;
