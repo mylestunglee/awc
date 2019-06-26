@@ -41,8 +41,8 @@ static bool render_unit(
 	uint8_t* const style) {
 
 	// Out of bounds
-	if (unit_left > grid_x || grid_x >= unit_right ||
-		unit_top > grid_y || grid_y >= unit_bottom)
+	if (unit_left > grid_x || grid_x >= unit_left + unit_width ||
+		unit_top > grid_y || grid_y >= unit_top + unit_height)
 		return false;
 
 	const unit_index unit = game->units.grid[y][x];
@@ -90,14 +90,37 @@ static bool render_selection(
 	if (game->x != x || game->y != y)
 		return false;
 
-	if (0 < grid_x && grid_x < grid_width - 1 &&
-		0 < grid_y && grid_y < grid_height - 1)
-		return false;
+	// Construct ASCII box art in selected tile
+	uint8_t edges = 0;
 
-	*symbol = selection_symbol;
-	*style = selection_style;
+	if (grid_x == 0) ++edges;
+	if (grid_x == grid_width - 1) ++edges;
+	if (grid_y == 0) edges += 2;
+	if (grid_y == grid_height - 1) edges += 2;
 
-	return true;
+	switch (edges) {
+		case 0: {
+			return false;
+		}
+		case 1: {
+			*symbol = '|';
+			break;
+		}
+		case 2: {
+			*symbol = '-';
+			break;
+		}
+		case 3: {
+			//*symbol = '+';
+			*symbol = game->workspace[y][x] + '0';
+			break;
+		}
+	}
+
+	const grid_index grid = game->map[y][x];
+	*style = (grid_styles[grid] & '\x0f') | selection_style;
+
+ 	return true;
 }
 
 static bool render_grid(
@@ -107,18 +130,31 @@ static bool render_grid(
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
-	grid_index grid = game->map[y][x];
+	const grid_index grid = game->map[y][x];
 	*symbol = grid_symbols[grid];
 	*style = grid_styles[grid];
 
-	if (game->labels[y][x] == 1) {
-		*symbol = '|';
-	}
-	else if (game->labels[y][x] == 3) {
-		*symbol = '+';
-	}
-	else if (game->labels[y][x] == 2) {
-		*symbol = '-';
+	// Apply label hightlighting
+	if (game->labels[y][x] != 0) {
+		// Clear foreground style
+		*style &= '\x0f';
+		*symbol = '#';
+
+		// Set foreground style
+		switch (game->labels[y][x]) {
+			case accessible_bit: {
+				*style |= accessible_style;
+				break;
+			}
+			case attackable_bit: {
+				*style |= attackable_style;
+				break;
+			}
+			case accessible_bit | attackable_bit: {
+				*style |= both_style;
+				break;
+			}
+		}
 	}
 
 	return true;
@@ -131,15 +167,11 @@ static void reset_cursor() {
 
 void render(const struct game* const game) {
 	reset_cursor();
-	grid_index screen_left;
-	grid_index screen_right;
-	grid_index screen_top;
-	grid_index screen_bottom;
 
-		screen_left = game->x - screen_half_width + 1;
-		screen_right = game->x + screen_half_width + 1;
-		screen_top = game->y - screen_half_height + 1;
-		screen_bottom = game->y + screen_half_height + 1;
+	const grid_index screen_left = game->x - screen_width / 2 + 1;
+	const grid_index screen_right = game->x + screen_width / 2 + 1;
+	const grid_index screen_top = game->y - screen_height / 2 + 1;
+	const grid_index screen_bottom = game->y + screen_height / 2 + 1;
 
 	for (grid_index y = screen_top; y != screen_bottom; ++y) {
 		for (grid_index grid_y = 0; grid_y < grid_height; ++grid_y) {

@@ -63,9 +63,9 @@ void game_loop(struct game* const game) {
 				if (game->selected == unit) {
 					game->selected = null_unit;
 					// optimise clear
-					grid_clear_all(game->labels);
 					grid_clear_all(game->workspace);
-				} else if (game->labels[game->y][game->x] != 0) {
+					grid_clear_all(game->labels);
+				} else if (game->labels[game->y][game->x] & accessible_bit != 0) {
 					units_move(&game->units, game->selected, game->x, game->y);
 					game->selected = null_unit;
 					grid_clear_all(game->labels);

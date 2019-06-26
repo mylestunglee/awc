@@ -10,13 +10,6 @@ void grid_clear_all(uint8_t grid[grid_size][grid_size]) {
     } while (++y);
 }
 
-void grid_clear_fill(
-	uint8_t grid[grid_size][grid_size],
-    const grid_index x,
-    const grid_index y) {
-
-}
-
 static void grid_explore_recursive(
     const struct game* const game,
     uint8_t labels[grid_size][grid_size],
@@ -28,15 +21,17 @@ static void grid_explore_recursive(
         return;
     }
     energy -= 1;
-    if (labels[y][x] > energy) {
+    if (workspace[y][x] > energy) {
         return;
     }
     workspace[y][x] = energy;
-    labels[y][x] |= 1;
-    labels[y][x + 1] |= 2;
-    labels[y][x - 1] |= 2;
-    labels[y + 1][x] |= 2;
-    labels[y - 1][x] |= 2;
+
+    labels[y][x] |= accessible_bit;
+    labels[y][(grid_index)(x + 1)] |= attackable_bit;
+    labels[y][(grid_index)(x - 1)] |= attackable_bit;
+    labels[(grid_index)(y + 1)][x] |= attackable_bit;
+    labels[(grid_index)(y - 1)][x] |= attackable_bit;
+
     grid_explore_recursive(game, labels, workspace, x + 1, y, energy);
     grid_explore_recursive(game, labels, workspace, x - 1, y, energy);
     grid_explore_recursive(game, labels, workspace, x, y + 1, energy);
@@ -49,6 +44,6 @@ void grid_explore(struct game* const game) {
         game->labels,
         game->workspace,
         game->units.data[game->selected].x,
-        game->units.data[game->selected].y, 5);
+        game->units.data[game->selected].y, 4);
 }
 

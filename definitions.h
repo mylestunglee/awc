@@ -17,13 +17,10 @@ typedef uint8_t grid_index;
 #define players_capacity 0x8
 #define unit_player_offset (unit_index)'\x05'
 #define unit_model_mask (unit_index)'\x1f'
-#define grid_max 0xff
 // Number of items to print before and after ellipsis
 #define verboseness 3
 #define screen_width 8
 #define screen_height 6
-#define screen_half_width screen_width / 2
-#define screen_half_height screen_height / 2
 #define grid_width 8
 #define grid_height 4
 #define grid_capacity 10
@@ -31,11 +28,13 @@ typedef uint8_t grid_index;
 #define unit_top 1
 #define unit_width 6
 #define unit_height 3
-#define unit_right unit_left + unit_width
-#define unit_bottom unit_top + unit_height
 #define selection_symbol '+'
-#define selection_style '\xe2'
-#define path_byte_capacity 4
+#define selection_style '\xe0'
+#define accessible_bit 1
+#define attackable_bit 2
+#define accessible_style '\xe0'
+#define attackable_style '\x90'
+#define both_style '\xc0'
 
 const static uint8_t grid_symbols[grid_capacity] = {'`', '^', '-', 'x'};
 const static uint8_t grid_styles[grid_capacity] = {'\xA2', '\x23', '\x78'};
