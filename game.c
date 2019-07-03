@@ -26,8 +26,8 @@ void game_initialise(struct game* const game) {
 	game->x = 0;
 	game->y = 0;
 	game_map_initialise(game->map);
-	grid_clear_all(game->labels);
-	grid_clear_all(game->workspace);
+	grid_clear_all_8(game->labels);
+	grid_clear_all_16(game->workspace);
 	units_initialise(&game->units);
 	game->selected = null_unit;
 	queue_initialise(&game->queue);
@@ -64,13 +64,13 @@ void game_loop(struct game* const game) {
 				if (game->selected == unit) {
 					game->selected = null_unit;
 					// optimise clear
-					grid_clear_all(game->workspace);
-					grid_clear_all(game->labels);
+					grid_clear_all_8(game->labels);
+					grid_clear_all_16(game->workspace);
 				} else if ((game->labels[game->y][game->x] & accessible_bit) != 0) {
 					units_move(&game->units, game->selected, game->x, game->y);
 					game->selected = null_unit;
-					grid_clear_all(game->labels);
-					grid_clear_all(game->workspace);
+					grid_clear_all_8(game->labels);
+					grid_clear_all_16(game->workspace);
 				}
 			}
 		}
