@@ -19,6 +19,10 @@ static void game_map_initialise(grid_index map[grid_size][grid_size]) {
 	map[0][255] = 2;
 	map[2][255] = 2;
 	map[3][255] = 2;
+
+	for (int i = 0; i < grid_capacity; i++) {
+		map[4][i] = i;
+	}
 }
 
 void game_initialise(struct game* const game) {
@@ -77,6 +81,7 @@ void game_loop(struct game* const game) {
 
 		render(game);
 
+		//printf("%u %u %s", game->x, game->y, grid_names[game->map[game->y][game->x]]);
 		printf("%u %u", game->x, game->y);
 
 		input = getch();
