@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "game.h"
 #include "graphics.h"
+#include "queue.h"
 
 int main() {
 	struct game game;
@@ -49,13 +50,6 @@ int main() {
 	game_loop(&game);
 
 	reset_style();
-
-	/*
-	printf("\e[1;%umHello, world!\n", 31); // red
-	printf("\e[1;%umHello, world!\n", 32); // green
-	printf("\e[1;%umHello, world!\n", 33); // yellow
-	printf("\e[1;%umHello, world!\n", 35); // blue
-	*/
 
 	return 0;
 }

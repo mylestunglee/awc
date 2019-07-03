@@ -7,7 +7,10 @@ typedef uint8_t unit_index;
 typedef uint8_t unit_health;
 typedef uint8_t unit_type;
 typedef uint8_t grid_index;
+typedef uint16_t queue_index;
+typedef uint8_t unit_energy;
 
+#define queue_capacity 0xffff
 #define units_capacity (unit_index)'\xff'
 #define null_unit units_capacity
 #define unit_index_format "%02X"

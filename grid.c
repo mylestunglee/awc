@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "grid.h"
 
 void grid_clear_all(uint8_t grid[grid_size][grid_size]) {
@@ -10,40 +11,36 @@ void grid_clear_all(uint8_t grid[grid_size][grid_size]) {
     } while (++y);
 }
 
-static void grid_explore_recursive(
-    const struct game* const game,
-    uint8_t labels[grid_size][grid_size],
-    uint8_t workspace[grid_size][grid_size],
-    const grid_index x,
-    const grid_index y,
-    uint8_t energy) {
-    if (energy < 1) {
-        return;
-    }
-    energy -= 1;
-    if (workspace[y][x] > energy) {
-        return;
-    }
-    workspace[y][x] = energy;
-
-    labels[y][x] |= accessible_bit;
-    labels[y][(grid_index)(x + 1)] |= attackable_bit;
-    labels[y][(grid_index)(x - 1)] |= attackable_bit;
-    labels[(grid_index)(y + 1)][x] |= attackable_bit;
-    labels[(grid_index)(y - 1)][x] |= attackable_bit;
-
-    grid_explore_recursive(game, labels, workspace, x + 1, y, energy);
-    grid_explore_recursive(game, labels, workspace, x - 1, y, energy);
-    grid_explore_recursive(game, labels, workspace, x, y + 1, energy);
-    grid_explore_recursive(game, labels, workspace, x, y - 1, energy);
-}
-
 void grid_explore(struct game* const game) {
-    grid_explore_recursive(
-        game,
-        game->labels,
-        game->workspace,
-        game->units.data[game->selected].x,
-        game->units.data[game->selected].y, 4);
+	struct queue* const queue = &game->queue;
+
+	assert(queue_empty(queue));
+
+	queue_insert(queue, (struct queue_node){.x = game->x, .y = game->y, .energy = 4});
+
+	while (!queue_empty(queue)) {
+		const struct queue_node* const node = queue_remove(queue);
+
+		const unit_energy cost = 1;
+
+		if (node->energy < cost)
+			continue;
+
+		const unit_energy energy = node->energy - cost;
+
+		if (game->workspace[node->y][node->x] > energy)
+			continue;
+
+		game->labels[node->y][node->x] |= accessible_bit;
+		game->labels[node->y][(grid_index)(node->x + 1)] |= attackable_bit;
+		game->labels[node->y][(grid_index)(node->x - 1)] |= attackable_bit;
+		game->labels[(grid_index)(node->y + 1)][node->x] |= attackable_bit;
+		game->labels[(grid_index)(node->y - 1)][node->x] |= attackable_bit;
+
+		queue_insert(queue, (struct queue_node){.x = node->x + 1, .y = node->y, .energy = energy});
+		queue_insert(queue, (struct queue_node){.x = node->x - 1, .y = node->y, .energy = energy});
+		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y + 1, .energy = energy});
+		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y - 1, .energy = energy});
+	}
 }
 
