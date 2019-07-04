@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "grid.h"
 
-void grid_clear_all_8(uint8_t grid[grid_size][grid_size]) {
+void grid_clear_all_uint8(uint8_t grid[grid_size][grid_size]) {
     grid_index y = 0;
     do {
         grid_index x = 0;
@@ -11,7 +11,7 @@ void grid_clear_all_8(uint8_t grid[grid_size][grid_size]) {
     } while (++y);
 }
 
-void grid_clear_all_16(uint16_t grid[grid_size][grid_size]) {
+void grid_clear_all_unit_energy(uint16_t grid[grid_size][grid_size]) {
     grid_index y = 0;
     do {
         grid_index x = 0;

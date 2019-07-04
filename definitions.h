@@ -40,9 +40,9 @@ typedef uint16_t unit_energy;
 #define both_style '\xc0'
 
 // const static char* grid_names[grid_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge"};
-const static uint8_t grid_symbols[grid_capacity] = {'A', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
-const static uint8_t grid_styles[grid_capacity] = {'\x80', '\xA2', '\x32', '\x13'};
-const static uint8_t unit_textures[1][grid_height][(grid_width + 1) / 2] = {
+const static uint8_t grid_symbols[grid_capacity] = {' ', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
+const static uint8_t grid_styles[grid_capacity] = {'\x00', '\xA2', '\x32', '\x13'};
+const static uint8_t unit_textures[1][unit_height][unit_width / 2] = {
 	{	{'\x01', '\x32', '\x03'},
 		{'\xf2', '\x24', '\x03'},
 		{'\x01', '\x1f', '\x03'}

@@ -165,6 +165,10 @@ static void reset_cursor() {
 	printf("\033[2J\033[1;1H");
 }
 
+static void reset_black() {
+	printf("%c[30;40m", '\x1B');
+}
+
 void render(const struct game* const game) {
 	reset_cursor();
 
@@ -175,7 +179,8 @@ void render(const struct game* const game) {
 
 	for (grid_index y = screen_top; y != screen_bottom; ++y) {
 		for (grid_index grid_y = 0; grid_y < grid_height; ++grid_y) {
-			uint8_t prev_style = '\0';
+			reset_black();
+			uint8_t prev_style = '\x00';
 			for (grid_index x = screen_left; x != screen_right; ++x) {
 				for (grid_index grid_x = 0; grid_x < grid_width; ++grid_x) {
 					uint8_t symbol;
