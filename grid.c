@@ -41,11 +41,13 @@ void grid_explore(struct game* const game) {
 		if (game->workspace[node->y][node->x] > energy)
 			continue;
 
-		game->labels[node->y][node->x] |= accessible_bit;
-		game->labels[node->y][(grid_index)(node->x + 1)] |= attackable_bit;
-		game->labels[node->y][(grid_index)(node->x - 1)] |= attackable_bit;
-		game->labels[(grid_index)(node->y + 1)][node->x] |= attackable_bit;
-		game->labels[(grid_index)(node->y - 1)][node->x] |= attackable_bit;
+		if (game->units.grid[node->y][node->x] == null_unit) {
+			game->labels[node->y][node->x] |= accessible_bit;
+			game->labels[node->y][(grid_index)(node->x + 1)] |= attackable_bit;
+			game->labels[node->y][(grid_index)(node->x - 1)] |= attackable_bit;
+			game->labels[(grid_index)(node->y + 1)][node->x] |= attackable_bit;
+			game->labels[(grid_index)(node->y - 1)][node->x] |= attackable_bit;
+		}
 
 		queue_insert(queue, (struct queue_node){.x = node->x + 1, .y = node->y, .energy = energy});
 		queue_insert(queue, (struct queue_node){.x = node->x - 1, .y = node->y, .energy = energy});

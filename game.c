@@ -12,13 +12,12 @@ static void game_map_initialise(grid_index map[grid_size][grid_size]) {
 			map[y][x] = 0;
 		} while (++x);
 	} while (++y);
-	map[0][1] = 1;
-	map[1][2] = 2;
-	map[0][16] = 1;
-	map[0][196] = 1;
-	map[0][255] = 2;
-	map[2][255] = 2;
-	map[3][255] = 2;
+
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 6; j++) {
+			map[j][i] = 1;
+		}
+	}
 
 	for (int i = 0; i < grid_capacity; i++) {
 		map[4][i] = i;

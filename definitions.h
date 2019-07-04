@@ -30,7 +30,7 @@ typedef uint16_t unit_energy;
 #define unit_left 1
 #define unit_top 1
 #define unit_width 6
-#define unit_height 3
+#define unit_height 2
 #define selection_symbol '+'
 #define selection_style '\xe0'
 #define accessible_bit 1
@@ -40,15 +40,44 @@ typedef uint16_t unit_energy;
 #define both_style '\xc0'
 
 // const static char* grid_names[grid_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge"};
-const static uint8_t grid_symbols[grid_capacity] = {' ', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
-const static uint8_t grid_styles[grid_capacity] = {'\x00', '\xA2', '\x32', '\x13'};
-const static uint8_t unit_textures[1][unit_height][unit_width / 2] = {
-	{	{'\x01', '\x32', '\x03'},
-		{'\xf2', '\x24', '\x03'},
-		{'\x01', '\x1f', '\x03'}
-	}};
-const static uint8_t unit_symbols[16] = {'a', 'b', 'd', 'e', 'f', 'g'};
-const static uint8_t player_style[players_capacity] = {'\xf7', '\xe6'};
-const static uint8_t player_symbol[players_capacity] = {'W', 'E'};
+const static uint8_t grid_symbols[grid_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
+const static uint8_t grid_styles[grid_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
+const static uint8_t unit_textures[15][unit_height][unit_width / 2] = {
+	{	{'\x03', '\xF3', '\x00'},
+		{'\x08', '\x88', '\x00'}
+	}, {{'\x0E', '\xFE', '\x00'},
+		{'\x08', '\x88', '\x00'}
+	}, {{'\x0A', '\xFD', '\x00'},
+		{'\x03', '\x33', '\x00'}
+	}, {{'\xAB', '\xFC', '\xD0'},
+		{'\x33', '\x33', '\x30'}
+	}, {{'\xBB', '\xFC', '\xE0'},
+		{'\x33', '\x33', '\x30'}
+	}, {{'\x08', '\xF8', '\x00'},
+		{'\x03', '\x33', '\x00'}
+	}, {{'\x88', '\xF8', '\x80'},
+		{'\x33', '\x33', '\x30'}
+	}, {{'\x0A', '\xFA', '\x00'},
+		{'\x03', '\x33', '\x00'}
+	}, {{'\xAA', '\xFA', '\xA0'},
+		{'\x33', '\x33', '\x30'}
+	}, {{'\x91', '\x11', '\x10'},
+		{'\x59', '\xFC', '\xE0'}
+	}, {{'\x91', '\x11', '\x10'},
+		{'\x57', '\xF7', '\x60'}
+	}, {{'\x0E', '\x4E', '\x10'},
+		{'\x0B', '\xFC', '\xE0'}
+	}, {{'\x88', '\xF8', '\x80'},
+		{'\x92', '\x22', '\xA0'}
+	}, {{'\x2A', '\xFA', '\x20'},
+		{'\x92', '\x2C', '\xE0'}
+	}, {{'\x12', '\x22', '\x10'},
+		{'\x5E', '\xFC', '\xE0'}
+	}
+};
+
+const static uint8_t unit_symbols[14] = {' ', '_', 'o', 'x', '<', '>', 'v', '^', '\\', '/', '[', ']', '-', '='};
+const static uint8_t player_style[players_capacity] = {'\xF8', '\xe6'};
+const static uint8_t player_symbol[players_capacity] = {'1', '1'};
 
 #endif
