@@ -47,7 +47,8 @@ void grid_explore(struct game* const game) {
 		if (unit == null_unit || unit_get_player(&game->units.data[unit]) != player)
 			game->labels[node->y][node->x] |= attackable_bit;
 
-		const unit_energy cost = movement_type_cost[movement_type][game->map[node->y][node->x]];
+		const tile_index tile = game->map[node->y][node->x];
+		const unit_energy cost = movement_type_cost[movement_type][tile];
 
 		// Inaccessible terrian
 		if (cost == 0)
@@ -65,8 +66,9 @@ void grid_explore(struct game* const game) {
 		else
 			game->workspace[node->y][node->x] = node->energy;
 
-		// Mark unit-free tiles as accessible
-		if (game->units.grid[node->y][node->x] == null_unit)
+		// Mark unit-free tiles as accessible but ships cannot block bridges
+		if (game->units.grid[node->y][node->x] == null_unit &&
+			(tile != tile_bridge || movement_type != movement_type_ship))
 			game->labels[node->y][node->x] |= accessible_bit;
 
 		queue_insert(queue, (struct queue_node){.x = node->x + 1, .y = node->y, .energy = energy});

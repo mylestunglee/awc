@@ -9,6 +9,7 @@ typedef uint8_t unit_type;
 typedef uint8_t grid_index;
 typedef uint16_t queue_index;
 typedef uint16_t unit_energy;
+typedef uint8_t tile_index;
 
 #define queue_capacity 0xffff
 #define units_capacity (unit_index)'\xff'
@@ -87,6 +88,9 @@ const static unit_energy unit_movement_ranges[units_models] = {3, 2, 8, 6, 5, 5,
 4 air
 5 ships
 */
+
+#define movement_type_ship 5
+#define tile_bridge 9
 
 const static uint8_t unit_movement_types[units_models] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
 const static unit_energy movement_type_cost[6][grid_capacity] = {

@@ -5,7 +5,7 @@
 #include "queue.h"
 
 struct game {
-	grid_index map[grid_size][grid_size];
+	tile_index map[grid_size][grid_size];
 	struct units units;
 	grid_index x;
 	grid_index y;

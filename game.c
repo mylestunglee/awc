@@ -4,7 +4,7 @@
 #include "graphics.h"
 #include "grid.h"
 
-static void game_map_initialise(grid_index map[grid_size][grid_size]) {
+static void game_map_initialise(tile_index map[grid_size][grid_size]) {
 	grid_index y = 0;
 	do {
 		grid_index x = 0;
@@ -13,15 +13,22 @@ static void game_map_initialise(grid_index map[grid_size][grid_size]) {
 		} while (++x);
 	} while (++y);
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 6; j++) {
-			map[j][i] = 1;
+			if (i < 9) {
+				map[j][i] = 1;
+			} else {
+				map[j][i] = 5;
+			}
 		}
 	}
 
 	for (int i = 0; i < grid_capacity; i++) {
 		map[4][i] = i;
 	}
+
+	map[4][10] = 1;
+	map[5][10] = 1;
 }
 
 void game_initialise(struct game* const game) {
