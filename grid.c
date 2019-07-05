@@ -25,29 +25,49 @@ void grid_explore(struct game* const game) {
 	struct queue* const queue = &game->queue;
 
 	assert(queue_empty(queue));
+	assert(game->units.grid[game->y][game->x] != null_unit);
 
-	queue_insert(queue, (struct queue_node){.x = game->x, .y = game->y, .energy = 4});
+	const uint8_t model = unit_get_model(&game->units.data[game->units.grid[game->y][game->x]]);
+	const uint8_t player = unit_get_player(&game->units.data[game->units.grid[game->y][game->x]]);
+	const uint8_t movement_type = unit_movement_types[model];
+
+	queue_insert(queue, (struct queue_node){
+		.x = game->x,
+		.y = game->y,
+		.energy =
+			unit_movement_ranges[model] +
+			movement_type_cost[movement_type][game->map[game->y][game->x]]
+		});
 
 	while (!queue_empty(queue)) {
 		const struct queue_node* const node = queue_remove(queue);
+		const unit_index unit = game->units.grid[node->y][node->x];
 
-		const unit_energy cost = 1;
+		// Mark tiles without friendly units as attackable
+		if (unit == null_unit || unit_get_player(&game->units.data[unit]) != player)
+			game->labels[node->y][node->x] |= attackable_bit;
 
+		const unit_energy cost = movement_type_cost[movement_type][game->map[node->y][node->x]];
+
+		// Inaccessible terrian
+		if (cost == 0)
+			continue;
+
+		// Not enough energy to keep moving
 		if (node->energy < cost)
 			continue;
 
 		const unit_energy energy = node->energy - cost;
 
+		// Do not re-compute explored areas
 		if (game->workspace[node->y][node->x] > energy)
 			continue;
+		else
+			game->workspace[node->y][node->x] = node->energy;
 
-		if (game->units.grid[node->y][node->x] == null_unit) {
+		// Mark unit-free tiles as accessible
+		if (game->units.grid[node->y][node->x] == null_unit)
 			game->labels[node->y][node->x] |= accessible_bit;
-			game->labels[node->y][(grid_index)(node->x + 1)] |= attackable_bit;
-			game->labels[node->y][(grid_index)(node->x - 1)] |= attackable_bit;
-			game->labels[(grid_index)(node->y + 1)][node->x] |= attackable_bit;
-			game->labels[(grid_index)(node->y - 1)][node->x] |= attackable_bit;
-		}
 
 		queue_insert(queue, (struct queue_node){.x = node->x + 1, .y = node->y, .energy = energy});
 		queue_insert(queue, (struct queue_node){.x = node->x - 1, .y = node->y, .energy = energy});

@@ -63,7 +63,7 @@ static bool render_unit(
 		return false;
 
 	unit_type player = unit_get_player(&game->units.data[unit]);
-	*style = player_style[player];
+	*style = player_styles[player];
 
 	// Highlight selected unit
 	if (game->selected == unit) {
@@ -71,7 +71,7 @@ static bool render_unit(
 	}
 
 	if (texture == 15)
-		*symbol = player_symbol[player];
+		*symbol = player_symbols[player];
 	else
 		*symbol = unit_symbols[texture - 1];
 

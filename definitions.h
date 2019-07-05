@@ -38,11 +38,12 @@ typedef uint16_t unit_energy;
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
 #define both_style '\xc0'
+#define units_models 15
 
 // const static char* grid_names[grid_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge"};
 const static uint8_t grid_symbols[grid_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
 const static uint8_t grid_styles[grid_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
-const static uint8_t unit_textures[15][unit_height][unit_width / 2] = {
+const static uint8_t unit_textures[units_models][unit_height][unit_width / 2] = {
 	{	{'\x03', '\xF3', '\x00'},
 		{'\x08', '\x88', '\x00'}
 	}, {{'\x0E', '\xFE', '\x00'},
@@ -50,15 +51,15 @@ const static uint8_t unit_textures[15][unit_height][unit_width / 2] = {
 	}, {{'\x0A', '\xFD', '\x00'},
 		{'\x03', '\x33', '\x00'}
 	}, {{'\xAB', '\xFC', '\xD0'},
-		{'\x33', '\x33', '\x30'}
+		{'\x3E', '\xEE', '\x30'}
 	}, {{'\xBB', '\xFC', '\xE0'},
-		{'\x33', '\x33', '\x30'}
+		{'\x3E', '\xEE', '\x30'}
 	}, {{'\x08', '\xF8', '\x00'},
-		{'\x03', '\x33', '\x00'}
+		{'\x03', '\xE3', '\x00'}
 	}, {{'\x88', '\xF8', '\x80'},
 		{'\x33', '\x33', '\x30'}
 	}, {{'\x0A', '\xFA', '\x00'},
-		{'\x03', '\x33', '\x00'}
+		{'\x03', '\xE3', '\x00'}
 	}, {{'\xAA', '\xFA', '\xA0'},
 		{'\x33', '\x33', '\x30'}
 	}, {{'\x91', '\x11', '\x10'},
@@ -72,12 +73,36 @@ const static uint8_t unit_textures[15][unit_height][unit_width / 2] = {
 	}, {{'\x2A', '\xFA', '\x20'},
 		{'\x92', '\x2C', '\xE0'}
 	}, {{'\x12', '\x22', '\x10'},
-		{'\x5E', '\xFC', '\xE0'}
-	}
-};
+		{'\x5E', '\xFC', '\xE0'}}};
 
 const static uint8_t unit_symbols[14] = {' ', '_', 'o', 'x', '<', '>', 'v', '^', '\\', '/', '[', ']', '-', '='};
-const static uint8_t player_style[players_capacity] = {'\xF8', '\xe6'};
-const static uint8_t player_symbol[players_capacity] = {'1', '1'};
+const static uint8_t player_styles[players_capacity] = {'\xF8', '\xe6'};
+const static uint8_t player_symbols[players_capacity] = {'1', '2'};
+const static unit_energy unit_movement_ranges[units_models] = {3, 2, 8, 6, 5, 5, 5, 6, 4, 9, 7, 6, 5, 6, 5};
+/*
+0 int
+1 mech
+2 tires
+3 tread
+4 air
+5 ships
+*/
+
+const static uint8_t unit_movement_types[units_models] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
+const static unit_energy movement_type_cost[6][grid_capacity] = {
+	{0, 1, 1, 2, 1, 0, 0, 2, 1, 1},
+	{0, 1, 1, 1, 1, 0, 0, 1, 1, 1},
+	{0, 2, 3, 0, 1, 0, 0, 0, 1, 1},
+	{0, 1, 2, 0, 1, 0, 0, 0, 1, 1},
+	{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+	{0, 0, 0, 0, 0, 1, 2, 0, 0, 1}};
+
+const static uint8_t grid_defense[6][grid_capacity] = {
+	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1},
+	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1},
+	{0, 1, 2, 0, 0, 0, 0, 0, 0, 0},
+	{0, 1, 2, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 1, 0, 0, 0}};
 
 #endif
