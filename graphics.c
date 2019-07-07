@@ -66,11 +66,6 @@ static bool render_unit(
 	const player_index player = game->units.data[unit].player;
 	*style = player_styles[player];
 
-	// Highlight selected unit
-	if (game->selected == unit) {
-		*style ^= 0x88;
-	}
-
 	if (texture == 15)
 		*symbol = player_symbols[player];
 	else
@@ -175,6 +170,7 @@ static bool render_grid(
 	const struct game* const game,
 	const grid_index x,
 	const grid_index y,
+	const bool attack_actionable,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
@@ -186,7 +182,22 @@ static bool render_grid(
 	if (game->labels[y][x] != 0) {
 		// Clear foreground style
 		*style &= '\x0f';
-		*symbol = '#';
+
+		// Show arrows highlighting position to attack unit
+		if (attack_actionable && x == game->prev_x && y == game->prev_y) {
+			if ((grid_index)(game->prev_x + 1) == game->x)
+				*symbol = '>';
+			else if ((grid_index)(game->prev_x - 1) == game->x)
+				*symbol = '<';
+			else if ((grid_index)(game->prev_y + 1) == game->y)
+				*symbol = 'v';
+			else if ((grid_index)(game->prev_y - 1) == game->y)
+				*symbol = '^';
+			else
+				// Previous position incorrectly set
+				assert(false);
+		} else
+			*symbol = '*';
 
 		// Set foreground style
 		switch (game->labels[y][x]) {
@@ -217,7 +228,7 @@ static void reset_black() {
 	printf("%c[30;40m", '\x1B');
 }
 
-void render(const struct game* const game) {
+void render(const struct game* const game, const bool attack_actionable) {
 	reset_cursor();
 
 	const grid_index screen_left = game->x - screen_width / 2 + 1;
@@ -237,7 +248,7 @@ void render(const struct game* const game) {
 					if (render_health_bar(game, x, y, tile_x, tile_y, &symbol, &style) ||
 						render_selection(game, x, y, tile_x, tile_y, &symbol, &style) ||
 						render_unit(game, x, y, tile_x, tile_y, &symbol, &style) ||
-						render_grid(game, x, y, &symbol, &style)) {
+						render_grid(game, x, y, attack_actionable, &symbol, &style)) {
 
 						render_pixel(symbol, style, prev_style);
 						prev_style = style;

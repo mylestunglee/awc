@@ -13,6 +13,8 @@ struct game {
 	uint8_t labels[grid_size][grid_size];
 	unit_energy workspace[grid_size][grid_size];
 	struct queue queue;
+	grid_index prev_x;
+	grid_index prev_y;
 };
 
 void game_initialise(struct game* const);

@@ -92,5 +92,7 @@ void grid_explore(struct game* const game) {
 		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y + 1, .energy = energy});
 		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y - 1, .energy = energy});
 	}
+
+	grid_clear_all_unit_energy(game->workspace);
 }
 

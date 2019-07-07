@@ -101,10 +101,15 @@ void units_delete(struct units* const units, const grid_index x, const grid_inde
 }
 
 void units_move(struct units* const units, const unit_index unit, const grid_index x, const grid_index y) {
-	assert(unit != null_unit);
-	assert(units->grid[y][x] == null_unit);
 	const grid_index old_x = units->data[unit].x;
 	const grid_index old_y = units->data[unit].y;
+
+	// Do nothing if position has not changed
+	if (old_x == x && old_y == y)
+		return;
+
+	assert(unit != null_unit);
+	assert(units->grid[y][x] == null_unit);
 	units->data[unit].x = x;
 	units->data[unit].y = y;
 	units->grid[old_y][old_x] = null_unit;

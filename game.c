@@ -43,77 +43,100 @@ void game_initialise(struct game* const game) {
 	queue_initialise(&game->queue);
 }
 
+static void game_parse_movement(struct game* const game, const uint8_t input) {
+	switch (input) {
+		case 'w': {
+			game->prev_x = game->x;
+			game->prev_y = game->y;
+			--game->y;
+			break;
+		}
+		case 'a': {
+			game->prev_x = game->x;
+			game->prev_y = game->y;
+			--game->x;
+			break;
+		}
+		case 's': {
+			game->prev_x = game->x;
+			game->prev_y = game->y;
+			++game->y;
+			break;
+		}
+		case 'd': {
+			game->prev_x = game->x;
+			game->prev_y = game->y;
+			++game->x;
+			break;
+		}
+	}
+}
+
+static bool game_attack_actionable(const struct game* const game) {
+	// 1. Select a unit
+	// 2. Previous selected tile is accessible
+	// 3. Selected tile is attackable
+	if (game->selected == null_unit ||
+		(game->labels[game->prev_y][game->prev_x] & accessible_bit) == 0 ||
+		(game->labels[game->y][game->x] & attackable_bit) == 0)
+		return false;
+
+	const unit_index attackee_index = game->units.grid[game->y][game->x];
+
+	// 4. Selected tile has a unit
+	return attackee_index != null_unit;
+}
+
+static void game_handle_action(struct game* const game) {
+	const unit_index unit = game->units.grid[game->y][game->x];
+	if (game->selected == null_unit) {
+		// Select unit
+		if (unit != null_unit) {
+			game->selected = unit;
+			grid_explore(game);
+		}
+	} else {
+		// Cursor over selected unit
+		if (game->selected == unit) {
+			game->selected = null_unit;
+			grid_clear_all_uint8(game->labels);
+		// Move to accessible tile
+		} else if ((game->labels[game->y][game->x] & accessible_bit) != 0) {
+			units_move(&game->units, game->selected, game->x, game->y);
+			game->selected = null_unit;
+			grid_clear_all_uint8(game->labels);
+		}
+	}
+}
+
+static void game_handle_attack(struct game* const game) {
+	units_move(&game->units, game->selected, game->prev_x, game->prev_y);
+	units_delete(&game->units, game->x, game->y);
+	game->selected = null_unit;
+	grid_clear_all_uint8(game->labels);
+}
+
 void game_loop(struct game* const game) {
-	render(game);
+	bool attack_actionable = game_attack_actionable(game);
+
+	render(game, attack_actionable);
 
 	char input = getch();
-	grid_index prev_x = game->x;
-	grid_index prev_y = game->y;
 
 	while (input != 'q') {
-		if (input == 'a') {
-			prev_x = game->x;
-			prev_y = game->y;
-			--game->x;
-		}
-		else if (input == 'd') {
-			prev_x = game->x;
-			prev_y = game->y;
-			++game->x;
-		}
-		else if (input == 'w') {
-			prev_x = game->x;
-			prev_y = game->y;
-			--game->y;
-		}
-		else if (input == 's') {
-			prev_x = game->x;
-			prev_y = game->y;
-			++game->y;
-		}
+		game_parse_movement(game, input);
+
+		attack_actionable = game_attack_actionable(game);
 
 		if (input == ' ') {
-			const unit_index unit = game->units.grid[game->y][game->x];
-			if (game->selected == null_unit) {
-				// Select unit
-				if (unit != null_unit) {
-					game->selected = unit;
-					grid_explore(game);
-					grid_clear_all_unit_energy(game->workspace);
-				}
-			} else {
-				// Cursor over selected unit
-				if (game->selected == unit) {
-					game->selected = null_unit;
-					grid_clear_all_uint8(game->labels);
-				// Move to accessible tile
-				} else if ((game->labels[game->y][game->x] & accessible_bit) != 0) {
-					units_move(&game->units, game->selected, game->x, game->y);
-					game->selected = null_unit;
-					grid_clear_all_uint8(game->labels);
-				// Attack enemy unit
-				} else if (
-					(game->labels[game->y][game->x] & attackable_bit) != 0 &&
-					(game->labels[prev_y][prev_x] & accessible_bit) != 0 &&
-					game->units.data[unit].player != game->units.data[game->selected].player) {
-
-					units_move(&game->units, game->selected, prev_x, prev_y);
-
-					//game->units.data[unit].health = 0;
-					units_delete(&game->units, game->x, game->y);
-
-					game->selected = null_unit;
-					grid_clear_all_uint8(game->labels);
-
-				}
-
-			}
+			if (attack_actionable)
+				game_handle_attack(game);
+			else
+				game_handle_action(game);
 		}
 
+		render(game, attack_actionable);
 
-		render(game);
-
-		//printf("%u %u %s", game->x, game->y, grid_names[game->map[game->y][game->x]]);
 		printf("%u %u", game->x, game->y);
 
 		input = getch();
