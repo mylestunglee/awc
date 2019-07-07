@@ -80,6 +80,7 @@ static bool render_selection(
 	const grid_index y,
 	const grid_index tile_x,
 	const grid_index tile_y,
+	const bool attack_actionable,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
@@ -113,7 +114,11 @@ static bool render_selection(
 	}
 
 	const tile_index tile = game->map[y][x];
-	*style = (grid_styles[tile] & '\x0f') | selection_style;
+
+	if (attack_actionable)
+		*style = (grid_styles[tile] & '\x0f') | attackable_style;
+	else
+		*style = (grid_styles[tile] & '\x0f') | accessible_style;
 
  	return true;
 }
@@ -197,7 +202,7 @@ static bool render_grid(
 				// Previous position incorrectly set
 				assert(false);
 		} else
-			*symbol = '*';
+			*symbol = ':';
 
 		// Set foreground style
 		switch (game->labels[y][x]) {
@@ -207,10 +212,6 @@ static bool render_grid(
 			}
 			case attackable_bit: {
 				*style |= attackable_style;
-				break;
-			}
-			case accessible_bit | attackable_bit: {
-				*style |= both_style;
 				break;
 			}
 		}
@@ -246,7 +247,7 @@ void render(const struct game* const game, const bool attack_actionable) {
 					uint8_t style;
 
 					if (render_health_bar(game, x, y, tile_x, tile_y, &symbol, &style) ||
-						render_selection(game, x, y, tile_x, tile_y, &symbol, &style) ||
+						render_selection(game, x, y, tile_x, tile_y, attack_actionable, &symbol, &style) ||
 						render_unit(game, x, y, tile_x, tile_y, &symbol, &style) ||
 						render_grid(game, x, y, attack_actionable, &symbol, &style)) {
 

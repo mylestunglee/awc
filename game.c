@@ -76,15 +76,9 @@ static bool game_attack_actionable(const struct game* const game) {
 	// 1. Select a unit
 	// 2. Previous selected tile is accessible
 	// 3. Selected tile is attackable
-	if (game->selected == null_unit ||
-		(game->labels[game->prev_y][game->prev_x] & accessible_bit) == 0 ||
-		(game->labels[game->y][game->x] & attackable_bit) == 0)
-		return false;
-
-	const unit_index attackee_index = game->units.grid[game->y][game->x];
-
-	// 4. Selected tile has a unit
-	return attackee_index != null_unit;
+	return game->selected != null_unit &&
+		(game->labels[game->prev_y][game->prev_x] & accessible_bit) != 0 &&
+		(game->labels[game->y][game->x] & attackable_bit) != 0;
 }
 
 static void game_handle_action(struct game* const game) {

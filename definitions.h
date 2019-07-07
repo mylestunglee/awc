@@ -35,12 +35,10 @@ typedef uint8_t player_index;
 #define unit_width 5
 #define unit_height 2
 #define selection_symbol '+'
-#define selection_style '\xe0'
 #define accessible_bit 1
 #define attackable_bit 2
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
-#define both_style '\xc0'
 #define unit_models 15
 
 // const static char* grid_names[grid_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge"};

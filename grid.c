@@ -30,7 +30,7 @@ static void grid_explore_mark_attackable(
 	const unit_index unit = game->units.grid[y][x];
 
 	// Mark tiles without friendly units as attackable
-	if (unit == null_unit || game->units.data[unit].player != player)
+	if (unit != null_unit && game->units.data[unit].player != player)
 		game->labels[y][x] |= attackable_bit;
 }
 
