@@ -5,12 +5,13 @@
 
 typedef uint8_t unit_index;
 typedef uint8_t unit_health;
-typedef uint8_t unit_type;
+typedef uint8_t unit_model;
 typedef uint8_t grid_index;
 typedef uint16_t queue_index;
 typedef uint16_t unit_energy;
 typedef uint8_t tile_index;
 typedef uint32_t unit_health_wide;
+typedef uint8_t player_index;
 
 #define unit_health_max 0xff
 #define queue_capacity 0xffff
@@ -24,7 +25,6 @@ typedef uint32_t unit_health_wide;
 #define unit_player_offset (unit_index)'\x05'
 #define unit_model_mask (unit_index)'\x1f'
 // Number of items to print before and after ellipsis
-#define verboseness 3
 #define screen_width 10
 #define screen_height 8
 #define grid_width 8

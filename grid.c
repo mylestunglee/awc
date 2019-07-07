@@ -25,12 +25,12 @@ static void grid_explore_mark_attackable(
 	struct game* const game,
 	const grid_index x,
 	const grid_index y,
-	const uint8_t player) {
+	const player_index player) {
 
 	const unit_index unit = game->units.grid[y][x];
 
 	// Mark tiles without friendly units as attackable
-	if (unit == null_unit || unit_get_player(&game->units.data[unit]) != player)
+	if (unit == null_unit || game->units.data[unit].player != player)
 		game->labels[y][x] |= attackable_bit;
 }
 
@@ -40,9 +40,9 @@ void grid_explore(struct game* const game) {
 	assert(queue_empty(queue));
 	assert(game->units.grid[game->y][game->x] != null_unit);
 
-	const uint8_t model = unit_get_model(&game->units.data[game->units.grid[game->y][game->x]]);
+	const unit_model model = game->units.data[game->units.grid[game->y][game->x]].model;
 	const uint8_t movement_type = unit_movement_types[model];
-	const uint8_t player = unit_get_player(&game->units.data[game->units.grid[game->y][game->x]]);
+	const player_index player = game->units.data[game->units.grid[game->y][game->x]].player;
 
 	queue_insert(queue, (struct queue_node){
 		.x = game->x,

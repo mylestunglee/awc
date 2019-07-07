@@ -2,16 +2,6 @@
 #include <stdio.h>
 #include "units.h"
 
-// Get unit's model
-unit_type unit_get_model(const struct unit* const unit) {
-	return unit->type & unit_model_mask;
-}
-
-// Get unit's player
-unit_type unit_get_player(const struct unit* const unit) {
-	return unit->type >> unit_player_offset;
-}
-
 // Time complexity: O(units_capacity + players_capacity + grid_size^2)
 void units_initialise(struct units* const units) {
 	// Set counters
@@ -21,7 +11,7 @@ void units_initialise(struct units* const units) {
 	for (unit_index i = 0; i < units_capacity; ++i)
 		units->frees[i] = i;
 
-	for (unit_type i = 0; i < players_capacity; ++i)
+	for (player_index i = 0; i < players_capacity; ++i)
 		units->firsts[i] = null_unit;
 
 	// Clear grid
@@ -53,7 +43,7 @@ static unit_index units_players_insert(struct units* const units, const struct u
 	if (index == null_unit)
 		return null_unit;
 
-	const unit_type player = unit_get_player(unit);
+	const player_index player = unit->player;
 
 	// Link new node at front
 	units->nexts[index] = units->firsts[player];
@@ -87,7 +77,7 @@ static void units_frees_delete(struct units* const units, const unit_index index
 }
 
 static void units_players_delete(struct units* const units, const unit_index index) {
-	const unit_type player = unit_get_player(&units->data[index]);
+	const player_index player = units->data[index].player;
 
 	// Link firsts or prevs to skip over index
 	if (units->firsts[player] == index) {
@@ -125,6 +115,8 @@ void units_move(struct units* const units, const unit_index unit, const grid_ind
 void units_frees_print(const struct units* const units) {
 	assert(units_capacity > 0);
 
+	const unit_index verboseness = 3;
+
 	unit_index j = units->start;
 	for (unit_index i = 0; i < units_capacity - units->size; ++i) {
 		if (i < verboseness || i >= units_capacity - units->size - verboseness) {
@@ -140,7 +132,7 @@ void units_frees_print(const struct units* const units) {
 
 // Print linked lists of index and unit type pairs across all players
 void units_players_print(const struct units* const units) {
-	for (unit_type player = 0; player < players_capacity; ++player) {
+	for (player_index player = 0; player < players_capacity; ++player) {
 		unit_index curr = units->firsts[player];
 		printf(unit_type_format": ["unit_index_format"]", player, curr);
 		while (curr != null_unit) {

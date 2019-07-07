@@ -6,7 +6,8 @@
 
 struct unit {
 	unit_health health;
-	unit_type type;
+	unit_model model;
+	player_index player;
 	grid_index x;
 	grid_index y;
 };
@@ -16,14 +17,11 @@ struct units {
 	unit_index start;
 	unit_index size;
 	unit_index frees[units_capacity];
-	unit_index firsts[players_capacity];
+	player_index firsts[players_capacity];
 	unit_index prevs[units_capacity];
 	unit_index nexts[units_capacity];
 	unit_index grid[grid_size][grid_size];
 };
-
-unit_type unit_get_model(const struct unit* const);
-unit_type unit_get_player(const struct unit* const);
 
 void units_initialise(struct units* const);
 bool units_insert(struct units* const, const struct unit);

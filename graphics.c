@@ -46,7 +46,7 @@ static bool render_unit(
 		return false;
 
 	const unit_index unit = game->units.grid[y][x];
-	const unit_type model = unit_get_model(&game->units.data[unit]);
+	const unit_model model = game->units.data[unit].model;
 
 	if (unit == null_unit)
 		return false;
@@ -63,7 +63,7 @@ static bool render_unit(
 	if (texture == 0)
 		return false;
 
-	const unit_type player = unit_get_player(&game->units.data[unit]);
+	const player_index player = game->units.data[unit].player;
 	*style = player_styles[player];
 
 	// Highlight selected unit
