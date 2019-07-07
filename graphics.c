@@ -150,18 +150,12 @@ static bool render_health_bar(
 	if (health == unit_health_max)
 		return false;
 
-	// Set health bar colour
-	if (health < 64)
-		*style = '\x90';
-	else if (health < 128)
-		*style = '\x30';
-	else if (health < 192)
-		*style = '\xB0';
-	else
-		*style = '\xA0';
 
-	// fix types
-	const uint8_t steps = (int)health * (4 * unit_width - 1) / 255;
+	// Set health bar colour
+	const uint8_t styles[4] = {'\x90', '\x30', '\xB0', '\xA0'};
+	*style = styles[(health & '\xC0') >> 6];
+
+	const uint8_t steps = (unit_health_wide)health * (4 * unit_width - 1) / unit_health_max;
 
 	if (steps < 4 * (tile_x - unit_left))
 		*symbol = ' ';
@@ -173,6 +167,7 @@ static bool render_health_bar(
 		*symbol = ']';
 	else
 		*symbol = '=';
+
 	return true;
 }
 

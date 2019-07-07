@@ -10,6 +10,7 @@ typedef uint8_t grid_index;
 typedef uint16_t queue_index;
 typedef uint16_t unit_energy;
 typedef uint8_t tile_index;
+typedef uint32_t unit_health_wide;
 
 #define unit_health_max 0xff
 #define queue_capacity 0xffff
@@ -24,7 +25,7 @@ typedef uint8_t tile_index;
 #define unit_model_mask (unit_index)'\x1f'
 // Number of items to print before and after ellipsis
 #define verboseness 3
-#define screen_width 16
+#define screen_width 10
 #define screen_height 8
 #define grid_width 8
 #define grid_height 4
@@ -40,12 +41,12 @@ typedef uint8_t tile_index;
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
 #define both_style '\xc0'
-#define units_models 15
+#define unit_models 15
 
 // const static char* grid_names[grid_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge"};
 const static uint8_t grid_symbols[grid_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
 const static uint8_t grid_styles[grid_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
-const static uint8_t unit_textures[units_models][unit_height][(unit_width + 1) / 2] = {
+const static uint8_t unit_textures[unit_models][unit_height][(unit_width + 1) / 2] = {
 	{	{'\x03', '\xF3', '\x00'},
 		{'\x08', '\x88', '\x00'}
 	}, {{'\x0E', '\xFE', '\x00'},
@@ -80,7 +81,7 @@ const static uint8_t unit_textures[units_models][unit_height][(unit_width + 1) /
 const static uint8_t unit_symbols[14] = {' ', '_', 'o', 'x', '<', '>', 'v', '^', '\\', '/', '[', ']', '-', '='};
 const static uint8_t player_styles[players_capacity] = {'\xF8', '\xe6'};
 const static uint8_t player_symbols[players_capacity] = {'1', '2'};
-const static unit_energy unit_movement_ranges[units_models] = {3, 2, 8, 6, 5, 5, 5, 6, 4, 9, 7, 6, 5, 6, 5};
+const static unit_energy unit_movement_ranges[unit_models] = {3, 2, 8, 6, 5, 5, 5, 6, 4, 9, 7, 6, 5, 6, 5};
 /*
 0 int
 1 mech
@@ -93,7 +94,7 @@ const static unit_energy unit_movement_ranges[units_models] = {3, 2, 8, 6, 5, 5,
 #define movement_type_ship 5
 #define tile_bridge 9
 
-const static uint8_t unit_movement_types[units_models] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
+const static uint8_t unit_movement_types[unit_models] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
 const static unit_energy movement_type_cost[6][grid_capacity] = {
 	{0, 1, 1, 2, 1, 0, 0, 2, 1, 1},
 	{0, 1, 1, 1, 1, 0, 0, 1, 1, 1},
@@ -110,4 +111,23 @@ const static uint8_t grid_defense[6][grid_capacity] = {
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 1, 0, 0, 0}};
 
+const static uint8_t units_damage[unit_models][unit_models] = {
+	{55,  45,  12,  5,   1,   15,  25,  5,   25,  0,   0,   7,   0,   0,   0},
+	{65,  55,  85,  55,  15,  70,  85,  65,  85,  0,   0,   9,   0,   0,   0},
+	{70,  65,  35,  6,   1,   45,  55,  4,   28,  0,   0,   10,  0,   0,   0},
+	{75,  70,  85,  55,  15,  70,  85,  65,  85,  0,   0,   10,  1,   5,   1},
+	{105, 95,  105, 85,  55,  105, 105, 105, 105, 0,   0,   12,  10,  45,  10},
+	{90,  85,  80,  70,  45,  75,  80,  75,  80,  0,   0,   0,   40,  65,  60},
+	{95,  90,  90,  85,  55,  80,  85,  85,  90,  0,   0,   0,   55,  85,  85},
+	{105, 105, 60,  25,  10,  50,  45,  45,  55,  65,  75,  120, 0,   0,   0},
+	{0,   0,   0,   0,   0,   0,   0,   0,   0,   100, 100, 120, 0,   0,   0},
+	{0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  100, 100, 0,   0,   0},
+	{110, 110, 105, 105, 95,  105, 105, 95,  105, 0,   0,   0,   75,  85,  95},
+	{75,  75,  55,  55,  25,  65,  65,  25,  65,  0,   0,   65,  25,  55,  25},
+	{95,  90,  90,  85,  55,  80,  85,  85,  90,  0,   0,   0,   50,  95,  95},
+	{0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  65,  115, 0,    0,  90},
+	{0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  25,  55}
+};
+
 #endif
+
