@@ -11,6 +11,7 @@ typedef uint16_t queue_index;
 typedef uint16_t unit_energy;
 typedef uint8_t tile_index;
 
+#define unit_health_max 0xff
 #define queue_capacity 0xffff
 #define units_capacity (unit_index)'\xff'
 #define null_unit units_capacity
@@ -23,14 +24,14 @@ typedef uint8_t tile_index;
 #define unit_model_mask (unit_index)'\x1f'
 // Number of items to print before and after ellipsis
 #define verboseness 3
-#define screen_width 8
-#define screen_height 6
+#define screen_width 16
+#define screen_height 8
 #define grid_width 8
 #define grid_height 4
 #define grid_capacity 10
 #define unit_left 1
 #define unit_top 1
-#define unit_width 6
+#define unit_width 5
 #define unit_height 2
 #define selection_symbol '+'
 #define selection_style '\xe0'
@@ -44,7 +45,7 @@ typedef uint8_t tile_index;
 // const static char* grid_names[grid_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge"};
 const static uint8_t grid_symbols[grid_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
 const static uint8_t grid_styles[grid_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
-const static uint8_t unit_textures[units_models][unit_height][unit_width / 2] = {
+const static uint8_t unit_textures[units_models][unit_height][(unit_width + 1) / 2] = {
 	{	{'\x03', '\xF3', '\x00'},
 		{'\x08', '\x88', '\x00'}
 	}, {{'\x0E', '\xFE', '\x00'},

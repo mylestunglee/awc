@@ -35,26 +35,27 @@ static bool render_unit(
 	const struct game* const game,
 	const grid_index x,
 	const grid_index y,
-	const grid_index grid_x,
-	const grid_index grid_y,
+	const grid_index tile_x,
+	const grid_index tile_y,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
 	// Out of bounds
-	if (unit_left > grid_x || grid_x >= unit_left + unit_width ||
-		unit_top > grid_y || grid_y >= unit_top + unit_height)
+	if (unit_left > tile_x || tile_x >= unit_left + unit_width ||
+		unit_top > tile_y || tile_y >= unit_top + unit_height)
 		return false;
 
 	const unit_index unit = game->units.grid[y][x];
+	const unit_type model = unit_get_model(&game->units.data[unit]);
 
 	if (unit == null_unit)
 		return false;
 
-	uint8_t texture = unit_textures[unit]
-		[grid_y - unit_top][(grid_x - unit_left) / 2];
+	uint8_t texture = unit_textures[model]
+		[tile_y - unit_top][(tile_x - unit_left) / 2];
 
 	// Extract 4-bits corresponding to texture coordinate
-	if ((grid_x - unit_left) % 2 == 0)
+	if ((tile_x - unit_left) % 2 == 0)
 		texture = texture >> 4;
 	else
 		texture = texture & 15;
@@ -62,7 +63,7 @@ static bool render_unit(
 	if (texture == 0)
 		return false;
 
-	unit_type player = unit_get_player(&game->units.data[unit]);
+	const unit_type player = unit_get_player(&game->units.data[unit]);
 	*style = player_styles[player];
 
 	// Highlight selected unit
@@ -82,8 +83,8 @@ static bool render_selection(
 	const struct game* const game,
 	const grid_index x,
 	const grid_index y,
-	const grid_index grid_x,
-	const grid_index grid_y,
+	const grid_index tile_x,
+	const grid_index tile_y,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
@@ -93,10 +94,10 @@ static bool render_selection(
 	// Construct ASCII box art in selected tile
 	uint8_t edges = 0;
 
-	if (grid_x == 0) ++edges;
-	if (grid_x == grid_width - 1) ++edges;
-	if (grid_y == 0) edges += 2;
-	if (grid_y == grid_height - 1) edges += 2;
+	if (tile_x == 0) ++edges;
+	if (tile_x == grid_width - 1) ++edges;
+	if (tile_y == 0) edges += 2;
+	if (tile_y == grid_height - 1) edges += 2;
 
 	switch (edges) {
 		case 0: {
@@ -111,16 +112,68 @@ static bool render_selection(
 			break;
 		}
 		case 3: {
-			//*symbol = '+';
-			*symbol = game->workspace[y][x] + '0';
+			*symbol = '+';
 			break;
 		}
 	}
 
-	const grid_index grid = game->map[y][x];
-	*style = (grid_styles[grid] & '\x0f') | selection_style;
+	const tile_index tile = game->map[y][x];
+	*style = (grid_styles[tile] & '\x0f') | selection_style;
 
  	return true;
+}
+
+static bool render_health_bar(
+	const struct game* const game,
+	const grid_index x,
+	const grid_index y,
+	const grid_index tile_x,
+	const grid_index tile_y,
+	uint8_t* const symbol,
+	uint8_t* const style) {
+
+	// Display health bar on the bottom of unit
+	if (tile_y != grid_height - 1)
+		return false;
+
+	if (tile_x < unit_left || tile_x >= unit_left + unit_width)
+		return false;
+
+	const unit_index unit = game->units.grid[y][x];
+
+	if (unit == null_unit)
+		return false;
+
+	const unit_health health = game->units.data[unit].health;
+
+	// Hide health bar on full-health units
+	if (health == unit_health_max)
+		return false;
+
+	// Set health bar colour
+	if (health < 64)
+		*style = '\x90';
+	else if (health < 128)
+		*style = '\x30';
+	else if (health < 192)
+		*style = '\xB0';
+	else
+		*style = '\xA0';
+
+	// fix types
+	const uint8_t steps = (int)health * (4 * unit_width - 1) / 255;
+
+	if (steps < 4 * (tile_x - unit_left))
+		*symbol = ' ';
+	else if (steps < 4 * (tile_x - unit_left) + 1)
+		*symbol = '[';
+	else if (steps < 4 * (tile_x - unit_left) + 2)
+		*symbol = '|';
+	else if (steps < 4 * (tile_x - unit_left) + 3)
+		*symbol = ']';
+	else
+		*symbol = '=';
+	return true;
 }
 
 static bool render_grid(
@@ -130,9 +183,9 @@ static bool render_grid(
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
-	const grid_index grid = game->map[y][x];
-	*symbol = grid_symbols[grid];
-	*style = grid_styles[grid];
+	const tile_index tile = game->map[y][x];
+	*symbol = grid_symbols[tile];
+	*style = grid_styles[tile];
 
 	// Apply label hightlighting
 	if (game->labels[y][x] != 0) {
@@ -178,16 +231,17 @@ void render(const struct game* const game) {
 	const grid_index screen_bottom = game->y + screen_height / 2 + 1;
 
 	for (grid_index y = screen_top; y != screen_bottom; ++y) {
-		for (grid_index grid_y = 0; grid_y < grid_height; ++grid_y) {
+		for (uint8_t tile_y = 0; tile_y < grid_height; ++tile_y) {
 			reset_black();
 			uint8_t prev_style = '\x00';
 			for (grid_index x = screen_left; x != screen_right; ++x) {
-				for (grid_index grid_x = 0; grid_x < grid_width; ++grid_x) {
+				for (uint8_t tile_x = 0; tile_x < grid_width; ++tile_x) {
 					uint8_t symbol;
 					uint8_t style;
 
-					if (render_selection(game, x, y, grid_x, grid_y, &symbol, &style) ||
-						render_unit(game, x, y, grid_x, grid_y, &symbol, &style) ||
+					if (render_health_bar(game, x, y, tile_x, tile_y, &symbol, &style) ||
+						render_selection(game, x, y, tile_x, tile_y, &symbol, &style) ||
+						render_unit(game, x, y, tile_x, tile_y, &symbol, &style) ||
 						render_grid(game, x, y, &symbol, &style)) {
 
 						render_pixel(symbol, style, prev_style);
