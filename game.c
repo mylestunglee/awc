@@ -47,20 +47,31 @@ void game_loop(struct game* const game) {
 	render(game);
 
 	char input = getch();
+	grid_index prev_x = game->x;
+	grid_index prev_y = game->y;
 
 	while (input != 'q') {
 		if (input == 'a') {
+			prev_x = game->x;
+			prev_y = game->y;
 			--game->x;
 		}
-		if (input == 'd') {
+		else if (input == 'd') {
+			prev_x = game->x;
+			prev_y = game->y;
 			++game->x;
 		}
-		if (input == 'w') {
+		else if (input == 'w') {
+			prev_x = game->x;
+			prev_y = game->y;
 			--game->y;
 		}
-		if (input == 's') {
+		else if (input == 's') {
+			prev_x = game->x;
+			prev_y = game->y;
 			++game->y;
 		}
+
 		if (input == ' ') {
 			const unit_index unit = game->units.grid[game->y][game->x];
 			if (game->selected == null_unit) {
@@ -68,22 +79,37 @@ void game_loop(struct game* const game) {
 				if (unit != null_unit) {
 					game->selected = unit;
 					grid_explore(game);
+					grid_clear_all_unit_energy(game->workspace);
 				}
 			} else {
 				// Cursor over selected unit
 				if (game->selected == unit) {
 					game->selected = null_unit;
-					// optimise clear
 					grid_clear_all_uint8(game->labels);
-					grid_clear_all_unit_energy(game->workspace);
+				// Move to accessible tile
 				} else if ((game->labels[game->y][game->x] & accessible_bit) != 0) {
 					units_move(&game->units, game->selected, game->x, game->y);
 					game->selected = null_unit;
 					grid_clear_all_uint8(game->labels);
-					grid_clear_all_unit_energy(game->workspace);
+				// Attack enemy unit
+				} else if (
+					(game->labels[game->y][game->x] & attackable_bit) != 0 &&
+					(game->labels[prev_y][prev_x] & accessible_bit) != 0 &&
+					game->units.data[unit].player != game->units.data[game->selected].player) {
+
+					units_move(&game->units, game->selected, prev_x, prev_y);
+
+					//game->units.data[unit].health = 0;
+					units_delete(&game->units, game->x, game->y);
+
+					game->selected = null_unit;
+					grid_clear_all_uint8(game->labels);
+
 				}
+
 			}
 		}
+
 
 		render(game);
 

@@ -40,9 +40,10 @@ void grid_explore(struct game* const game) {
 	assert(queue_empty(queue));
 	assert(game->units.grid[game->y][game->x] != null_unit);
 
-	const unit_model model = game->units.data[game->units.grid[game->y][game->x]].model;
+	const unit_index unit = game->units.grid[game->y][game->x];
+	const unit_model model = game->units.data[unit].model;
 	const uint8_t movement_type = unit_movement_types[model];
-	const player_index player = game->units.data[game->units.grid[game->y][game->x]].player;
+	const player_index player = game->units.data[unit].player;
 
 	queue_insert(queue, (struct queue_node){
 		.x = game->x,
@@ -75,7 +76,8 @@ void grid_explore(struct game* const game) {
 			game->workspace[node->y][node->x] = node->energy;
 
 		// Mark unit-free tiles as accessible but ships cannot block bridges
-		if (game->units.grid[node->y][node->x] == null_unit &&
+		if ((game->units.grid[node->y][node->x] == null_unit ||
+			 game->units.grid[node->y][node->x] == unit) &&
 			(tile != tile_bridge || movement_type != movement_type_ship)) {
 
 			game->labels[node->y][node->x] |= accessible_bit;
