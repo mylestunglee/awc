@@ -5,16 +5,16 @@
 #include "queue.h"
 
 struct game {
-	tile_index map[grid_size][grid_size];
+	tile_t map[grid_size][grid_size];
 	struct units units;
-	grid_index x;
-	grid_index y;
-	unit_index selected;
+	grid_t x;
+	grid_t y;
+	unit_t selected;
 	uint8_t labels[grid_size][grid_size];
-	unit_energy workspace[grid_size][grid_size];
+	energy_t workspace[grid_size][grid_size];
 	struct queue queue;
-	grid_index prev_x;
-	grid_index prev_y;
+	grid_t prev_x;
+	grid_t prev_y;
 };
 
 void game_initialise(struct game* const);

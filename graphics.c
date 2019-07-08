@@ -33,10 +33,10 @@ static void render_pixel(uint8_t symbol, const uint8_t style, const uint8_t prev
 // Attempt to find symbol style pair from rendering coordinates
 static bool render_unit(
 	const struct game* const game,
-	const grid_index x,
-	const grid_index y,
-	const grid_index tile_x,
-	const grid_index tile_y,
+	const grid_t x,
+	const grid_t y,
+	const grid_t tile_x,
+	const grid_t tile_y,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
@@ -45,8 +45,8 @@ static bool render_unit(
 		unit_top > tile_y || tile_y >= unit_top + unit_height)
 		return false;
 
-	const unit_index unit = game->units.grid[y][x];
-	const unit_model model = game->units.data[unit].model;
+	const unit_t unit = game->units.grid[y][x];
+	const model_t model = game->units.data[unit].model;
 
 	if (unit == null_unit)
 		return false;
@@ -63,7 +63,7 @@ static bool render_unit(
 	if (texture == 0)
 		return false;
 
-	const player_index player = game->units.data[unit].player;
+	const player_t player = game->units.data[unit].player;
 	*style = player_styles[player];
 
 	if (texture == 15)
@@ -76,10 +76,10 @@ static bool render_unit(
 
 static bool render_selection(
 	const struct game* const game,
-	const grid_index x,
-	const grid_index y,
-	const grid_index tile_x,
-	const grid_index tile_y,
+	const grid_t x,
+	const grid_t y,
+	const grid_t tile_x,
+	const grid_t tile_y,
 	const bool attack_actionable,
 	uint8_t* const symbol,
 	uint8_t* const style) {
@@ -91,9 +91,9 @@ static bool render_selection(
 	uint8_t edges = 0;
 
 	if (tile_x == 0) ++edges;
-	if (tile_x == grid_width - 1) ++edges;
+	if (tile_x == tile_width - 1) ++edges;
 	if (tile_y == 0) edges += 2;
-	if (tile_y == grid_height - 1) edges += 2;
+	if (tile_y == tile_height - 1) edges += 2;
 
 	switch (edges) {
 		case 0: {
@@ -113,7 +113,7 @@ static bool render_selection(
 		}
 	}
 
-	const tile_index tile = game->map[y][x];
+	const tile_t tile = game->map[y][x];
 
 	if (attack_actionable)
 		*style = (grid_styles[tile] & '\x0f') | attackable_style;
@@ -125,29 +125,29 @@ static bool render_selection(
 
 static bool render_health_bar(
 	const struct game* const game,
-	const grid_index x,
-	const grid_index y,
-	const grid_index tile_x,
-	const grid_index tile_y,
+	const grid_t x,
+	const grid_t y,
+	const grid_t tile_x,
+	const grid_t tile_y,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
 	// Display health bar on the bottom of unit
-	if (tile_y != grid_height - 1)
+	if (tile_y != tile_height - 1)
 		return false;
 
 	if (tile_x < unit_left || tile_x >= unit_left + unit_width)
 		return false;
 
-	const unit_index unit = game->units.grid[y][x];
+	const unit_t unit = game->units.grid[y][x];
 
 	if (unit == null_unit)
 		return false;
 
-	const unit_health health = game->units.data[unit].health;
+	const health_t health = game->units.data[unit].health;
 
 	// Hide health bar on full-health units
-	if (health == unit_health_max)
+	if (health == health_t_max)
 		return false;
 
 
@@ -155,7 +155,7 @@ static bool render_health_bar(
 	const uint8_t styles[4] = {'\x90', '\x30', '\xB0', '\xA0'};
 	*style = styles[(health & '\xC0') >> 6];
 
-	const uint8_t steps = (unit_health_wide)health * (4 * unit_width - 1) / unit_health_max;
+	const uint8_t steps = (health_t_wide)health * (4 * unit_width - 1) / health_t_max;
 
 	if (steps < 4 * (tile_x - unit_left))
 		*symbol = ' ';
@@ -173,13 +173,13 @@ static bool render_health_bar(
 
 static bool render_grid(
 	const struct game* const game,
-	const grid_index x,
-	const grid_index y,
+	const grid_t x,
+	const grid_t y,
 	const bool attack_actionable,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
-	const tile_index tile = game->map[y][x];
+	const tile_t tile = game->map[y][x];
 	*symbol = grid_symbols[tile];
 	*style = grid_styles[tile];
 
@@ -190,13 +190,13 @@ static bool render_grid(
 
 		// Show arrows highlighting position to attack unit
 		if (attack_actionable && x == game->prev_x && y == game->prev_y) {
-			if ((grid_index)(game->prev_x + 1) == game->x)
+			if ((grid_t)(game->prev_x + 1) == game->x)
 				*symbol = '>';
-			else if ((grid_index)(game->prev_x - 1) == game->x)
+			else if ((grid_t)(game->prev_x - 1) == game->x)
 				*symbol = '<';
-			else if ((grid_index)(game->prev_y + 1) == game->y)
+			else if ((grid_t)(game->prev_y + 1) == game->y)
 				*symbol = 'v';
-			else if ((grid_index)(game->prev_y - 1) == game->y)
+			else if ((grid_t)(game->prev_y - 1) == game->y)
 				*symbol = '^';
 			else
 				// Previous position incorrectly set
@@ -232,17 +232,17 @@ static void reset_black() {
 void render(const struct game* const game, const bool attack_actionable) {
 	reset_cursor();
 
-	const grid_index screen_left = game->x - screen_width / 2 + 1;
-	const grid_index screen_right = game->x + screen_width / 2 + 1;
-	const grid_index screen_top = game->y - screen_height / 2 + 1;
-	const grid_index screen_bottom = game->y + screen_height / 2 + 1;
+	const grid_t screen_left = game->x - screen_width / 2 + 1;
+	const grid_t screen_right = game->x + screen_width / 2 + 1;
+	const grid_t screen_top = game->y - screen_height / 2 + 1;
+	const grid_t screen_bottom = game->y + screen_height / 2 + 1;
 
-	for (grid_index y = screen_top; y != screen_bottom; ++y) {
-		for (uint8_t tile_y = 0; tile_y < grid_height; ++tile_y) {
+	for (grid_t y = screen_top; y != screen_bottom; ++y) {
+		for (uint8_t tile_y = 0; tile_y < tile_height; ++tile_y) {
 			reset_black();
 			uint8_t prev_style = '\x00';
-			for (grid_index x = screen_left; x != screen_right; ++x) {
-				for (uint8_t tile_x = 0; tile_x < grid_width; ++tile_x) {
+			for (grid_t x = screen_left; x != screen_right; ++x) {
+				for (uint8_t tile_x = 0; tile_x < tile_width; ++tile_x) {
 					uint8_t symbol;
 					uint8_t style;
 

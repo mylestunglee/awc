@@ -4,10 +4,10 @@
 #include "graphics.h"
 #include "grid.h"
 
-static void game_map_initialise(tile_index map[grid_size][grid_size]) {
-	grid_index y = 0;
+static void game_map_initialise(tile_t map[grid_size][grid_size]) {
+	grid_t y = 0;
 	do {
-		grid_index x = 0;
+		grid_t x = 0;
 		do {
 			map[y][x] = 0;
 		} while (++x);
@@ -23,7 +23,7 @@ static void game_map_initialise(tile_index map[grid_size][grid_size]) {
 		}
 	}
 
-	for (int i = 0; i < grid_capacity; i++) {
+	for (int i = 0; i < tile_capacity; i++) {
 		map[4][i] = i;
 	}
 
@@ -37,7 +37,7 @@ void game_initialise(struct game* const game) {
 	game->y = 0;
 	game_map_initialise(game->map);
 	grid_clear_all_uint8(game->labels);
-	grid_clear_all_unit_energy(game->workspace);
+	grid_clear_all_energy_t(game->workspace);
 	units_initialise(&game->units);
 	game->selected = null_unit;
 	queue_initialise(&game->queue);
@@ -82,7 +82,7 @@ static bool game_attack_actionable(const struct game* const game) {
 }
 
 static void game_handle_action(struct game* const game) {
-	const unit_index unit = game->units.grid[game->y][game->x];
+	const unit_t unit = game->units.grid[game->y][game->x];
 	if (game->selected == null_unit) {
 		// Select unit
 		if (unit != null_unit) {

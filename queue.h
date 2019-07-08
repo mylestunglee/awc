@@ -5,14 +5,14 @@
 #include "definitions.h"
 
 struct queue_node {
-	grid_index x;
-	grid_index y;
-	unit_energy energy;
+	grid_t x;
+	grid_t y;
+	energy_t energy;
 };
 
 struct queue {
-	queue_index start;
-	queue_index end;
+	queue_t start;
+	queue_t end;
 	struct queue_node nodes[queue_capacity];
 };
 

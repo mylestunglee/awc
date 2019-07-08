@@ -8,28 +8,28 @@ void units_initialise(struct units* const units) {
 	units->start = 0;
 	units->size = 0;
 	// Setup indices
-	for (unit_index i = 0; i < units_capacity; ++i)
+	for (unit_t i = 0; i < units_capacity; ++i)
 		units->frees[i] = i;
 
-	for (player_index i = 0; i < players_capacity; ++i)
+	for (player_t i = 0; i < players_capacity; ++i)
 		units->firsts[i] = null_unit;
 
 	// Clear grid
-	grid_index y = 0;
+	grid_t y = 0;
 	do {
-		grid_index x = 0;
+		grid_t x = 0;
 		do {
 			units->grid[y][x] = null_unit;
 		} while (++x);
 	} while (++y);
 }
 
-static unit_index units_frees_insert(struct units* const units, const struct unit* const unit) {
+static unit_t units_frees_insert(struct units* const units, const struct unit* const unit) {
 	// Check space to insert unit
 	if (units->size == units_capacity)
 		return null_unit;
 
-	const unit_index index = units->start;
+	const unit_t index = units->start;
 	units->data[index] = *unit;
 	units->start = (units->start + 1) % units_capacity;
 	++units->size;
@@ -37,13 +37,13 @@ static unit_index units_frees_insert(struct units* const units, const struct uni
 	return index;
 }
 
-static unit_index units_players_insert(struct units* const units, const struct unit* const unit) {
-	unit_index index = units_frees_insert(units, unit);
+static unit_t units_players_insert(struct units* const units, const struct unit* const unit) {
+	unit_t index = units_frees_insert(units, unit);
 	// Propagate failure
 	if (index == null_unit)
 		return null_unit;
 
-	const player_index player = unit->player;
+	const player_t player = unit->player;
 
 	// Link new node at front
 	units->nexts[index] = units->firsts[player];
@@ -61,7 +61,7 @@ bool units_insert(struct units* const units, const struct unit unit) {
 	if (units->grid[unit.y][unit.x] != null_unit)
 		return true;
 
-	const unit_index index = units_players_insert(units, &unit);
+	const unit_t index = units_players_insert(units, &unit);
 	if (index == null_unit)
 		return true;
 
@@ -69,15 +69,15 @@ bool units_insert(struct units* const units, const struct unit unit) {
 	return false;
 }
 
-static void units_frees_delete(struct units* const units, const unit_index index) {
+static void units_frees_delete(struct units* const units, const unit_t index) {
 	assert(units->size > 0);
 
 	units->frees[(units_capacity + units->start - units->size) % units_capacity] = index;
 	--units->size;
 }
 
-static void units_players_delete(struct units* const units, const unit_index index) {
-	const player_index player = units->data[index].player;
+static void units_players_delete(struct units* const units, const unit_t index) {
+	const player_t player = units->data[index].player;
 
 	// Link firsts or prevs to skip over index
 	if (units->firsts[player] == index) {
@@ -94,15 +94,15 @@ static void units_players_delete(struct units* const units, const unit_index ind
 	units_frees_delete(units, index);
 }
 
-void units_delete(struct units* const units, const grid_index x, const grid_index y) {
+void units_delete(struct units* const units, const grid_t x, const grid_t y) {
 	assert(units->grid[y][x] != null_unit);
 	units_players_delete(units, units->grid[y][x]);
 	units->grid[y][x] = null_unit;
 }
 
-void units_move(struct units* const units, const unit_index unit, const grid_index x, const grid_index y) {
-	const grid_index old_x = units->data[unit].x;
-	const grid_index old_y = units->data[unit].y;
+void units_move(struct units* const units, const unit_t unit, const grid_t x, const grid_t y) {
+	const grid_t old_x = units->data[unit].x;
+	const grid_t old_y = units->data[unit].y;
 
 	// Do nothing if position has not changed
 	if (old_x == x && old_y == y)
@@ -120,12 +120,12 @@ void units_move(struct units* const units, const unit_index unit, const grid_ind
 void units_frees_print(const struct units* const units) {
 	assert(units_capacity > 0);
 
-	const unit_index verboseness = 3;
+	const unit_t verboseness = 3;
 
-	unit_index j = units->start;
-	for (unit_index i = 0; i < units_capacity - units->size; ++i) {
+	unit_t j = units->start;
+	for (unit_t i = 0; i < units_capacity - units->size; ++i) {
 		if (i < verboseness || i >= units_capacity - units->size - verboseness) {
-			printf(unit_index_format" ", units->frees[j]);
+			printf(unit_t_format" ", units->frees[j]);
 		} else if (i == 3) {
 			printf("... ");
 		}
@@ -137,12 +137,12 @@ void units_frees_print(const struct units* const units) {
 
 // Print linked lists of index and unit type pairs across all players
 void units_players_print(const struct units* const units) {
-	for (player_index player = 0; player < players_capacity; ++player) {
-		unit_index curr = units->firsts[player];
-		printf(unit_type_format": ["unit_index_format"]", player, curr);
+	for (player_t player = 0; player < players_capacity; ++player) {
+		unit_t curr = units->firsts[player];
+		printf(unit_type_format": ["unit_t_format"]", player, curr);
 		while (curr != null_unit) {
-			const unit_index next = units->nexts[curr];
-			printf("->["unit_type_format": "unit_type_format" ("grid_index_format", "grid_index_format") "unit_index_format"]", curr, units->prevs[curr], units->data[curr].x, units->data[curr].y, next);
+			const unit_t next = units->nexts[curr];
+			printf("->["unit_type_format": "unit_type_format" ("grid_t_format", "grid_t_format") "unit_t_format"]", curr, units->prevs[curr], units->data[curr].x, units->data[curr].y, next);
 			curr = next;
 		}
 		printf("\n");
@@ -152,13 +152,13 @@ void units_players_print(const struct units* const units) {
 // Prints mapping from grid to unit indices
 void units_grid_print(const struct units* const units) {
 	printf("{");
-	grid_index y = 0;
+	grid_t y = 0;
 	do {
-		grid_index x = 0;
+		grid_t x = 0;
 		do
 		{
 			if (units->grid[y][x] != null_unit)
-				printf("("grid_index_format", "grid_index_format"): "unit_index_format" ", x, y, units->grid[y][x]);
+				printf("("grid_t_format", "grid_t_format"): "unit_t_format" ", x, y, units->grid[y][x]);
 		} while (++x);
 	} while (++y);
 	printf("}\n");

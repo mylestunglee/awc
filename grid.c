@@ -2,19 +2,19 @@
 #include "grid.h"
 
 void grid_clear_all_uint8(uint8_t grid[grid_size][grid_size]) {
-    grid_index y = 0;
+    grid_t y = 0;
     do {
-        grid_index x = 0;
+        grid_t x = 0;
         do {
             grid[y][x] = 0;
         } while (++x);
     } while (++y);
 }
 
-void grid_clear_all_unit_energy(uint16_t grid[grid_size][grid_size]) {
-    grid_index y = 0;
+void grid_clear_all_energy_t(uint16_t grid[grid_size][grid_size]) {
+    grid_t y = 0;
     do {
-        grid_index x = 0;
+        grid_t x = 0;
         do {
             grid[y][x] = 0;
         } while (++x);
@@ -23,12 +23,12 @@ void grid_clear_all_unit_energy(uint16_t grid[grid_size][grid_size]) {
 
 static void grid_explore_mark_attackable(
 	struct game* const game,
-	const grid_index x,
-	const grid_index y,
-	const unit_model model,
-	const player_index player) {
+	const grid_t x,
+	const grid_t y,
+	const model_t model,
+	const player_t player) {
 
-	const unit_index index = game->units.grid[y][x];
+	const unit_t index = game->units.grid[y][x];
 	const struct unit* const unit = &game->units.data[index];
 
 	// Mark tiles without friendly units as attackable
@@ -44,10 +44,10 @@ void grid_explore(struct game* const game) {
 	assert(queue_empty(queue));
 	assert(game->units.grid[game->y][game->x] != null_unit);
 
-	const unit_index unit = game->units.grid[game->y][game->x];
-	const unit_model model = game->units.data[unit].model;
+	const unit_t unit = game->units.grid[game->y][game->x];
+	const model_t model = game->units.data[unit].model;
 	const uint8_t movement_type = unit_movement_types[model];
-	const player_index player = game->units.data[unit].player;
+	const player_t player = game->units.data[unit].player;
 
 	queue_insert(queue, (struct queue_node){
 		.x = game->x,
@@ -60,8 +60,8 @@ void grid_explore(struct game* const game) {
 	while (!queue_empty(queue)) {
 		const struct queue_node* const node = queue_remove(queue);
 
-		const tile_index tile = game->map[node->y][node->x];
-		const unit_energy cost = movement_type_cost[movement_type][tile];
+		const tile_t tile = game->map[node->y][node->x];
+		const energy_t cost = movement_type_cost[movement_type][tile];
 
 		// Inaccessible terrian
 		if (cost == 0)
@@ -71,7 +71,7 @@ void grid_explore(struct game* const game) {
 		if (node->energy < cost)
 			continue;
 
-		const unit_energy energy = node->energy - cost;
+		const energy_t energy = node->energy - cost;
 
 		// Do not re-compute explored areas
 		if (game->workspace[node->y][node->x] > energy)
@@ -97,6 +97,6 @@ void grid_explore(struct game* const game) {
 		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y - 1, .energy = energy});
 	}
 
-	grid_clear_all_unit_energy(game->workspace);
+	grid_clear_all_energy_t(game->workspace);
 }
 
