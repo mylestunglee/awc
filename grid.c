@@ -85,12 +85,15 @@ void grid_explore(struct game* const game) {
 			(tile != tile_bridge || movement_type != movement_type_ship)) {
 
 			game->labels[node->y][node->x] |= accessible_bit;
+
+			// Mark attackable tiles
 			grid_explore_mark_attackable(game, node->x + 1, node->y, model, player);
 			grid_explore_mark_attackable(game, node->x - 1, node->y, model, player);
 			grid_explore_mark_attackable(game, node->x, node->y + 1, model, player);
 			grid_explore_mark_attackable(game, node->x, node->y - 1, model, player);
 		}
 
+		// Explore adjacent tiles
 		queue_insert(queue, (struct queue_node){.x = node->x + 1, .y = node->y, .energy = energy});
 		queue_insert(queue, (struct queue_node){.x = node->x - 1, .y = node->y, .energy = energy});
 		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y + 1, .energy = energy});

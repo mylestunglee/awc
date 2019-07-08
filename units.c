@@ -94,10 +94,11 @@ static void units_players_delete(struct units* const units, const unit_t index) 
 	units_frees_delete(units, index);
 }
 
-void units_delete(struct units* const units, const grid_t x, const grid_t y) {
-	assert(units->grid[y][x] != null_unit);
-	units_players_delete(units, units->grid[y][x]);
-	units->grid[y][x] = null_unit;
+void units_delete(struct units* const units, const unit_t unit_index) {
+	assert(unit_index != null_unit);
+	units_players_delete(units, unit_index);
+	const struct unit* const unit = &units->data[unit_index];
+	units->grid[unit->y][unit->x] = null_unit;
 }
 
 void units_move(struct units* const units, const unit_t unit, const grid_t x, const grid_t y) {

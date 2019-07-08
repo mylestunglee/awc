@@ -25,7 +25,7 @@ struct units {
 
 void units_initialise(struct units* const);
 bool units_insert(struct units* const, const struct unit);
-void units_delete(struct units* const, const grid_t, const grid_t);
+void units_delete(struct units* const, const unit_t);
 void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
 void units_frees_print(const struct units* const);
 void units_players_print(const struct units* const);

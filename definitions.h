@@ -13,7 +13,7 @@ typedef uint8_t tile_t;
 typedef uint32_t health_t_wide;
 typedef uint8_t player_t;
 
-#define health_t_max 0xff
+#define health_max 0xff
 #define queue_capacity 0xffff
 #define units_capacity (unit_t)'\xff'
 #define null_unit units_capacity

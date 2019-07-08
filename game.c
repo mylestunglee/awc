@@ -75,7 +75,9 @@ static void game_parse_movement(struct game* const game, const uint8_t input) {
 static bool game_attack_actionable(const struct game* const game) {
 	// 1. A unit is selected
 	// 2. Previous selected tile is accessible
-	// 3. Selected tile is attackable
+	// 3. Selected tile is attackable, which implies:
+	//     a. Selected unit can attack with positive damage
+	//     b. Attacker and attackee are in different teams
 	return game->selected != null_unit &&
 		(game->labels[game->prev_y][game->prev_x] & accessible_bit) != 0 &&
 		(game->labels[game->y][game->x] & attackable_bit) != 0;
@@ -103,9 +105,57 @@ static void game_handle_action(struct game* const game) {
 	}
 }
 
+// Calculate damage when attacker attacks attackee
+static health_t calc_damage(
+	const struct game* const game,
+	const struct unit* const attacker,
+	const struct unit* const attackee) {
+
+	const tile_t tile = game->map[attackee->y][attackee->x];
+	const uint8_t movement_type = unit_movement_types[attackee->model];
+
+	return (health_t)((
+		(health_t_wide)units_damage[attacker->model][attackee->model] *
+		(health_t_wide)(attacker->health + 1) *
+		(health_t_wide)(10 - grid_defense[movement_type][tile])
+	) / (100 * 10));
+}
+
 static void game_handle_attack(struct game* const game) {
-	units_move(&game->units, game->selected, game->prev_x, game->prev_y);
-	units_delete(&game->units, game->x, game->y);
+	assert(game->units.grid[game->y][game->x] != null_unit);
+	assert(game->selected != null_unit);
+
+	struct unit* const attacker = &game->units.data[game->selected];
+	const unit_t attackee_index = game->units.grid[game->y][game->x];
+	struct unit* const attackee = &game->units.data[attackee_index];
+
+	// Skip to post-attack cleanup when a unit dies
+	do {
+		const health_t damage = calc_damage(game, attacker, attackee);
+
+		// Apply damage
+		if (damage > attackee->health) {
+			units_delete(&game->units, attackee_index);
+			break;
+		}
+
+		attackee->health -= damage;
+
+		// Prepare attacker for counter-attack
+		units_move(&game->units, game->selected, game->prev_x, game->prev_y);
+
+		const health_t counter_damage = calc_damage(game, attackee, attacker);
+
+		// Apply counter damage
+		if (counter_damage > attacker->health) {
+			units_delete(&game->units, game->selected);
+			break;
+		}
+
+		attacker->health -= counter_damage;
+	} while (false);
+
+	// Deselect attacker
 	game->selected = null_unit;
 	grid_clear_all_uint8(game->labels);
 }

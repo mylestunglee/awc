@@ -147,7 +147,7 @@ static bool render_health_bar(
 	const health_t health = game->units.data[unit].health;
 
 	// Hide health bar on full-health units
-	if (health == health_t_max)
+	if (health == health_max)
 		return false;
 
 
@@ -155,7 +155,7 @@ static bool render_health_bar(
 	const uint8_t styles[4] = {'\x90', '\x30', '\xB0', '\xA0'};
 	*style = styles[(health & '\xC0') >> 6];
 
-	const uint8_t steps = (health_t_wide)health * (4 * unit_width - 1) / health_t_max;
+	const uint8_t steps = (health_t_wide)health * (4 * unit_width - 1) / health_max;
 
 	if (steps < 4 * (tile_x - unit_left))
 		*symbol = ' ';
