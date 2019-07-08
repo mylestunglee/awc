@@ -73,7 +73,7 @@ static void game_parse_movement(struct game* const game, const uint8_t input) {
 }
 
 static bool game_attack_actionable(const struct game* const game) {
-	// 1. Select a unit
+	// 1. A unit is selected
 	// 2. Previous selected tile is accessible
 	// 3. Selected tile is attackable
 	return game->selected != null_unit &&

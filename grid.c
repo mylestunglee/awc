@@ -25,12 +25,16 @@ static void grid_explore_mark_attackable(
 	struct game* const game,
 	const grid_index x,
 	const grid_index y,
+	const unit_model model,
 	const player_index player) {
 
-	const unit_index unit = game->units.grid[y][x];
+	const unit_index index = game->units.grid[y][x];
+	const struct unit* const unit = &game->units.data[index];
 
 	// Mark tiles without friendly units as attackable
-	if (unit != null_unit && game->units.data[unit].player != player)
+	if (index != null_unit &&
+		unit->player != player &&
+		units_damage[model][unit->model] != 0)
 		game->labels[y][x] |= attackable_bit;
 }
 
@@ -81,10 +85,10 @@ void grid_explore(struct game* const game) {
 			(tile != tile_bridge || movement_type != movement_type_ship)) {
 
 			game->labels[node->y][node->x] |= accessible_bit;
-			grid_explore_mark_attackable(game, node->x + 1, node->y, player);
-			grid_explore_mark_attackable(game, node->x - 1, node->y, player);
-			grid_explore_mark_attackable(game, node->x, node->y + 1, player);
-			grid_explore_mark_attackable(game, node->x, node->y - 1, player);
+			grid_explore_mark_attackable(game, node->x + 1, node->y, model, player);
+			grid_explore_mark_attackable(game, node->x - 1, node->y, model, player);
+			grid_explore_mark_attackable(game, node->x, node->y + 1, model, player);
+			grid_explore_mark_attackable(game, node->x, node->y - 1, model, player);
 		}
 
 		queue_insert(queue, (struct queue_node){.x = node->x + 1, .y = node->y, .energy = energy});
