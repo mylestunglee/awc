@@ -76,7 +76,7 @@ const static uint8_t unit_textures[model_capacity][unit_height][(unit_width + 1)
 		{'\x5E', '\xFC', '\xE0'}}};
 
 const static uint8_t unit_symbols[14] = {' ', '_', 'o', 'x', '<', '>', 'v', '^', '\\', '/', '[', ']', '-', '='};
-const static uint8_t player_styles[players_capacity] = {'\xF8', '\xe6'};
+const static uint8_t player_styles[players_capacity] = {'\xF8', '\xF6'};
 const static uint8_t player_symbols[players_capacity] = {'1', '2'};
 const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 5, 6, 4, 9, 7, 6, 5, 6, 5};
 /*

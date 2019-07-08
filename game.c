@@ -85,9 +85,10 @@ static bool game_attack_actionable(const struct game* const game) {
 
 static void game_handle_action(struct game* const game) {
 	const unit_t unit = game->units.grid[game->y][game->x];
+
 	if (game->selected == null_unit) {
 		// Select unit
-		if (unit != null_unit) {
+		if (unit != null_unit && game->units.data[unit].enabled) {
 			game->selected = unit;
 			grid_explore(game);
 		}
@@ -99,6 +100,7 @@ static void game_handle_action(struct game* const game) {
 		// Move to accessible tile
 		} else if ((game->labels[game->y][game->x] & accessible_bit) != 0) {
 			units_move(&game->units, game->selected, game->x, game->y);
+			game->units.data[game->selected].enabled = false;
 			game->selected = null_unit;
 			grid_clear_all_uint8(game->labels);
 		}
@@ -156,6 +158,7 @@ static void game_handle_attack(struct game* const game) {
 	} while (false);
 
 	// Deselect attacker
+	attacker->enabled = false;
 	game->selected = null_unit;
 	grid_clear_all_uint8(game->labels);
 }

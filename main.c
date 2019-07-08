@@ -8,7 +8,7 @@ int main() {
 	game_initialise(&game);
 
 	for (int i = 0; i < 15; i++) {
-		units_insert(&game.units, (struct unit){.model = i, .x = i, .y = 3, .health = i * 18 + 3, .player = i % 2});
+		units_insert(&game.units, (struct unit){.model = i, .x = i, .y = 3, .health = i * 18 + 3, .player = i % 2, .enabled = true});
 	}
 
 	game_loop(&game);

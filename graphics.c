@@ -45,12 +45,13 @@ static bool render_unit(
 		unit_top > tile_y || tile_y >= unit_top + unit_height)
 		return false;
 
-	const unit_t unit = game->units.grid[y][x];
-	const model_t model = game->units.data[unit].model;
+	const unit_t unit_index = game->units.grid[y][x];
 
-	if (unit == null_unit)
+	if (unit_index == null_unit)
 		return false;
 
+	const struct unit* const unit = &game->units.data[unit_index];
+	const model_t model = unit->model;
 	uint8_t texture = unit_textures[model]
 		[tile_y - unit_top][(tile_x - unit_left) / 2];
 
@@ -63,11 +64,14 @@ static bool render_unit(
 	if (texture == 0)
 		return false;
 
-	const player_t player = game->units.data[unit].player;
-	*style = player_styles[player];
+	*style = player_styles[unit->player];
+
+	// Dim forecolours if disable
+	if (!unit->enabled)
+		*style &= '\x7F';
 
 	if (texture == 15)
-		*symbol = player_symbols[player];
+		*symbol = player_symbols[unit->player];
 	else
 		*symbol = unit_symbols[texture - 1];
 

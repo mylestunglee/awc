@@ -10,6 +10,7 @@ struct unit {
 	player_t player;
 	grid_t x;
 	grid_t y;
+	bool enabled;
 };
 
 struct units {
