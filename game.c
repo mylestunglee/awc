@@ -131,6 +131,9 @@ static void game_handle_attack(struct game* const game) {
 
 	// Skip to post-attack cleanup when a unit dies
 	do {
+		// Prepare attacker for counter-attack
+		units_move(&game->units, game->selected, game->prev_x, game->prev_y);
+
 		const health_t damage = calc_damage(game, attacker, attackee);
 
 		// Apply damage
@@ -140,9 +143,6 @@ static void game_handle_attack(struct game* const game) {
 		}
 
 		attackee->health -= damage;
-
-		// Prepare attacker for counter-attack
-		units_move(&game->units, game->selected, game->prev_x, game->prev_y);
 
 		const health_t counter_damage = calc_damage(game, attackee, attacker);
 
