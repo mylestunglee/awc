@@ -41,6 +41,11 @@ void game_initialise(struct game* const game) {
 	units_initialise(&game->units);
 	game->selected = null_unit;
 	queue_initialise(&game->queue);
+	game->turn = 0;
+
+	for (player_t player = 0; player < players_capacity; ++player) {
+		units_set_enabled(&game->units, player, player == 0);
+	}
 }
 
 static void game_parse_movement(struct game* const game, const uint8_t input) {
@@ -72,7 +77,7 @@ static void game_parse_movement(struct game* const game, const uint8_t input) {
 	}
 }
 
-static bool game_attack_actionable(const struct game* const game) {
+static bool game_attack_enabled(const struct game* const game) {
 	// 1. A unit is selected
 	// 2. Previous selected tile is accessible
 	// 3. Selected tile is attackable, which implies:
@@ -163,26 +168,34 @@ static void game_handle_attack(struct game* const game) {
 	grid_clear_all_uint8(game->labels);
 }
 
-void game_loop(struct game* const game) {
-	bool attack_actionable = game_attack_actionable(game);
+static void game_next_turn(struct game* const game) {
+	units_set_enabled(&game->units, game->turn, false);
+	game->turn = (game->turn + 1) % players_capacity;
+	units_set_enabled(&game->units, game->turn, true);
+}
 
-	render(game, attack_actionable);
+void game_loop(struct game* const game) {
+	bool attack_enabled = game_attack_enabled(game);
+
+	render(game, attack_enabled);
 
 	char input = getch();
 
 	while (input != 'q') {
 		game_parse_movement(game, input);
 
-		attack_actionable = game_attack_actionable(game);
+		attack_enabled = game_attack_enabled(game);
 
 		if (input == ' ') {
-			if (attack_actionable)
+			if (attack_enabled)
 				game_handle_attack(game);
 			else
 				game_handle_action(game);
+		} else if (input == 'n') {
+			game_next_turn(game);
 		}
 
-		render(game, attack_actionable);
+		render(game, attack_enabled);
 
 		printf("%u %u", game->x, game->y);
 

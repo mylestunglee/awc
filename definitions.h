@@ -21,7 +21,7 @@ typedef uint8_t player_t;
 #define unit_type_format "%02X"
 #define grid_t_format "%d"
 #define grid_size 0x100
-#define players_capacity 0x8
+#define players_capacity 3
 #define unit_player_offset (unit_t)'\x05'
 #define model_t_mask (unit_t)'\x1f'
 #define screen_width 10
@@ -76,7 +76,7 @@ const static uint8_t unit_textures[model_capacity][unit_height][(unit_width + 1)
 		{'\x5E', '\xFC', '\xE0'}}};
 
 const static uint8_t unit_symbols[14] = {' ', '_', 'o', 'x', '<', '>', 'v', '^', '\\', '/', '[', ']', '-', '='};
-const static uint8_t player_styles[players_capacity] = {'\xF8', '\xF6'};
+const static uint8_t player_styles[players_capacity] = {'\xF4', '\xF1', '\xF3'};
 const static uint8_t player_symbols[players_capacity] = {'1', '2'};
 const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 5, 6, 4, 9, 7, 6, 5, 6, 5};
 /*

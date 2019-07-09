@@ -15,6 +15,7 @@ struct game {
 	struct queue queue;
 	grid_t prev_x;
 	grid_t prev_y;
+	player_t turn;
 };
 
 void game_initialise(struct game* const);

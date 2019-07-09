@@ -164,3 +164,13 @@ void units_grid_print(const struct units* const units) {
 	} while (++y);
 	printf("}\n");
 }
+
+// Sets enabled property for each unit of a player
+void units_set_enabled(struct units* const units, const player_t player, const bool enabled) {
+	unit_t curr = units->firsts[player];
+
+	while (curr != null_unit) {
+		units->data[curr].enabled = enabled;
+		curr = units->nexts[curr];
+	}
+}

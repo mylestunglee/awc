@@ -31,5 +31,6 @@ void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
 void units_frees_print(const struct units* const);
 void units_players_print(const struct units* const);
 void units_grid_print(const struct units* const);
+void units_set_enabled(struct units* const, const player_t, const bool);
 
 #endif

@@ -68,7 +68,7 @@ static bool render_unit(
 
 	// Dim forecolours if disable
 	if (!unit->enabled)
-		*style &= '\x7F';
+		*style &= '\x0F';
 
 	if (texture == 15)
 		*symbol = player_symbols[unit->player];
