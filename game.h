@@ -17,6 +17,7 @@ struct game {
 	grid_t prev_y;
 	player_t turn;
 	player_t alives[players_capacity];
+	player_t territory[grid_size][grid_size];
 };
 
 void game_preload(struct game* const);

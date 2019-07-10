@@ -17,18 +17,21 @@ typedef uint8_t player_t;
 #define queue_capacity 0xffff
 #define units_capacity (unit_t)'\xff'
 #define null_unit units_capacity
+#define null_player players_capacity
 #define unit_t_format "%02X"
 #define unit_type_format "%02X"
 #define grid_t_format "%d"
 #define grid_size 0x100
-#define players_capacity 7
+#define players_capacity 3
 #define unit_player_offset (unit_t)'\x05'
 #define model_t_mask (unit_t)'\x1f'
 #define screen_width 10
 #define screen_height 8
 #define tile_width 8
 #define tile_height 4
-#define tile_capacity 15
+#define terrian_capacity 10
+#define capturable_capacity 5
+#define tile_capacity (terrian_capacity + capturable_capacity)
 #define unit_left 1
 #define unit_top 1
 #define unit_width 5
@@ -41,8 +44,8 @@ typedef uint8_t player_t;
 #define model_capacity 15
 
 const static char* tile_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge", "city", "factory", "airport", "habour", "HQ"};
-const static uint8_t grid_symbols[tile_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '=', 'C', 'F', 'A', 'S', 'H'};
-const static uint8_t grid_styles[tile_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78', '\xF8', '\xF8', '\xF8', '\xF8', '\xF8'};
+const static uint8_t tile_symbols[tile_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '=', 'C', 'F', 'A', 'S', 'H'};
+const static uint8_t tile_styles[tile_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78', '\xF8', '\xF8', '\xF8', '\xF8', '\xF8'};
 const static uint8_t unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
 	{	{'\x03', '\xF3', '\x00'},
 		{'\x08', '\x88', '\x00'}
@@ -75,8 +78,30 @@ const static uint8_t unit_textures[model_capacity][unit_height][(unit_width + 1)
 	}, {{'\x12', '\x22', '\x10'},
 		{'\x5E', '\xFC', '\xE0'}}};
 
+const static uint8_t capturable_textures[capturable_capacity][tile_height][(tile_width + 1) / 2] = {
+	{   {'\x00', '\xB1', '\x1C', '\x00'},
+		{'\x00', '\xB1', '\xB1', '\x1C'},
+		{'\xB1', '\x1C', '\xB1', '\x1C'},
+		{'\xB1', '\x1C', '\x00', '\x00'},
+	}, {{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+	}, {{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+	}, {{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+	}, {{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'},
+		{'\x00', '\x00', '\x00', '\x00'}}};
+
 const static uint8_t unit_symbols[14] = {' ', '_', 'o', 'x', '<', '>', 'v', '^', '\\', '/', '[', ']', '-', '='};
-const static uint8_t player_styles[players_capacity] = {'\xF4', '\xF1', '\xF3'};
+const static uint8_t player_styles[players_capacity + 1] = {'\xF4', '\xF1', '\xF3', '\xF8'};
 const static uint8_t player_symbols[players_capacity] = {'1', '2'};
 const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 5, 6, 4, 9, 7, 6, 5, 6, 5};
 /*

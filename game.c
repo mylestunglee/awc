@@ -30,17 +30,33 @@ static void game_map_initialise(tile_t map[grid_size][grid_size]) {
 	map[5][10] = 1;
 }
 
+static void game_territory_initialise(player_t territory[grid_size][grid_size]) {
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			territory[y][x] = null_player;
+		} while (++x);
+	} while (++y);
+
+	territory[4][10] = 0;
+	territory[4][11] = 1;
+	territory[4][12] = 3;
+}
+
 void game_preload(struct game* const game) {
 	// TODO: fix order
 	game->x = 0;
 	game->y = 0;
 	game_map_initialise(game->map);
+	grid_clear_all_uint8(game->territory);
 	grid_clear_all_uint8(game->labels);
 	grid_clear_all_energy_t(game->workspace);
 	units_initialise(&game->units);
 	game->selected = null_unit;
 	queue_initialise(&game->queue);
 	game->turn = 0;
+	game_territory_initialise(game->territory);
 }
 
 void game_postload(struct game* const game) {
@@ -209,7 +225,9 @@ void game_loop(struct game* const game) {
 
 		render(game, attack_enabled);
 
-		printf("%u %u %s", game->x, game->y, tile_names[game->map[game->y][game->x]]);
+		printf("%u %u %s %u", game->x, game->y,
+			tile_names[game->map[game->y][game->x]],
+			game->territory[game->y][game->x]);
 
 		input = getch();
 	}
