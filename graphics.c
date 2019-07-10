@@ -264,12 +264,16 @@ static bool render_capturable(
 	else
 		texture &= '\x0F';
 
-	*style = player_styles[game->territory[y][x]];
+	const player_t player = game->territory[y][x];
+
+	*style = player_styles[player];
 
 	if (texture == 0) {
 		*symbol = ' ';
 		render_highlight(game, x, y, attack_actionable, symbol, style);
-	} else
+	} else if (texture == '\x0F')
+		*symbol = player_symbols[player];
+	else
 		*symbol = unit_symbols[texture - 1];
 
 	return true;
