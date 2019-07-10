@@ -27,11 +27,10 @@ static void game_map_initialise(tile_t map[grid_size][grid_size]) {
 		map[4][i] = i;
 	}
 
-	map[4][10] = 1;
 	map[5][10] = 1;
 }
 
-void game_initialise(struct game* const game) {
+void game_preload(struct game* const game) {
 	// TODO: fix order
 	game->x = 0;
 	game->y = 0;
@@ -42,9 +41,15 @@ void game_initialise(struct game* const game) {
 	game->selected = null_unit;
 	queue_initialise(&game->queue);
 	game->turn = 0;
+}
 
+void game_postload(struct game* const game) {
 	for (player_t player = 0; player < players_capacity; ++player) {
+		// Set units' enabled state
 		units_set_enabled(&game->units, player, player == 0);
+
+		// Set players' alive state
+		game->alives[player] = game->units.firsts[player] != null_unit;
 	}
 }
 
@@ -170,7 +175,14 @@ static void game_handle_attack(struct game* const game) {
 
 static void game_next_turn(struct game* const game) {
 	units_set_enabled(&game->units, game->turn, false);
-	game->turn = (game->turn + 1) % players_capacity;
+
+	const player_t prev_turn = game->turn;
+
+	// Find next alive player
+	do {
+		game->turn = (game->turn + 1) % players_capacity;
+	} while (!game->alives[game->turn] && game->turn != prev_turn);
+
 	units_set_enabled(&game->units, game->turn, true);
 }
 
@@ -197,7 +209,7 @@ void game_loop(struct game* const game) {
 
 		render(game, attack_enabled);
 
-		printf("%u %u", game->x, game->y);
+		printf("%u %u %s", game->x, game->y, tile_names[game->map[game->y][game->x]]);
 
 		input = getch();
 	}

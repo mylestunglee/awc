@@ -21,14 +21,14 @@ typedef uint8_t player_t;
 #define unit_type_format "%02X"
 #define grid_t_format "%d"
 #define grid_size 0x100
-#define players_capacity 3
+#define players_capacity 7
 #define unit_player_offset (unit_t)'\x05'
 #define model_t_mask (unit_t)'\x1f'
 #define screen_width 10
 #define screen_height 8
 #define tile_width 8
 #define tile_height 4
-#define tile_capacity 10
+#define tile_capacity 15
 #define unit_left 1
 #define unit_top 1
 #define unit_width 5
@@ -40,9 +40,9 @@ typedef uint8_t player_t;
 #define attackable_style '\x90'
 #define model_capacity 15
 
-// const static char* grid_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge"};
-const static uint8_t grid_symbols[tile_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
-const static uint8_t grid_styles[tile_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
+const static char* tile_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge", "city", "factory", "airport", "habour", "HQ"};
+const static uint8_t grid_symbols[tile_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '=', 'C', 'F', 'A', 'S', 'H'};
+const static uint8_t grid_styles[tile_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78', '\xF8', '\xF8', '\xF8', '\xF8', '\xF8'};
 const static uint8_t unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
 	{	{'\x03', '\xF3', '\x00'},
 		{'\x08', '\x88', '\x00'}
@@ -93,20 +93,20 @@ const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 
 
 const static uint8_t unit_movement_types[model_capacity] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
 const static energy_t movement_type_cost[6][tile_capacity] = {
-	{0, 1, 1, 2, 1, 0, 0, 2, 1, 1},
-	{0, 1, 1, 1, 1, 0, 0, 1, 1, 1},
-	{0, 2, 3, 0, 1, 0, 0, 0, 1, 1},
-	{0, 1, 2, 0, 1, 0, 0, 0, 1, 1},
-	{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-	{0, 0, 0, 0, 0, 1, 2, 0, 0, 1}};
+	{0, 1, 1, 2, 1, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1},
+	{0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+	{0, 2, 3, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
+	{0, 1, 2, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
+	{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+	{0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0}};
 
 const static uint8_t grid_defense[6][tile_capacity] = {
-	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1},
-	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1},
-	{0, 1, 2, 0, 0, 0, 0, 0, 0, 0},
-	{0, 1, 2, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 1, 0, 0, 0}};
+	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
+	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
+	{0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 4},
+	{0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 4},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0}};
 
 const static uint8_t units_damage[model_capacity][model_capacity] = {
 	{55,  45,  12,  5,   1,   15,  25,  5,   25,  0,   0,   7,   0,   0,   0},

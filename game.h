@@ -16,10 +16,11 @@ struct game {
 	grid_t prev_x;
 	grid_t prev_y;
 	player_t turn;
+	player_t alives[players_capacity];
 };
 
-void game_initialise(struct game* const);
-
+void game_preload(struct game* const);
+void game_postload(struct game* const);
 void game_loop(struct game* const);
 
 #endif

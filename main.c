@@ -5,11 +5,12 @@
 
 int main() {
 	struct game game;
-	game_initialise(&game);
 
+	game_preload(&game);
 	for (int i = 0; i < 15; i++) {
-		units_insert(&game.units, (struct unit){.model = i, .x = i, .y = 3, .health = i * 18 + 3, .player = i % 2, .enabled = !(i % 2)});
+		units_insert(&game.units, (struct unit){.model = i, .x = i, .y = 3, .health = i * 18 + 3, .player = i % 2});
 	}
+	game_postload(&game);
 
 	game_loop(&game);
 
