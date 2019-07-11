@@ -3,6 +3,7 @@
 #include "game.h"
 #include "graphics.h"
 #include "grid.h"
+#include "file.h"
 
 static void game_map_initialise(tile_t map[grid_size][grid_size]) {
 	grid_t y = 0;
@@ -221,6 +222,8 @@ void game_loop(struct game* const game) {
 				game_handle_action(game);
 		} else if (input == 'n') {
 			game_next_turn(game);
+		} else if (input == 'z') {
+			file_save(game, (const uint8_t*)"state.txt");
 		}
 
 		render(game, attack_enabled);

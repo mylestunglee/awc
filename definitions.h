@@ -20,7 +20,9 @@ typedef uint8_t player_t;
 #define null_player players_capacity
 #define unit_t_format "%02X"
 #define unit_type_format "%02X"
-#define grid_t_format "%d"
+#define grid_t_format "%3u"
+#define player_format "%3u"
+#define health_format "%3u"
 #define grid_size 0x100
 #define players_capacity 3
 #define unit_player_offset (unit_t)'\x05'
@@ -44,7 +46,7 @@ typedef uint8_t player_t;
 #define model_capacity 15
 
 const static char* tile_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge", "city", "factory", "airport", "habour", "HQ"};
-const static uint8_t tile_symbols[terrian_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '='};
+const static uint8_t tile_symbols[tile_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '=', 'C', 'F', 'A', 'S', 'H'};
 const static uint8_t tile_styles[terrian_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
 const static uint8_t unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
 	{	{'\x03', '\xF3', '\x00'},
