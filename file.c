@@ -3,6 +3,71 @@
 #include "file.h"
 #include "units.h"
 
+static void file_load_turn(struct game* const game, const char* const tokens) {
+	player_t turn;
+	if (sscanf(tokens, "%hhu", &turn) != 1)
+		return;
+
+	game->turn = turn - 1;
+}
+
+static void file_load_map(struct game* const game, const char* const tokens) {
+	grid_t y;
+	char map_str[grid_size] = {0};
+	if (sscanf(tokens, "%hhu%s", &y, map_str) != 2)
+		return;
+
+	--y;
+	grid_t x = 0;
+
+	// Read symbols left to right
+	while (map_str[x] != '\0') {
+		// Find tile index for symbol
+		for (tile_t tile = 0; tile < tile_capacity; ++tile) {
+			if (map_str[x] == tile_symbols[tile]) {
+				game->map[y][x] = tile;
+				break;
+			}
+		}
+		++x;
+	}
+}
+
+static void file_load_territory(struct game* const game, const char* const tokens) {
+	grid_t x, y;
+	player_t player;
+
+	if (sscanf(tokens, "%hhu%hhu%hhu", &player, &x, &y) != 3)
+		return;
+
+	--player;
+	--x;
+	--y;
+
+	if (player < players_capacity)
+		game->territory[y][x] = player;
+}
+
+static void file_load_unit(struct game* const game, const char* const tokens, const model_t model) {
+	grid_t x, y;
+	player_t player;
+	health_t_wide health;
+	if (sscanf(tokens, "%hhu%hhu%hhu%u", &player, &x, &y, &health) != 4)
+		return;
+
+	--player;
+	--x;
+	--y;
+
+	if (player < players_capacity)
+		units_insert(&game->units, (struct unit){
+			.model = model,
+			.x = x,
+			.y = y,
+			.health = (health * (health_max + 1) / 1000) - 1,
+			.player = player});
+}
+
 bool file_load(struct game* const game, const char* const filename) {
 	FILE* const file = fopen(filename, "r");
 
@@ -11,63 +76,31 @@ bool file_load(struct game* const game, const char* const filename) {
 	char line[buffer_size];
 
 	while (fgets(line, buffer_size, file)) {
-		char* saveptr;
-		char* key = __strtok_r(line, delim, &saveptr);
+		char* tokens;
+		char* key = __strtok_r(line, delim, &tokens);
 
-		if (strcmp(key, "turn") == 0) {
-			player_t turn;
-			sscanf(saveptr, "%hhu", &turn);
-			game->turn = turn - 1;
-		} else if (strcmp(key, "map") == 0) {
-			grid_t y;
-			char map_str[grid_size] = {0};
-			sscanf(saveptr, "%hhu%s", &y, map_str);
-			--y;
-			grid_t x = 0;
-			while (map_str[x] != '\0') {
-				for (tile_t tile = 0; tile < tile_capacity; ++tile) {
-					if (map_str[x] == tile_symbols[tile])
-						game->map[y][x] = tile;
+		if (!strcmp(key, "turn"))
+			file_load_turn(game, tokens);
+		else if (!strcmp(key, "map"))
+			file_load_map(game, tokens);
+		else if (!strcmp(key, "territory"))
+			file_load_territory(game, tokens);
+		else
+			for (model_t model = 0; model < model_capacity; ++model)
+				if (!strcmp(key, model_names[model])) {
+					file_load_unit(game, tokens, model);
+					break;
 				}
-				++x;
-			}
-		} else if (strcmp(key, "territory") == 0) {
-			grid_t x, y;
-			player_t player;
-			sscanf(saveptr, "%hhu%hhu%hhu", &player, &x, &y);
-			--player;
-			--x;
-			--y;
-			game->territory[y][x] = player;
-		} else {
-			for (model_t model = 0; model < model_capacity; ++model) {
-				if (strcmp(key, model_names[model]) == 0) {
-					grid_t x, y;
-					player_t player;
-					health_t_wide health;
-					sscanf(saveptr, "%hhu%hhu%hhu%u", &player, &x, &y, &health);
-					--player;
-					--x;
-					--y;
-					units_insert(&game->units, (struct unit){
-						.model = model,
-						.x = x,
-						.y = y,
-						.health = (health * (health_max + 1) / 1000) - 1,
-						.player = player});
-				}
-			}
-		}
-
-		printf("%s\n", key);
 	}
+
+	fclose(file);
 
 	return false;
 }
 
 static int file_row_length(const struct game* const game, const grid_t y) {
 	for (int x = grid_size - 1; x >= 0; --x) {
-		if (game->map[y][x] != 0) {
+		if (game->map[y][x]) {
 			return x;
 		}
 	}

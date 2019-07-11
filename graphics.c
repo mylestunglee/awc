@@ -193,7 +193,7 @@ static void render_highlight(
 	uint8_t* const style) {
 
 	// Apply label hightlighting
-	if (game->labels[y][x] != 0) {
+	if (game->labels[y][x]) {
 		// Clear foreground style
 		*style &= '\x0f';
 

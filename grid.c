@@ -34,7 +34,7 @@ static void grid_explore_mark_attackable(
 	// Mark tiles without friendly units as attackable
 	if (index != null_unit &&
 		unit->player != player &&
-		units_damage[model][unit->model] != 0)
+		units_damage[model][unit->model])
 		game->labels[y][x] |= attackable_bit;
 }
 

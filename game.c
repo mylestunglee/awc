@@ -13,10 +13,6 @@ static void game_territory_initialise(player_t territory[grid_size][grid_size]) 
 			territory[y][x] = null_player;
 		} while (++x);
 	} while (++y);
-
-	territory[4][10] = 0;
-	territory[4][11] = 1;
-	territory[4][12] = 3;
 }
 
 void game_preload(struct game* const game) {
@@ -80,8 +76,8 @@ static bool game_attack_enabled(const struct game* const game) {
 	//     a. Selected unit can attack with positive damage
 	//     b. Attacker and attackee are in different teams
 	return game->selected != null_unit &&
-		(game->labels[game->prev_y][game->prev_x] & accessible_bit) != 0 &&
-		(game->labels[game->y][game->x] & attackable_bit) != 0;
+		game->labels[game->prev_y][game->prev_x] & accessible_bit &&
+		game->labels[game->y][game->x] & attackable_bit;
 }
 
 static void game_handle_action(struct game* const game) {
@@ -99,7 +95,7 @@ static void game_handle_action(struct game* const game) {
 			game->selected = null_unit;
 			grid_clear_all_uint8(game->labels);
 		// Move to accessible tile
-		} else if ((game->labels[game->y][game->x] & accessible_bit) != 0) {
+		} else if (game->labels[game->y][game->x] & accessible_bit) {
 			units_move(&game->units, game->selected, game->x, game->y);
 			game->units.data[game->selected].enabled = false;
 			game->selected = null_unit;
