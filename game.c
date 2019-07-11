@@ -223,7 +223,7 @@ void game_loop(struct game* const game) {
 		} else if (input == 'n') {
 			game_next_turn(game);
 		} else if (input == 'z') {
-			file_save(game, (const uint8_t*)"state.txt");
+			file_save(game, "state.txt");
 		}
 
 		render(game, attack_enabled);
