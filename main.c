@@ -2,19 +2,15 @@
 #include "game.h"
 #include "graphics.h"
 #include "queue.h"
+#include "file.h"
 
 int main() {
 	struct game game;
 
 	game_preload(&game);
-	for (int i = 0; i < 15; i++) {
-		units_insert(&game.units, (struct unit){.model = i, .x = i, .y = 3, .health = i * 18 + 3, .player = i % 2});
-	}
+	file_load(&game, "state.txt");
 	game_postload(&game);
-
 	game_loop(&game);
-
 	reset_style();
-
 	return 0;
 }

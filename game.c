@@ -5,32 +5,6 @@
 #include "grid.h"
 #include "file.h"
 
-static void game_map_initialise(tile_t map[grid_size][grid_size]) {
-	grid_t y = 0;
-	do {
-		grid_t x = 0;
-		do {
-			map[y][x] = 0;
-		} while (++x);
-	} while (++y);
-
-	for (int i = 0; i < 20; i++) {
-		for (int j = 0; j < 6; j++) {
-			if (i < 9) {
-				map[j][i] = 1;
-			} else {
-				map[j][i] = 5;
-			}
-		}
-	}
-
-	for (int i = 0; i < tile_capacity; i++) {
-		map[4][i] = i;
-	}
-
-	map[5][10] = 1;
-}
-
 static void game_territory_initialise(player_t territory[grid_size][grid_size]) {
 	grid_t y = 0;
 	do {
@@ -49,7 +23,7 @@ void game_preload(struct game* const game) {
 	// TODO: fix order
 	game->x = 0;
 	game->y = 0;
-	game_map_initialise(game->map);
+	grid_clear_all_uint8(game->map);
 	grid_clear_all_uint8(game->territory);
 	grid_clear_all_uint8(game->labels);
 	grid_clear_all_energy_t(game->workspace);
@@ -63,7 +37,7 @@ void game_preload(struct game* const game) {
 void game_postload(struct game* const game) {
 	for (player_t player = 0; player < players_capacity; ++player) {
 		// Set units' enabled state
-		units_set_enabled(&game->units, player, player == 0);
+		units_set_enabled(&game->units, player, player == game->turn);
 
 		// Set players' alive state
 		game->alives[player] = game->units.firsts[player] != null_unit;
@@ -228,9 +202,13 @@ void game_loop(struct game* const game) {
 
 		render(game, attack_enabled);
 
-		printf("%u %u %s %u", game->x, game->y,
-			tile_names[game->map[game->y][game->x]],
-			game->territory[game->y][game->x]);
+		if (game->territory[game->y][game->x] != null_player)
+			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu", game->turn, game->x, game->y,
+				tile_names[game->map[game->y][game->x]],
+				game->territory[game->y][game->x]);
+		else
+			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=none", game->turn, game->x, game->y,
+				tile_names[game->map[game->y][game->x]]);
 
 		input = getch();
 	}

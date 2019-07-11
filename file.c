@@ -1,7 +1,67 @@
 #include <stdio.h>
+#include <string.h>
 #include "file.h"
+#include "units.h"
 
-bool file_load(const struct game* const game, const char* const filename) {
+bool file_load(struct game* const game, const char* const filename) {
+	FILE* const file = fopen(filename, "r");
+
+	const char* delim = " ";
+	const int buffer_size = 4096;
+	char line[buffer_size];
+
+	while (fgets(line, buffer_size, file)) {
+		char* saveptr;
+		char* key = __strtok_r(line, delim, &saveptr);
+
+		if (strcmp(key, "turn") == 0) {
+			player_t turn;
+			sscanf(saveptr, "%hhu", &turn);
+			game->turn = turn - 1;
+		} else if (strcmp(key, "map") == 0) {
+			grid_t y;
+			char map_str[grid_size] = {0};
+			sscanf(saveptr, "%hhu%s", &y, map_str);
+			--y;
+			grid_t x = 0;
+			while (map_str[x] != '\0') {
+				for (tile_t tile = 0; tile < tile_capacity; ++tile) {
+					if (map_str[x] == tile_symbols[tile])
+						game->map[y][x] = tile;
+				}
+				++x;
+			}
+		} else if (strcmp(key, "territory") == 0) {
+			grid_t x, y;
+			player_t player;
+			sscanf(saveptr, "%hhu%hhu%hhu", &player, &x, &y);
+			--player;
+			--x;
+			--y;
+			game->territory[y][x] = player;
+		} else {
+			for (model_t model = 0; model < model_capacity; ++model) {
+				if (strcmp(key, model_names[model]) == 0) {
+					grid_t x, y;
+					player_t player;
+					health_t_wide health;
+					sscanf(saveptr, "%hhu%hhu%hhu%u", &player, &x, &y, &health);
+					--player;
+					--x;
+					--y;
+					units_insert(&game->units, (struct unit){
+						.model = model,
+						.x = x,
+						.y = y,
+						.health = (health * (health_max + 1) / 1000) - 1,
+						.player = player});
+				}
+			}
+		}
+
+		printf("%s\n", key);
+	}
+
 	return false;
 }
 
@@ -63,6 +123,7 @@ bool file_save(const struct game* const game, const char* const filename) {
 			} while (++x);
 		} while (++y);
 	}
+
 	fclose(file);
 
 	return false;
