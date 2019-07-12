@@ -168,7 +168,7 @@ static bool render_health_bar(
 	const uint8_t styles[4] = {'\x90', '\x30', '\xB0', '\xA0'};
 	*style = styles[(health & '\xC0') >> 6];
 
-	const uint8_t steps = (health_t_wide)health * (4 * unit_width - 1) / health_max;
+	const uint8_t steps = (health_wide_t)health * (4 * unit_width - 1) / health_max;
 
 	if (steps < 4 * (tile_x - unit_left))
 		*symbol = ' ';

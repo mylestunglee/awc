@@ -126,7 +126,7 @@ void units_frees_print(const struct units* const units) {
 	unit_t j = units->start;
 	for (unit_t i = 0; i < units_capacity - units->size; ++i) {
 		if (i < verboseness || i >= units_capacity - units->size - verboseness) {
-			printf(unit_t_format" ", units->frees[j]);
+			printf(unit_format" ", units->frees[j]);
 		} else if (i == 3) {
 			printf("... ");
 		}
@@ -140,10 +140,10 @@ void units_frees_print(const struct units* const units) {
 void units_players_print(const struct units* const units) {
 	for (player_t player = 0; player < players_capacity; ++player) {
 		unit_t curr = units->firsts[player];
-		printf(unit_type_format": ["unit_t_format"]", player, curr);
+		printf(player_format": ["unit_format"]", player, curr);
 		while (curr != null_unit) {
 			const unit_t next = units->nexts[curr];
-			printf("->["unit_type_format": "unit_type_format" ("grid_t_format", "grid_t_format") "unit_t_format"]", curr, units->prevs[curr], units->data[curr].x, units->data[curr].y, next);
+			printf("->["unit_format": "unit_format" ("grid_format", "grid_format") "unit_format"]", curr, units->prevs[curr], units->data[curr].x, units->data[curr].y, next);
 			curr = next;
 		}
 		printf("\n");
@@ -159,7 +159,7 @@ void units_grid_print(const struct units* const units) {
 		do
 		{
 			if (units->grid[y][x] != null_unit)
-				printf("("grid_t_format", "grid_t_format"): "unit_t_format" ", x, y, units->grid[y][x]);
+				printf("("grid_format", "grid_format"): "unit_format" ", x, y, units->grid[y][x]);
 		} while (++x);
 	} while (++y);
 	printf("}\n");

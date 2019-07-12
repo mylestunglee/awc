@@ -14,7 +14,7 @@ static void file_load_turn(struct game* const game, const char* const tokens) {
 static void file_load_map(struct game* const game, const char* const tokens) {
 	grid_t y;
 	char map_str[grid_size] = {0};
-	if (sscanf(tokens, "%hhu%s", &y, map_str) != 2)
+	if (sscanf(tokens, grid_format row_format, &y, map_str) != 2)
 		return;
 
 	--y;
@@ -37,7 +37,7 @@ static void file_load_territory(struct game* const game, const char* const token
 	grid_t x, y;
 	player_t player;
 
-	if (sscanf(tokens, "%hhu%hhu%hhu", &player, &x, &y) != 3)
+	if (sscanf(tokens, player_format grid_format grid_format, &player, &x, &y) != 3)
 		return;
 
 	--player;
@@ -51,8 +51,8 @@ static void file_load_territory(struct game* const game, const char* const token
 static void file_load_unit(struct game* const game, const char* const tokens, const model_t model) {
 	grid_t x, y;
 	player_t player;
-	health_t_wide health;
-	if (sscanf(tokens, "%hhu%hhu%hhu%u", &player, &x, &y, &health) != 4)
+	health_wide_t health;
+	if (sscanf(tokens, player_format grid_format grid_format health_wide_format, &player, &x, &y, &health) != 4)
 		return;
 
 	--player;
@@ -72,7 +72,7 @@ bool file_load(struct game* const game, const char* const filename) {
 	FILE* const file = fopen(filename, "r");
 
 	const char* delim = " ";
-	const int buffer_size = 4096;
+	const uint16_t buffer_size = 4096;
 	char line[buffer_size];
 
 	while (fgets(line, buffer_size, file)) {
@@ -93,13 +93,11 @@ bool file_load(struct game* const game, const char* const filename) {
 				}
 	}
 
-	fclose(file);
-
-	return false;
+	return fclose(file) >= 0;
 }
 
-static int file_row_length(const struct game* const game, const grid_t y) {
-	for (int x = grid_size - 1; x >= 0; --x) {
+static grid_wide_t file_row_length(const struct game* const game, const grid_t y) {
+	for (grid_wide_t x = grid_size - 1; x >= 0; --x) {
 		if (game->map[y][x]) {
 			return x;
 		}
@@ -110,17 +108,39 @@ static int file_row_length(const struct game* const game, const grid_t y) {
 static void file_save_map(const struct game* const game, FILE* const file) {
 	grid_t y = 0;
 	do {
-		int length = file_row_length(game, y);
+		const grid_wide_t length = file_row_length(game, y);
 
 		if (length < 0)
 			continue;
 
-		fprintf(file, "map "grid_t_format" ", y + 1);
+		fprintf(file, "map "grid_format" ", y + 1);
 
-		for (int x = 0; x <= length; ++x) {
+		for (grid_wide_t x = 0; x <= length; ++x) {
 			fprintf(file, "%c", tile_symbols[game->map[y][x]]);
 		}
 		fprintf(file, "\n");
+	} while (++y);
+}
+
+static void file_save_units(const struct game* const game, FILE* const file) {
+	for (player_t player = 0; player < players_capacity; ++player) {
+		unit_t curr = game->units.firsts[player];
+		while (curr != null_unit) {
+			const struct unit* const unit = &game->units.data[curr];
+			fprintf(file, model_format" "player_format" "grid_format" "grid_format" "health_format"\n", model_names[unit->model], unit->player + 1, unit->x + 1, unit->y + 1, 1000 * (unit->health + 1) / (health_max + 1));
+			curr = game->units.nexts[curr];
+		}
+	}
+}
+
+static void file_save_territory(const struct game* const game, FILE* const file) {
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			if (game->territory[y][x] != null_player)
+				fprintf(file, "territory "player_format" "grid_format" "grid_format"\n", game->territory[y][x] + 1, x + 1, y + 1);
+		} while (++x);
 	} while (++y);
 }
 
@@ -130,34 +150,10 @@ bool file_save(const struct game* const game, const char* const filename) {
 	if (!file)
 		return true;
 
-	// Write turn
-	fprintf(file, "turn %u\n", game->turn + 1);
-
+	fprintf(file, "turn "turn_format"\n", game->turn + 1);
 	file_save_map(game, file);
+	file_save_units(game, file);
+	file_save_territory(game, file);
 
-	// Write units
-	for (player_t player = 0; player < players_capacity; ++player) {
-		unit_t curr = game->units.firsts[player];
-		while (curr != null_unit) {
-			const struct unit* const unit = &game->units.data[curr];
-			fprintf(file, "%-12s "player_format" "grid_t_format" "grid_t_format" "health_format"\n", model_names[unit->model], unit->player + 1, unit->x + 1, unit->y + 1, 1000 * (unit->health + 1) / (health_max + 1));
-			curr = game->units.nexts[curr];
-		}
-	}
-
-	// Write territory
-	{
-		grid_t y = 0;
-		do {
-			grid_t x = 0;
-			do {
-				if (game->territory[y][x] != null_player)
-					fprintf(file, "territory "player_format" "grid_t_format" "grid_t_format"\n", game->territory[y][x] + 1, x + 1, y + 1);
-			} while (++x);
-		} while (++y);
-	}
-
-	fclose(file);
-
-	return false;
+	return fclose(file) >= 0;
 }

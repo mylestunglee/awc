@@ -114,9 +114,9 @@ static health_t calc_damage(
 	const uint8_t movement_type = unit_movement_types[attackee->model];
 
 	return (health_t)((
-		(health_t_wide)units_damage[attacker->model][attackee->model] *
-		(health_t_wide)(attacker->health + 1) *
-		(health_t_wide)(10 - grid_defense[movement_type][tile])
+		(health_wide_t)units_damage[attacker->model][attackee->model] *
+		(health_wide_t)(attacker->health + 1) *
+		(health_wide_t)(10 - tile_defense[movement_type][tile])
 	) / (100 * 10));
 }
 

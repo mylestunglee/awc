@@ -3,47 +3,56 @@
 
 #include <stdint.h>
 
+// Types
+
 typedef uint8_t unit_t;
 typedef uint8_t health_t;
 typedef uint8_t model_t;
 typedef uint8_t grid_t;
+typedef int16_t grid_wide_t;
 typedef uint16_t queue_t;
 typedef uint16_t energy_t;
 typedef uint8_t tile_t;
-typedef uint32_t health_t_wide;
+typedef uint32_t health_wide_t;
 typedef uint8_t player_t;
 
+#define grid_size 256
 #define health_max 0xff
+#define model_capacity 15
+#define movement_types_capacity 6
+#define terrian_capacity 10
+#define capturable_capacity 5
+#define tile_capacity (terrian_capacity + capturable_capacity)
 #define queue_capacity 0xffff
 #define units_capacity (unit_t)'\xff'
 #define null_unit units_capacity
 #define null_player players_capacity
-#define unit_t_format "%02X"
-#define unit_type_format "%02X"
-#define grid_t_format "%3u"
-#define player_format "%3u"
-#define health_format "%4u"
-#define grid_size 0x100
 #define players_capacity 3
-#define unit_player_offset (unit_t)'\x05'
-#define model_t_mask (unit_t)'\x1f'
+
+#define unit_format "%02X"
+#define grid_format "%3hhu"
+#define player_format "%3hhu"
+#define health_format "%4hhu"
+#define row_format "%256s"
+#define model_format "%-12s"
+#define turn_format "%hhu"
+#define health_wide_format "%u"
+
+// Graphics
 #define screen_width 10
 #define screen_height 8
 #define tile_width 8
 #define tile_height 4
-#define terrian_capacity 10
-#define capturable_capacity 5
-#define tile_capacity (terrian_capacity + capturable_capacity)
 #define unit_left 1
 #define unit_top 1
 #define unit_width 5
 #define unit_height 2
+
 #define selection_symbol '+'
 #define accessible_bit 1
 #define attackable_bit 2
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
-#define model_capacity 15
 
 const static char* tile_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge", "city", "factory", "airport", "habour", "HQ"};
 const static char* model_names[model_capacity] = {"infantry", "mech", "recon", "tank", "battletank", "antiair", "artillery", "rockets", "missles", "fighter", "bomber", "battlecopter", "battleship", "crusier", "submarine"};
@@ -120,7 +129,7 @@ const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 
 #define tile_bridge 9
 
 const static uint8_t unit_movement_types[model_capacity] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
-const static energy_t movement_type_cost[6][tile_capacity] = {
+const static energy_t movement_type_cost[movement_types_capacity][tile_capacity] = {
 	{0, 1, 1, 2, 1, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1},
 	{0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
 	{0, 2, 3, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
@@ -128,7 +137,7 @@ const static energy_t movement_type_cost[6][tile_capacity] = {
 	{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 	{0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0}};
 
-const static uint8_t grid_defense[6][tile_capacity] = {
+const static uint8_t tile_defense[movement_types_capacity][tile_capacity] = {
 	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
 	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
 	{0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 4},
@@ -151,7 +160,6 @@ const static uint8_t units_damage[model_capacity][model_capacity] = {
 	{75,  75,  55,  55,  25,  65,  65,  25,  65,  0,   0,   65,  25,  55,  25},
 	{95,  90,  90,  85,  55,  80,  85,  85,  90,  0,   0,   0,   50,  95,  95},
 	{0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  65,  115, 0,    0,  90},
-	{0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  25,  55}
-};
+	{0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  25,  55}};
 
 #endif
