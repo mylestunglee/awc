@@ -15,7 +15,7 @@ static void game_territory_initialise(player_t territory[grid_size][grid_size]) 
 	} while (++y);
 }
 
-void game_preload(struct game* const game) {
+static void game_preload(struct game* const game) {
 	// TODO: fix order
 	game->x = 0;
 	game->y = 0;
@@ -30,43 +30,72 @@ void game_preload(struct game* const game) {
 	game_territory_initialise(game->territory);
 }
 
-void game_postload(struct game* const game) {
+static void game_postload(struct game* const game) {
 	for (player_t player = 0; player < players_capacity; ++player) {
-		// Set units' enabled state
-		units_set_enabled(&game->units, player, player == game->turn);
-
 		// Set players' alive state
 		game->alives[player] = game->units.firsts[player] != null_unit;
 	}
 }
 
-static void game_parse_movement(struct game* const game, const uint8_t input) {
+bool game_load(struct game* const game, const char* const filename) {
+	game_preload(game);
+	const bool error = file_load(game, filename);
+	game_postload(game);
+	return error;
+}
+
+static bool game_parse_movement(struct game* const game, const char input) {
 	switch (input) {
 		case 'w': {
 			game->prev_x = game->x;
 			game->prev_y = game->y;
 			--game->y;
-			break;
+			return true;
 		}
 		case 'a': {
 			game->prev_x = game->x;
 			game->prev_y = game->y;
 			--game->x;
-			break;
+			return true;
 		}
 		case 's': {
 			game->prev_x = game->x;
 			game->prev_y = game->y;
 			++game->y;
-			break;
+			return true;
 		}
 		case 'd': {
 			game->prev_x = game->x;
 			game->prev_y = game->y;
 			++game->x;
-			break;
+			return true;
 		}
 	}
+	return false;
+}
+
+static bool game_parse_file(struct game* const game, const char input) {
+	bool error;
+
+	switch (input) {
+		case '1': {error = game_load(game, "state1.txt"); break;}
+		case '2': {error = game_load(game, "state2.txt"); break;}
+		case '3': {error = game_load(game, "state3.txt"); break;}
+		case '4': {error = game_load(game, "state4.txt"); break;}
+		case '5': {error = game_load(game, "state5.txt"); break;}
+		case '6': {error = file_save(game, "state1.txt"); break;}
+		case '7': {error = file_save(game, "state2.txt"); break;}
+		case '8': {error = file_save(game, "state3.txt"); break;}
+		case '9': {error = file_save(game, "state4.txt"); break;}
+		case '0': {error = file_save(game, "state5.txt"); break;}
+		default:
+			return false;
+	}
+
+	if (error)
+		printf("IO error");
+
+	return true;
 }
 
 static bool game_attack_enabled(const struct game* const game) {
@@ -181,11 +210,12 @@ void game_loop(struct game* const game) {
 	char input = getch();
 
 	while (input != 'q') {
-		game_parse_movement(game, input);
-
 		attack_enabled = game_attack_enabled(game);
 
-		if (input == ' ') {
+		if (game_parse_movement(game, input) ||
+			game_parse_file(game, input)) {
+
+		} else if (input == ' ') {
 			if (attack_enabled)
 				game_handle_attack(game);
 			else

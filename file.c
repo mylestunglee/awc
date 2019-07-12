@@ -52,7 +52,13 @@ static void file_load_unit(struct game* const game, const char* const tokens, co
 	grid_t x, y;
 	player_t player;
 	health_wide_t health;
-	if (sscanf(tokens, player_format grid_format grid_format health_wide_format, &player, &x, &y, &health) != 4)
+	char enabled[8];
+	if (sscanf(tokens,
+			player_format
+			grid_format
+			grid_format
+			health_wide_format
+			"%8s", &player, &x, &y, &health, enabled) != 5)
 		return;
 
 	--player;
@@ -65,11 +71,15 @@ static void file_load_unit(struct game* const game, const char* const tokens, co
 			.x = x,
 			.y = y,
 			.health = (health * (health_max + 1) / 1000) - 1,
-			.player = player});
+			.player = player,
+			.enabled = !strcmp(enabled, "enabled")});
 }
 
 bool file_load(struct game* const game, const char* const filename) {
 	FILE* const file = fopen(filename, "r");
+
+	if (!file)
+		return true;
 
 	const char* delim = " ";
 	const uint16_t buffer_size = 4096;
@@ -93,7 +103,7 @@ bool file_load(struct game* const game, const char* const filename) {
 				}
 	}
 
-	return fclose(file) >= 0;
+	return fclose(file) < 0;
 }
 
 static grid_wide_t file_row_length(const struct game* const game, const grid_t y) {
@@ -127,7 +137,18 @@ static void file_save_units(const struct game* const game, FILE* const file) {
 		unit_t curr = game->units.firsts[player];
 		while (curr != null_unit) {
 			const struct unit* const unit = &game->units.data[curr];
-			fprintf(file, model_format" "player_format" "grid_format" "grid_format" "health_format"\n", model_names[unit->model], unit->player + 1, unit->x + 1, unit->y + 1, 1000 * (unit->health + 1) / (health_max + 1));
+			fprintf(file,
+				model_format" "
+				player_format" "
+				grid_format" "
+				grid_format" "
+				health_format" %s\n",
+				model_names[unit->model],
+				unit->player + 1,
+				unit->x + 1,
+				unit->y + 1,
+				1000 * (unit->health + 1) / (health_max + 1),
+				unit->enabled ? "enabled" : "disabled");
 			curr = game->units.nexts[curr];
 		}
 	}
@@ -155,5 +176,5 @@ bool file_save(const struct game* const game, const char* const filename) {
 	file_save_units(game, file);
 	file_save_territory(game, file);
 
-	return fclose(file) >= 0;
+	return fclose(file) < 0;
 }
