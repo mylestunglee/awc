@@ -100,12 +100,12 @@ static bool game_parse_file(struct game* const game, const char input) {
 
 static bool game_attack_enabled(const struct game* const game) {
 	// 1. A unit is selected
-	// 2. Previous selected tile is accessible
+	// 2. Previous selected tile is accessible if direct attack
 	// 3. Selected tile is attackable, which implies:
 	//     a. Selected unit can attack with positive damage
 	//     b. Attacker and attackee are in different teams
 	return game->selected != null_unit &&
-		game->labels[game->prev_y][game->prev_x] & accessible_bit &&
+		(units_min_range[game->units.data[game->selected].model] || game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
 		game->labels[game->y][game->x] & attackable_bit;
 }
 
@@ -134,19 +134,18 @@ static void game_handle_action(struct game* const game) {
 }
 
 // Calculate damage when attacker attacks attackee
-static health_t calc_damage(
+static health_wide_t calc_damage(
 	const struct game* const game,
 	const struct unit* const attacker,
 	const struct unit* const attackee) {
 
 	const tile_t tile = game->map[attackee->y][attackee->x];
 	const uint8_t movement_type = unit_movement_types[attackee->model];
-
-	return (health_t)((
+	return (
 		(health_wide_t)units_damage[attacker->model][attackee->model] *
 		(health_wide_t)(attacker->health + 1) *
 		(health_wide_t)(10 - tile_defense[movement_type][tile])
-	) / (100 * 10));
+	) / (100 * 10);
 }
 
 static void game_handle_attack(struct game* const game) {
@@ -159,10 +158,12 @@ static void game_handle_attack(struct game* const game) {
 
 	// Skip to post-attack cleanup when a unit dies
 	do {
-		// Prepare attacker for counter-attack
-		units_move(&game->units, game->selected, game->prev_x, game->prev_y);
+		// If unit is direct, move to attack
+		const bool ranged = units_min_range[attacker->model];
+		if (!ranged)
+			units_move(&game->units, game->selected, game->prev_x, game->prev_y);
 
-		const health_t damage = calc_damage(game, attacker, attackee);
+		const health_wide_t damage = calc_damage(game, attacker, attackee);
 
 		// Apply damage
 		if (damage > attackee->health) {
@@ -172,7 +173,11 @@ static void game_handle_attack(struct game* const game) {
 
 		attackee->health -= damage;
 
-		const health_t counter_damage = calc_damage(game, attackee, attacker);
+		// Ranged units do not receive counter-attacks
+		if (ranged)
+			break;
+
+		const health_wide_t counter_damage = calc_damage(game, attackee, attacker);
 
 		// Apply counter damage
 		if (counter_damage > attacker->health) {
@@ -203,19 +208,19 @@ static void game_next_turn(struct game* const game) {
 }
 
 void game_loop(struct game* const game) {
-	bool attack_enabled = game_attack_enabled(game);
-
-	render(game, attack_enabled);
+	render(game, false);
 
 	char input = getch();
 
 	while (input != 'q') {
-		attack_enabled = game_attack_enabled(game);
 
+		// Fix case skipping
 		if (game_parse_movement(game, input) ||
-			game_parse_file(game, input)) {
+			game_parse_file(game, input)) {}
 
-		} else if (input == ' ') {
+		const bool attack_enabled = game_attack_enabled(game);
+
+		if (input == ' ') {
 			if (attack_enabled)
 				game_handle_attack(game);
 			else
@@ -227,12 +232,16 @@ void game_loop(struct game* const game) {
 		render(game, attack_enabled);
 
 		if (game->territory[game->y][game->x] != null_player)
-			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu", game->turn, game->x, game->y,
+			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu attack=%u label=%u", game->turn, game->x, game->y,
 				tile_names[game->map[game->y][game->x]],
-				game->territory[game->y][game->x]);
+				game->territory[game->y][game->x],
+				attack_enabled,
+				game->labels[game->y][game->x]);
 		else
-			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=none", game->turn, game->x, game->y,
-				tile_names[game->map[game->y][game->x]]);
+			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=none attack=%u label=%u", game->turn, game->x, game->y,
+				tile_names[game->map[game->y][game->x]],
+				attack_enabled,
+				game->labels[game->y][game->x]);
 
 		input = getch();
 	}

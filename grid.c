@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdlib.h>
 #include "grid.h"
 
 void grid_clear_all_uint8(uint8_t grid[grid_size][grid_size]) {
@@ -21,7 +22,8 @@ void grid_clear_all_energy_t(uint16_t grid[grid_size][grid_size]) {
     } while (++y);
 }
 
-static void grid_explore_mark_attackable(
+// Marks a tile as attackable if position relates to attackable unit
+static void grid_explore_mark_attackable_tile(
 	struct game* const game,
 	const grid_t x,
 	const grid_t y,
@@ -38,6 +40,43 @@ static void grid_explore_mark_attackable(
 		game->labels[y][x] |= attackable_bit;
 }
 
+static void grid_explore_mark_attackable_direct(
+	struct game* const game,
+	const grid_t x,
+	const grid_t y,
+	const model_t model,
+	const player_t player) {
+
+	// Direct attack only applies to 0-ranged models
+	if(units_min_range[model])
+		return;
+
+	grid_explore_mark_attackable_tile(game, x + 1, y, model, player);
+	grid_explore_mark_attackable_tile(game, x - 1, y, model, player);
+	grid_explore_mark_attackable_tile(game, x, y + 1, model, player);
+	grid_explore_mark_attackable_tile(game, x, y - 1, model, player);
+}
+
+static void grid_explore_mark_attackable_ranged(
+	struct game* const game,
+	const grid_t x,
+	const grid_t y,
+	const model_t model,
+	const player_t player) {
+
+	// Range attack only applies to positive ranged models
+	if(!units_min_range[model])
+		return;
+
+	for (grid_wide_t j = -units_max_range[model]; j <= units_max_range[model]; ++j)
+		for (grid_wide_t i = -units_max_range[model]; i <= units_max_range[model]; ++i) {
+			const grid_wide_t distance = abs(i) + abs(j);
+			if (units_min_range[model] <= distance && distance <= units_max_range[model])
+				grid_explore_mark_attackable_tile(game, x + i, y + j, model, player);
+		}
+}
+
+
 void grid_explore(struct game* const game) {
 	struct queue* const queue = &game->queue;
 
@@ -47,6 +86,8 @@ void grid_explore(struct game* const game) {
 	const model_t model = game->units.data[game->selected].model;
 	const uint8_t movement_type = unit_movement_types[model];
 	const player_t player = game->units.data[game->selected].player;
+
+	grid_explore_mark_attackable_ranged(game, game->x, game->y, model, player);
 
 	queue_insert(queue, (struct queue_node){
 		.x = game->x,
@@ -90,11 +131,7 @@ void grid_explore(struct game* const game) {
 
 			game->labels[node->y][node->x] |= accessible_bit;
 
-			// Mark attackable tiles
-			grid_explore_mark_attackable(game, node->x + 1, node->y, model, player);
-			grid_explore_mark_attackable(game, node->x - 1, node->y, model, player);
-			grid_explore_mark_attackable(game, node->x, node->y + 1, model, player);
-			grid_explore_mark_attackable(game, node->x, node->y - 1, model, player);
+			grid_explore_mark_attackable_direct(game, node->x, node->y, model, player);
 		}
 
 		// Explore adjacent tiles

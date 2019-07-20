@@ -162,4 +162,7 @@ const static uint8_t units_damage[model_capacity][model_capacity] = {
 	{0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  65,  115, 0,    0,  90},
 	{0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  25,  55}};
 
+const static grid_t units_min_range[model_capacity] = {0, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 1, 0, 0};
+const static grid_t units_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 0, 0, 6, 0, 0};
+
 #endif
