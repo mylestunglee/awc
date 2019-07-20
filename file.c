@@ -75,6 +75,18 @@ static void file_load_unit(struct game* const game, const char* const tokens, co
 			.enabled = !strcmp(enabled, "enabled")});
 }
 
+static void file_load_gold(struct game* const game, const char* const tokens) {
+	player_t player;
+	gold_t gold;
+	if (sscanf(tokens, player_format gold_format, &player, &gold) != 2)
+		return;
+
+	--player;
+
+	if (player < players_capacity)
+		game->golds[player] = gold;
+}
+
 bool file_load(struct game* const game, const char* const filename) {
 	FILE* const file = fopen(filename, "r");
 
@@ -95,6 +107,8 @@ bool file_load(struct game* const game, const char* const filename) {
 			file_load_map(game, tokens);
 		else if (!strcmp(key, "territory"))
 			file_load_territory(game, tokens);
+		else if (!strcmp(key, "gold"))
+			file_load_gold(game, tokens);
 		else
 			for (model_t model = 0; model < model_capacity; ++model)
 				if (!strcmp(key, model_names[model])) {
@@ -165,6 +179,12 @@ static void file_save_territory(const struct game* const game, FILE* const file)
 	} while (++y);
 }
 
+static void file_save_golds(const struct game* const game, FILE* const file) {
+	for (player_t player = 0; player < players_capacity; ++player)
+		if (game->golds[player])
+			fprintf(file, "gold "player_format" "gold_format"\n", player + 1, game->golds[player]);
+}
+
 bool file_save(const struct game* const game, const char* const filename) {
 	FILE* const file = fopen(filename, "w");
 
@@ -175,6 +195,7 @@ bool file_save(const struct game* const game, const char* const filename) {
 	file_save_map(game, file);
 	file_save_units(game, file);
 	file_save_territory(game, file);
+	file_save_golds(game, file);
 
 	return fclose(file) < 0;
 }

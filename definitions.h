@@ -15,6 +15,7 @@ typedef uint16_t energy_t;
 typedef uint8_t tile_t;
 typedef uint32_t health_wide_t;
 typedef uint8_t player_t;
+typedef uint16_t gold_t;
 
 #define grid_size 256
 #define health_max 0xff
@@ -37,6 +38,7 @@ typedef uint8_t player_t;
 #define model_format "%-12s"
 #define turn_format "%hhu"
 #define health_wide_format "%u"
+#define gold_format "%hu"
 
 // Graphics
 #define screen_width 10

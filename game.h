@@ -18,6 +18,8 @@ struct game {
 	player_t turn;
 	player_t alives[players_capacity];
 	player_t territory[grid_size][grid_size];
+	gold_t golds[players_capacity];
+	gold_t incomes[players_capacity];
 };
 
 bool game_load(struct game* const, const char* const);

@@ -9,9 +9,9 @@ static void game_territory_initialise(player_t territory[grid_size][grid_size]) 
 	grid_t y = 0;
 	do {
 		grid_t x = 0;
-		do {
+		do
 			territory[y][x] = null_player;
-		} while (++x);
+		while (++x);
 	} while (++y);
 }
 
@@ -28,13 +28,31 @@ static void game_preload(struct game* const game) {
 	queue_initialise(&game->queue);
 	game->turn = 0;
 	game_territory_initialise(game->territory);
+
+	for (player_t player = 0; player < players_capacity; ++player) {
+		game->golds[player] = 0;
+		game->incomes[player] = 0;
+	}
+}
+
+static void game_compute_incomes(struct game* const game) {
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			const player_t player = game->territory[y][x];
+			if (player != null_player)
+				++game->incomes[player];
+		} while (++x);
+	} while (++y);
 }
 
 static void game_postload(struct game* const game) {
-	for (player_t player = 0; player < players_capacity; ++player) {
-		// Set players' alive state
+	game_compute_incomes(game);
+
+	// Set players' alive state
+	for (player_t player = 0; player < players_capacity; ++player)
 		game->alives[player] = game->units.firsts[player] != null_unit;
-	}
 }
 
 bool game_load(struct game* const game, const char* const filename) {
@@ -205,6 +223,9 @@ static void game_next_turn(struct game* const game) {
 	} while (!game->alives[game->turn] && game->turn != prev_turn);
 
 	units_set_enabled(&game->units, game->turn, true);
+
+	// Add income to golds
+	game->golds[game->turn] += game->incomes[game->turn];
 }
 
 void game_loop(struct game* const game) {
@@ -232,16 +253,18 @@ void game_loop(struct game* const game) {
 		render(game, attack_enabled);
 
 		if (game->territory[game->y][game->x] != null_player)
-			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu attack=%u label=%u", game->turn, game->x, game->y,
+			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu attack=%u label=%u gold=%u", game->turn, game->x, game->y,
 				tile_names[game->map[game->y][game->x]],
 				game->territory[game->y][game->x],
 				attack_enabled,
-				game->labels[game->y][game->x]);
+				game->labels[game->y][game->x],
+				game->golds[game->turn]);
 		else
-			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=none attack=%u label=%u", game->turn, game->x, game->y,
+			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=none attack=%u label=%u gold=%u", game->turn, game->x, game->y,
 				tile_names[game->map[game->y][game->x]],
 				attack_enabled,
-				game->labels[game->y][game->x]);
+				game->labels[game->y][game->x],
+				game->golds[game->turn]);
 
 		input = getch();
 	}
