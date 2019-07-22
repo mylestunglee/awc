@@ -4,6 +4,7 @@
 #include "graphics.h"
 #include "grid.h"
 #include "file.h"
+#include "bitarray.h"
 
 static void game_territory_initialise(player_t territory[grid_size][grid_size]) {
 	grid_t y = 0;
@@ -28,11 +29,15 @@ static void game_preload(struct game* const game) {
 	queue_initialise(&game->queue);
 	game->turn = 0;
 	game_territory_initialise(game->territory);
+	game->fog = false;
 
 	for (player_t player = 0; player < players_capacity; ++player) {
 		game->golds[player] = 0;
 		game->incomes[player] = 0;
 	}
+
+	bitarray_clear(game->bots, sizeof(game->bots));
+	bitarray_clear(game->alliances, sizeof(game->alliances));
 }
 
 static void game_compute_incomes(struct game* const game) {
@@ -284,18 +289,20 @@ void game_loop(struct game* const game) {
 		render(game, attack_enabled);
 
 		if (game->territory[game->y][game->x] != null_player)
-			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu attack=%u label=%u gold=%u", game->turn, game->x, game->y,
+			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu attack=%u label=%u gold=%u fog=%u", game->turn, game->x, game->y,
 				tile_names[game->map[game->y][game->x]],
 				game->territory[game->y][game->x],
 				attack_enabled,
 				game->labels[game->y][game->x],
-				game->golds[game->turn]);
+				game->golds[game->turn],
+				game->fog);
 		else
-			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=none attack=%u label=%u gold=%u", game->turn, game->x, game->y,
+			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=none attack=%u label=%u gold=%u fog=%u", game->turn, game->x, game->y,
 				tile_names[game->map[game->y][game->x]],
 				attack_enabled,
 				game->labels[game->y][game->x],
-				game->golds[game->turn]);
+				game->golds[game->turn],
+				game->fog);
 
 		input = getch();
 	}

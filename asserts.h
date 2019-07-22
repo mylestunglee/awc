@@ -22,11 +22,13 @@ void asserts() {
 	compiler_assert(is_unsigned(energy_t));
 	compiler_assert(is_unsigned(tile_t));
 	compiler_assert(is_unsigned(player_t));
+	compiler_assert(is_unsigned(player_wide_t));
 	compiler_assert(!is_unsigned(gold_t));
 
 	// Assert wide types
 	compiler_assert(4 * sizeof(health_t) == sizeof(health_wide_t));
 	compiler_assert(2 * sizeof(grid_t) == sizeof(grid_wide_t));
+	compiler_assert(2 * sizeof(player_t) == sizeof(player_wide_t));
 
 	// Assert type max values compiler_assert(grid_size == upper_bound(grid_t));
 	compiler_assert(health_max == max_value(health_t));

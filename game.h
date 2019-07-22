@@ -16,10 +16,14 @@ struct game {
 	grid_t prev_x;
 	grid_t prev_y;
 	player_t turn;
-	player_t alives[players_capacity];
+	// change to bit array
+	uint8_t alives[players_capacity];
 	player_t territory[grid_size][grid_size];
 	gold_t golds[players_capacity];
 	gold_t incomes[players_capacity];
+	bool fog;
+	uint8_t bots[(players_capacity + 7) / 8];
+	uint8_t alliances[(players_capacity * players_capacity + 7) / 8];
 };
 
 bool game_load(struct game* const, const char* const);

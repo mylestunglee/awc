@@ -1,7 +1,9 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include "file.h"
 #include "units.h"
+#include "bitarray.h"
 
 static void file_load_turn(struct game* const game, const char* const tokens) {
 	player_t turn;
@@ -48,6 +50,17 @@ static void file_load_territory(struct game* const game, const char* const token
 		game->territory[y][x] = player;
 }
 
+static void file_load_bot(struct game* const game, const char* const tokens) {
+	player_t player;
+	if (sscanf(tokens, player_format, &player) != 1)
+		return;
+
+	--player;
+
+	if (player < players_capacity)
+		bitarray_set(game->bots, player);
+}
+
 static void file_load_unit(struct game* const game, const char* const tokens, const model_t model) {
 	grid_t x, y;
 	player_t player;
@@ -70,7 +83,7 @@ static void file_load_unit(struct game* const game, const char* const tokens, co
 			.model = model,
 			.x = x,
 			.y = y,
-			.health = (health * (health_max + 1) / 1000) - 1,
+			.health = health,
 			.player = player,
 			.enabled = !strcmp(enabled, "enabled")});
 }
@@ -109,6 +122,10 @@ bool file_load(struct game* const game, const char* const filename) {
 			file_load_territory(game, tokens);
 		else if (!strcmp(key, "gold"))
 			file_load_gold(game, tokens);
+		else if (!strcmp(key, "bot"))
+			file_load_bot(game, tokens);
+		else if (!strcmp(key, "fog\n"))
+			game->fog = true;
 		else
 			for (model_t model = 0; model < model_capacity; ++model)
 				if (!strcmp(key, model_names[model])) {
@@ -161,7 +178,7 @@ static void file_save_units(const struct game* const game, FILE* const file) {
 				unit->player + 1,
 				unit->x + 1,
 				unit->y + 1,
-				1000 * (unit->health + 1) / (health_max + 1),
+				unit->health,
 				unit->enabled ? "enabled" : "disabled");
 			curr = game->units.nexts[curr];
 		}
@@ -185,6 +202,12 @@ static void file_save_golds(const struct game* const game, FILE* const file) {
 			fprintf(file, "gold "player_format" "gold_format"\n", player + 1, game->golds[player]);
 }
 
+static void file_save_bots(const struct game* const game, FILE* const file) {
+	for (player_t player = 0; player < players_capacity; ++player)
+		if (bitarray_get(game->bots, player))
+			fprintf(file, "bot "player_format"\n", player + 1);
+}
+
 bool file_save(const struct game* const game, const char* const filename) {
 	FILE* const file = fopen(filename, "w");
 
@@ -196,6 +219,9 @@ bool file_save(const struct game* const game, const char* const filename) {
 	file_save_units(game, file);
 	file_save_territory(game, file);
 	file_save_golds(game, file);
+	file_save_bots(game, file);
+	if (game->fog)
+		fprintf(file, "fog");
 
 	return fclose(file) < 0;
 }

@@ -15,6 +15,7 @@ typedef uint16_t queue_t;
 typedef uint16_t energy_t;
 typedef uint8_t tile_t;
 typedef uint8_t player_t;
+typedef uint16_t player_wide_t;
 typedef int16_t gold_t;
 
 #define grid_size 256
