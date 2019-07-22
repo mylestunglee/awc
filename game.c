@@ -144,7 +144,13 @@ static void game_handle_action(struct game* const game) {
 		// Move to accessible tile
 		} else if (game->labels[game->y][game->x] & accessible_bit) {
 			units_move(&game->units, game->selected, game->x, game->y);
-			game->units.data[game->selected].enabled = false;
+			struct unit* const unit = &game->units.data[game->selected];
+			// Capture if infantry or mech
+			if (unit->model < unit_capturable_upper_bound &&
+				game->map[game->y][game->x] >= tile_capturable_lower_bound &&
+				game->territory[game->y][game->x] != unit->player)
+				game->territory[game->y][game->x] = unit->player;
+			unit->enabled = false;
 			game->selected = null_unit;
 			grid_clear_all_uint8(game->labels);
 		}
