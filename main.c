@@ -1,8 +1,6 @@
-#include <stdio.h>
 #include "game.h"
+#include "asserts.h"
 #include "graphics.h"
-#include "queue.h"
-#include "file.h"
 
 int main() {
 	struct game game;
