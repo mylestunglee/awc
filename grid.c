@@ -48,7 +48,7 @@ static void grid_explore_mark_attackable_direct(
 	const player_t player) {
 
 	// Direct attack only applies to 0-ranged models
-	if(units_min_range[model])
+	if(models_min_range[model])
 		return;
 
 	grid_explore_mark_attackable_tile(game, x + 1, y, model, player);
@@ -65,13 +65,13 @@ static void grid_explore_mark_attackable_ranged(
 	const player_t player) {
 
 	// Range attack only applies to positive ranged models
-	if(!units_min_range[model])
+	if(!models_min_range[model])
 		return;
 
-	for (grid_wide_t j = -units_max_range[model]; j <= units_max_range[model]; ++j)
-		for (grid_wide_t i = -units_max_range[model]; i <= units_max_range[model]; ++i) {
+	for (grid_wide_t j = -models_max_range[model]; j <= models_max_range[model]; ++j)
+		for (grid_wide_t i = -models_max_range[model]; i <= models_max_range[model]; ++i) {
 			const grid_wide_t distance = abs(i) + abs(j);
-			if (units_min_range[model] <= distance && distance <= units_max_range[model])
+			if (models_min_range[model] <= distance && distance <= models_max_range[model])
 				grid_explore_mark_attackable_tile(game, x + i, y + j, model, player);
 		}
 }

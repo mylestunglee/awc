@@ -169,7 +169,7 @@ static void file_save_units(const struct game* const game, FILE* const file) {
 		while (curr != null_unit) {
 			const struct unit* const unit = &game->units.data[curr];
 			fprintf(file,
-				model_format" "
+				model_name_format" "
 				player_format" "
 				grid_format" "
 				grid_format" "

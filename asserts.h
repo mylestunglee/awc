@@ -31,7 +31,7 @@ void asserts() {
 	compiler_assert(2 * sizeof(player_t) == sizeof(player_wide_t));
 
 	// Assert type max values compiler_assert(grid_size == upper_bound(grid_t));
-	compiler_assert(health_max == max_value(health_t));
+	compiler_assert(health_max <= max_value(health_t));
 	compiler_assert(tile_capacity <= upper_bound(tile_t));
 	compiler_assert(model_capacity <= upper_bound(model_t));
 	compiler_assert(queue_capacity == max_value(queue_t));
@@ -45,7 +45,8 @@ void asserts() {
 	printf(grid_format, (grid_t)0);
 	printf(player_format, (health_t)0);
 	printf(row_format, "");
-	printf(model_format, "");
+	printf(model_format, (model_t)0);
+	printf(model_name_format, "");
 	printf(turn_format, (player_t)0);
 	printf(health_wide_format, 0);
 	printf(gold_format, (gold_t)0);

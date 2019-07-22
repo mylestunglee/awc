@@ -1,6 +1,6 @@
 TARGET = main
 CC = gcc
-CFLAGS = -g -Wall -std=c11 -pedantic -Wno-unused-variable
+CFLAGS = -g -Wall -std=c11 -pedantic
 
 .PHONY: default all clean
 

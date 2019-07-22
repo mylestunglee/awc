@@ -36,7 +36,8 @@ typedef int16_t gold_t;
 #define player_format "%3hhu"
 #define health_format "%4hhu"
 #define row_format "%256s"
-#define model_format "%-12s"
+#define model_name_format "%-12s"
+#define model_format "%hhu"
 #define turn_format "%hhu"
 #define health_wide_format "%u"
 #define gold_format "%hd"
@@ -56,9 +57,10 @@ typedef int16_t gold_t;
 #define attackable_bit 2
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
+#define buildable_style '\xf0'
 
-const static char* tile_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge", "city", "factory", "airport", "habour", "HQ"};
-const static char* model_names[model_capacity] = {"infantry", "mech", "recon", "tank", "battletank", "antiair", "artillery", "rockets", "missles", "fighter", "bomber", "battlecopter", "battleship", "crusier", "submarine"};
+const static char* const tile_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge", "city", "factory", "airport", "habour", "HQ"};
+const static char* const model_names[model_capacity] = {"infantry", "mech", "recon", "tank", "battletank", "antiair", "artillery", "rockets", "missles", "fighter", "bomber", "battlecopter", "battleship", "crusier", "submarine"};
 const static uint8_t tile_symbols[tile_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', ':', '-', '=', 'C', 'F', 'A', 'S', 'H'};
 const static uint8_t tile_styles[terrian_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
 const static uint8_t unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
@@ -167,10 +169,12 @@ const static uint8_t units_damage[model_capacity][model_capacity] = {
 	{0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  65,  115, 0,    0,  90},
 	{0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  25,  55}};
 
-const static grid_t units_min_range[model_capacity] = {0, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 1, 0, 0};
-const static grid_t units_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 0, 0, 6, 0, 0};
-const static gold_t units_cost[model_capacity] = {1, 3, 4, 7, 16, 6, 15, 8, 12, 20, 22, 9, 28, 18, 20};
+const static grid_t models_min_range[model_capacity] = {0, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 1, 0, 0};
+const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 0, 0, 6, 0, 0};
+const static gold_t models_cost[model_capacity] = {1, 3, 4, 7, 16, 6, 15, 8, 12, 20, 22, 9, 28, 18, 20};
+const static model_t buildable_models_range[capturable_capacity] = {0, 9, 3, 3, 0};
+const static model_t buildable_models_offset[capturable_capacity] = {0, 0, 9, 12, 0};
 
-#define gold_scale 5
+#define gold_scale 10
 
 #endif

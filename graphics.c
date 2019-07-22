@@ -86,7 +86,8 @@ static bool render_selection(
 	const grid_t y,
 	const grid_t tile_x,
 	const grid_t tile_y,
-	const bool attack_actionable,
+	const bool attack_enabled,
+	const bool build_enabled,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
@@ -128,10 +129,14 @@ static bool render_selection(
 		*style = player_styles[game->territory[y][x]];
 
 	// Highlight box pre-attack
-	if (attack_actionable)
-		*style = (*style & '\x0f') | attackable_style;
+	*style &= '\x0f';
+
+	if (attack_enabled)
+		*style |= attackable_style;
+	else if (build_enabled)
+		*style |= buildable_style;
 	else
-		*style = (*style & '\x0f') | accessible_style;
+		*style |= accessible_style;
 
  	return true;
 }
@@ -188,7 +193,7 @@ static void render_highlight(
 	const struct game* const game,
 	const grid_t x,
 	const grid_t y,
-	const bool attack_actionable,
+	const bool attack_enabled,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
@@ -198,7 +203,7 @@ static void render_highlight(
 		*style &= '\x0f';
 
 		// Show arrows highlighting position to attack unit
-		if (attack_actionable && x == game->prev_x && y == game->prev_y) {
+		if (attack_enabled && x == game->prev_x && y == game->prev_y) {
 			if ((grid_t)(game->prev_x + 1) == game->x)
 				*symbol = '>';
 			else if ((grid_t)(game->prev_x - 1) == game->x)
@@ -231,7 +236,7 @@ static bool render_terrian(
 	const struct game* const game,
 	const grid_t x,
 	const grid_t y,
-	const bool attack_actionable,
+	const bool attack_enabled,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
@@ -240,7 +245,7 @@ static bool render_terrian(
 	*symbol = tile_symbols[tile];
 	*style = tile_styles[tile];
 
-	render_highlight(game, x, y, attack_actionable, symbol, style);
+	render_highlight(game, x, y, attack_enabled, symbol, style);
 
 	return true;
 }
@@ -251,7 +256,7 @@ static bool render_capturable(
 	const grid_t y,
 	const grid_t tile_x,
 	const grid_t tile_y,
-	const bool attack_actionable,
+	const bool attack_enabled,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
@@ -270,7 +275,7 @@ static bool render_capturable(
 
 	if (texture == 0) {
 		*symbol = ' ';
-		render_highlight(game, x, y, attack_actionable, symbol, style);
+		render_highlight(game, x, y, attack_enabled, symbol, style);
 	} else if (texture == '\x0F')
 		*symbol = player_symbols[player];
 	else
@@ -285,16 +290,16 @@ static bool render_tile(
 	const grid_t y,
 	const grid_t tile_x,
 	const grid_t tile_y,
-	const bool attack_actionable,
+	const bool attack_enabled,
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
 	const tile_t tile = game->map[y][x];
 
 	if (tile < terrian_capacity)
-		return render_terrian(game, x, y, attack_actionable, symbol, style);
+		return render_terrian(game, x, y, attack_enabled, symbol, style);
 	else
-		return render_capturable(game, x, y, tile_x, tile_y, attack_actionable, symbol, style);
+		return render_capturable(game, x, y, tile_x, tile_y, attack_enabled, symbol, style);
 }
 
 static void reset_cursor() {
@@ -306,7 +311,10 @@ static void reset_black() {
 	printf("%c[30;40m", '\x1B');
 }
 
-void render(const struct game* const game, const bool attack_actionable) {
+void render(
+	const struct game* const game,
+	const bool attack_enabled,
+	const bool build_enabled) {
 	reset_cursor();
 
 	const grid_t screen_left = game->x - screen_width / 2 + 1;
@@ -324,9 +332,9 @@ void render(const struct game* const game, const bool attack_actionable) {
 					uint8_t style;
 
 					if (render_health_bar(game, x, y, tile_x, tile_y, &symbol, &style) ||
-						render_selection(game, x, y, tile_x, tile_y, attack_actionable, &symbol, &style) ||
+						render_selection(game, x, y, tile_x, tile_y, attack_enabled, build_enabled, &symbol, &style) ||
 						render_unit(game, x, y, tile_x, tile_y, &symbol, &style) ||
-						render_tile(game, x, y, tile_x, tile_y, attack_actionable, &symbol, &style)) {
+						render_tile(game, x, y, tile_x, tile_y, attack_enabled, &symbol, &style)) {
 
 						render_pixel(symbol, style, prev_style);
 						prev_style = style;

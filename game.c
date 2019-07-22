@@ -36,6 +36,7 @@ static void game_preload(struct game* const game) {
 		game->incomes[player] = 0;
 	}
 
+	bitarray_clear(game->alives, sizeof(game->alives));
 	bitarray_clear(game->bots, sizeof(game->bots));
 	bitarray_clear(game->alliances, sizeof(game->alliances));
 }
@@ -57,7 +58,8 @@ static void game_postload(struct game* const game) {
 
 	// Set players' alive state
 	for (player_t player = 0; player < players_capacity; ++player)
-		game->alives[player] = game->units.firsts[player] != null_unit;
+		if (game->units.firsts[player] != null_unit || game->incomes[player])
+			bitarray_set(game->alives, player);
 }
 
 bool game_load(struct game* const game, const char* const filename) {
@@ -97,6 +99,33 @@ static bool game_parse_movement(struct game* const game, const char input) {
 	return false;
 }
 
+// Build try to build a unit
+static bool game_parse_build(struct game* const game, const char input) {
+	const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
+	const model_t value = input - '1';
+
+	if (value >= buildable_models_range[capturable])
+		return false;
+
+	const model_t model = value + buildable_models_offset[capturable];
+	const gold_t cost = gold_scale * models_cost[model];
+
+	if (game->golds[game->turn] < cost)
+		return false;
+
+	game->golds[game->turn] -= cost;
+
+	units_insert(&game->units, (struct unit){
+		.health = health_max,
+		.model = model,
+		.player = game->turn,
+		.x = game->x,
+		.y = game->y,
+		.enabled = false});
+
+	return true;
+}
+
 static bool game_parse_file(struct game* const game, const char input) {
 	bool error;
 
@@ -121,6 +150,19 @@ static bool game_parse_file(struct game* const game, const char input) {
 	return true;
 }
 
+static bool game_build_enabled(const struct game* const game) {
+	// The state is build enabled iff:
+	// 1. The player owns the selected capturable
+	// 2. There is no unit on the tile
+	// 3. The capturable has buildable units
+	// 4. No unit is selected
+	return
+		game->territory[game->y][game->x] != null_player &&
+		game->units.grid[game->y][game->x] == null_unit &&
+		buildable_models_range[game->map[game->y][game->x] - terrian_capacity] &&
+		game->selected == null_unit;
+}
+
 static bool game_attack_enabled(const struct game* const game) {
 	// The state is attack enabled iff:
 	// 1. A unit is selected
@@ -129,7 +171,7 @@ static bool game_attack_enabled(const struct game* const game) {
 	//     a. Selected unit can attack with positive damage
 	//     b. Attacker and attackee are in different teams
 	return game->selected != null_unit &&
-		(units_min_range[game->units.data[game->selected].model] || game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
+		(models_min_range[game->units.data[game->selected].model] || game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
 		game->labels[game->y][game->x] & attackable_bit;
 }
 
@@ -192,7 +234,7 @@ static void game_handle_attack(struct game* const game) {
 	// Skip to post-attack cleanup when a unit dies
 	do {
 		// If unit is direct, move to attack
-		const bool ranged = units_min_range[attacker->model];
+		const bool ranged = models_min_range[attacker->model];
 		if (!ranged)
 			units_move(&game->units, game->selected, game->prev_x, game->prev_y);
 
@@ -235,7 +277,7 @@ static void game_next_turn(struct game* const game) {
 	// Find next alive player
 	do {
 		game->turn = (game->turn + 1) % players_capacity;
-	} while (!game->alives[game->turn] && game->turn != prev_turn);
+	} while (!bitarray_get(game->alives, game->turn) && game->turn != prev_turn);
 
 	units_set_enabled(&game->units, game->turn, true);
 
@@ -256,7 +298,7 @@ static void game_next_turn(struct game* const game) {
 			else
 				unit->health += heal_rate;
 			// Deduct heal cost
-			game->golds[game->turn] -= units_cost[unit->model];
+			game->golds[game->turn] -= models_cost[unit->model];
 			printf(gold_format, game->golds[game->turn]);
 		}
 
@@ -264,18 +306,65 @@ static void game_next_turn(struct game* const game) {
 	}
 }
 
+static void print_normal_text(const struct game* const game) {
+	printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u fog=%u", game->turn, game->x, game->y,
+		tile_names[game->map[game->y][game->x]],
+		game->territory[game->y][game->x],
+		game->labels[game->y][game->x],
+		game->golds[game->turn],
+		game->fog);
+}
+
+static void print_attack_text(const struct game* const game) {
+	printf("in attack mode");
+}
+
+static void print_build_text(const struct game* const game) {
+	const tile_t tile = game->map[game->y][game->x];
+	assert(tile >= terrian_capacity);
+	const tile_t capturable = tile - terrian_capacity;
+
+	printf("in build mode:");
+	for (model_t model = 0; model < buildable_models_range[capturable]; ++model) {
+		printf("("model_format") %s ", model, model_names[model]);
+	}
+}
+
+static void print_text(
+	const struct game* const game,
+	const bool attack_enabled,
+	const bool build_enabled) {
+
+	if (attack_enabled)
+		print_attack_text(game);
+	else if (build_enabled)
+		print_build_text(game);
+	else
+		print_normal_text(game);
+}
+
 void game_loop(struct game* const game) {
-	render(game, false);
+	render(game, false, false);
+	print_text(game, false, false);
 
 	char input = getch();
 
 	while (input != 'q') {
 
 		// Fix case skipping
-		if (game_parse_movement(game, input) ||
-			game_parse_file(game, input)) {}
+		game_parse_movement(game, input);
 
 		const bool attack_enabled = game_attack_enabled(game);
+		const bool build_enabled = game_build_enabled(game);
+
+		// Switch 0-9 keys between building and save/loading states
+		if (build_enabled) {
+			// Assume tile to be capturable
+			assert(game->map[game->y][game->x] >= terrian_capacity);
+
+			game_parse_build(game, input);
+		} else
+			game_parse_file(game, input);
 
 		if (input == ' ') {
 			if (attack_enabled)
@@ -286,23 +375,8 @@ void game_loop(struct game* const game) {
 			game_next_turn(game);
 		}
 
-		render(game, attack_enabled);
-
-		if (game->territory[game->y][game->x] != null_player)
-			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu attack=%u label=%u gold=%u fog=%u", game->turn, game->x, game->y,
-				tile_names[game->map[game->y][game->x]],
-				game->territory[game->y][game->x],
-				attack_enabled,
-				game->labels[game->y][game->x],
-				game->golds[game->turn],
-				game->fog);
-		else
-			printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=none attack=%u label=%u gold=%u fog=%u", game->turn, game->x, game->y,
-				tile_names[game->map[game->y][game->x]],
-				attack_enabled,
-				game->labels[game->y][game->x],
-				game->golds[game->turn],
-				game->fog);
+		render(game, attack_enabled, build_enabled);
+		print_text(game, attack_enabled, build_enabled);
 
 		input = getch();
 	}
