@@ -168,5 +168,8 @@ const static uint8_t units_damage[model_capacity][model_capacity] = {
 
 const static grid_t units_min_range[model_capacity] = {0, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 1, 0, 0};
 const static grid_t units_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 0, 0, 6, 0, 0};
+const static gold_t units_cost[model_capacity] = {1, 3, 4, 7, 16, 6, 15, 8, 12, 20, 22, 9, 28, 18, 20};
+
+#define gold_scale 5
 
 #endif

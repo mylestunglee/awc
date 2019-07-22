@@ -117,6 +117,7 @@ static bool game_parse_file(struct game* const game, const char input) {
 }
 
 static bool game_attack_enabled(const struct game* const game) {
+	// The state is attack enabled iff:
 	// 1. A unit is selected
 	// 2. Previous selected tile is accessible if direct attack
 	// 3. Selected tile is attackable, which implies:
@@ -145,7 +146,10 @@ static void game_handle_action(struct game* const game) {
 		} else if (game->labels[game->y][game->x] & accessible_bit) {
 			units_move(&game->units, game->selected, game->x, game->y);
 			struct unit* const unit = &game->units.data[game->selected];
-			// Capture if infantry or mech
+			// The moved unit can capture iff:
+			// 1. The unit is a infantry or a mech
+			// 2. The tile is capturable
+			// 3. The tile is owned other than the player
 			if (unit->model < unit_capturable_upper_bound &&
 				game->map[game->y][game->x] >= tile_capturable_lower_bound &&
 				game->territory[game->y][game->x] != unit->player)
@@ -231,7 +235,28 @@ static void game_next_turn(struct game* const game) {
 	units_set_enabled(&game->units, game->turn, true);
 
 	// Add income to golds
-	game->golds[game->turn] += game->incomes[game->turn];
+	game->golds[game->turn] += gold_scale * game->incomes[game->turn];
+	printf(gold_format, game->golds[game->turn]);
+
+	// Heal units on friendly capturables
+	unit_t curr = game->units.firsts[game->turn];
+	while (curr != null_unit) {
+		struct unit* const unit = &game->units.data[curr];
+		if (game->territory[unit->y][unit->x] == game->turn &&
+			unit->health < health_max) {
+			// Cap heal at maximum health
+			const health_t heal_rate = health_max / gold_scale;
+			if (unit->health >= health_max - heal_rate)
+				unit->health = health_max;
+			else
+				unit->health += heal_rate;
+			// Deduct heal cost
+			game->golds[game->turn] -= units_cost[unit->model];
+			printf(gold_format, game->golds[game->turn]);
+		}
+
+		curr = game->units.nexts[curr];
+	}
 }
 
 void game_loop(struct game* const game) {
