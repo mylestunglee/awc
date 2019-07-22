@@ -223,14 +223,42 @@ static health_wide_t calc_damage(
 	) / (100 * 10);
 }
 
+// Calculate damage and counter-damage values without performing attack
+static void simulate_attack(
+	const struct game* const game,
+	health_wide_t* const damage,
+	health_wide_t* const counter_damage) {
+
+	assert(game->selected != null_unit);
+
+	const struct unit* const attacker = &game->units.data[game->selected];
+	const unit_t attackee_index = game->units.grid[game->y][game->x];
+	const struct unit* const attackee = &game->units.data[attackee_index];
+
+	*damage = calc_damage(game, attacker, attackee);
+
+	// Apply damage
+	if (*damage > attackee->health) {
+		*counter_damage = 0;
+		return;
+	}
+
+	// Ranged units do not receive counter-attacks
+	if (models_min_range[attacker->model])
+		*counter_damage = 0;
+	else
+		*counter_damage = calc_damage(game, attackee, attacker);
+}
+
+// Perform attack
 static void game_handle_attack(struct game* const game) {
 	assert(game->units.grid[game->y][game->x] != null_unit);
+
 	assert(game->selected != null_unit);
 
 	struct unit* const attacker = &game->units.data[game->selected];
 	const unit_t attackee_index = game->units.grid[game->y][game->x];
 	struct unit* const attackee = &game->units.data[attackee_index];
-
 	// Skip to post-attack cleanup when a unit dies
 	do {
 		// If unit is direct, move to attack
@@ -238,7 +266,9 @@ static void game_handle_attack(struct game* const game) {
 		if (!ranged)
 			units_move(&game->units, game->selected, game->prev_x, game->prev_y);
 
-		const health_wide_t damage = calc_damage(game, attacker, attackee);
+		// Compute damage
+		health_wide_t damage, counter_damage;
+		simulate_attack(game, &damage, &counter_damage);
 
 		// Apply damage
 		if (damage > attackee->health) {
@@ -251,8 +281,6 @@ static void game_handle_attack(struct game* const game) {
 		// Ranged units do not receive counter-attacks
 		if (ranged)
 			break;
-
-		const health_wide_t counter_damage = calc_damage(game, attackee, attacker);
 
 		// Apply counter damage
 		if (counter_damage > attacker->health) {
@@ -316,7 +344,11 @@ static void print_normal_text(const struct game* const game) {
 }
 
 static void print_attack_text(const struct game* const game) {
-	printf("in attack mode");
+	health_wide_t damage, counter_damage;
+	simulate_attack(game, &damage, &counter_damage);
+	printf("Damage: %u%% Counter-damage: %u%%",
+		(damage * 100) / health_max,
+		(counter_damage * 100) / health_max);
 }
 
 static void print_build_text(const struct game* const game) {
@@ -354,8 +386,10 @@ void game_loop(struct game* const game) {
 		// Fix case skipping
 		game_parse_movement(game, input);
 
-		const bool attack_enabled = game_attack_enabled(game);
+		// Compute possible actions
+		bool attack_enabled = game_attack_enabled(game);
 		const bool build_enabled = game_build_enabled(game);
+		assert(!(attack_enabled && build_enabled));
 
 		// Switch 0-9 keys between building and save/loading states
 		if (build_enabled) {
@@ -367,9 +401,10 @@ void game_loop(struct game* const game) {
 			game_parse_file(game, input);
 
 		if (input == ' ') {
-			if (attack_enabled)
+			if (attack_enabled) {
 				game_handle_attack(game);
-			else
+				attack_enabled = false;
+			} else
 				game_handle_action(game);
 		} else if (input == 'n') {
 			game_next_turn(game);
