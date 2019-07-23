@@ -1,26 +1,71 @@
 #include <assert.h>
 #include <stdlib.h>
+#include "definitions.h"
 #include "grid.h"
 
 void grid_clear_all_uint8(uint8_t grid[grid_size][grid_size]) {
-    grid_t y = 0;
-    do {
-        grid_t x = 0;
-        do {
-            grid[y][x] = 0;
-        } while (++x);
-    } while (++y);
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			grid[y][x] = 0;
+		} while (++x);
+	} while (++y);
 }
 
-void grid_clear_all_energy_t(uint16_t grid[grid_size][grid_size]) {
-    grid_t y = 0;
-    do {
-        grid_t x = 0;
-        do {
-            grid[y][x] = 0;
-        } while (++x);
-    } while (++y);
+void grid_clear_all_energy_t(energy_t workspace[grid_size][grid_size]) {
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do
+			workspace[y][x] = 0;
+		while (++x);
+	} while (++y);
 }
+
+void grid_clear_territory(player_t territory[grid_size][grid_size]) {
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do
+			territory[y][x] = null_player;
+		while (++x);
+	} while (++y);
+}
+
+void grid_clear_player_territory(
+	player_t territory[grid_size][grid_size],
+	const player_t loser) {
+
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do
+			if (territory[y][x] == loser)
+				territory[y][x] = null_player;
+		while (++x);
+	} while (++y);
+}
+
+void grid_correct_map(
+	player_t territory[grid_size][grid_size],
+	tile_t map[grid_size][grid_size]) {
+
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			if (territory[y][x] > players_capacity) {
+				territory[y][x] = null_player;
+			}
+
+			if (territory[y][x] == null_player && map[y][x] == tile_HQ)
+				map[y][x] = tile_city;
+		} while (++x);
+	} while (++y);
+}
+
+
 
 // Marks a tile as attackable if position relates to attackable unit
 static void grid_explore_mark_attackable_tile(

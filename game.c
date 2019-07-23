@@ -6,29 +6,18 @@
 #include "file.h"
 #include "bitarray.h"
 
-static void game_territory_initialise(player_t territory[grid_size][grid_size]) {
-	grid_t y = 0;
-	do {
-		grid_t x = 0;
-		do
-			territory[y][x] = null_player;
-		while (++x);
-	} while (++y);
-}
-
 static void game_preload(struct game* const game) {
 	// TODO: fix order
 	game->x = 0;
 	game->y = 0;
 	grid_clear_all_uint8(game->map);
-	grid_clear_all_uint8(game->territory);
 	grid_clear_all_uint8(game->labels);
 	grid_clear_all_energy_t(game->workspace);
+	grid_clear_territory(game->territory);
 	units_initialise(&game->units);
 	game->selected = null_unit;
 	queue_initialise(&game->queue);
 	game->turn = 0;
-	game_territory_initialise(game->territory);
 	game->fog = false;
 
 	for (player_t player = 0; player < players_capacity; ++player) {
@@ -36,7 +25,6 @@ static void game_preload(struct game* const game) {
 		game->incomes[player] = 0;
 	}
 
-	bitarray_clear(game->alives, sizeof(game->alives));
 	bitarray_clear(game->bots, sizeof(game->bots));
 	bitarray_clear(game->alliances, sizeof(game->alliances));
 }
@@ -54,12 +42,8 @@ static void game_compute_incomes(struct game* const game) {
 }
 
 static void game_postload(struct game* const game) {
+	grid_correct_map(game->territory, game->map);
 	game_compute_incomes(game);
-
-	// Set players' alive state
-	for (player_t player = 0; player < players_capacity; ++player)
-		if (game->units.firsts[player] != null_unit || game->incomes[player])
-			bitarray_set(game->alives, player);
 }
 
 bool game_load(struct game* const game, const char* const filename) {
@@ -157,7 +141,7 @@ static bool game_build_enabled(const struct game* const game) {
 	// 3. The capturable has buildable units
 	// 4. No unit is selected
 	return
-		game->territory[game->y][game->x] != null_player &&
+		game->territory[game->y][game->x] == game->turn &&
 		game->units.grid[game->y][game->x] == null_unit &&
 		buildable_models_range[game->map[game->y][game->x] - terrian_capacity] &&
 		game->selected == null_unit;
@@ -173,6 +157,33 @@ static bool game_attack_enabled(const struct game* const game) {
 	return game->selected != null_unit &&
 		(models_min_range[game->units.data[game->selected].model] || game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
 		game->labels[game->y][game->x] & attackable_bit;
+}
+
+// Occurs when unit captures enemy capturable
+static void game_handle_capture(struct game* const game) {
+	const player_t loser = game->territory[game->y][game->x];
+
+	// If the enemy loses their HQ
+	if (game->map[game->y][game->x] == tile_HQ) {
+
+		// Remove units
+		units_delete_player(&game->units, loser);
+
+		// Remove territory
+
+		assert(loser != null_player);
+		assert(loser != game->turn);
+
+		grid_clear_player_territory(game->territory, loser);
+
+		// Change HQ into a city
+		game->map[game->y][game->x] = tile_city;
+
+		game->incomes[loser] = 0;
+	} else
+		--game->incomes[loser];
+
+	game->territory[game->y][game->x] = game->turn;
 }
 
 static void game_handle_action(struct game* const game) {
@@ -196,11 +207,12 @@ static void game_handle_action(struct game* const game) {
 			// The moved unit can capture iff:
 			// 1. The unit is a infantry or a mech
 			// 2. The tile is capturable
-			// 3. The tile is owned other than the player
+			// 3. The tile is owned by an enemy
 			if (unit->model < unit_capturable_upper_bound &&
 				game->map[game->y][game->x] >= tile_capturable_lower_bound &&
 				game->territory[game->y][game->x] != unit->player)
-				game->territory[game->y][game->x] = unit->player;
+				game_handle_capture(game);
+
 			unit->enabled = false;
 			game->selected = null_unit;
 			grid_clear_all_uint8(game->labels);
@@ -305,7 +317,10 @@ static void game_next_turn(struct game* const game) {
 	// Find next alive player
 	do {
 		game->turn = (game->turn + 1) % players_capacity;
-	} while (!bitarray_get(game->alives, game->turn) && game->turn != prev_turn);
+	} while (
+		game->units.firsts[game->turn] == null_unit &&
+		game->incomes[game->turn] == 0 &&
+		game->turn != prev_turn);
 
 	units_set_enabled(&game->units, game->turn, true);
 
@@ -358,7 +373,7 @@ static void print_build_text(const struct game* const game) {
 
 	printf("in build mode:");
 	for (model_t model = 0; model < buildable_models_range[capturable]; ++model) {
-		printf("("model_format") %s ", model, model_names[model]);
+		printf("("model_format") %s ", model + 1, model_names[model + buildable_models_offset[capturable]]);
 	}
 }
 
@@ -388,7 +403,7 @@ void game_loop(struct game* const game) {
 
 		// Compute possible actions
 		bool attack_enabled = game_attack_enabled(game);
-		const bool build_enabled = game_build_enabled(game);
+		bool build_enabled = game_build_enabled(game);
 		assert(!(attack_enabled && build_enabled));
 
 		// Switch 0-9 keys between building and save/loading states
@@ -396,7 +411,8 @@ void game_loop(struct game* const game) {
 			// Assume tile to be capturable
 			assert(game->map[game->y][game->x] >= terrian_capacity);
 
-			game_parse_build(game, input);
+			if (game_parse_build(game, input))
+				build_enabled = false;
 		} else
 			game_parse_file(game, input);
 
@@ -408,6 +424,7 @@ void game_loop(struct game* const game) {
 				game_handle_action(game);
 		} else if (input == 'n') {
 			game_next_turn(game);
+			build_enabled = game_build_enabled(game);
 		}
 
 		render(game, attack_enabled, build_enabled);

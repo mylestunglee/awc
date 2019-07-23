@@ -16,7 +16,6 @@ struct game {
 	grid_t prev_x;
 	grid_t prev_y;
 	player_t turn;
-	uint8_t alives[(players_capacity + 7) / 8];
 	player_t territory[grid_size][grid_size];
 	gold_t golds[players_capacity];
 	gold_t incomes[players_capacity];

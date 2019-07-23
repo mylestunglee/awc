@@ -174,3 +174,9 @@ void units_set_enabled(struct units* const units, const player_t player, const b
 		curr = units->nexts[curr];
 	}
 }
+
+// Clears all units of a player
+void units_delete_player(struct units* const units, const player_t player) {
+	while (units->firsts[player] != null_unit)
+		units_delete(units, units->firsts[player]);
+}
