@@ -65,7 +65,17 @@ void grid_correct_map(
 	} while (++y);
 }
 
-
+void grid_compute_incomes(player_t territory[grid_size][grid_size], gold_t incomes[players_capacity]) {
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			const player_t player = territory[y][x];
+			if (player != null_player)
+				++incomes[player];
+		} while (++x);
+	} while (++y);
+}
 
 // Marks a tile as attackable if position relates to attackable unit
 static void grid_explore_mark_attackable_tile(

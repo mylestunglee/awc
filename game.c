@@ -29,21 +29,9 @@ static void game_preload(struct game* const game) {
 	bitarray_clear(game->alliances, sizeof(game->alliances));
 }
 
-static void game_compute_incomes(struct game* const game) {
-	grid_t y = 0;
-	do {
-		grid_t x = 0;
-		do {
-			const player_t player = game->territory[y][x];
-			if (player != null_player)
-				++game->incomes[player];
-		} while (++x);
-	} while (++y);
-}
-
 static void game_postload(struct game* const game) {
 	grid_correct_map(game->territory, game->map);
-	game_compute_incomes(game);
+	grid_compute_incomes(game->territory, game->incomes);
 }
 
 bool game_load(struct game* const game, const char* const filename) {
