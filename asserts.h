@@ -9,7 +9,7 @@
 #define max_value(type) (type)~(type)0
 #define upper_bound(type) max_value(type) + 1
 
-void asserts() {
+void asserts(void) {
 	// Assert signness of type definitions
 	compiler_assert(is_unsigned(unit_t));
 	compiler_assert(is_unsigned(health_t));

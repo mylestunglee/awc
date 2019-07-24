@@ -6,6 +6,6 @@
 
 void render(const struct game* const, const bool, const bool);
 
-void reset_style();
+void reset_style(void);
 
 #endif
