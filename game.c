@@ -248,8 +248,8 @@ static void simulate_attack(
 		return;
 	}
 
-	// Ranged units do not receive counter-attacks
-	if (models_min_range[attacker->model])
+	// Ranged units do not receive to give counter-attacks
+	if (models_min_range[attacker->model] || models_min_range[attackee->model])
 		*counter_damage = 0;
 	else
 		*counter_damage = calc_damage(game, attackee, attacker);
@@ -305,6 +305,7 @@ static void game_handle_attack(struct game* const game) {
 static void game_next_turn(struct game* const game) {
 	// Clear unit selection and enabled
 	game->selected = null_unit;
+	grid_clear_all_uint8(game->labels);
 	units_set_enabled(&game->units, game->turn, false);
 
 	const player_t prev_turn = game->turn;
