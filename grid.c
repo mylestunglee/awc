@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
+#include "bitarray.h"
 #include "definitions.h"
 #include "grid.h"
 
@@ -90,7 +91,7 @@ static void grid_explore_mark_attackable_tile(
 
 	// Mark tiles without friendly units as attackable
 	if (index != null_unit &&
-		unit->player != player &&
+		!bitmatrix_get(game->alliances, unit->player, player) &&
 		units_damage[model][unit->model])
 		game->labels[y][x] |= attackable_bit;
 }
@@ -131,24 +132,24 @@ static void grid_explore_mark_attackable_ranged(
 		}
 }
 
-
+// Recursively marks tiles that are accessible or attackable from the cursor tile
 void grid_explore(struct game* const game) {
 	struct queue* const queue = &game->queue;
 
 	assert(queue_empty(queue));
 	assert(game->units.grid[game->y][game->x] != null_unit);
 
-	const model_t model = game->units.data[game->selected].model;
-	const uint8_t movement_type = unit_movement_types[model];
-	const player_t player = game->units.data[game->selected].player;
+	const unit_t index = game->units.grid[game->y][game->x];
+	const struct unit* const cursor = &game->units.data[index];
+	const uint8_t movement_type = unit_movement_types[cursor->model];
 
-	grid_explore_mark_attackable_ranged(game, game->x, game->y, model, player);
+	grid_explore_mark_attackable_ranged(game, game->x, game->y, cursor->model, cursor->player);
 
 	queue_insert(queue, (struct queue_node){
 		.x = game->x,
 		.y = game->y,
 		.energy =
-			unit_movement_ranges[model] +
+			unit_movement_ranges[cursor->model] +
 			movement_type_cost[movement_type][game->map[game->y][game->x]]
 		});
 
@@ -167,8 +168,12 @@ void grid_explore(struct game* const game) {
 			continue;
 
 		// Cannot pass through enemy units
-		const unit_t unit = game->units.grid[node->y][node->x];
-		if (unit != null_unit && game->units.data[unit].player != player)
+		const unit_t unit_at_node = game->units.grid[node->y][node->x];
+		if (unit_at_node != null_unit &&
+			!bitmatrix_get(
+				game->alliances,
+				game->units.data[unit_at_node].player,
+				cursor->player))
 			continue;
 
 		const energy_t energy = node->energy - cost;
@@ -181,12 +186,11 @@ void grid_explore(struct game* const game) {
 
 
 		// Mark unit-free tiles as accessible but ships cannot block bridges
-		if ((unit == null_unit || unit == game->selected) &&
+		if ((unit_at_node == null_unit || unit_at_node == index) &&
 			(tile != tile_bridge || movement_type != movement_type_ship)) {
 
 			game->labels[node->y][node->x] |= accessible_bit;
-
-			grid_explore_mark_attackable_direct(game, node->x, node->y, model, player);
+			grid_explore_mark_attackable_direct(game, node->x, node->y, cursor->model, cursor->player);
 		}
 
 		// Explore adjacent tiles
@@ -196,6 +200,7 @@ void grid_explore(struct game* const game) {
 		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y - 1, .energy = energy});
 	}
 
+	game->labels[game->y][game->x] |= accessible_bit;
 	grid_clear_all_energy_t(game->workspace);
 }
 

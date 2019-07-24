@@ -76,7 +76,6 @@ static bool render_unit(
 	if (!unit->enabled)
 		*style &= '\x0F';
 
-
 	return true;
 }
 
@@ -352,3 +351,4 @@ void render(
 void reset_style() {
 	printf("%c[0m", '\x1B');
 }
+

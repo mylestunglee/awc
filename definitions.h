@@ -28,8 +28,8 @@ typedef int16_t gold_t;
 #define queue_capacity (queue_t)0xffff
 #define units_capacity (unit_t)0xff
 #define null_unit units_capacity
+#define players_capacity 5
 #define null_player players_capacity
-#define players_capacity 3
 
 #define unit_format "%02X"
 #define grid_format "%3hhu"
@@ -41,6 +41,7 @@ typedef int16_t gold_t;
 #define turn_format "%hhu"
 #define health_wide_format "%u"
 #define gold_format "%hd"
+#define enabled_format "%8s"
 
 // Graphics
 #define screen_width 10
@@ -118,8 +119,8 @@ const static uint8_t capturable_textures[capturable_capacity][tile_height][(tile
 		{'\xB1', '\x11', '\x11', '\x1C'}}};
 
 const static uint8_t unit_symbols[14] = {' ', '_', 'o', 'x', '<', '>', 'v', '^', '\\', '/', '[', ']', '-', '='};
-const static uint8_t player_styles[players_capacity + 1] = {'\xF4', '\xF1', '\xF3', '\xF8'};
-const static uint8_t player_symbols[players_capacity + 1] = {'1', '2', '3', ' '};
+const static uint8_t player_styles[players_capacity + 1] = {'\xF4', '\xF1', '\xF3', '\xF8', '\xF8', '\xF8'};
+const static uint8_t player_symbols[players_capacity + 1] = {'1', '2', '3', '4', '5', ' '};
 const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 5, 6, 4, 9, 7, 6, 5, 6, 5};
 /*
 0 int
@@ -178,5 +179,6 @@ const static model_t buildable_models_range[capturable_capacity] = {0, 9, 3, 3, 
 const static model_t buildable_models_offset[capturable_capacity] = {0, 0, 9, 12, 0};
 
 #define gold_scale 10
+#define bitarray_size(bits) (bits + 7) / 8
 
 #endif

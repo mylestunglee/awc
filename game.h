@@ -20,8 +20,8 @@ struct game {
 	gold_t golds[players_capacity];
 	gold_t incomes[players_capacity];
 	bool fog;
-	uint8_t bots[(players_capacity + 7) / 8];
-	uint8_t alliances[(players_capacity * players_capacity + 7) / 8];
+	uint8_t bots[bitarray_size(players_capacity)];
+	uint8_t alliances[bitarray_size((players_capacity * (players_capacity - 1)) / 2)];
 };
 
 bool game_load(struct game* const, const char* const);

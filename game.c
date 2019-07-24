@@ -157,11 +157,10 @@ static void game_handle_capture(struct game* const game) {
 		// Remove units
 		units_delete_player(&game->units, loser);
 
-		// Remove territory
-
 		assert(loser != null_player);
 		assert(loser != game->turn);
 
+		// Remove territory
 		grid_clear_player_territory(game->territory, loser);
 
 		// Change HQ into a city
@@ -178,10 +177,13 @@ static void game_handle_action(struct game* const game) {
 	const unit_t unit = game->units.grid[game->y][game->x];
 
 	if (game->selected == null_unit) {
-		// Select unit
+		// Select unit iff:
+		// 1. A unit is not already selected
+		// 2. The unit is enabled
+		// 3. The unit has possible moves
 		if (unit != null_unit && game->units.data[unit].enabled) {
-			game->selected = unit;
 			grid_explore(game);
+			game->selected = unit;
 		}
 	} else {
 		// Cursor over selected unit
@@ -198,7 +200,10 @@ static void game_handle_action(struct game* const game) {
 			// 3. The tile is owned by an enemy
 			if (unit->model < unit_capturable_upper_bound &&
 				game->map[game->y][game->x] >= tile_capturable_lower_bound &&
-				game->territory[game->y][game->x] != unit->player)
+				!bitmatrix_get(
+					game->alliances,
+					game->territory[game->y][game->x],
+					unit->player))
 				game_handle_capture(game);
 
 			unit->enabled = false;
@@ -298,6 +303,8 @@ static void game_handle_attack(struct game* const game) {
 }
 
 static void game_next_turn(struct game* const game) {
+	// Clear unit selection and enabled
+	game->selected = null_unit;
 	units_set_enabled(&game->units, game->turn, false);
 
 	const player_t prev_turn = game->turn;
