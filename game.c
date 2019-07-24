@@ -387,20 +387,23 @@ static void print_text(
 }
 
 void game_loop(struct game* const game) {
-	render(game, false, false);
-	print_text(game, false, false);
+	do {
+		bool attack_enabled = game_attack_enabled(game);
+		bool build_enabled = game_build_enabled(game);
+		assert(!(attack_enabled && build_enabled));
 
-	char input = getch();
+		render(game, attack_enabled, build_enabled);
+		print_text(game, attack_enabled, build_enabled);
 
-	while (input != 'q') {
+		char input = getch();
+
+		if (input == '\n')
+			break;
 
 		// Fix case skipping
 		game_parse_movement(game, input);
 
 		// Compute possible actions
-		bool attack_enabled = game_attack_enabled(game);
-		bool build_enabled = game_build_enabled(game);
-		assert(!(attack_enabled && build_enabled));
 
 		// Switch 0-9 keys between building and save/loading states
 		if (build_enabled) {
@@ -415,17 +418,10 @@ void game_loop(struct game* const game) {
 		if (input == ' ') {
 			if (attack_enabled) {
 				game_handle_attack(game);
-				attack_enabled = false;
 			} else
 				game_handle_action(game);
 		} else if (input == 'n') {
 			game_next_turn(game);
-			build_enabled = game_build_enabled(game);
 		}
-
-		render(game, attack_enabled, build_enabled);
-		print_text(game, attack_enabled, build_enabled);
-
-		input = getch();
-	}
+	} while (true);
 }
