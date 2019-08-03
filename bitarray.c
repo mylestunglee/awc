@@ -11,6 +11,10 @@ void bitarray_set(uint8_t* const data, const player_wide_t index) {
 	data[index >> 3] |= 1 << (index & 7);
 }
 
+void bitarray_unset(uint8_t* const data, const player_wide_t index) {
+	data[index >> 3] &= ~(1 << (index & 7));
+}
+
 bool bitarray_get(const uint8_t* const data, const player_wide_t index) {
 	return data[index >> 3] & (1 << (index & 7));
 }
@@ -37,6 +41,19 @@ void bitmatrix_set(uint8_t* const data, const player_t p, const player_t q) {
 		bitarray_set(data, bitmatrix_cascade(p, q));
 	else
 		bitarray_set(data, bitmatrix_cascade(q, p));
+}
+
+void bitmatrix_unset(uint8_t* const data, const player_t p, const player_t q) {
+	if (p == null_player || q == null_player)
+		return;
+
+	if (p == q)
+		return;
+
+	if (p > q)
+		bitarray_unset(data, bitmatrix_cascade(p, q));
+	else
+		bitarray_unset(data, bitmatrix_cascade(q, p));
 }
 
 bool bitmatrix_get(const uint8_t* const data, const player_t p, const player_t q) {
