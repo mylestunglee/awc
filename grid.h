@@ -11,5 +11,6 @@ void grid_correct_map(player_t[grid_size][grid_size], tile_t[grid_size][grid_siz
 void grid_compute_incomes(player_t [grid_size][grid_size], gold_t[players_capacity]);
 
 void grid_explore(struct game* const);
+void grid_reveal(struct game* const);
 
 #endif

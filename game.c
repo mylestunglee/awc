@@ -32,6 +32,7 @@ static void game_preload(struct game* const game) {
 static void game_postload(struct game* const game) {
 	grid_correct_map(game->territory, game->map);
 	grid_compute_incomes(game->territory, game->incomes);
+	grid_reveal(game);
 }
 
 bool game_load(struct game* const game, const char* const filename) {
@@ -95,6 +96,9 @@ static bool game_parse_build(struct game* const game, const char input) {
 		.y = game->y,
 		.enabled = false});
 
+	// TODO: just reveal the new unit
+	grid_reveal(game);
+
 	return true;
 }
 
@@ -157,6 +161,7 @@ static void game_handle_capture(struct game* const game) {
 		// Remove units
 		units_delete_player(&game->units, loser);
 
+		// HQ must be owned
 		assert(loser != null_player);
 		assert(loser != game->turn);
 
@@ -167,9 +172,10 @@ static void game_handle_capture(struct game* const game) {
 		game->map[game->y][game->x] = tile_city;
 
 		game->incomes[loser] = 0;
-	} else
+	} else if (loser != null_player)
 		--game->incomes[loser];
 
+	// Reveal does not need to be set because a unit is assumed to be capturing locally
 	game->territory[game->y][game->x] = game->turn;
 }
 
@@ -190,6 +196,7 @@ static void game_handle_action(struct game* const game) {
 		if (game->selected == unit) {
 			game->selected = null_unit;
 			grid_clear_all_uint8(game->labels);
+			grid_reveal(game);
 		// Move to accessible tile
 		} else if (game->labels[game->y][game->x] & accessible_bit) {
 			units_move(&game->units, game->selected, game->x, game->y);
@@ -209,6 +216,7 @@ static void game_handle_action(struct game* const game) {
 			unit->enabled = false;
 			game->selected = null_unit;
 			grid_clear_all_uint8(game->labels);
+			grid_reveal(game);
 		}
 	}
 }
@@ -300,6 +308,7 @@ static void game_handle_attack(struct game* const game) {
 	attacker->enabled = false;
 	game->selected = null_unit;
 	grid_clear_all_uint8(game->labels);
+	grid_reveal(game);
 }
 
 static void game_next_turn(struct game* const game) {
@@ -319,6 +328,7 @@ static void game_next_turn(struct game* const game) {
 		game->turn != prev_turn);
 
 	units_set_enabled(&game->units, game->turn, true);
+	grid_reveal(game);
 
 	// Add income to golds
 	game->golds[game->turn] += gold_scale * game->incomes[game->turn];
@@ -397,7 +407,7 @@ void game_loop(struct game* const game) {
 
 		char input = getch();
 
-		if (input == '\n')
+		if (input == '\n' || input == 'q')
 			break;
 
 		// Fix case skipping
@@ -424,4 +434,7 @@ void game_loop(struct game* const game) {
 			game_next_turn(game);
 		}
 	} while (true);
+
+	// New line after print text
+	printf("\n");
 }

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "bitarray.h"
 #include "graphics.h"
 
 static void render_pixel(uint8_t symbol, const uint8_t style, const uint8_t prev_style) {
@@ -30,6 +31,10 @@ static void render_pixel(uint8_t symbol, const uint8_t style, const uint8_t prev
 	printf("%c", symbol);
 }
 
+static bool hidden_tile(const struct game* const game, const grid_t x, const grid_t y) {
+	return game->fog && !(game->labels[y][x] & reveal_bit);
+}
+
 // Attempt to find symbol style pair from rendering coordinates
 static bool render_unit(
 	const struct game* const game,
@@ -39,6 +44,10 @@ static bool render_unit(
 	const grid_t tile_y,
 	uint8_t* const symbol,
 	uint8_t* const style) {
+
+	// Hide in fog
+	if (hidden_tile(game, x, y))
+		return false;
 
 	// Out of bounds
 	if (unit_left > tile_x || tile_x >= unit_left + unit_width ||
@@ -51,6 +60,7 @@ static bool render_unit(
 		return false;
 
 	const struct unit* const unit = &game->units.data[unit_index];
+
 	const model_t model = unit->model;
 	uint8_t texture = unit_textures[model]
 		[tile_y - unit_top][(tile_x - unit_left) / 2];
@@ -119,13 +129,18 @@ static bool render_selection(
 		}
 	}
 
-	const tile_t tile = game->map[y][x];
+	// Darken background in fog
+	if (hidden_tile(game, x, y))
+		*style = tile_styles[0];
+	else {
+		const tile_t tile = game->map[y][x];
 
-	// Handle terrian and capturable tiles
-	if (tile < terrian_capacity)
-		*style = tile_styles[tile];
-	else
-		*style = player_styles[game->territory[y][x]];
+		// Handle terrian and capturable tiles
+		if (tile < terrian_capacity)
+			*style = tile_styles[tile];
+		else
+			*style = player_styles[game->territory[y][x]];
+	}
 
 	// Highlight box pre-attack
 	*style &= '\x0f';
@@ -149,6 +164,10 @@ static bool render_health_bar(
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
+	// Hide in fog
+	if (hidden_tile(game, x, y))
+		return false;
+
 	// Display health bar on the bottom of unit
 	if (tile_y != tile_height - 1)
 		return false;
@@ -156,12 +175,13 @@ static bool render_health_bar(
 	if (tile_x < unit_left || tile_x >= unit_left + unit_width)
 		return false;
 
-	const unit_t unit = game->units.grid[y][x];
+	const unit_t unit_index = game->units.grid[y][x];
 
-	if (unit == null_unit)
+	if (unit_index == null_unit)
 		return false;
 
-	const health_t health = game->units.data[unit].health;
+	const struct unit* const unit = &game->units.data[unit_index];
+	const health_t health = unit->health;
 
 	// Hide health bar on full-health units
 	if (health == health_max)
@@ -196,38 +216,39 @@ static void render_highlight(
 	uint8_t* const symbol,
 	uint8_t* const style) {
 
+	const uint8_t highlight = game->labels[y][x] & (accessible_bit | attackable_bit);
+
 	// Apply label hightlighting
-	if (game->labels[y][x]) {
-		// Clear foreground style
-		*style &= '\x0f';
+	if (!highlight)
+		return;
 
-		// Show arrows highlighting position to attack unit
-		if (attack_enabled && x == game->prev_x && y == game->prev_y) {
-			if ((grid_t)(game->prev_x + 1) == game->x)
-				*symbol = '>';
-			else if ((grid_t)(game->prev_x - 1) == game->x)
-				*symbol = '<';
-			else if ((grid_t)(game->prev_y + 1) == game->y)
-				*symbol = 'v';
-			else if ((grid_t)(game->prev_y - 1) == game->y)
-				*symbol = '^';
-			else
-				// Previous position incorrectly set
-				assert(false);
-		} else
-			*symbol = ':';
+	// Clear foreground style
+	*style &= '\x0f';
 
-		// Set foreground style
-		switch (game->labels[y][x]) {
-			case accessible_bit: {
-				*style |= accessible_style;
-				break;
-			}
-			case attackable_bit: {
-				*style |= attackable_style;
-				break;
-			}
-		}
+	// Show arrows highlighting position to attack unit
+	if (attack_enabled && x == game->prev_x && y == game->prev_y) {
+		if ((grid_t)(game->prev_x + 1) == game->x)
+			*symbol = '>';
+		else if ((grid_t)(game->prev_x - 1) == game->x)
+			*symbol = '<';
+		else if ((grid_t)(game->prev_y + 1) == game->y)
+			*symbol = 'v';
+		else if ((grid_t)(game->prev_y - 1) == game->y)
+			*symbol = '^';
+		else
+			// Previous position incorrectly set
+			assert(false);
+	} else
+		*symbol = ':';
+
+	// Set foreground style
+	switch (highlight) {
+		case accessible_bit:
+			*style |= accessible_style;
+			break;
+		case attackable_bit:
+			*style |= attackable_style;
+			break;
 	}
 }
 
@@ -242,7 +263,11 @@ static bool render_terrian(
 	const tile_t tile = game->map[y][x];
 
 	*symbol = tile_symbols[tile];
-	*style = tile_styles[tile];
+
+	if (hidden_tile(game, x, y))
+		*style = tile_styles[0];
+	else
+		*style = tile_styles[tile];
 
 	render_highlight(game, x, y, attack_enabled, symbol, style);
 
@@ -270,14 +295,21 @@ static bool render_capturable(
 
 	const player_t player = game->territory[y][x];
 
-	*style = player_styles[player];
+	if (hidden_tile(game, x, y))
+		*style = tile_styles[0];
+	else
+		*style = player_styles[player];
 
 	if (texture == 0) {
 		*symbol = ' ';
 		render_highlight(game, x, y, attack_enabled, symbol, style);
-	} else if (texture == '\x0F')
-		*symbol = player_symbols[player];
-	else
+	} else if (texture == '\x0F') {
+		// Show player symbol if tile is not hidden
+		if (hidden_tile(game, x, y))
+			*symbol = fog_symbol;
+		else
+			*symbol = player_symbols[player];
+	} else
 		*symbol = unit_symbols[texture - 1];
 
 	return true;

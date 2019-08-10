@@ -64,7 +64,7 @@ void grid_correct_map(
 				map[y][x] = tile_city;
 		} while (++x);
 	} while (++y);
-}
+	}
 
 void grid_compute_incomes(player_t territory[grid_size][grid_size], gold_t incomes[players_capacity]) {
 	grid_t y = 0;
@@ -89,10 +89,11 @@ static void grid_explore_mark_attackable_tile(
 	const unit_t index = game->units.grid[y][x];
 	const struct unit* const unit = &game->units.data[index];
 
-	// Mark tiles without friendly units as attackable
+	// Mark revealed tiles without friendly units as attackable
 	if (index != null_unit &&
 		!bitmatrix_get(game->alliances, unit->player, player) &&
-		units_damage[model][unit->model])
+		units_damage[model][unit->model] &&
+		(!game->fog || game->labels[y][x] & reveal_bit))
 		game->labels[y][x] |= attackable_bit;
 }
 
@@ -207,3 +208,71 @@ void grid_explore(struct game* const game) {
 	grid_clear_all_energy_t(game->workspace);
 }
 
+// Reveal a diamond shape at (x, y) with radius r
+static void diamond_reveal(
+	tile_t map[grid_size][grid_size],
+	const grid_t x,
+	const grid_t y,
+	const grid_t r,
+	uint8_t labels[grid_size][grid_size]) {
+
+	// Draw upper diamond
+	for (grid_t j = y - r; j != y; ++j) {
+		const grid_t v = r + j - y;
+		for (grid_t i = x - v; i != x + v + 1; ++i)
+			if (map[j][i] != tile_forest)
+				labels[j][i] |= reveal_bit;
+	}
+
+	// Draw lower diamond
+	for (grid_t j = y; j != y + r + 1; ++j) {
+		const grid_t v = r + y - j;
+		for (grid_t i = x - v; i != x + v + 1; ++i)
+			if (map[j][i] != tile_forest)
+				labels[j][i] |= reveal_bit;
+	}
+
+	// Reveal adjacent tiles
+	labels[(grid_t)(y - 1)][x] |= reveal_bit;
+	labels[y][(grid_t)(x - 1)] |= reveal_bit;
+	labels[y][x] |= reveal_bit;
+	labels[y][(grid_t)(x + 1)] |= reveal_bit;
+	labels[(grid_t)(y + 1)][x] |= reveal_bit;
+}
+
+// Reveal tiles in fog
+void grid_reveal(struct game* const game) {
+	// No purpose of revealing the map when there is no fog
+	if (!game->fog)
+		return;
+
+	// For each allied player
+	for (player_t player = 0; player < players_capacity; ++player) {
+		if (bitmatrix_get(game->alliances, game->turn, player)) {
+			// Reveal fog from units
+			unit_t curr = game->units.firsts[player];
+			while (curr != null_unit) {
+				const struct unit* const unit = &game->units.data[curr];
+
+				// Extra vision on mountains
+				grid_t vision = models_vision[unit->model];
+				if (unit->model < unit_capturable_upper_bound &&
+					game->map[unit->y][unit->x] == tile_mountain)
+					vision = mountain_vision;
+
+				diamond_reveal(game->map, unit->x, unit->y, vision, game->labels);
+				curr = game->units.nexts[curr];
+			}
+		}
+	}
+
+	// Reveal fog from territory
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			if (bitmatrix_get(game->alliances, game->turn, game->territory[y][x]))
+				game->labels[y][x] |= reveal_bit;
+		} while (++x);
+	} while (++y);
+}

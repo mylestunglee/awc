@@ -53,9 +53,11 @@ typedef int16_t gold_t;
 #define unit_width 5
 #define unit_height 2
 
+#define fog_symbol '?'
 #define selection_symbol '+'
 #define accessible_bit 1
 #define attackable_bit 2
+#define reveal_bit 4
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
 #define buildable_style '\xf0'
@@ -133,10 +135,13 @@ const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 
 
 #define unit_capturable_upper_bound 2
 #define movement_type_ship 5
+#define tile_forest 2
+#define tile_mountain 3
 #define tile_bridge 9
 #define tile_city 10
 #define tile_HQ 14
 #define tile_capturable_lower_bound 10
+#define mountain_vision 5
 
 const static uint8_t unit_movement_types[model_capacity] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
 const static energy_t movement_type_cost[movement_types_capacity][tile_capacity] = {
@@ -177,6 +182,7 @@ const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 
 const static gold_t models_cost[model_capacity] = {1, 3, 4, 7, 16, 6, 15, 8, 12, 20, 22, 9, 28, 18, 20};
 const static model_t buildable_models_range[capturable_capacity] = {0, 9, 3, 3, 0};
 const static model_t buildable_models_offset[capturable_capacity] = {0, 0, 9, 12, 0};
+const static grid_t models_vision[model_capacity] = {2, 2, 5, 3, 1, 1, 1, 2, 5, 2, 2, 3, 2, 3, 5};
 
 #define gold_scale 10
 #define bitarray_size(bits) (bits + 7) / 8
