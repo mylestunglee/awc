@@ -123,7 +123,9 @@ bool file_load(struct game* const game, const char* const filename) {
 		char* tokens;
 		char* key = __strtok_r(line, delim, &tokens);
 
-		if (!strcmp(key, "turn"))
+		if (key == NULL)
+			continue;
+		else if (!strcmp(key, "turn"))
 			sscanf(tokens, turn_format, &game->turn);
 		else if (!strcmp(key, "map"))
 			file_load_map(game->map, tokens);

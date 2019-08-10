@@ -1,4 +1,4 @@
-TARGET = main
+TARGET = awc
 CC = gcc
 CFLAGS = -g -Wall -pedantic
 
