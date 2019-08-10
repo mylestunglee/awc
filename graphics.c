@@ -238,8 +238,12 @@ static void render_highlight(
 		else
 			// Previous position incorrectly set
 			assert(false);
-	} else
-		*symbol = ':';
+
+		*style |= attackable_style;
+		return;
+	}
+
+	*symbol = ':';
 
 	// Set foreground style
 	switch (highlight) {
