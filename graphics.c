@@ -253,6 +253,9 @@ static void render_highlight(
 		case attackable_bit:
 			*style |= attackable_style;
 			break;
+		case accessible_bit | attackable_bit:
+			*style |= accessible_attackable_style;
+			break;
 	}
 }
 

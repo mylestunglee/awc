@@ -100,7 +100,8 @@ static bool game_parse_build(struct game* const game, const char input) {
 	if (success && game->fog)
 		grid_reveal_unit(game->units.grid[game->y][game->x], game);
 
-	return success;
+	// Build attempted, so don't fall through to next key-press cases
+	return true;
 }
 
 static bool game_parse_file(struct game* const game, const char input) {
@@ -186,23 +187,28 @@ static void game_handle_capture(struct game* const game) {
 static void game_handle_action(struct game* const game) {
 	const unit_t unit = game->units.grid[game->y][game->x];
 
-	if (game->selected == null_unit) {
-		// Select unit iff:
-		// 1. A unit is not already selected
-		// 2. The unit is enabled
-		// 3. The unit has possible moves
-		if (unit != null_unit && game->units.data[unit].enabled) {
-			grid_explore(game);
-			game->selected = unit;
-		}
-	} else {
-		// Cursor over selected unit
-		if (game->selected == unit) {
-			game->selected = null_unit;
+	// Select unit iff:
+	// 1. A unit is not already selected
+	// 2. The unit is enabled
+	// 3. The unit has possible moves
+	if (game->selected == null_unit && unit != null_unit) {
+		const bool select = game->units.data[unit].enabled;
+
+		// Remove highlighting of disabled units
+		if (select) {
 			grid_clear_all_uint8(game->labels);
 			grid_reveal(game);
-		// Move to accessible tile
-		} else if (game->labels[game->y][game->x] & accessible_bit) {
+		}
+
+		// Allow highlighting of disabled units
+		grid_explore(!select, game);
+
+		if (select)
+			game->selected = unit;
+	} else {
+		// Move to accessible tile when cursor is not over unit
+		if (game->selected != unit &&
+			game->labels[game->y][game->x] & accessible_bit) {
 			units_move(&game->units, game->selected, game->x, game->y);
 			struct unit* const unit = &game->units.data[game->selected];
 			// The moved unit can capture iff:
@@ -218,10 +224,11 @@ static void game_handle_action(struct game* const game) {
 				game_handle_capture(game);
 
 			unit->enabled = false;
-			game->selected = null_unit;
-			grid_clear_all_uint8(game->labels);
-			grid_reveal(game);
 		}
+
+		game->selected = null_unit;
+		grid_clear_all_uint8(game->labels);
+		grid_reveal(game);
 	}
 }
 

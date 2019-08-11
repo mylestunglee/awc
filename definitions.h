@@ -60,6 +60,7 @@ typedef int16_t gold_t;
 #define reveal_bit 4
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
+#define accessible_attackable_style '\xd0'
 #define buildable_style '\xf0'
 
 const static char* const tile_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge", "city", "factory", "airport", "habour", "HQ"};
