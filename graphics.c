@@ -357,8 +357,8 @@ void render(
 
 	const grid_t screen_left = game->x - screen_width / 2 + 1;
 	const grid_t screen_right = game->x + screen_width / 2 + 1;
-	const grid_t screen_top = game->y - screen_height / 2 + 1;
-	const grid_t screen_bottom = game->y + screen_height / 2 + 1;
+	const grid_t screen_top = game->y - screen_height / 2;
+	const grid_t screen_bottom = game->y + screen_height / 2;
 
 	for (grid_t y = screen_top; y != screen_bottom; ++y) {
 		for (uint8_t tile_y = 0; tile_y < tile_height; ++tile_y) {

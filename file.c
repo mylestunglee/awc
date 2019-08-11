@@ -5,10 +5,9 @@
 #include "units.h"
 #include "bitarray.h"
 
-static void file_load_map(tile_t map[grid_size][grid_size], const char* const tokens) {
-	grid_t y;
+static void file_load_map(tile_t map[grid_size][grid_size], const char* const tokens, const grid_t y) {
 	char map_str[grid_size] = {0};
-	if (sscanf(tokens, grid_format row_format, &y, map_str) != 2)
+	if (sscanf(tokens, row_format, map_str) != 1)
 		return;
 
 	grid_t x = 0;
@@ -115,6 +114,7 @@ bool file_load(struct game* const game, const char* const filename) {
 	const char* const delim = " ";
 	const uint16_t buffer_size = 4096;
 	char line[buffer_size];
+	grid_t y = 0;
 
 	while (fgets(line, buffer_size, file)) {
 		// Remove trailing new-line character
@@ -127,9 +127,10 @@ bool file_load(struct game* const game, const char* const filename) {
 			continue;
 		else if (!strcmp(key, "turn"))
 			sscanf(tokens, turn_format, &game->turn);
-		else if (!strcmp(key, "map"))
-			file_load_map(game->map, tokens);
-		else if (!strcmp(key, "territory"))
+		else if (!strcmp(key, "map")) {
+			file_load_map(game->map, tokens, y);
+			++y;
+		} else if (!strcmp(key, "territory"))
 			file_load_territory(game->territory, tokens);
 		else if (!strcmp(key, "gold"))
 			file_load_gold(game->golds, tokens);
@@ -167,7 +168,7 @@ static void file_save_map(const struct game* const game, FILE* const file) {
 		if (length < 0)
 			continue;
 
-		fprintf(file, "map "grid_format" ", y);
+		fprintf(file, "map ");
 
 		for (grid_wide_t x = 0; x <= length; ++x) {
 			fprintf(file, "%c", tile_symbols[game->map[y][x]]);
