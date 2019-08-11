@@ -88,7 +88,8 @@ static bool game_parse_build(struct game* const game, const char input) {
 
 	game->golds[game->turn] -= cost;
 
-	units_insert(&game->units, (struct unit){
+	// Error may occur when units is full
+	const bool success = !units_insert(&game->units, (struct unit){
 		.health = health_max,
 		.model = model,
 		.player = game->turn,
@@ -96,10 +97,10 @@ static bool game_parse_build(struct game* const game, const char input) {
 		.y = game->y,
 		.enabled = false});
 
-	// TODO: just reveal the new unit
-	grid_reveal(game);
+	if (success && game->fog)
+		grid_reveal_unit(game->units.grid[game->y][game->x], game);
 
-	return true;
+	return success;
 }
 
 static bool game_parse_file(struct game* const game, const char input) {
@@ -176,7 +177,10 @@ static void game_handle_capture(struct game* const game) {
 		--game->incomes[loser];
 
 	// Reveal does not need to be set because a unit is assumed to be capturing locally
-	game->territory[game->y][game->x] = game->turn;
+	if (loser != game->turn) {
+		game->territory[game->y][game->x] = game->turn;
+		++game->incomes[game->turn];
+	}
 }
 
 static void game_handle_action(struct game* const game) {
@@ -412,6 +416,9 @@ void game_loop(struct game* const game) {
 
 		// Fix case skipping
 		game_parse_movement(game, input);
+
+		attack_enabled = game_attack_enabled(game);
+		build_enabled = game_build_enabled(game);
 
 		// Compute possible actions
 

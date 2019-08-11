@@ -58,10 +58,11 @@ static unit_t units_players_insert(struct units* const units, const struct unit*
 }
 
 bool units_insert(struct units* const units, const struct unit unit) {
-	if (units->grid[unit.y][unit.x] != null_unit)
-		return true;
+	assert(units->grid[unit.y][unit.x] == null_unit);
 
 	const unit_t index = units_players_insert(units, &unit);
+
+	// units_players_insert may fail when units data structure is at capacity
 	if (index == null_unit)
 		return true;
 

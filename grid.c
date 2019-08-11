@@ -240,6 +240,22 @@ static void diamond_reveal(
 	labels[(grid_t)(y + 1)][x] |= reveal_bit;
 }
 
+// Reveal one unit in fog
+void grid_reveal_unit(const unit_t index, struct game* const game) {
+	assert(game->fog);
+	assert(index != null_unit);
+
+	const struct unit* const unit = &game->units.data[index];
+
+	// Extra vision on mountains
+	grid_t vision = models_vision[unit->model];
+	if (unit->model < unit_capturable_upper_bound &&
+		game->map[unit->y][unit->x] == tile_mountain)
+		vision = mountain_vision;
+
+	diamond_reveal(game->map, unit->x, unit->y, vision, game->labels);
+}
+
 // Reveal tiles in fog
 void grid_reveal(struct game* const game) {
 	// No purpose of revealing the map when there is no fog
@@ -249,18 +265,9 @@ void grid_reveal(struct game* const game) {
 	// For each allied player
 	for (player_t player = 0; player < players_capacity; ++player) {
 		if (bitmatrix_get(game->alliances, game->turn, player)) {
-			// Reveal fog from units
 			unit_t curr = game->units.firsts[player];
 			while (curr != null_unit) {
-				const struct unit* const unit = &game->units.data[curr];
-
-				// Extra vision on mountains
-				grid_t vision = models_vision[unit->model];
-				if (unit->model < unit_capturable_upper_bound &&
-					game->map[unit->y][unit->x] == tile_mountain)
-					vision = mountain_vision;
-
-				diamond_reveal(game->map, unit->x, unit->y, vision, game->labels);
+				grid_reveal_unit(curr, game);
 				curr = game->units.nexts[curr];
 			}
 		}
