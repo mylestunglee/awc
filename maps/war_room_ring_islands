@@ -1,0 +1,84 @@
+map ~~~~~~~~~~~~~~~~"~~~~~~~~~~~~~~~~
+map ~~~~::~~*~~~~~""CC~~~~~~~~~~~*~~~
+map ~~~:"":~~~~~~~"Y""~~~~~~~~~~~~~~~
+map ~~:"CC"::~~~~"F-CY-----F--Y~~~~~~
+map ~~:"F--Y-------~~"~~~~~"YC--~~*~~
+map ~~~:"CC"S~~~~"S~~~~~~~~~"YY-"~~~~
+map ~~~~:Y":~~~~~~~~~~~~~~~~~""-C~~~~
+map ~~*~~::~~~~~~~~~~~~~*~~~~SF-"~~~~
+map ~~~*~~~~~~:"C"~~~~~~~~~~~FHFY"~~~
+map ~~~~~~~~~:C"""Y":~~~~*~~~SF-"Y"~~
+map ~~~~~~~~~:"C"Y"C:~~~~~~~~""-"""~~
+map *~~~~::~~~""F"":~~~*~~~~~~"CC--"~
+map ~~~~:"":~~S""::~~~~~~~~~~~~"""F"~
+map ~~~:-C":~~~~~~~~~~~~~~~~~*~~~~-~~
+map ~~~:-"Y:~~~~~~~:::~~~~*~~~~~~~-~~
+map ~~~"F"":~~~*~~~"""~~~~~~~~~~~~-~~
+map ~~~SY":~~~~~~~CC"FS~~~~~~~~~~:-::
+map ~~~~C:~~~~~~:"""""F":~~~~~~~:YC"C
+map ~~~~-~~~~~~~:"""H""":~~~~~~*:"-""
+map ~~~~-~~~*~~~:"F""""":~*~~~~~:C-""
+map ~~~~-~~~~~~~~~SF"CC~~~~~~~~~~~-FY
+map ~~~~-~~~~~~~~~~"""~~~~~~~~~~~~S""
+map ~~~~-~~~~~~~~~~:::~~~~~:::~~~~~~~
+map ~~:"F~~~~~::~~~~~~~~~~:""":~~~~~~
+map ~~:"-S~*~:C":~~~~~~~~:"CCY":~~~*~
+map ~:"C-"~~~:"C":~~~~*~~~S"""Y":~~~~
+map ~:""-"~~~~:"F":~~~~~~:"CYC":~~~~:
+map ~:"C-"~~~~~:"C":~~~~~~::"":~~~~:"
+map ~:Y"C"~~~~~~:"C:~~~~~~~~::~~~~:""
+map ~:Y"-"S~~~~~~::~~~~~~~~~~~~~~~:C"
+map ~:YY-"F"S~~~~~~~~~~~~::~~~~~~~~-C
+map ~~:"-FHF""~~~*~~~~~~S"Y~~~*~~~S-"
+map ~~:C--F-F-----------YFY~~~~~~""F"
+map ~~~:C"""::~~~~~~~~~CY-C---------"
+territory   2  14   3
+territory   2  16   3
+territory   2  23   3
+territory   2  25   4
+territory   2  14   5
+territory   2  28   6
+territory   2  25   7
+territory   2  26   7
+territory   2  25   8
+territory   2  26   8
+territory   2  27   8
+territory   2  25   9
+territory   2  26   9
+territory   2  27  11
+territory   2  28  11
+territory   2  30  12
+territory   1  14  16
+territory   1  15  16
+territory   1  17  16
+territory   1  18  16
+territory   1  18  17
+territory   1  16  18
+territory   1  14  19
+territory   1  14  20
+territory   1  15  20
+territory   1  17  20
+territory   1  18  20
+territory   0   4  23
+territory   0   5  24
+territory   0   3  25
+territory   0   3  27
+territory   0   4  28
+territory   0   6  29
+territory   0   6  30
+territory   0   8  30
+territory   0   5  31
+territory   0   6  31
+territory   0   7  31
+territory   0  20  31
+territory   0   3  32
+territory   0   6  32
+territory   0   8  32
+territory   0  21  32
+territory   0   4  33
+territory   0  19  33
+territory   0  22  33
+bot 1
+bot 2
+team 1 2
+fog

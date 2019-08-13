@@ -1,0 +1,34 @@
+map YY"F""FYYFYYYYY
+map "CH--------C"F"
+map ~"CF"C~~~~----C
+map ~~~Y~~~C~~~~~-Y
+map ~~~~~~~-~YY~~-~
+map ~~------------Y
+map ~"-~-~YCY~-~F"~
+map ~F-~C~~~~~C~~"~
+map ~~-~-~~~~~~~~"~
+map ~"---""""C~~Y"~
+map ~-~"-~-~""~~~"~
+map ~"~"-~C~F""""C~
+map ~C~F-~~~-~~"Y~~
+map ~"~~-~CC"~YY~~~
+map ~C"--~~-~~~"YY~
+map ~~~~----~~~Y"~~
+map ~~~~~~~-----""Y
+map ~~~~~~~~~C"-F"F
+map ~~~~~~~~~"C--HC
+map ~~~~~~~~~Y""FCY
+territory   0   3   0
+territory   0   1   1
+territory   0   2   1
+territory   0   2   2
+territory   0   3   2
+territory   1  12  17
+territory   1  14  17
+territory   1  13  18
+territory   1  14  18
+territory   1  12  19
+territory   1  13  19
+bot 1
+team 1
+fog

@@ -1,0 +1,93 @@
+map ^^^"""""""""""""""""""~~~~~~~~~~~~~~~~~
+map ^^""""""""""""""CC""C"~~~~~~~~""~~~~~~~
+map ^"""C-C-C--C""-------C~~~~~~~~SA~~~~~~~
+map ""CC---""""--C-"""""-~~~~~~~~~~~~~~~~~~
+map C--"""-"""C-"-""A"C-~~~~~~~~~~~~~~~~~~~
+map --""CY-CCC-----C"---~~~~~~~~~~~~~~~~~~~
+map -"Y"YYY"""YYY"--C-"~~~~~~~~~~~~~~~~~~~~
+map -YYCYYYYYC"Y""Y""""~~~~~~~~~~~~~~~~~~~~
+map -"Y"YY"YYYC"CCY""Y~~~~~~"~~~~~~~~~~~:::
+map -C"""YC""YYYYY""YY~~~~~~S~~~~~~~~~~:"""
+map YYYY"""Y""YYY""YY~~~~~~~~~~~~~~~~:~""Y"
+map YY"YY"YYYCYY""YYY~~~~~~~~~~~~~~:~"~SA""
+map Y""""""YY"Y""YYY~~~~~~~~~~~~~::Y~S-F-A"
+map Y"YYYY""Y"""YYY~~~~~~~~~~~~::""^"-FHF-"
+map Y""YYYY"""YYYY~~~~~~~~~~~~:"""^"""-F-""
+map YY"YYYYY"YYYY~~~~~"~~~~~~:"""^"""F"-"A"
+map YY""YYYY"YYY~~~~~~S~~~~~:"""Y""CC---C""
+map YYY"YYY""YY~~~~~~~~~~~~:"""""-----"-"Y"
+map Y"""""""YY~~~~~~~~~~~~:"""YCC-""""C-""Y
+map "A-F-F-"":~~~~~~~~~~~:"""YY---CC"^"--""
+map -"FHF"--:~~~~~~~~~~~:""^"Y"""-""^^^"-C"
+map -A"F-S::~~~~~~~~~~~:""^"""""^-"^^^^"-""
+map --S-:~~~~~~~~~~~~~::"^^"CCC""-"""^""-C"
+map "-~:~~~~~~~~~~~~~:""^^""------CCC""C-""
+map ::~~~~~~~~~~~~~~~"^^"""C-""""-----A--C"
+map ~~~~~~~~~~~~~~~~~S""A----"^"C""""^""-""
+map ~~~~~~~~~~~~~~~:"-C""-"""^""""YYY^"C-"^
+map ~~~~~~~~~~~~~~~:""-""-"Y""CC""""""""-"^
+map ~~~~~~~~~~~~~~:""C-CC----------CCCC--"^
+map ~~~~~~~~~~~~~~:"""""""""""""""""""""""^
+territory   0  30   2
+territory   0  31   2
+territory   0   4   5
+territory   0   3   7
+territory   0   9   7
+territory   0  10   8
+territory   0  12   8
+territory   0  13   8
+territory   0   1   9
+territory   0   6   9
+territory   0  24   9
+territory   0   9  11
+territory   1  35  11
+territory   1  36  11
+territory   1  33  12
+territory   1  35  12
+territory   1  37  12
+territory   1  34  13
+territory   1  35  13
+territory   1  36  13
+territory   1  35  14
+territory   1  33  15
+territory   1  37  15
+territory   0  18  16
+territory   1  31  16
+territory   1  32  16
+territory   1  36  16
+territory   1  27  18
+territory   1  28  18
+territory   1  34  18
+territory   0   1  19
+territory   0   3  19
+territory   0   5  19
+territory   1  30  19
+territory   1  31  19
+territory   0   2  20
+territory   0   3  20
+territory   0   4  20
+territory   1  37  20
+territory   0   1  21
+territory   0   3  21
+territory   0   5  21
+territory   0   2  22
+territory   1  37  22
+infantry       0  14   2 255 enabled
+infantry       0   6   5 255 enabled
+battleship     0  24   9 255 enabled
+fighter        0  21  11 255 enabled
+battleship     0  24  12 255 enabled
+battleship     0  22  13 255 enabled
+bomber         0  23  15 255 enabled
+crusier        0  18  16 255 enabled
+bomber         0  24  17 255 enabled
+fighter        0  18  18 255 enabled
+artillery      0   5  20 255 enabled
+battletank     0   2  21 255 enabled
+battletank     0   4  21 255 enabled
+artillery      0   1  22 255 enabled
+infantry       0  24  23 255 enabled
+battletank     0  18  25 255 enabled
+infantry       0  19  26 255 enabled
+infantry       0  25  27 255 enabled
+battletank     0  18  28 255 enabled

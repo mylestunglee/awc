@@ -1,0 +1,43 @@
+map ~~~~~~~"""""""~~~~~~~
+map ~~~~""""^YYY^""""~~*~
+map ~~~~""YYYCACYYY""~~~~
+map ~~~~"-----------"~~~~
+map ~*~~Y-"CC^F^CC"-Y~~~~
+map ~~~~Y-~~~~~~~~~-Y~~~~
+map ~~~~Y-~~~~*~~~~-Y~~~~
+map YY"""-"Y~~~*~Y"-"""YY
+map """FA-"^~~~~~^"-AF"""
+map "FA""-"YYYYYYY"-""AF"
+map "FA""-"YYYYYYY"-""AF"
+map """FA-""~~~~~""-AF"""
+map Y""YY"CC~~~~~CC"YY""Y
+map ~~~~~~~~~~~~~~~~~~~~~
+map ~~~~~~~~~~~~*~~~~~~~~
+map ~~~~~~~~~*~~~~~~~~~~~
+map ~~~^YYY"~~~~~"YYY^~~~
+map ~~~""""CCYYYCC""""~~~
+map ~~~^"H"YYYYYYY"H"^~~~
+map ~~~"Y""^YCACY^""Y"~~~
+map ~~~YYY""~~~~~""YYY~~~
+territory   0   3   8
+territory   0   4   8
+territory   1  16   8
+territory   1  17   8
+territory   0   1   9
+territory   0   2   9
+territory   1  18   9
+territory   1  19   9
+territory   0   1  10
+territory   0   2  10
+territory   1  18  10
+territory   1  19  10
+territory   0   3  11
+territory   0   4  11
+territory   1  16  11
+territory   1  17  11
+territory   0   6  12
+territory   0   7  12
+territory   1  13  12
+territory   1  14  12
+territory   0   5  18
+territory   1  15  18

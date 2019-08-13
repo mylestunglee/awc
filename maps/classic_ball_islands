@@ -1,0 +1,24 @@
+map ~~~~~~~~~~~~~~~~
+map ~~~~~~YY""~"F"~~
+map ~~~~~"""CC"AHA"~
+map ~~"~~~C^YY""F""~
+map ~~C"~~~"""FYYYY~
+map ~""""~~~C"YY""~~
+map ~C"C""~~~C""CC"~
+map ~~"YYC"~~~""YY"~
+map ~"C"YYY"~~~CYYC~
+map ~""""""C"~~~"""~
+map ~F""FF^"""~~~C"~
+map ~""F""YYY"~~~"~~
+map ~~AHA"YY"C"~~~~~
+map ~~"F""YYC"~~~~~~
+territory   1  12   1
+territory   1  11   2
+territory   1  12   2
+territory   1  13   2
+territory   1  12   3
+territory   0   3  11
+territory   0   2  12
+territory   0   3  12
+territory   0   4  12
+territory   0   3  13

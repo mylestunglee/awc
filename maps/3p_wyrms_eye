@@ -1,0 +1,50 @@
+map *~~'~~~*~~~---F"Y"C""Y"F"Y:~~~
+map ~~"'~'~~~~"-"F------------:~~~
+map ~~Y'C'~'~C"-H"-"^~~~~~"""-"~::
+map ~"Y'C'C'"^"F---Y":~'~:Y^"-"""Y
+map ~Y"'C'C'Y""""^-"Y::'::"Y"-^^""
+map ~-~'~'C'YC::""-C""C'C^Y"^C""^C
+map ~-~~~'~'~-~~""------""""Y"^"""
+map ~--:~~~~'-'''"""^"'''''''""F"Y
+map ~F-F::C~~""C'C'''''^YYC"'Y""""
+map ~-H-Y"-Y"F^"'''^"F""Y""^'"Y"""
+map ~F--"^-----''""Y"Y"Y^Y"Y-C"Y^"
+map ~"^-"C"""'-'^FY"Y"Y"YF"Y'Y^YYY
+map ~C"-Y""Y''C""Y"YY...."..'.."
+map ~~"-"Y^''"Y"""Y"".YY^YY^'''-''
+map ~~"Y^""'^Y""CY"YF"YYCYYYY^YYY^
+map ~~:Y"Y"'""F"""YY".YYY^Y--C--YC
+map ~~~"C"Y-C""^Y":~Y.Y^YCY-C-C-YY
+map ~~~::""'^"Y""F:~~~:YCYFF-H-FF~
+map ~*~~~~C':::"Y~~~~*~::::-C-CY~~
+map ~~~*~~~'~~~~~~~*~~~~~~~~~~~~~*
+territory   1  14   0
+territory   1  13   1
+territory   1   9   2
+territory   1  12   2
+territory   1  11   3
+territory   1   9   5
+territory   0   1   8
+territory   0   3   8
+territory   0   6   8
+territory   0  11   8
+territory   1  13   8
+territory   0   2   9
+territory   2  17   9
+territory   0   1  10
+territory   2  21  11
+territory   0   1  12
+territory   2  16  14
+territory   2  20  14
+territory   2  25  15
+territory   2  24  16
+territory   2  26  16
+territory   2  13  17
+territory   2  20  17
+territory   2  22  17
+territory   2  23  17
+territory   2  25  17
+territory   2  27  17
+territory   2  28  17
+territory   2  24  18
+territory   2  26  18

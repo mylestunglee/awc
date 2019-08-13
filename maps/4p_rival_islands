@@ -1,0 +1,66 @@
+map ~~~~~~~~~~~~~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~~~~~~~
+map ~~~"""~~~~~~~~~""""~~~~
+map ~~"F"F"""~~~~"""F"F"~~~
+map ~~SFFFAYYY~~YYYAFFFS~~~
+map ~~""-"""""::"""""-""~~~
+map ~~SA-""C""YYY"C""-AS~~~
+map ~~""----C----C----""~~~
+map ~~""-""""YYY"""-"""~~~~
+map ~~""HCCC"::""CC-CH"~~~~
+map ~~:""YYY"~~""YYY"":~~~~
+map ~~~:"""~~~~~~"""":~~~~~
+map ~~~~~~~~~~~~~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~~~~~~~
+map ~~~:"YYY~~~~~"""""":~~~
+map ~~:""""""~~~"""C"""":~~
+map ~~""HCCC":::""C-CCH""~~
+map ~~""-YYY""YY"""-YYY""~~
+map ~~""----C----C-----""~~
+map ~~SA-"""""YY""YYY"-AS~~
+map ~~"F-F""C"YY"""""F-F"~~
+map ~~SFFFA""""::"""AFFFS~~
+map ~~""""""""~~~~"""""""~~
+map ~~~"""""~~~~~~~~""""~~~
+map ~~~~~~~~~~~~~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~~~~~~~
+territory   1   3   3
+territory   1   5   3
+territory   2  16   3
+territory   2  18   3
+territory   1   2   4
+territory   1   3   4
+territory   1   4   4
+territory   1   5   4
+territory   1   6   4
+territory   2  15   4
+territory   2  16   4
+territory   2  17   4
+territory   2  18   4
+territory   2  19   4
+territory   1   2   6
+territory   1   3   6
+territory   2  18   6
+territory   2  19   6
+territory   1   4   9
+territory   2  17   9
+territory   0   4  16
+territory   3  18  16
+territory   0   2  19
+territory   0   3  19
+territory   3  19  19
+territory   3  20  19
+territory   0   3  20
+territory   0   5  20
+territory   3  17  20
+territory   3  19  20
+territory   0   2  21
+territory   0   3  21
+territory   0   4  21
+territory   0   5  21
+territory   0   6  21
+territory   3  16  21
+territory   3  17  21
+territory   3  18  21
+territory   3  19  21
+territory   3  20  21

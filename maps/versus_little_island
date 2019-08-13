@@ -1,0 +1,16 @@
+map ~~~~~~~~~~~~~~~~~~~
+map ~~~~~~~~~~~~"Y"F"Y~
+map ~~~~~~~~C-------H"~
+map ~~~~~~~^"-"Y"CC""F~
+map ~~~~~Y"YY-C""Y"Y"~~
+map ~~Y"""Y"C-YYY"~~~~~
+map ~F""CCYY"-"^~~~~~~~
+map ~"H-------C~~~~~~~~
+map ~Y"F"Y"~~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~~~
+territory   1  15   1
+territory   1  16   2
+territory   1  17   3
+territory   0   1   6
+territory   0   2   7
+territory   0   3   8

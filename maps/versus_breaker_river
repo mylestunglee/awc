@@ -1,0 +1,31 @@
+map YY"""""~~~~~"""""YY
+map YA""CCY~~~~~YCC""AY
+map "-"F"Y~~~~~~~Y"F"-Y
+map "-FA"~~~~~~~~~"AF-"
+map "-F"~~~~~~~~~~~"F-Y
+map "-Y~~~~~~~~~~~~~"-"
+map Y-Y~~Y"YC~CY"Y~~"-Y
+map Y-"~~"C-----F"~~"-Y
+map Y-------Y~Y-------Y
+map Y-"~~"F-----C"~~"-Y
+map Y-Y~~Y"YC~CY"Y~~"-"
+map Y-"~~~-~~~~~-~~~"-"
+map "-"~~~-~~~~~-~~~"-"
+map YH""^Y"^Y^^""Y^"YHY
+map Y""^YCAY"""YACY^YY"
+territory   0   1   1
+territory   0   4   1
+territory   0   5   1
+territory   1  13   1
+territory   1  14   1
+territory   1  17   1
+territory   0   3   2
+territory   1  15   2
+territory   0   2   3
+territory   0   3   3
+territory   1  15   3
+territory   1  16   3
+territory   0   2   4
+territory   1  16   4
+territory   0   1  13
+territory   1  17  13

@@ -1,0 +1,25 @@
+map :HFS::CC:~~~*~~:Y~*~~YCY
+map FY:~~~Y:~*~~*~~~~~~~:FCY
+map S~~~YY:~*~~~~~~CY~:FYC::
+map ~~~~~~~~~~:CF~YY:~~~~~~:
+map ~~**~*~~:SYY:~~~~~~*~~:Y
+map Y:~~~~~:CY:~~~~~~~*~~:SC
+map YC~SY:~FY:~~~:CY~**~:~~~
+map CYCY:~~~~~~~YCY:~~~~C~~~
+map F:~~~~~~~~Y~~S~~~~FC:~:C
+map ~~~~:CY:~~~~~~~~~~:~~~~S
+map ~~:CY~~~~*~~~~~*~~~~*~~:
+map *~~~~~*~~~~SY~~~~*~*~~~:
+map *~~Y:~*~SY~YYYF:*~~~~~:F
+map ~:C~~~~~YYCYYY:~~~~~~~YH
+map :C~~SY~FYY:~~~~~~~~:YSF~
+map Y~CYYHF:~~~~~~~~:FYC:~~~
+territory   1   1   0
+territory   1   2   0
+territory   1   0   1
+territory   2  23  12
+territory   2  23  13
+territory   0   7  14
+territory   2  22  14
+territory   0   5  15
+territory   0   6  15

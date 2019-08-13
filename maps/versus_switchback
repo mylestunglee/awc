@@ -1,0 +1,25 @@
+map ^^^^^^^^^^^^^^^^^^^^^
+map ^^CF^^^^CC^^^^CC^^^H^
+map ^----^^----^^----^F-F
+map ^-^^-^^-^^-Y^-^^-^F-F
+map ^-^^-^^-^Y-YY-^^-^^-^
+map ^-Y^-^^-YY-Y^-^C-Y^-^
+map ^-YY-C^-Y^-YY-C^-YY-^
+map ^-YY-C^-CY-^C-F^-^Y-^
+map ^-^Y-^F-YY-YY-^^-YY-^
+map ^-YY-^^-Y^-Y^-^^-^Y-^
+map ^-^^-^^-YY-YY-^^-^^-^
+map F-F^-^^-^^-Y^-^^-^^-^
+map F-F^----^^----^^----^
+map ^H^^^CC^^^^CC^^^^FC^^
+map ^^^^^^^^^^^^^^^^^^^^^
+territory   1  19   1
+territory   1  18   2
+territory   1  20   2
+territory   1  18   3
+territory   1  20   3
+territory   0   0  11
+territory   0   2  11
+territory   0   0  12
+territory   0   2  12
+territory   0   1  13

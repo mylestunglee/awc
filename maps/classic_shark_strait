@@ -1,0 +1,81 @@
+map ~~~~~~~~~~~~~~~""^^^"""""""~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~C""""AC"C"~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~"ACC""C"~~~~~~~~~~~~
+map ~~~~~~~::::~~~~~~::~""S~~~~~~~~~~~~~~
+map ~~~~~~"""""~~~~~~~~~~~~~~~~~~::~~~~~~
+map ~~~:"YCCCYC"~~~~~~~~~~~~~~~~~""~~~~~~
+map ~~~:"YYY"YYY""~~~~~~~~~~~~~""CC""~~~~
+map ~~~~""YYC---CCYY"~~~~~~~~""""""^^"~~~
+map ~~~"CCY"-YYYY---S~~~::~""C""^^^""""~~
+map ~~YC---C-"^^"-""Y~~~"""C""^^""""C"":~
+map ~~"Y-Y"Y-C^^C-CCY~~~"""""^""YY"C"^":~
+map ~~SF-"A"------"Y~~~""C""^-------""":~
+map ~~YYFAYC-"""Y-CY~~~"^""^--"""YY-"C"~~
+map ~~"FHFY"-~~~Y---~~~"^A""-"^"C""-""~~~
+map ~~S"F"YC-~~~YY"-------"^-"^""^A-A"~~~
+map ~~~A-AYY-"""Y"^-~~~""-"^-"^""F"F"S~~~
+map ~~~Y-------Y"YY-~~~""-"^-"^"""FHF~~~~
+map ~~~Y"Y-Y"Y--C---~~~"^----"^""A"F"~~~~
+map ~~~~CY-"C"YYY"YY~~~"^""^""^"YYA"S~~~~
+map ~~~~Y"-C"^""YAYY~~~"^""^""""""""""~~~
+map ~~~:"C-"^"CCY"-----""""""C""^^^^^"~~~
+map ~~~:"Y-YYY^YY^-"~~~"^"""^"""YYYYY~~~~
+map ~~~:"Y--"YYY"Y-C~~~~~SC""^"CYY"YY~~~~
+map ~~~:""Y-C---C--Y~~~~~~~"""^YYYCY~~~~~
+map ~~~~~C""YY""YYY~~~~~~~~:~"""YYY~~~~~~
+map ~~~~~~~C"YCCY~~~~~~~~~~~~~~C""~~~~~~~
+map ~~~~~~~~S"""~~~~~~::::~~~~~:::~~~~~~~
+map ~~~~~~~~~::~~~~~~~""""~~~~~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~""""C"""~~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~YACCC"AYYY~~~~~~~~~~~
+territory   0   4   8
+territory   0   3   9
+territory   1  32   9
+territory   1  31  10
+territory   0   2  11
+territory   0   3  11
+territory   0   6  11
+territory   0   4  12
+territory   0   5  12
+territory   0   7  12
+territory   1  33  12
+territory   0   3  13
+territory   0   4  13
+territory   0   5  13
+territory   1  28  13
+territory   0   2  14
+territory   0   4  14
+territory   0   7  14
+territory   1  30  14
+territory   1  32  14
+territory   0   3  15
+territory   0   5  15
+territory   1  29  15
+territory   1  31  15
+territory   1  33  15
+territory   1  30  16
+territory   1  31  16
+territory   1  32  16
+territory   1  29  17
+territory   1  31  17
+territory   0   4  18
+territory   1  30  18
+territory   1  32  18
+infantry       1  17   2 255 disabled
+infantry       1  20   3 255 disabled
+infantry       1  25   7 255 disabled
+fighter        1  20   9 255 disabled
+bomber         1  22   9 255 disabled
+battletank     1  19  13 255 disabled
+battletank     1  16  14 255 disabled
+rockets        1  18  14 255 disabled
+rockets        1  19  15 255 disabled
+rockets        1  19  19 255 disabled
+fighter        1  21  19 255 disabled
+bomber         1  22  19 255 disabled
+battletank     1  16  20 255 disabled
+rockets        1  18  20 255 disabled
+battletank     1  19  21 255 disabled
+infantry       1  23  23 255 disabled
+infantry       1  27  24 255 disabled
+infantry       1  20  28 255 disabled

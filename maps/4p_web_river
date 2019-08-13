@@ -1,0 +1,47 @@
+map """""'""""""""'""""-"
+map """""'FF"""""Y'""""-"
+map -------------"'Y""F-"
+map ""-""'FF""H"""'""""-"
+map "F-""'""""""Y"'"C""-"
+map ""-""'""""""""'""C"-"
+map ""-""'""Y"'''''""""-"
+map "C-C"'"CC"'"--------"
+map ""-""''''''"-"'''''-'
+map ""------"Y'Y-"'"""F-F
+map '''''""------"'"""F-F
+map ""Y"'""-""''-'''"""-"
+map Y"CC'Y"-""'"-""'Y""-"
+map "-""'""-"C'C-""'"""H"
+map "H""'''-'''"-""'""Y-"
+map "-Y""'"-"C'C-""'"""Y"
+map "-"""'"-"Y'Y-""'"CC""
+map F-F""'"------""''''''
+map F-F"Y'"-"Y'C-------""
+map '-''''"-""'''''"""-""
+map "-------"C'"""'""C-C"
+map "-"""''''''"""'"""-""
+map "-C""'"""""Y""'"Y"-""
+map "-"""'"""H""FF'"""-F"
+map "-F""'Y--------------
+map C-"""'""""Y"FF'"""-Y"
+map "-"""'"CC"""""'Y""-""
+territory   1   6   1
+territory   1   7   1
+territory   1   6   3
+territory   1   7   3
+territory   1  10   3
+territory   0  18   9
+territory   0  20   9
+territory   0  18  10
+territory   0  20  10
+territory   0  19  13
+territory   2   1  14
+territory   2   0  17
+territory   2   2  17
+territory   2   0  18
+territory   2   2  18
+territory   3   9  23
+territory   3  12  23
+territory   3  13  23
+territory   3  12  25
+territory   3  13  25

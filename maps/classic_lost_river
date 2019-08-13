@@ -1,0 +1,28 @@
+map YYYY""'""YYYYYYYYYYYYYYYY""'""YY
+map YYYY""'""""""""""YYY"Y"""""'"YYY
+map YY""""'""CCCCCCC""""A"CCCC"-"""Y
+map YY"C""''"""""""""'''''"""""'"A"Y
+map YYC""""'''''''''''"""'''''''"""Y
+map YYY""""""-""""""""""""""'""""""Y
+map YYY""^"""'"""""""""C""""'"C""FAY
+map YY"""^"""'''-''CC"C"'''''"Y"FHFY
+map YYF"A^"""''"""'''"""'""-"""""FYY
+map YFHF""""'''"""""'''''""-""""FYYY
+map YYF"""""'"""""""'""""""''''"""YY
+map Y"""""'''"""^""''"""""''""'""C"Y
+map Y"C"""'""""^"""'""C"'''"""''""YY
+map YY"C""'"YYC""A"'""""'"""C""'"C"Y
+map YYYY""'"YYYYYY"'"YY"'"YYYY"'""YY
+territory   1  29   6
+territory   1  30   6
+territory   1  28   7
+territory   1  29   7
+territory   1  30   7
+territory   0   2   8
+territory   0   4   8
+territory   1  29   8
+territory   0   1   9
+territory   0   2   9
+territory   0   3   9
+territory   1  28   9
+territory   0   2  10

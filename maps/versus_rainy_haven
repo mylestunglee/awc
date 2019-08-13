@@ -1,0 +1,34 @@
+map ~~:""""":~*~SFH
+map *~:"C"F~~~~~~Y"
+map ~*~:"C":~"C~~~A
+map ~~~:C"":~S"~~~~
+map "~~:"C":~~~~~~~
+map C"~:"YC:~~~~~~"
+map "S~~:"":~""Y~~A
+map C~~~~::~~FY~~""
+map ~~~~~~~~S"C~~SC
+map ~~~"Y"~~~~"~~~"
+map *~~C"A"~~~~~~~~
+map ~~~~C""~~::::~~
+map "~~~~~~~:"FC":~
+map AY~~~~~:"""""":
+map HFS~~~:"CCCCC":
+territory   1  12   0
+territory   1  13   0
+territory   1  14   0
+territory   0   4   1
+territory   0   5   2
+territory   1  14   2
+territory   0   4   3
+territory   0   5   4
+territory   0   6   5
+territory   1  11  12
+territory   0   0  13
+territory   0   0  14
+territory   0   1  14
+territory   0   2  14
+territory   1   8  14
+territory   1   9  14
+territory   1  10  14
+territory   1  11  14
+territory   1  12  14

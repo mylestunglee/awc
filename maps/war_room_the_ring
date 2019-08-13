@@ -1,0 +1,45 @@
+map ^^^^^^"C"~~"CC^^^^^
+map ^^^C^C""~~~~~"CSFH^
+map ^HFCAY"~~~~~~~~~SF^
+map ^FA~~~~~~:Y:~~~~~SC
+map ^C~~~.."..""S~~~~~F
+map ^A~~.."-"""-"Y~~~~C
+map C"~.."C-CCC-C"S:~~"
+map "~~"---F"""F---"~~~
+map "~~.CC""CAC""C"":~~
+map "C~""C"F"H"F"C"."~~
+map ""~."C""CAC""CC."~:
+map Y"""---F"""F---""~"
+map Y"".."C-CCC-C".."~"
+map YY"".."-"""-"..""~"
+map """""..".".".Y""~~"
+map ^"""""C"C"C"C"C""""
+map ^^""^^"CCFCC"C"C^^^
+map ^^^^^^^^FHFY^^^^^^^
+territory   2   3   1
+territory   0  14   1
+territory   0  16   1
+territory   0  17   1
+territory   2   1   2
+territory   2   2   2
+territory   2   3   2
+territory   0  16   2
+territory   0  17   2
+territory   2   1   3
+territory   2   2   3
+territory   2   1   4
+territory   0  18   5
+territory   1   7   9
+territory   1   9   9
+territory   1  11   9
+territory   3   7  16
+territory   3   9  16
+territory   3  11  16
+territory   3   8  17
+territory   3   9  17
+territory   3  10  17
+bot 1
+bot 2
+bot 3
+team 1 2 3
+fog

@@ -1,0 +1,72 @@
+map YYYYYYY"YY""""Y~~Y""""YYY""YYYYY
+map Y""""YY---CCC""~~YCCC----YY""Y"Y
+map YCCC---H"""""""~~"""""""HY"CC""Y
+map """""""-""""Y""~~"YYY"""-----C""
+map "Y""C""FA""YY""~~"YYYC""F"""""""
+map :"""Y"F"F"CYYY~~~~"YY"AF"FAY""":
+map ~::"YA"F""""S~~~~~~S"C""F""Y"::~
+map ~~~~~"S"S""~~~~~~~~~~""S"S"~~~~~
+map ~~~~~~~:~~~~~~~~~~~~~~~~:~~~~~~~
+map ~~~~~~~~~~~~~~:::::~~~~~~~~~~~~~
+map ~~~~~~~~~~~~::"""""::~~~~~~~~~~~
+map ~~~~~~~~~~~:"""C"C""":~~~~~~~~~~
+map ~~~~~~~~~~:""AC"Y"FYY":~~~~~~~~~
+map ~~~~~~~~~~~SY"""F"""YS~~~~~~~~~~
+map ~~~~~~~~~~:""YF"""CA"":~~~~~~~~~
+map ~~~~:~~~~~~:""YC"C""":~~~~~~:~~~
+map ~~~:"S"YY~~~::"""""::~~~YYYS":~~
+map ~~:"""""YY~~~~:::::~~~~YYY"""":~
+map ~~~Y"CCC""Y~~~~~~~~~~~Y""""C""":
+map ~~~Y"------Y~~~~~~~~~~Y""CC-CCY~
+map ~~~"""""H"-""~~~~~~~~""A"""-""Y~
+map ~~~"CCC---FAS~~~~~~~~S"F"A"-"""~
+map ~~~~"""""""F":~~~~~~:"F"F--HCCY~
+map ~~~~"YY""AFFS~~~~~~~~S"F"""""Y"~
+map ~~~~~"YY"Y"""~~~~~~~~""Y"""YYY"~
+map ~~~~~~"YCYC"~~~~~~~~~~CYCY~~""~~
+map ~~~~~~~~~~~~~~~~~~~~~~~"Y"~~~~~~
+map ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+territory   1   7   2
+territory   2  24   2
+territory   1   4   4
+territory   1   7   4
+territory   1   8   4
+territory   2  21   4
+territory   2  24   4
+territory   1   6   5
+territory   1   8   5
+territory   1  10   5
+territory   2  22   5
+territory   2  23   5
+territory   2  25   5
+territory   2  26   5
+territory   1   5   6
+territory   1   7   6
+territory   2  21   6
+territory   2  24   6
+territory   1   6   7
+territory   1   8   7
+territory   2  23   7
+territory   2  25   7
+territory   0   8  20
+territory   3  23  20
+territory   0  10  21
+territory   0  11  21
+territory   0  12  21
+territory   3  21  21
+territory   3  23  21
+territory   3  25  21
+territory   0  11  22
+territory   3  22  22
+territory   3  24  22
+territory   3  27  22
+territory   0   9  23
+territory   0  10  23
+territory   0  11  23
+territory   0  12  23
+territory   3  21  23
+territory   3  23  23
+territory   0   8  25
+territory   0  10  25
+territory   3  22  25
+territory   3  24  25

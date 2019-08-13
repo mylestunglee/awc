@@ -1,0 +1,39 @@
+map ~~~~~~~~~~~~~~~~~~~~~~~~~~
+map ~~~~~~~~""""""""""""~~~~~~
+map ~~~~~~""""""""""""""""~~~~
+map ~~~~~"CCCYY"FHF"CC"YY^^~~~
+map ~~~~~"-------F----YYY^^~~~
+map ~~~~"C-"""""YY"""Y^^YY^^~~
+map ~~~~""-CYY"~~~~"Y^^^FYYY~~
+map ~~~""Y-YY~~~~~~~~~^^^YYY~~
+map ~~~"""-Y"~~~~~~~~~~^YYYY~~
+map ~~~Y""-""~~~"YY"~~~YYYYY~~
+map ~~~YCC-"~~~"Y""""YYYYYYY~~
+map ~~~Y""-"~~~YFHFY""""YYYY~~
+map ~~~YY"-C~~~""F---"""""YY~~
+map ~~~YY"-""~~~""Y"-C""CCC"~~
+map ~~~Y"C-Y"~~~"""C-"""""""~~
+map ~~~Y"Y-Y"~~~~~~"-""CC""~~~
+map ~~~Y""-"~~~~~~~"-C""""~~~~
+map ~~~~"CFC~~"Y"""C-""""~~~~~
+map ~~~~Y"------CC---""~~~~~~~
+map ~~~~YYY"~~""Y""""~~~~~~~~~
+map ~~~~~YY~~~~~~~~~~~~~~~~~~~
+territory   0   6   3
+territory   0   7   3
+territory   0   8   3
+territory   0  12   3
+territory   0  13   3
+territory   0  14   3
+territory   0  16   3
+territory   0  17   3
+territory   0  13   4
+territory   1  12  11
+territory   1  13  11
+territory   1  14  11
+territory   1  13  12
+territory   1  17  13
+territory   1  15  14
+bot 1
+team 1
+fog

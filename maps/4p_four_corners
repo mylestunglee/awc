@@ -1,0 +1,22 @@
+map HF"""^^^^^^^"FH
+map F""CY^"Y^^^CC"F
+map ""CYYYYY^"""Y""
+map ^^""Y"YCYYY""^^
+map ^CY""YCACY""YC^
+map ^CYY"YYCY""YYC^
+map ^^Y""""YY"YYY^^
+map ""Y"Y"^"""Y"C""
+map F""CYY^^Y""C""F
+map HF"YC^^^YYYY"FH
+territory   0   0   0
+territory   0   1   0
+territory   3  13   0
+territory   3  14   0
+territory   0   0   1
+territory   3  14   1
+territory   1   0   8
+territory   2  14   8
+territory   1   0   9
+territory   1   1   9
+territory   2  13   9
+territory   2  14   9

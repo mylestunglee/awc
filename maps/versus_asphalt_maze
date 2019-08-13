@@ -1,0 +1,21 @@
+map YYYYY""""""""F"
+map YYY""-------FHF
+map YYY"Y-Y-Y-Y-"F"
+map Y""----C------"
+map Y"Y-Y-Y-Y-Y-Y-"
+map "----C---C----"
+map "-Y-Y-Y-Y-Y-Y"Y
+map "------C----""Y
+map "FY-Y-Y-Y-Y"YYY
+map FHF-------""YYY
+map "F""""""""YYYYY
+territory   1  13   0
+territory   1  12   1
+territory   1  13   1
+territory   1  14   1
+territory   1  13   2
+territory   0   1   8
+territory   0   0   9
+territory   0   1   9
+territory   0   2   9
+territory   0   1  10

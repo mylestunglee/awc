@@ -1,0 +1,52 @@
+map "YYY-Y^^YY""YYY^^^^^^^""Y"""""""
+map """Y-"Y^^Y"C"F"Y^^^^""CC"Y""YYY"
+map """"-"Y^^^-----------------C""YY
+map """"-C"Y^^-"""""^^F""""C""-""""Y
+map "Y"C-"""""-""~~~^^""""""C"F""C"Y
+map "YY"-A"YCC-"~~~~~~"Y"CC"YFHF"""Y
+map ~""F-------Y~~~~~~~~YY"Y""F"""YY
+map ~~""Y"""Y^-"~~~*~~~~~~"""A"A""YY
+map ~~~"YYCCY^-"F~~~~~~~~~~~"""""YYY
+map ~~~""YYYY^-C^""~~~*~~~~~~"""Y~~Y
+map ~~~~"""YYY----"^~~~~~~~~~~~~Y"YY
+map ~~~~~"""YY^^^-"^""~~*~~~~~~~~"""
+map ~~~~~~"""YC^^-C^^""~~~~~~*~~~~Y"
+map ~~~~~~~"""YY^---C"""~~~*~~~~~~"Y
+map ~~~~~~~~~""YYC^^"C"F"~~~~~~~~~~Y
+map ~~~~~~~~~~"""YYY""F"F~~:~~~~~~~"
+map ~~~~~~~~~~~""""YYY"F""""::~~*~~~
+map ~~~~~~~~~~~~~""""YYYY""""Y:~~~~~
+map ~~~~~~~~~~~~~~""""YYYC""Y"H:~~~~
+map ~~~~~~~~~~~~~~~~""C"Y""Y"""Y:~~~
+map ~~~~~~~~~~~~~~~~~~"""Y"::"Y:~~~~
+map ~~~~~~~~~~~~~~~~~~~""YY~~::~~~~~
+map ~~~~~~~~~~~~~~~~~~~"YY"~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~~""Y~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~~"""~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~~~"~~~~~~~~~~~~
+map ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+territory   1  27   2
+territory   1  18   3
+territory   1  23   3
+territory   1  24   4
+territory   1  26   4
+territory   1  29   4
+territory   1  21   5
+territory   1  22   5
+territory   1  25   5
+territory   1  26   5
+territory   1  27   5
+territory   1  26   6
+territory   1  25   7
+territory   1  27   7
+territory   0  14  12
+territory   0  16  13
+territory   0  17  14
+territory   0  19  14
+territory   0  18  15
+territory   0  20  15
+territory   0  19  16
+territory   0  26  18
+bot 1
+team 1
+fog

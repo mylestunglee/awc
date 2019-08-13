@@ -1,0 +1,49 @@
+map ^"------------YYYY^^^^^^^^""
+map ^FC"^^""""CFC-------------CC
+map ^""::~~~~~::~S^^^YYY:::::-""
+map YS~~~*~~~*~~~~~~~~~~~~~~~SF"
+map ^Y~~~~~~~~~~~~~~~~~~~*~~:FHF
+map ^~~~SY"^::^^^Y::"Y^~~~*~~SFY
+map ^~~~"F"^"""""YY"""Y^~~~~:"Y^
+map ^~~"^C"C"""^^CF"CC"F":::""""
+map ^~~Y^"""Y^^~^^"~~~^"C"F"""""
+map ^~~"Y"CY~~~~~~~~~~~~~~^^Y""Y
+map ^~~~:::~~~~~~~~~*~~~~~~^^^YY
+map ~~~~~~*~~~~::~~~~~~~~~~~~^"Y
+map YC~~~*~~~^^Y""YYY::::~~*~~"Y
+map C"Y"~~~~^^^""---FYYY^^~~~~~"
+map """F::^^^^^CC-Y^"Y""C"^^~~~~
+map ^"F-----YY^^^-^^^""C""^^^~*~
+map ^F-:::"-------C"^^C"F"S^^~~~
+map ""S~~~~^^Y^^^"::Y^^^::~~~~~C
+map "H-:*~~~~~~~~~~~~~~~~~~~*~~"
+map ""S~~*~~~~~~~~~~~~~~~~~*~~F"
+map """::::^""^::^""^^~Y^^:::""^
+map CC""""""YY"CC"""""^Y""CC""^^
+territory   1  10   1
+territory   1  11   1
+territory   1  12   1
+territory   1  26   1
+territory   1  27   1
+territory   1  25   3
+territory   1  26   3
+territory   1  25   4
+territory   1  26   4
+territory   1  27   4
+territory   1  25   5
+territory   1  26   5
+territory   1  16   7
+territory   1  17   7
+territory   1  19   7
+territory   1  20   8
+territory   1  22   8
+territory   0   3  14
+territory   0   2  15
+territory   0   1  16
+territory   0   2  17
+territory   0   1  18
+territory   0   0  21
+territory   0   1  21
+bot 1
+team 1
+fog
