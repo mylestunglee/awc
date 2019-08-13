@@ -44,8 +44,6 @@ typedef int16_t gold_t;
 #define enabled_format "%8s"
 
 // Graphics
-#define screen_width 10
-#define screen_height 8
 #define tile_width 8
 #define tile_height 4
 #define unit_left 1

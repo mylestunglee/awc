@@ -1,4 +1,5 @@
 #include <termios.h>
+#include <sys/ioctl.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -14,4 +15,11 @@ char getch(void) {
 	char ch = getchar();
 	tcsetattr(0, TCSANOW, &old);
 	return ch;
+}
+
+void get_console_size(int* const width, int* const height) {
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	*width = w.ws_col;
+	*height = w.ws_row;
 }

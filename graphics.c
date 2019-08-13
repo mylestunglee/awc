@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "bitarray.h"
 #include "graphics.h"
+#include "console.h"
 
 static void render_pixel(uint8_t symbol, const uint8_t style, const uint8_t prev_style) {
 	if (style != prev_style) {
@@ -355,6 +356,10 @@ void render(
 	const bool build_enabled) {
 	reset_cursor();
 
+	int console_width, console_height;
+	get_console_size(&console_width, &console_height);
+	const grid_t screen_width = console_width / tile_width;
+	const grid_t screen_height = console_height / tile_height;
 	const grid_t screen_left = game->x - screen_width / 2 + 1;
 	const grid_t screen_right = game->x + screen_width / 2 + 1;
 	const grid_t screen_top = game->y - screen_height / 2;
