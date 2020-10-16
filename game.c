@@ -154,6 +154,8 @@ static void game_handle_capture(struct game* const game) {
 
 	// If the enemy loses their HQ
 	if (game->map[game->y][game->x] == tile_HQ) {
+		assert(loser != null_player);
+		assert(loser != game->turn);
 
 		// Remove units
 		units_delete_player(&game->units, loser);
@@ -314,6 +316,14 @@ static void game_handle_attack(struct game* const game) {
 	grid_clear_all_uint8(game->labels);
 }
 
+// A player is alive iff:
+// 1. The player has units
+// 2. The player has a HQ, implied by a positive income
+//    This holds because when a player loses their HQ, income is nullified
+static bool game_player_alive(struct game* const game, const player_t player) {
+	return game->units.firsts[player] != null_unit || game->incomes[player] > 0;
+}
+
 static void game_next_turn(struct game* const game) {
 	// Clear unit selection and enabled
 	game->selected = null_unit;
@@ -326,8 +336,7 @@ static void game_next_turn(struct game* const game) {
 	do {
 		game->turn = (game->turn + 1) % players_capacity;
 	} while (
-		game->units.firsts[game->turn] == null_unit &&
-		game->incomes[game->turn] == 0 &&
+		game_player_alive(game, game->turn) &&
 		game->turn != prev_turn);
 
 	units_set_enabled(&game->units, game->turn, true);
