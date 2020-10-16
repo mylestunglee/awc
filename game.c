@@ -18,7 +18,6 @@ static void game_preload(struct game* const game) {
 	game->selected = null_unit;
 	queue_initialise(&game->queue);
 	game->turn = 0;
-	game->fog = false;
 
 	for (player_t player = 0; player < players_capacity; ++player) {
 		game->golds[player] = 0;
@@ -32,7 +31,6 @@ static void game_preload(struct game* const game) {
 static void game_postload(struct game* const game) {
 	grid_correct_map(game->territory, game->map);
 	grid_compute_incomes(game->territory, game->incomes);
-	grid_reveal(game);
 }
 
 bool game_load(struct game* const game, const char* const filename) {
@@ -89,16 +87,13 @@ static bool game_parse_build(struct game* const game, const char input) {
 	game->golds[game->turn] -= cost;
 
 	// Error may occur when units is full
-	const bool success = !units_insert(&game->units, (struct unit){
+	units_insert(&game->units, (struct unit){
 		.health = health_max,
 		.model = model,
 		.player = game->turn,
 		.x = game->x,
 		.y = game->y,
 		.enabled = false});
-
-	if (success && game->fog)
-		grid_reveal_unit(game->units.grid[game->y][game->x], game);
 
 	// Build attempted, so don't fall through to next key-press cases
 	return true;
@@ -197,7 +192,6 @@ static void game_handle_action(struct game* const game) {
 		// Remove highlighting of disabled units
 		if (select) {
 			grid_clear_all_uint8(game->labels);
-			grid_reveal(game);
 		}
 
 		// Allow highlighting of disabled units
@@ -228,7 +222,6 @@ static void game_handle_action(struct game* const game) {
 
 		game->selected = null_unit;
 		grid_clear_all_uint8(game->labels);
-		grid_reveal(game);
 	}
 }
 
@@ -319,7 +312,6 @@ static void game_handle_attack(struct game* const game) {
 	attacker->enabled = false;
 	game->selected = null_unit;
 	grid_clear_all_uint8(game->labels);
-	grid_reveal(game);
 }
 
 static void game_next_turn(struct game* const game) {
@@ -339,7 +331,6 @@ static void game_next_turn(struct game* const game) {
 		game->turn != prev_turn);
 
 	units_set_enabled(&game->units, game->turn, true);
-	grid_reveal(game);
 
 	// Add income to golds
 	game->golds[game->turn] += gold_scale * game->incomes[game->turn];
@@ -367,12 +358,11 @@ static void game_next_turn(struct game* const game) {
 }
 
 static void print_normal_text(const struct game* const game) {
-	printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u fog=%u", game->turn, game->x, game->y,
+	printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u", game->turn, game->x, game->y,
 		tile_names[game->map[game->y][game->x]],
 		game->territory[game->y][game->x],
 		game->labels[game->y][game->x],
-		game->golds[game->turn],
-		game->fog);
+		game->golds[game->turn]);
 }
 
 static void print_attack_text(const struct game* const game) {

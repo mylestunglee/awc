@@ -51,11 +51,9 @@ typedef int16_t gold_t;
 #define unit_width 5
 #define unit_height 2
 
-#define fog_symbol '?'
 #define selection_symbol '+'
 #define accessible_bit 1
 #define attackable_bit 2
-#define reveal_bit 4
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
 #define accessible_attackable_style '\xd0'

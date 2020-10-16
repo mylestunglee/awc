@@ -138,8 +138,6 @@ bool file_load(struct game* const game, const char* const filename) {
 			file_load_bot(game->bots, tokens);
 		else if (!strcmp(key, "team"))
 			file_load_team(game->alliances, tokens);
-		else if (!strcmp(key, "fog"))
-			game->fog = true;
 		else
 			for (model_t model = 0; model < model_capacity; ++model)
 				if (!strcmp(key, model_names[model])) {
@@ -285,8 +283,6 @@ bool file_save(const struct game* const game, const char* const filename) {
 	file_save_golds(game->golds, file);
 	file_save_bots(game->bots, file);
 	file_save_teams(game->alliances, file);
-	if (game->fog)
-		fprintf(file, "fog");
 
 	return fclose(file) < 0;
 }

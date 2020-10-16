@@ -19,7 +19,6 @@ struct game {
 	player_t territory[grid_size][grid_size];
 	gold_t golds[players_capacity];
 	gold_t incomes[players_capacity];
-	bool fog;
 	uint8_t bots[bitarray_size(players_capacity)];
 	uint8_t alliances[bitarray_size((players_capacity * (players_capacity - 1)) / 2)];
 };
