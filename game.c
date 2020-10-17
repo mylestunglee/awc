@@ -270,10 +270,8 @@ static void simulate_attack(
 		*counter_damage = calc_damage(game, attackee, attacker);
 }
 
-// Perform attack
 static void game_handle_attack(struct game* const game) {
 	assert(game->units.grid[game->y][game->x] != null_unit);
-
 	assert(game->selected != null_unit);
 
 	struct unit* const attacker = &game->units.data[game->selected];
@@ -321,7 +319,7 @@ static void game_handle_attack(struct game* const game) {
 // 1. The player has units
 // 2. The player has a HQ, implied by a positive income
 //    This holds because when a player loses their HQ, income is nullified
-static bool game_player_is_alive(struct game* const game, const player_t player) {
+static bool game_player_is_alive(const struct game* const game, const player_t player) {
 	return game->units.firsts[player] != null_unit || game->incomes[player] > 0;
 }
 
@@ -359,12 +357,12 @@ static void game_start_turn(struct game* const game)
 	game_repair_units(game);
 }
 
-static bool game_player_is_bot(struct game* const game, const player_t player)
+static bool game_player_is_bot(const struct game* const game, const player_t player)
 {
 	return bitarray_get(game->bots, player);
 }
 
-static bool game_all_alive_are_bots(struct game* const game)
+static bool game_all_alive_are_bots(const struct game* const game)
 {
 	for (player_t player = 0; player < players_capacity; ++player) {
 		if (game_player_is_alive(game, player) && !game_player_is_bot(game, player))
@@ -382,7 +380,7 @@ static void game_next_turn(struct game* const game) {
 		return;
 	}
 
-	// Find next alive player
+	// Play subsequent bot turns
 	do {
 		game->turn = (game->turn + 1) % players_capacity;
 
@@ -391,7 +389,7 @@ static void game_next_turn(struct game* const game) {
 		else if (game_player_is_bot(game, game->turn))
 		{
 			game_start_turn(game);
-			// bot play
+			bot_play(game);
 			game_end_turn(game);
 		}
 		else
