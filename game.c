@@ -239,8 +239,8 @@ static health_wide_t calc_damage(
 	return (
 		(health_wide_t)units_damage[attacker->model][attackee->model] *
 		(health_wide_t)(attacker->health + 1) *
-		(health_wide_t)(10 - tile_defense[movement_type][tile])
-	) / (100 * 10);
+		(health_wide_t)(defense_max - tile_defense[movement_type][tile])
+	) / (attack_max * defense_max);
 }
 
 // Calculate damage and counter-damage values without performing attack
@@ -413,9 +413,10 @@ static void print_normal_text(const struct game* const game) {
 static void print_attack_text(const struct game* const game) {
 	health_wide_t damage, counter_damage;
 	simulate_attack(game, &damage, &counter_damage);
+	const health_wide_t percent = 100;
 	printf("Damage: %u%% Counter-damage: %u%%",
-		(damage * 100) / health_max,
-		(counter_damage * 100) / health_max);
+		(damage * percent) / health_max,
+		(counter_damage * percent) / health_max);
 }
 
 static void print_build_text(const struct game* const game) {

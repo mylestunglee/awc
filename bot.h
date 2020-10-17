@@ -1,4 +1,4 @@
-#ifdef bot_h
+#ifndef bot_h
 #define bot_h
 #include "game.h"
 

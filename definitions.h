@@ -31,6 +31,8 @@ typedef int16_t gold_t;
 #define players_capacity 5
 #define null_player players_capacity
 #define heal_rate (health_t)16
+#define defense_max (health_wide_t)10
+#define attack_max (health_wide_t)100
 
 #define unit_format "%02X"
 #define grid_format "%3hhu"
