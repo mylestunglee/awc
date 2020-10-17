@@ -191,8 +191,8 @@ void grid_explore(const bool label_attackable_tiles, struct game* const game) {
 		// Do not re-compute explored areas
 		if (game->workspace[node->y][node->x] > energy)
 			continue;
-		else
-			game->workspace[node->y][node->x] = node->energy;
+
+		game->workspace[node->y][node->x] = node->energy;
 
 
 		// Mark unit-free tiles as accessible but ships cannot block bridges
