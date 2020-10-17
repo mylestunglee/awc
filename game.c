@@ -13,7 +13,7 @@ static void game_preload(struct game* const game) {
 	game->y = 0;
 	grid_clear_all_uint8(game->map);
 	grid_clear_all_uint8(game->labels);
-	grid_clear_all_energy_t(game->workspace);
+	grid_clear_all_energy(game->workspace);
 	grid_clear_territory(game->territory);
 	units_initialise(&game->units);
 	game->selected = null_unit;

@@ -14,7 +14,7 @@ void grid_clear_all_uint8(uint8_t grid[grid_size][grid_size]) {
 	} while (++y);
 }
 
-void grid_clear_all_energy_t(energy_t workspace[grid_size][grid_size]) {
+void grid_clear_all_energy(energy_t workspace[grid_size][grid_size]) {
 	grid_t y = 0;
 	do {
 		grid_t x = 0;
@@ -48,6 +48,7 @@ void grid_clear_player_territory(
 	} while (++y);
 }
 
+// Normalise invalid map territory state
 void grid_correct_map(
 	player_t territory[grid_size][grid_size],
 	tile_t map[grid_size][grid_size]) {
@@ -64,7 +65,7 @@ void grid_correct_map(
 				map[y][x] = tile_city;
 		} while (++x);
 	} while (++y);
-	}
+}
 
 void grid_compute_incomes(player_t territory[grid_size][grid_size], gold_t incomes[players_capacity]) {
 	grid_t y = 0;
@@ -213,5 +214,5 @@ void grid_explore(const bool label_attackable_tiles, struct game* const game) {
 	game->labels[game->y][game->x] |= accessible_bit;
 
 	// Clean-up temporary memory
-	grid_clear_all_energy_t(game->workspace);
+	grid_clear_all_energy(game->workspace);
 }
