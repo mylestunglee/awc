@@ -18,7 +18,7 @@ void queue_insert(struct queue* const queue, const struct queue_node node) {
 	++queue->end;
 }
 
-struct queue_node* queue_remove(struct queue* const queue) {
+struct queue_node* queue_pop(struct queue* const queue) {
 	// Assume queue is non-empty
 	assert(!queue_empty(queue));
 

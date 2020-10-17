@@ -161,10 +161,10 @@ void grid_explore(const bool label_attackable_tiles, struct game* const game) {
 		.energy =
 			unit_movement_ranges[cursor_unit->model] +
 			movement_type_cost[movement_type][game->map[game->y][game->x]]
-		});
+	});
 
 	while (!queue_empty(queue)) {
-		const struct queue_node* const node = queue_remove(queue);
+		const struct queue_node* const node = queue_pop(queue);
 
 		const tile_t tile = game->map[node->y][node->x];
 		const energy_t cost = movement_type_cost[movement_type][tile];

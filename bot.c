@@ -1,6 +1,7 @@
 #include "bot.h"
 #include "bitarray.h"
 #include "grid.h"
+#include "queue.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -77,12 +78,28 @@ static void bot_label_unit_targets(struct game* const game, const struct unit* c
 	}
 }
 
+static void bot_explore_targets(struct game* const game, const struct unit* const unit)
+{
+	struct queue* const queue = &game->queue;
+	assert(queue_empty(queue));
+
+	queue_insert(queue, (struct queue_node){
+		.x = game->x,
+		.y = game->y,
+		.energy = 0
+	});
+
+	while (!queue_empty(queue)) {
+		const struct queue_node* const node = queue_pop(queue);
+		(void)node;
+	}
+}
+
 static void bot_interact_unit(struct game* const game, const struct unit* const unit)
 {
 	// Assume labels and workspace are clean
-	// Label target tiles
 	bot_label_unit_targets(game, unit);
-	// Path find to a target
+	bot_explore_targets(game, unit);
 	// Move unit towards target
 
 	// cleanup

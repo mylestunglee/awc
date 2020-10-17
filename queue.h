@@ -22,6 +22,6 @@ bool queue_empty(const struct queue* const);
 
 void queue_insert(struct queue* const, const struct queue_node);
 
-struct queue_node* queue_remove(struct queue* const);
+struct queue_node* queue_pop(struct queue* const);
 
 #endif
