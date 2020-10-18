@@ -149,23 +149,24 @@ void grid_explore(const bool label_attackable_tiles, struct game* const game) {
 	assert(queue_empty(queue));
 	assert(game->units.grid[game->y][game->x] != null_unit);
 
+	// Use cursor instead of selected property because we want to highlight non-selectable enemy units
 	const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
 	const struct unit* const cursor_unit = &game->units.data[cursor_unit_index];
 	const uint8_t movement_type = unit_movement_types[cursor_unit->model];
+	const energy_t init_energy =
+		unit_movement_ranges[cursor_unit->model] +
+		movement_type_cost[movement_type][game->map[game->y][game->x]];
 
 	grid_explore_mark_attackable_ranged(game, game->x, game->y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);
 
 	queue_insert(queue, (struct queue_node){
 		.x = game->x,
 		.y = game->y,
-		.energy =
-			unit_movement_ranges[cursor_unit->model] +
-			movement_type_cost[movement_type][game->map[game->y][game->x]]
+		.energy = init_energy
 	});
 
 	while (!queue_empty(queue)) {
 		const struct queue_node* const node = queue_pop(queue);
-
 		const tile_t tile = game->map[node->y][node->x];
 		const energy_t cost = movement_type_cost[movement_type][tile];
 
@@ -212,7 +213,4 @@ void grid_explore(const bool label_attackable_tiles, struct game* const game) {
 
 	// Allow stuck units to wait
 	game->labels[game->y][game->x] |= accessible_bit;
-
-	// Clean-up temporary memory
-	grid_clear_all_energy(game->workspace);
 }

@@ -199,6 +199,7 @@ static void game_handle_action(struct game* const game) {
 
 		// Allow highlighting of disabled units
 		grid_explore(!select, game);
+		grid_clear_all_energy(game->workspace);
 
 		if (select)
 			game->selected = unit;
