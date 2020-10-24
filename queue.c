@@ -11,8 +11,9 @@ bool queue_empty(const struct queue* const queue) {
 }
 
 void queue_insert(struct queue* const queue, const struct queue_node node) {
-	// Assume queue is non-full
-	assert(queue->start != (queue_t)(queue->end + 1));
+	// If full then silently fail
+	if (queue->start != (queue_t)(queue->end + 1))
+		return;
 
 	queue->nodes[queue->end] = node;
 	++queue->end;

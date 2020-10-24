@@ -25,7 +25,7 @@ typedef int16_t gold_t;
 #define terrian_capacity 10
 #define capturable_capacity 5
 #define tile_capacity (terrian_capacity + capturable_capacity)
-#define queue_capacity (queue_t)0xfff
+#define queue_capacity (queue_t)0xffff
 #define units_capacity (unit_t)0xff
 #define null_unit units_capacity
 #define players_capacity 5
