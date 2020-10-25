@@ -4,7 +4,7 @@
 #include "definitions.h"
 #include "grid.h"
 
-void grid_clear_all_uint8(uint8_t grid[grid_size][grid_size]) {
+void grid_clear_uint8(uint8_t grid[grid_size][grid_size]) {
 	grid_t y = 0;
 	do {
 		grid_t x = 0;
@@ -14,7 +14,7 @@ void grid_clear_all_uint8(uint8_t grid[grid_size][grid_size]) {
 	} while (++y);
 }
 
-void grid_clear_all_energy(energy_t workspace[grid_size][grid_size]) {
+void grid_clear_energy(energy_t workspace[grid_size][grid_size]) {
 	grid_t y = 0;
 	do {
 		grid_t x = 0;
@@ -142,8 +142,14 @@ static void grid_explore_mark_attackable_ranged(
 		}
 }
 
+
 // Recursively marks tiles that are accessible or attackable from the cursor tile
-void grid_explore(const bool label_attackable_tiles, struct game* const game) {
+void grid_explore(struct game* const game, const bool label_attackable_tiles) {
+	grid_explore_recursive(game, label_attackable_tiles, 1);
+}
+
+// Use scalar > 1 when looking ahead multiple turns
+void grid_explore_recursive(struct game* const game, const bool label_attackable_tiles, const energy_t scalar) {
 	struct queue* const queue = &game->queue;
 
 	assert(queue_empty(queue));
@@ -154,7 +160,7 @@ void grid_explore(const bool label_attackable_tiles, struct game* const game) {
 	const struct unit* const cursor_unit = &game->units.data[cursor_unit_index];
 	const uint8_t movement_type = unit_movement_types[cursor_unit->model];
 	const energy_t init_energy =
-		unit_movement_ranges[cursor_unit->model] +
+		scalar * unit_movement_ranges[cursor_unit->model] +
 		movement_type_cost[movement_type][game->map[game->y][game->x]];
 
 	grid_explore_mark_attackable_ranged(game, game->x, game->y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);

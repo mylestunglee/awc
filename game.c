@@ -11,9 +11,9 @@ static void game_preload(struct game* const game) {
 	// TODO: fix order
 	game->x = 0;
 	game->y = 0;
-	grid_clear_all_uint8(game->map);
-	grid_clear_all_uint8(game->labels);
-	grid_clear_all_energy(game->workspace);
+	grid_clear_uint8(game->map);
+	grid_clear_uint8(game->labels);
+	grid_clear_energy(game->workspace);
 	grid_clear_territory(game->territory);
 	units_initialise(&game->units);
 	game->selected = null_unit;
@@ -150,7 +150,7 @@ static bool game_attack_enabled(const struct game* const game) {
 }
 
 // Occurs when unit captures enemy capturable
-static void game_handle_capture(struct game* const game) {
+void game_handle_capture(struct game* const game) {
 	const player_t loser = game->territory[game->y][game->x];
 
 	// If the enemy loses their HQ
@@ -194,12 +194,12 @@ static void game_handle_action(struct game* const game) {
 
 		// Remove highlighting of disabled units
 		if (select) {
-			grid_clear_all_uint8(game->labels);
+			grid_clear_uint8(game->labels);
 		}
 
 		// Allow highlighting of disabled units
-		grid_explore(!select, game);
-		grid_clear_all_energy(game->workspace);
+		grid_explore(game, !select);
+		grid_clear_energy(game->workspace);
 
 		if (select)
 			game->selected = unit;
@@ -225,7 +225,7 @@ static void game_handle_action(struct game* const game) {
 		}
 
 		game->selected = null_unit;
-		grid_clear_all_uint8(game->labels);
+		grid_clear_uint8(game->labels);
 	}
 }
 
@@ -313,7 +313,7 @@ static void game_handle_attack(struct game* const game) {
 	// Deselect attacker
 	attacker->enabled = false;
 	game->selected = null_unit;
-	grid_clear_all_uint8(game->labels);
+	grid_clear_uint8(game->labels);
 }
 
 // A player is alive iff:
@@ -326,7 +326,7 @@ static bool game_player_is_alive(const struct game* const game, const player_t p
 
 static void game_end_turn(struct game* const game) {
 	game->selected = null_unit;
-	grid_clear_all_uint8(game->labels);
+	grid_clear_uint8(game->labels);
 	units_set_enabled(&game->units, game->turn, false);
 }
 
