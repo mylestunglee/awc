@@ -6,6 +6,7 @@
 #include "file.h"
 #include "bitarray.h"
 #include "bot.h"
+#include "action.h"
 
 static void game_preload(struct game* const game) {
 	// TODO: fix order
@@ -149,39 +150,6 @@ static bool game_attack_enabled(const struct game* const game) {
 		game->labels[game->y][game->x] & attackable_bit;
 }
 
-// Occurs when unit captures enemy capturable
-void game_handle_capture(struct game* const game) {
-	const player_t loser = game->territory[game->y][game->x];
-
-	// If the enemy loses their HQ
-	if (game->map[game->y][game->x] == tile_HQ) {
-		assert(loser != null_player);
-		assert(loser != game->turn);
-
-		// Remove units
-		units_delete_player(&game->units, loser);
-
-		// HQ must be owned
-		assert(loser != null_player);
-		assert(loser != game->turn);
-
-		// Remove territory
-		grid_clear_player_territory(game->territory, loser);
-
-		// Change HQ into a city
-		game->map[game->y][game->x] = tile_city;
-
-		game->incomes[loser] = 0;
-	} else if (loser != null_player)
-		--game->incomes[loser];
-
-	// Reveal does not need to be set because a unit is assumed to be capturing locally
-	if (loser != game->turn) {
-		game->territory[game->y][game->x] = game->turn;
-		++game->incomes[game->turn];
-	}
-}
-
 static void game_handle_action(struct game* const game) {
 	const unit_t unit = game->units.grid[game->y][game->x];
 
@@ -207,21 +175,12 @@ static void game_handle_action(struct game* const game) {
 		// Move to accessible tile when cursor is not over unit
 		if (game->selected != unit &&
 			game->labels[game->y][game->x] & accessible_bit) {
-			units_move(&game->units, game->selected, game->x, game->y);
-			struct unit* const unit = &game->units.data[game->selected];
-			// The moved unit can capture iff:
-			// 1. The unit is a infantry or a mech
-			// 2. The tile is capturable
-			// 3. The tile is owned by an enemy
-			if (unit->model < unit_capturable_upper_bound &&
-				game->map[game->y][game->x] >= tile_capturable_lower_bound &&
-				!bitmatrix_get(
-					game->alliances,
-					game->territory[game->y][game->x],
-					unit->player))
-				game_handle_capture(game);
 
-			unit->enabled = false;
+			assert(game->selected != null_unit);
+
+			units_move(&game->units, game->selected, game->x, game->y);
+			action_handle_capture(game);
+			game->units.data[game->selected].enabled = false;
 		}
 
 		game->selected = null_unit;

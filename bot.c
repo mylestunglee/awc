@@ -1,7 +1,7 @@
 #include "bot.h"
 #include "bitarray.h"
 #include "grid.h"
-#include "game.h"
+#include "action.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -76,7 +76,7 @@ static void bot_interact_unit_capture(struct game* const game, struct unit* cons
 	game->x = x;
 	game->y = y;
 	units_move(&game->units, game->units.grid[unit->y][unit->x], x, y);
-	game_handle_capture(game);
+	action_handle_capture(game);
 	unit->enabled = false;
 }
 

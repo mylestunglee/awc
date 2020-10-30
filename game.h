@@ -24,7 +24,6 @@ struct game {
 };
 
 bool game_load(struct game* const, const char* const);
-void game_handle_capture(struct game* const);
 void game_loop(struct game* const);
 
 #endif
