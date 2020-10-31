@@ -11,7 +11,7 @@ struct game {
 	grid_t y;
 	unit_t selected;
 	uint8_t labels[grid_size][grid_size];
-	energy_t workspace[grid_size][grid_size];
+	energy_t energies[grid_size][grid_size];
 	struct queue queue;
 	grid_t prev_x;
 	grid_t prev_y;

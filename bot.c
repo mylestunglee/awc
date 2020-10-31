@@ -32,7 +32,7 @@ static bool bot_find_nearest_capturable(
 			if (game->map[y][x] < tile_capturable_lower_bound)
 				continue;
 
-			const energy_t energy = game->workspace[y][x];
+			const energy_t energy = game->energies[y][x];
 
 			// Unit can move within range
 			if (energy == 0)
@@ -77,21 +77,26 @@ static void bot_interact_unit_capture(struct game* const game, struct unit* cons
 	game->y = y;
 	units_move(&game->units, game->units.grid[unit->y][unit->x], x, y);
 	action_handle_capture(game);
+	assert (game->territory[y][x] == unit->player);
 	unit->enabled = false;
 }
 
 // Attempt single-turn operation
 static void bot_interact_unit_trivial(struct game* const game, struct unit* const unit)
 {
+	// Populate labels and workspace
 	game->x = unit->x;
 	game->y = unit->y;
 	grid_explore(game, false);
 
 	// Scan for something to do
-	bot_interact_unit_capture(game, unit);
+	assert (unit->enabled);
+
+	if (unit->enabled)
+		bot_interact_unit_capture(game, unit);
 
 	grid_clear_uint8(game->labels);
-	grid_clear_energy(game->workspace);
+	grid_clear_energy(game->energies);
 }
 
 static void bot_interact_unit(struct game* const game, struct unit* const unit)

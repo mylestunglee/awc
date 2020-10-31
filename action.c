@@ -38,8 +38,13 @@ static void action_capture(struct game* const game) {
 
 void action_handle_capture(struct game* const game)
 {
-	const unit_t index = game->units.grid[game->y][game->x];
-	const struct unit* const unit = &game->units.data[index];
+	assert (game->selected != null_unit);
+
+	const struct unit* const unit = &game->units.data[game->selected];
+
+	assert (unit->player == game->turn);
+	assert (unit->x == game->x);
+	assert (unit->y == game->y);
 
 	// The moved unit can capture iff:
 	// 1. The unit is a infantry or a mech

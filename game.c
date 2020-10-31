@@ -14,7 +14,7 @@ static void game_preload(struct game* const game) {
 	game->y = 0;
 	grid_clear_uint8(game->map);
 	grid_clear_uint8(game->labels);
-	grid_clear_energy(game->workspace);
+	grid_clear_energy(game->energies);
 	grid_clear_territory(game->territory);
 	units_initialise(&game->units);
 	game->selected = null_unit;
@@ -167,7 +167,7 @@ static void game_handle_action(struct game* const game) {
 
 		// Allow highlighting of disabled units
 		grid_explore(game, !select);
-		grid_clear_energy(game->workspace);
+		grid_clear_energy(game->energies);
 
 		if (select)
 			game->selected = unit;

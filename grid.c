@@ -196,10 +196,10 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 		const energy_t energy = node->energy - cost;
 
 		// Do not re-compute explored areas
-		if (game->workspace[node->y][node->x] > energy)
+		if (game->energies[node->y][node->x] > energy)
 			continue;
 
-		game->workspace[node->y][node->x] = node->energy;
+		game->energies[node->y][node->x] = node->energy;
 
 
 		// Mark unit-free tiles as accessible but ships cannot block bridges
