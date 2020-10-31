@@ -6,8 +6,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static unit_t bot_find_attackee(struct game* const game, const struct unit* const attacker)
-{
+static unit_t bot_find_attackee(struct game* const game, const struct unit* const attacker) {
 	unit_t best_attackee = null_unit;
 	health_wide_t best_metric = 0;
 
@@ -19,17 +18,28 @@ static unit_t bot_find_attackee(struct game* const game, const struct unit* cons
 			if (!(game->labels[y][x] & attackable_bit))
 				continue;
 
-			(void)best_metric;
-			(void)best_attackee;
-			
+			game->x = x;
+			game->y = y;
+
+			health_t damage, counter_damage;
+			simulate_attack(game, &damage, &counter_damage);
+
+			const struct unit* const attackee = &game->units.data[game->units.grid[y][x]];
+			health_wide_t metric = (health_wide_t)damage * models_cost[attackee->model] -
+				(health_wide_t)counter_damage * models_cost[attacker->model];
+
+			if (metric > best_metric) {
+				best_metric = metric;
+				best_attackee = game->units.grid[y][x];
+			}
+
 		} while (++x);
 	} while (++y);
 
 	return best_attackee;
 }
 
-static void bot_handle_attack(struct game* const game, const struct unit* const unit)
-{
+static void bot_handle_attack(struct game* const game, struct unit* const unit) {
 	// find best attackable unit
 	const unit_t attackee = bot_find_attackee(game, unit);
 
@@ -87,8 +97,7 @@ static bool bot_find_nearest_capturable(
 }
 
 // Capture nearest enemy capturable
-static void bot_handle_capture(struct game* const game, struct unit* const unit)
-{
+static void bot_handle_capture(struct game* const game, struct unit* const unit) {
 	assert (unit->enabled);
 
 	// Unit can capture
