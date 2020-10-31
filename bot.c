@@ -1,21 +1,49 @@
 #include "bot.h"
 #include "bitarray.h"
 #include "grid.h"
+#include "game.h"
 #include "action.h"
 #include <assert.h>
 #include <stdlib.h>
 
-static void bot_interact_unit_ranged(struct game* const game, const struct unit* const unit)
+static unit_t bot_find_attackee(struct game* const game, const struct unit* const attacker)
 {
-	(void)game;
-	(void)unit;
+	unit_t best_attackee = null_unit;
+	health_wide_t best_metric = 0;
+
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			// Attackee is at an attack-labelled tile
+			if (!(game->labels[y][x] & attackable_bit))
+				continue;
+
+			(void)best_metric;
+			(void)best_attackee;
+			
+		} while (++x);
+	} while (++y);
+
+	return best_attackee;
 }
 
-static void bot_interact_unit_direct(struct game* const game, const struct unit* const unit)
+static void bot_handle_attack(struct game* const game, const struct unit* const unit)
+{
+	// find best attackable unit
+	const unit_t attackee = bot_find_attackee(game, unit);
+
+	if (attackee == null_unit)
+		return;
+
+	// TOOD
+}
+
+/*static void bot_interact_unit_direct(struct game* const game, const struct unit* const unit)
 {
 	(void)game;
 	(void)unit;
-}
+}*/
 
 static bool bot_find_nearest_capturable(
 	struct game* const game,
@@ -59,7 +87,7 @@ static bool bot_find_nearest_capturable(
 }
 
 // Capture nearest enemy capturable
-static void bot_interact_unit_capture(struct game* const game, struct unit* const unit)
+static void bot_handle_capture(struct game* const game, struct unit* const unit)
 {
 	assert (unit->enabled);
 
@@ -76,13 +104,15 @@ static void bot_interact_unit_capture(struct game* const game, struct unit* cons
 	game->x = x;
 	game->y = y;
 	units_move(&game->units, game->units.grid[unit->y][unit->x], x, y);
+
 	action_handle_capture(game);
 	assert (game->territory[y][x] == unit->player);
+
 	unit->enabled = false;
 }
 
 // Attempt single-turn operation
-static void bot_interact_unit_trivial(struct game* const game, struct unit* const unit)
+static void bot_handle_local(struct game* const game, struct unit* const unit)
 {
 	// Populate labels and workspace
 	game->x = unit->x;
@@ -92,8 +122,10 @@ static void bot_interact_unit_trivial(struct game* const game, struct unit* cons
 	// Scan for something to do
 	assert (unit->enabled);
 
+	bot_handle_attack(game, unit);
+
 	if (unit->enabled)
-		bot_interact_unit_capture(game, unit);
+		bot_handle_capture(game, unit);
 
 	grid_clear_uint8(game->labels);
 	grid_clear_energy(game->energies);
@@ -102,27 +134,22 @@ static void bot_interact_unit_trivial(struct game* const game, struct unit* cons
 static void bot_interact_unit(struct game* const game, struct unit* const unit)
 {
 	assert (game->turn == unit->player);
-
-	bot_interact_unit_trivial(game, unit);
-
-	if (!unit->enabled)
-		return;
-
-	if (models_min_range[unit->model]) {
-		bot_interact_unit_ranged(game, unit);
-	} else {
-		bot_interact_unit_direct(game, unit);
-	}
+	game->selected = game->units.grid[unit->y][unit->x];
+	bot_handle_local(game, unit);
+	game->selected = null_unit;
 }
 
 static void bot_interact_units(struct game* const game)
 {
+	assert (game->selected == null_unit);
+
 	struct units* const units = &game->units;
 	unit_t curr = units->firsts[game->turn];
 	while (curr != null_unit) {
 		bot_interact_unit(game, &units->data[curr]);
 		curr = units->nexts[curr];
 	}
+
 }
 
 void bot_play(struct game* const game)

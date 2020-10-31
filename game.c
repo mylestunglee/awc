@@ -189,7 +189,7 @@ static void game_handle_action(struct game* const game) {
 }
 
 // Calculate damage when attacker attacks attackee
-static health_wide_t calc_damage(
+static health_t calc_damage(
 	const struct game* const game,
 	const struct unit* const attacker,
 	const struct unit* const attackee) {
@@ -204,10 +204,10 @@ static health_wide_t calc_damage(
 }
 
 // Calculate damage and counter-damage values without performing attack
-static void simulate_attack(
+void simulate_attack(
 	const struct game* const game,
-	health_wide_t* const damage,
-	health_wide_t* const counter_damage) {
+	health_t* const damage,
+	health_t* const counter_damage) {
 
 	assert(game->selected != null_unit);
 
@@ -245,7 +245,7 @@ static void game_handle_attack(struct game* const game) {
 			units_move(&game->units, game->selected, game->prev_x, game->prev_y);
 
 		// Compute damage
-		health_wide_t damage, counter_damage;
+		health_t damage, counter_damage;
 		simulate_attack(game, &damage, &counter_damage);
 
 		// Apply damage
