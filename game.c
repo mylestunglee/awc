@@ -204,7 +204,7 @@ static health_t calc_damage(
 }
 
 // Calculate damage and counter-damage values without performing attack
-void simulate_attack(
+void game_simulate_attack(
 	const struct game* const game,
 	health_t* const damage,
 	health_t* const counter_damage) {
@@ -231,46 +231,9 @@ void simulate_attack(
 }
 
 static void game_handle_attack(struct game* const game) {
-	assert(game->units.grid[game->y][game->x] != null_unit);
-	assert(game->selected != null_unit);
+	action_handle_attack(game);
 
-	struct unit* const attacker = &game->units.data[game->selected];
-	const unit_t attackee_index = game->units.grid[game->y][game->x];
-	struct unit* const attackee = &game->units.data[attackee_index];
-	// Skip to post-attack cleanup when a unit dies
-	do {
-		// If unit is direct, move to attack
-		const bool ranged = models_min_range[attacker->model];
-		if (!ranged)
-			units_move(&game->units, game->selected, game->prev_x, game->prev_y);
-
-		// Compute damage
-		health_t damage, counter_damage;
-		simulate_attack(game, &damage, &counter_damage);
-
-		// Apply damage
-		if (damage > attackee->health) {
-			units_delete(&game->units, attackee_index);
-			break;
-		}
-
-		attackee->health -= damage;
-
-		// Ranged units do not receive counter-attacks
-		if (ranged)
-			break;
-
-		// Apply counter damage
-		if (counter_damage > attacker->health) {
-			units_delete(&game->units, game->selected);
-			break;
-		}
-
-		attacker->health -= counter_damage;
-	} while (false);
-
-	// Deselect attacker
-	attacker->enabled = false;
+        game->units.data[game->selected].enabled = false;
 	game->selected = null_unit;
 	grid_clear_uint8(game->labels);
 }
@@ -370,7 +333,7 @@ static void print_normal_text(const struct game* const game) {
 
 static void print_attack_text(const struct game* const game) {
 	health_t damage, counter_damage;
-	simulate_attack(game, &damage, &counter_damage);
+	game_simulate_attack(game, &damage, &counter_damage);
 	const health_wide_t percent = 100;
 	printf("Damage: %u%% Counter-damage: %u%%",
 		(damage * percent) / health_max,

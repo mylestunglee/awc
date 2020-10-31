@@ -26,7 +26,7 @@ struct game {
 bool game_load(struct game* const, const char* const);
 void game_loop(struct game* const);
 
-void simulate_attack(
+void game_simulate_attack(
         const struct game* const game,
         health_t* const damage,
         health_t* const counter_damage);

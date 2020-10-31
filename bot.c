@@ -22,31 +22,40 @@ static unit_t bot_find_attackee(struct game* const game, const struct unit* cons
 			game->y = y;
 
 			health_t damage, counter_damage;
-			simulate_attack(game, &damage, &counter_damage);
+			game_simulate_attack(game, &damage, &counter_damage);
 
-			const struct unit* const attackee = &game->units.data[game->units.grid[y][x]];
+			const unit_t attackee_index = game->units.grid[y][x];
+			const struct unit* const attackee = &game->units.data[attackee_index];
 			health_wide_t metric = (health_wide_t)damage * models_cost[attackee->model] -
 				(health_wide_t)counter_damage * models_cost[attacker->model];
 
-			if (metric > best_metric) {
+			if (metric > best_metric || best_attackee == null_unit) {
 				best_metric = metric;
-				best_attackee = game->units.grid[y][x];
+				best_attackee = attackee_index;
 			}
-
 		} while (++x);
 	} while (++y);
 
 	return best_attackee;
 }
 
-static void bot_handle_attack(struct game* const game, struct unit* const unit) {
+static void bot_handle_attack(struct game* const game, struct unit* const attacker) {
 	// find best attackable unit
-	const unit_t attackee = bot_find_attackee(game, unit);
+	const unit_t attackee_index = bot_find_attackee(game, attacker);
 
-	if (attackee == null_unit)
+	if (attackee_index == null_unit)
 		return;
 
-	// TOOD
+	const struct unit* const attackee = &game->units.data[attackee_index];
+
+	if (models_min_range[attacker->model]) {
+		game->x = attackee->x;
+		game->y = attackee->y;
+		action_handle_attack(game);
+		attacker->enabled = false;
+	} else {
+		// TOOD
+	}
 }
 
 /*static void bot_interact_unit_direct(struct game* const game, const struct unit* const unit)
