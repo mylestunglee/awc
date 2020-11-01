@@ -151,7 +151,7 @@ static bool bot_find_nearest_capturable(
 }
 
 // Capture nearest enemy capturable
-static void bot_handle_capture(struct game* const game, struct unit* const unit) {
+static void handle_capture(struct game* const game, struct unit* const unit) {
 	assert (unit->enabled);
 
 	// Unit can capture
@@ -175,7 +175,7 @@ static void bot_handle_capture(struct game* const game, struct unit* const unit)
 }
 
 // Attempt single-turn operation
-static void bot_handle_local(struct game* const game, struct unit* const unit)
+static void handle_local(struct game* const game, struct unit* const unit)
 {
 	// Populate labels and workspace
 	game->x = unit->x;
@@ -188,7 +188,7 @@ static void bot_handle_local(struct game* const game, struct unit* const unit)
 	handle_attack(game, unit);
 
 	if (unit->enabled)
-		bot_handle_capture(game, unit);
+		handle_capture(game, unit);
 
 	grid_clear_uint8(game->labels);
 	grid_clear_energy(game->energies);
@@ -198,7 +198,7 @@ static void bot_interact_unit(struct game* const game, struct unit* const unit)
 {
 	assert (game->turn == unit->player);
 	game->selected = game->units.grid[unit->y][unit->x];
-	bot_handle_local(game, unit);
+	handle_local(game, unit);
 	game->selected = null_unit;
 }
 
