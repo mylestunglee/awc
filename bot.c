@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static unit_t bot_find_attackee(struct game* const game, const struct unit* const attacker) {
+static unit_t find_attackee(struct game* const game, const struct unit* const attacker) {
 	unit_t best_attackee = null_unit;
 	health_wide_t best_metric = 0;
 
@@ -39,30 +39,75 @@ static unit_t bot_find_attackee(struct game* const game, const struct unit* cons
 	return best_attackee;
 }
 
-static void bot_handle_attack(struct game* const game, struct unit* const attacker) {
-	// find best attackable unit
-	const unit_t attackee_index = bot_find_attackee(game, attacker);
+static void handle_ranged_attack(
+	struct game* const game,
+	struct unit* const attacker,
+	const struct unit* const attackee) {
+	game->x = attackee->x;
+	game->y = attackee->y;
+	action_handle_attack(game);
+	attacker->enabled = false;
+}
+
+static void handle_direct_attack(
+	struct game* const game,
+	struct unit* const attacker,
+	const struct unit* const attackee) {
+
+	// Find maximal defense tile around attackee
+	energy_t max_energy = 0;
+	health_t max_defense = 0;
+	uint8_t best_i = 0;
+
+	const grid_t x = attackee->x;
+	const grid_t y = attackee->y;
+	const grid_t adjacent_x[] = {x + 1, x, x - 1, x};
+	const grid_t adjacent_y[] = {y, y - 1, y, y + 1};
+
+	for (uint8_t i = 0; i < 4; ++i) {
+		const tile_t i_x = adjacent_x[i];
+		const tile_t i_y = adjacent_y[i];
+
+		if (!(game->labels[i_y][i_x] & accessible_bit))
+			continue;
+
+		const model_t model = attacker->model;
+		const tile_t tile = game->map[i_y][i_x];
+		const health_t defense = tile_defense[model][tile];
+		const energy_t energy = game->energies[i_y][i_x];
+
+		// Lexicographical ordering over defence then energy
+		if (defense > max_defense || (defense == max_defense && energy > max_energy)) {
+			max_defense = defense;
+			max_energy = energy;
+			best_i = i;
+		}
+	}
+
+	assert (max_energy > 0);
+
+	// Apply attack
+	game->x = x;
+	game->y = y;
+	game->prev_x = adjacent_x[best_i];
+	game->prev_y = adjacent_y[best_i];
+	action_handle_attack(game);
+	attacker->enabled = false;
+}
+
+static void handle_attack(struct game* const game, struct unit* const attacker) {
+	const unit_t attackee_index = find_attackee(game, attacker);
 
 	if (attackee_index == null_unit)
 		return;
 
 	const struct unit* const attackee = &game->units.data[attackee_index];
 
-	if (models_min_range[attacker->model]) {
-		game->x = attackee->x;
-		game->y = attackee->y;
-		action_handle_attack(game);
-		attacker->enabled = false;
-	} else {
-		// TOOD
-	}
+	if (models_min_range[attacker->model])
+		handle_ranged_attack(game, attacker, attackee);
+	else
+		handle_direct_attack(game, attacker, attackee);
 }
-
-/*static void bot_interact_unit_direct(struct game* const game, const struct unit* const unit)
-{
-	(void)game;
-	(void)unit;
-}*/
 
 static bool bot_find_nearest_capturable(
 	struct game* const game,
@@ -140,7 +185,7 @@ static void bot_handle_local(struct game* const game, struct unit* const unit)
 	// Scan for something to do
 	assert (unit->enabled);
 
-	bot_handle_attack(game, unit);
+	handle_attack(game, unit);
 
 	if (unit->enabled)
 		bot_handle_capture(game, unit);

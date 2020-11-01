@@ -151,7 +151,7 @@ const static energy_t movement_type_cost[movement_types_capacity][tile_capacity]
 	{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 	{0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0}};
 
-const static uint8_t tile_defense[movement_types_capacity][tile_capacity] = {
+const static health_t tile_defense[movement_types_capacity][tile_capacity] = {
 	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
 	{0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
 	{0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 4},
@@ -159,7 +159,7 @@ const static uint8_t tile_defense[movement_types_capacity][tile_capacity] = {
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0}};
 
-const static uint8_t units_damage[model_capacity][model_capacity] = {
+const static health_t units_damage[model_capacity][model_capacity] = {
 	{55,  45,  12,  5,   1,   15,  25,  5,   25,  0,   0,   7,   0,   0,   0},
 	{65,  55,  85,  55,  15,  70,  85,  65,  85,  0,   0,   9,   0,   0,   0},
 	{70,  65,  35,  6,   1,   45,  55,  4,   28,  0,   0,   10,  0,   0,   0},
