@@ -191,9 +191,36 @@ static void handle_local(struct game* const game, struct unit* const unit) {
 
 }
 
-static void label_targets(struct game* const game, const struct unit* const unit) {
+// TODO: may not be required if use bot_find_closest_capturable
+static void mark_capturable_tiles(struct game* const game, const struct unit* const unit) {
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			bool accessible = game->energies[y][x] > 0;
+
+			bool tile_capturable = game->map[y][x] >= tile_capturable_lower_bound;
+			bool tile_unfriendly = !bitmatrix_get(game->alliances, game->territory[y][x], game->turn);
+			bool unit_capturable = unit->model < unit_capturable_upper_bound;
+			bool capturable = tile_capturable && tile_unfriendly && unit_capturable;
+
+			if (accessible && capturable)
+				game->labels[y][x] |= bot_target_bit;
+		} while (++x);
+	} while (++y);
+}
+
+// TODO: implement bot_find_closest_attackable
+static void mark_attackable_tiles(struct game* const game, const struct unit* const unit) {
 	(void)game;
 	(void)unit;
+
+	// for each enemy player
+		// for each attackable unit
+			// if ranged
+				// loop diamond around unit
+			// else
+				// mark adjacent tiles
 }
 
 static void handle_nonlocal(struct game* const game, struct unit* const unit) {
@@ -205,7 +232,8 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
 
 	// label_attackable_tiles argument=false is unimportant because attack_bit is unread
 	grid_explore_recursive(game, false, look_ahead);
-	label_targets(game, unit);
+	mark_capturable_tiles(game, unit);
+	mark_attackable_tiles(game, unit);
 	// find closest target; go to such target
 
 	grid_clear_uint8(game->labels);
