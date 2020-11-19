@@ -64,6 +64,7 @@ static void handle_direct_attack(
 	const grid_t adjacent_x[] = {x + 1, x, x - 1, x};
 	const grid_t adjacent_y[] = {y, y - 1, y, y + 1};
 
+	// Each tile has four adjacent tiles
 	for (uint8_t i = 0; i < 4; ++i) {
 		const tile_t i_x = adjacent_x[i];
 		const tile_t i_y = adjacent_y[i];
@@ -138,8 +139,7 @@ static bool bot_find_nearest_capturable(
 			if (friendly)
 				continue;
 
-			if (energy > max_energy)
-			{
+			if (energy > max_energy) {
 				max_energy = energy;
 				*nearest_x = x;
 				*nearest_y = y;
@@ -175,41 +175,61 @@ static void handle_capture(struct game* const game, struct unit* const unit) {
 }
 
 // Attempt single-turn operation
-static void handle_local(struct game* const game, struct unit* const unit)
-{
+static void handle_local(struct game* const game, struct unit* const unit) {
+	assert (unit->enabled);
+
 	// Populate labels and workspace
 	game->x = unit->x;
 	game->y = unit->y;
+
+	// Scan for local targets
 	grid_explore(game, false);
-
-	// Scan for something to do
-	assert (unit->enabled);
-
 	handle_attack(game, unit);
 
 	if (unit->enabled)
 		handle_capture(game, unit);
 
+}
+
+static void label_targets(struct game* const game, const struct unit* const unit) {
+	(void)game;
+	(void)unit;
+}
+
+static void handle_nonlocal(struct game* const game, struct unit* const unit) {
+	// Number of turns of unit movement to look ahead
+	const energy_t look_ahead = 4;
+
+	assert(game->x == unit->x);
+	assert(game->y == unit->y);
+
+	// label_attackable_tiles argument=false is unimportant because attack_bit is unread
+	grid_explore_recursive(game, false, look_ahead);
+	label_targets(game, unit);
+	// find closest target; go to such target
+
 	grid_clear_uint8(game->labels);
 	grid_clear_energy(game->energies);
 }
 
-static void bot_interact_unit(struct game* const game, struct unit* const unit)
-{
+static void interact_unit(struct game* const game, struct unit* const unit) {
 	assert (game->turn == unit->player);
 	game->selected = game->units.grid[unit->y][unit->x];
 	handle_local(game, unit);
+
+	if (unit->enabled)
+		handle_nonlocal(game, unit);
+
 	game->selected = null_unit;
 }
 
-static void bot_interact_units(struct game* const game)
-{
+static void interact_units(struct game* const game) {
 	assert (game->selected == null_unit);
 
 	struct units* const units = &game->units;
 	unit_t curr = units->firsts[game->turn];
 	while (curr != null_unit) {
-		bot_interact_unit(game, &units->data[curr]);
+		interact_unit(game, &units->data[curr]);
 		curr = units->nexts[curr];
 	}
 
@@ -217,5 +237,5 @@ static void bot_interact_units(struct game* const game)
 
 void bot_play(struct game* const game)
 {
-	bot_interact_units(game);
+	interact_units(game);
 }
