@@ -130,14 +130,18 @@ static void grid_explore_mark_attackable_ranged(
 	const player_t player,
 	const bool label_attackable_tiles) {
 
+	const grid_wide_t min_range = models_min_range[model];
+	const grid_wide_t max_range = models_max_range[model];
+
 	// Range attack only applies to positive ranged models
-	if (!models_min_range[model])
+	if (!min_range)
 		return;
 
-	for (grid_wide_t j = -models_max_range[model]; j <= models_max_range[model]; ++j)
-		for (grid_wide_t i = -models_max_range[model]; i <= models_max_range[model]; ++i) {
+
+	for (grid_wide_t j = -max_range; j <= max_range; ++j)
+		for (grid_wide_t i = -max_range; i <= max_range; ++i) {
 			const grid_wide_t distance = abs(i) + abs(j);
-			if (models_min_range[model] <= distance && distance <= models_max_range[model])
+			if (min_range <= distance && distance <= max_range)
 				grid_explore_mark_attackable_tile(game, x + i, y + j, model, player, label_attackable_tiles);
 		}
 }
