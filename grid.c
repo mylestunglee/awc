@@ -176,8 +176,8 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 	});
 
 	while (!list_empty(list)) {
-		const struct list_node* const node = list_pop(list);
-		const tile_t tile = game->map[node->y][node->x];
+		const struct list_node node = list_front_pop(list);
+		const tile_t tile = game->map[node.y][node.x];
 		const energy_t cost = movement_type_cost[movement_type][tile];
 
 		// Inaccessible terrian
@@ -185,11 +185,11 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 			continue;
 
 		// Not enough energy to keep moving
-		if (node->energy < cost)
+		if (node.energy < cost)
 			continue;
 
 		// Cannot pass through enemy units
-		const unit_t node_unit_index = game->units.grid[node->y][node->x];
+		const unit_t node_unit_index = game->units.grid[node.y][node.x];
 		if (node_unit_index != null_unit &&
 			!bitmatrix_get(
 				game->alliances,
@@ -197,28 +197,28 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 				cursor_unit->player))
 			continue;
 
-		const energy_t energy = node->energy - cost;
+		const energy_t energy = node.energy - cost;
 
 		// Do not re-compute explored areas
-		if (game->energies[node->y][node->x] > energy)
+		if (game->energies[node.y][node.x] > energy)
 			continue;
 
-		game->energies[node->y][node->x] = node->energy;
+		game->energies[node.y][node.x] = node.energy;
 
 
 		// Mark unit-free tiles as accessible but ships cannot block bridges
 		if ((node_unit_index == null_unit || node_unit_index == cursor_unit_index) &&
 			(tile != tile_bridge || movement_type != movement_type_ship)) {
 
-			game->labels[node->y][node->x] |= accessible_bit;
-			grid_explore_mark_attackable_direct(game, node->x, node->y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);
+			game->labels[node.y][node.x] |= accessible_bit;
+			grid_explore_mark_attackable_direct(game, node.x, node.y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);
 		}
 
 		// Explore adjacent tiles
-		list_insert(list, (struct list_node){.x = node->x + 1, .y = node->y, .energy = energy});
-		list_insert(list, (struct list_node){.x = node->x - 1, .y = node->y, .energy = energy});
-		list_insert(list, (struct list_node){.x = node->x, .y = node->y + 1, .energy = energy});
-		list_insert(list, (struct list_node){.x = node->x, .y = node->y - 1, .energy = energy});
+		list_insert(list, (struct list_node){.x = node.x + 1, .y = node.y, .energy = energy});
+		list_insert(list, (struct list_node){.x = node.x - 1, .y = node.y, .energy = energy});
+		list_insert(list, (struct list_node){.x = node.x, .y = node.y + 1, .energy = energy});
+		list_insert(list, (struct list_node){.x = node.x, .y = node.y - 1, .energy = energy});
 	}
 
 	// Allow stuck units to wait

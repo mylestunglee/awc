@@ -15,15 +15,17 @@ void list_insert(struct list* const list, const struct list_node node) {
 	if (list->start == (list_t)(list->end + 1))
 		return;
 
-	list->nodes[list->end] = node;
-	++list->end;
+	list->nodes[list->end++] = node;
 }
 
-struct list_node* list_pop(struct list* const list) {
-	// Assume list is non-empty
+struct list_node list_front_pop(struct list* const list) {
 	assert(!list_empty(list));
 
-	struct list_node* const node = &list->nodes[list->start];
-	++list->start;
-	return node;
+	return list->nodes[list->start++];
+}
+
+struct list_node list_back_pop(struct list* const list) {
+	assert(!list_empty(list));
+
+	return list->nodes[--list->end];
 }

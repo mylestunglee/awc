@@ -22,6 +22,8 @@ bool list_empty(const struct list* const);
 
 void list_insert(struct list* const, const struct list_node);
 
-struct list_node* list_pop(struct list* const);
+struct list_node list_front_pop(struct list* const);
+
+struct list_node list_back_pop(struct list* const);
 
 #endif
