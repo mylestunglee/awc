@@ -154,9 +154,9 @@ void grid_explore(struct game* const game, const bool label_attackable_tiles) {
 
 // Use scalar > 1 when looking ahead multiple turns
 void grid_explore_recursive(struct game* const game, const bool label_attackable_tiles, const energy_t scalar) {
-	struct queue* const queue = &game->queue;
+	struct list* const list = &game->list;
 
-	assert(queue_empty(queue));
+	assert(list_empty(list));
 	assert(game->units.grid[game->y][game->x] != null_unit);
 
 	// Use cursor instead of selected property because we want to highlight non-selectable enemy units
@@ -169,14 +169,14 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 
 	grid_explore_mark_attackable_ranged(game, game->x, game->y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);
 
-	queue_insert(queue, (struct queue_node){
+	list_insert(list, (struct list_node){
 		.x = game->x,
 		.y = game->y,
 		.energy = init_energy
 	});
 
-	while (!queue_empty(queue)) {
-		const struct queue_node* const node = queue_pop(queue);
+	while (!list_empty(list)) {
+		const struct list_node* const node = list_pop(list);
 		const tile_t tile = game->map[node->y][node->x];
 		const energy_t cost = movement_type_cost[movement_type][tile];
 
@@ -215,10 +215,10 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 		}
 
 		// Explore adjacent tiles
-		queue_insert(queue, (struct queue_node){.x = node->x + 1, .y = node->y, .energy = energy});
-		queue_insert(queue, (struct queue_node){.x = node->x - 1, .y = node->y, .energy = energy});
-		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y + 1, .energy = energy});
-		queue_insert(queue, (struct queue_node){.x = node->x, .y = node->y - 1, .energy = energy});
+		list_insert(list, (struct list_node){.x = node->x + 1, .y = node->y, .energy = energy});
+		list_insert(list, (struct list_node){.x = node->x - 1, .y = node->y, .energy = energy});
+		list_insert(list, (struct list_node){.x = node->x, .y = node->y + 1, .energy = energy});
+		list_insert(list, (struct list_node){.x = node->x, .y = node->y - 1, .energy = energy});
 	}
 
 	// Allow stuck units to wait

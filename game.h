@@ -2,7 +2,7 @@
 #define game_h
 
 #include "units.h"
-#include "queue.h"
+#include "list.h"
 
 struct game {
 	tile_t map[grid_size][grid_size];
@@ -12,7 +12,7 @@ struct game {
 	unit_t selected;
 	uint8_t labels[grid_size][grid_size];
 	energy_t energies[grid_size][grid_size];
-	struct queue queue;
+	struct list list;
 	grid_t prev_x;
 	grid_t prev_y;
 	player_t turn;

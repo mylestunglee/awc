@@ -11,7 +11,7 @@ typedef uint32_t health_wide_t;
 typedef uint8_t model_t;
 typedef uint8_t grid_t;
 typedef int16_t grid_wide_t;
-typedef uint16_t queue_t;
+typedef uint16_t list_t;
 typedef uint16_t energy_t;
 typedef uint8_t tile_t;
 typedef uint8_t player_t;
@@ -25,7 +25,7 @@ typedef int16_t gold_t;
 #define terrian_capacity 10
 #define capturable_capacity 5
 #define tile_capacity (terrian_capacity + capturable_capacity)
-#define queue_capacity (queue_t)0xffff
+#define list_capacity (list_t)0xffff
 #define units_capacity (unit_t)0xff
 #define null_unit units_capacity
 #define players_capacity 5

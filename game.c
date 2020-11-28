@@ -18,7 +18,7 @@ static void game_preload(struct game* const game) {
 	grid_clear_territory(game->territory);
 	units_initialise(&game->units);
 	game->selected = null_unit;
-	queue_initialise(&game->queue);
+	list_initialise(&game->list);
 	game->turn = 0;
 
 	for (player_t player = 0; player < players_capacity; ++player) {

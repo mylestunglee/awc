@@ -17,7 +17,7 @@ void asserts(void) {
 	compiler_assert(is_unsigned(model_t));
 	compiler_assert(is_unsigned(grid_t));
 	compiler_assert(!is_unsigned(grid_wide_t));
-	compiler_assert(is_unsigned(queue_t));
+	compiler_assert(is_unsigned(list_t));
 	compiler_assert(is_unsigned(energy_t));
 	compiler_assert(is_unsigned(energy_t));
 	compiler_assert(is_unsigned(tile_t));
@@ -34,7 +34,7 @@ void asserts(void) {
 	compiler_assert(health_max <= max_value(health_t));
 	compiler_assert(tile_capacity <= upper_bound(tile_t));
 	compiler_assert(model_capacity <= upper_bound(model_t));
-	compiler_assert(queue_capacity == max_value(queue_t));
+	compiler_assert(list_capacity == max_value(list_t));
 	compiler_assert(units_capacity == max_value(unit_t));
 	compiler_assert(null_unit == units_capacity);
 	compiler_assert(null_player == players_capacity);
