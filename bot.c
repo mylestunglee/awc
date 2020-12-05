@@ -330,6 +330,8 @@ static void move_towards_target(
 	const grid_t x,
 	const grid_t y) {
 
+	grid_find_path(game, x, y);
+
 	(void)game;
 	(void)unit;
 	(void)x;

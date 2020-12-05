@@ -156,8 +156,8 @@ void grid_explore(struct game* const game, const bool label_attackable_tiles) {
 void grid_explore_recursive(struct game* const game, const bool label_attackable_tiles, const energy_t scalar) {
 	struct list* const list = &game->list;
 
-	assert(list_empty(list));
-	assert(game->units.grid[game->y][game->x] != null_unit);
+	assert (list_empty(list));
+	assert (game->units.grid[game->y][game->x] != null_unit);
 
 	// Use cursor instead of selected property because we want to highlight non-selectable enemy units
 	const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
@@ -223,4 +223,34 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 
 	// Allow stuck units to wait
 	game->labels[game->y][game->x] |= accessible_bit;
+}
+
+// Populates game.list with coordinates along the path to maximal energy
+void grid_find_path(struct game* const game, grid_t x, grid_t y) {
+	assert (list_empty(&game->list));
+
+	energy_t prev_energy = 0;
+
+	while (true) {
+		energy_t next_energy = 0;
+
+		const grid_t adjacent_x[] = {x + 1, x, x - 1, x};
+		const grid_t adjacent_y[] = {y, y - 1, y, y + 1};
+
+		for (uint8_t i = 0; i < 4; ++i) {
+			energy_t energy = game->energies[adjacent_y[i]][adjacent_x[i]];
+
+			if (energy > next_energy) {
+				x = adjacent_x[i];
+				y = adjacent_y[i];
+				next_energy = energy;
+			}
+		}
+
+		if (next_energy < prev_energy)
+			return;
+
+		list_insert(&game->list, (struct list_node){.x = x, .y = y, .energy = next_energy});
+		prev_energy = next_energy;
+	}
 }

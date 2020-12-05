@@ -11,5 +11,6 @@ void grid_correct_map(player_t[grid_size][grid_size], tile_t[grid_size][grid_siz
 void grid_compute_incomes(player_t [grid_size][grid_size], gold_t[players_capacity]);
 void grid_explore(struct game* const, const bool);
 void grid_explore_recursive(struct game* const, const bool, const energy_t);
+void grid_find_path(struct game* const, grid_t x, grid_t y);
 
 #endif
