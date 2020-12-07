@@ -321,7 +321,7 @@ static bool find_nearest_target(
 		*nearest_y = capturable_y;
 	}
 
-	return attackee_target_energy == 0 && capturable_energy == 0;
+	return attackee_target_energy > 0 || capturable_energy > 0;
 }
 
 static void move_towards_target(
@@ -336,7 +336,7 @@ static void move_towards_target(
 
 	assert (!list_empty(list));
 
-	const energy_t accessible_energy = list_back_peek(list).energy - unit_movement_types[unit->model];
+	const energy_t accessible_energy = list_back_peek(list).energy - unit_movement_ranges[unit->model];
 
 	while (!list_empty(list) && list_back_peek(list).energy >= accessible_energy) {
 		const struct list_node node = list_back_pop(list);
@@ -348,6 +348,7 @@ static void move_towards_target(
 	units_move(&game->units, game->units.grid[unit->y][unit->x], x, y);
 	unit->enabled = false;
 }
+
 
 static void handle_nonlocal(struct game* const game, struct unit* const unit) {
 	// Number of turns of unit movement to look ahead

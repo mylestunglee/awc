@@ -164,9 +164,7 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 	const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
 	const struct unit* const cursor_unit = &game->units.data[cursor_unit_index];
 	const uint8_t movement_type = unit_movement_types[cursor_unit->model];
-	const energy_t init_energy =
-		scalar * unit_movement_ranges[cursor_unit->model] +
-		movement_type_cost[movement_type][game->map[game->y][game->x]];
+	const energy_t init_energy = scalar * unit_movement_ranges[cursor_unit->model] + 1;
 
 	grid_explore_mark_attackable_ranged(game, game->x, game->y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);
 
@@ -233,7 +231,7 @@ void grid_find_path(struct game* const game, grid_t x, grid_t y) {
 	energy_t prev_energy = 0;
 
 	while (true) {
-		list_insert(&game->list, (struct list_node){.x = x, .y = y});
+		list_insert(&game->list, (struct list_node){.x = x, .y = y, .energy = game->energies[y][x]});
 
 		energy_t next_energy = 0;
 
