@@ -158,6 +158,7 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 
 	assert (list_empty(list));
 	assert (game->units.grid[game->y][game->x] != null_unit);
+	assert (scalar > 0);
 
 	// Use cursor instead of selected property because we want to highlight non-selectable enemy units
 	const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
@@ -232,6 +233,8 @@ void grid_find_path(struct game* const game, grid_t x, grid_t y) {
 	energy_t prev_energy = 0;
 
 	while (true) {
+		list_insert(&game->list, (struct list_node){.x = x, .y = y});
+
 		energy_t next_energy = 0;
 
 		const grid_t adjacent_x[] = {x + 1, x, x - 1, x};
@@ -250,7 +253,6 @@ void grid_find_path(struct game* const game, grid_t x, grid_t y) {
 		if (next_energy < prev_energy)
 			return;
 
-		list_insert(&game->list, (struct list_node){.x = x, .y = y, .energy = next_energy});
 		prev_energy = next_energy;
 	}
 }

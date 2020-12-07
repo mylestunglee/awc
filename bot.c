@@ -327,15 +327,26 @@ static bool find_nearest_target(
 static void move_towards_target(
 	struct game* const game,
 	struct unit* const unit,
-	const grid_t x,
-	const grid_t y) {
+	grid_t x,
+	grid_t y) {
 
 	grid_find_path(game, x, y);
 
-	(void)game;
-	(void)unit;
-	(void)x;
-	(void)y;
+	struct list* const list = &game->list;
+
+	assert (!list_empty(list));
+
+	const energy_t accessible_energy = list_back_peek(list).energy - unit_movement_types[unit->model];
+
+	while (!list_empty(list) && list_back_peek(list).energy >= accessible_energy) {
+		const struct list_node node = list_back_pop(list);
+		x = node.x;
+		y = node.y;
+	}
+
+	list_initialise(list);
+	units_move(&game->units, game->units.grid[unit->y][unit->x], x, y);
+	unit->enabled = false;
 }
 
 static void handle_nonlocal(struct game* const game, struct unit* const unit) {

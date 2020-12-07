@@ -30,13 +30,13 @@ struct list_node list_back_pop(struct list* const list) {
 	return list->nodes[--list->end];
 }
 
-struct list_node list_front_peek(struct list* const list) {
+struct list_node list_front_peek(const struct list* const list) {
 	assert(!list_empty(list));
 
 	return list->nodes[list->start];
 }
 
-struct list_node list_back_peek(struct list* const list) {
+struct list_node list_back_peek(const struct list* const list) {
 	assert(!list_empty(list));
 
 	return list->nodes[list->end - 1];
