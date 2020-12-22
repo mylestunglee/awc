@@ -238,21 +238,7 @@ static void game_handle_attack(struct game* const game) {
 	grid_clear_uint8(game->labels);
 }
 
-// A player is alive iff:
-// 1. The player has units
-// 2. The player has a HQ, implied by a positive income
-//    This holds because when a player loses their HQ, income is nullified
-static bool game_player_is_alive(const struct game* const game, const player_t player) {
-	return game->units.firsts[player] != null_unit || game->incomes[player] > 0;
-}
-
-static void game_end_turn(struct game* const game) {
-	game->selected = null_unit;
-	grid_clear_uint8(game->labels);
-	units_set_enabled(&game->units, game->turn, false);
-}
-
-static void game_repair_units(struct game* const game)
+static void repair_units(struct game* const game)
 {
 	unit_t curr = game->units.firsts[game->turn];
 	while (curr != null_unit) {
@@ -266,61 +252,62 @@ static void game_repair_units(struct game* const game)
 				unit->health += heal_rate;
 			// Deduct heal cost
 			game->golds[game->turn] -= models_cost[unit->model];
-			printf(gold_format, game->golds[game->turn]);
 		}
 
 		curr = game->units.nexts[curr];
 	}
 }
 
-static void game_start_turn(struct game* const game)
-{
-	units_set_enabled(&game->units, game->turn, true);
-	game->golds[game->turn] += gold_scale * game->incomes[game->turn];
-	game_repair_units(game);
+// A player is alive iff:
+// 1. The player has units
+// 2. The player has a HQ, implied by a positive income
+//    This holds because when a player loses their HQ, income is nullified
+static bool is_alive(const struct game* const game, const player_t player) {
+	return game->units.firsts[player] != null_unit || game->incomes[player] > 0;
 }
 
-static bool game_player_is_bot(const struct game* const game, const player_t player)
-{
+static void end_turn(struct game* const game) {
+	game->selected = null_unit;
+	grid_clear_uint8(game->labels);
+	units_set_enabled(&game->units, game->turn, false);
+}
+
+static void start_turn(struct game* const game) {
+	units_set_enabled(&game->units, game->turn, true);
+	game->golds[game->turn] += gold_scale * game->incomes[game->turn];
+	repair_units(game);
+}
+
+static bool is_bot(const struct game* const game, const player_t player) {
 	return bitarray_get(game->bots, player);
 }
 
-static bool game_all_alive_are_bots(const struct game* const game)
-{
-	for (player_t player = 0; player < players_capacity; ++player) {
-		if (game_player_is_alive(game, player) && !game_player_is_bot(game, player))
-			return false;
+static void next_alive_turn(struct game* const game) {
+	for (player_t i = 0; i < players_capacity; ++i) {
+		game->turn = (game->turn + 1) % players_capacity;
+		if (is_alive(game, game->turn))
+			return;
 	}
-	return true;
+	assert (false);
 }
 
-static void game_next_turn(struct game* const game) {
-	game_end_turn(game);
+static bool exists_alive_non_bot(const struct game* const game) {
+	for (player_t player = 0; player < players_capacity; ++player)
+		if (is_alive(game, player) && !is_bot(game, player))
+			return true;
 
-	if (game_all_alive_are_bots(game))
-	{
-		game_start_turn(game);
-		return;
-	}
+	return false;
+}
 
-	// Play subsequent bot turns
+static void next_turn(struct game* const game) {
 	do {
-		game->turn = (game->turn + 1) % players_capacity;
-
-		if (!game_player_is_alive(game, game->turn))
-			continue;
-		else if (game_player_is_bot(game, game->turn))
-		{
-			game_start_turn(game);
+		if (is_bot(game, game->turn))
 			bot_play(game);
-			game_end_turn(game);
-		}
-		else
-			break;
-	} while (true);
 
-	game_start_turn(game);
-
+		end_turn(game);
+		next_alive_turn(game);
+		start_turn(game);
+	} while (exists_alive_non_bot(game) && is_bot(game, game->turn));
 }
 
 static void print_normal_text(const struct game* const game) {
@@ -402,7 +389,7 @@ void game_loop(struct game* const game) {
 			} else
 				game_handle_action(game);
 		} else if (input == 'n') {
-			game_next_turn(game);
+			next_turn(game);
 		}
 	} while (true);
 

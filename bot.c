@@ -392,7 +392,11 @@ static void interact_units(struct game* const game) {
 
 }
 
-void bot_play(struct game* const game)
-{
+void bot_play(struct game* const game) {
+	// Clear previous user interaction
+	game->selected = null_unit;
+	grid_clear_uint8(game->labels);
+
+	// Apply bot interaction
 	interact_units(game);
 }
