@@ -368,10 +368,10 @@ void game_loop(struct game* const game) {
 		// Fix case skipping
 		game_parse_movement(game, input);
 
+		// Compute possible actions
 		attack_enabled = game_attack_enabled(game);
 		build_enabled = game_build_enabled(game);
 
-		// Compute possible actions
 
 		// Switch 0-9 keys between building and save/loading states
 		if (build_enabled) {
