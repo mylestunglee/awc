@@ -64,67 +64,69 @@ typedef int16_t gold_t;
 #define buildable_style '\xf0'
 
 const static char* const tile_names[tile_capacity] = {"void", "plains", "forest", "mountains", "beach", "sea", "reef", "river", "road", "bridge", "city", "factory", "airport", "habour", "HQ"};
-const static char* const model_names[model_capacity] = {"infantry", "mech", "recon", "tank", "battletank", "antiair", "artillery", "rockets", "missles", "fighter", "bomber", "battlecopter", "battleship", "crusier", "submarine"};
+const static char* const model_names[model_capacity] = {"infantry", "mech", "recon", "tank", "battletank", "artillery", "rockets", "antiair", "missles", "battlecopter", "fighter", "bomber", "submarine", "crusier", "battleship"};
 const static uint8_t tile_symbols[tile_capacity] = {'.', '"', 'Y', '^', ':', '~', '*', '\'', '-', '=', 'C', 'F', 'A', 'S', 'H'};
 const static uint8_t tile_styles[terrian_capacity] = {'\x80', '\xA2', '\x32', '\x13', '\x3B', '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
 const static uint8_t unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
 	{	{'\x03', '\xF3', '\x00'},
 		{'\x08', '\x88', '\x00'}
-	}, {{'\x0E', '\xFE', '\x00'},
+	}, {	{'\x0E', '\xFE', '\x00'},
 		{'\x08', '\x88', '\x00'}
-	}, {{'\x0A', '\xFD', '\x00'},
+	}, {	{'\x0A', '\xFD', '\x00'},
 		{'\x03', '\x33', '\x00'}
-	}, {{'\xAB', '\xFC', '\xD0'},
+	}, {	{'\xAB', '\xFC', '\xD0'},
 		{'\x3E', '\xEE', '\x30'}
-	}, {{'\xBB', '\xFC', '\xE0'},
+	}, {	{'\xB1', '\xFC', '\xE0'},
 		{'\x3E', '\xEE', '\x30'}
-	}, {{'\x08', '\xF8', '\x00'},
+	}, {	{'\x08', '\xF8', '\x00'},
 		{'\x03', '\xE3', '\x00'}
-	}, {{'\x88', '\xF8', '\x80'},
+	}, {	{'\x88', '\xF8', '\x80'},
 		{'\x33', '\x33', '\x30'}
-	}, {{'\x0A', '\xFA', '\x00'},
+	}, {	{'\x0A', '\xFA', '\x00'},
 		{'\x03', '\xE3', '\x00'}
-	}, {{'\xAA', '\xFA', '\xA0'},
+	}, {	{'\xAA', '\xFA', '\xA0'},
 		{'\x33', '\x33', '\x30'}
-	}, {{'\x91', '\x11', '\x10'},
-		{'\x59', '\xFC', '\xE0'}
-	}, {{'\x91', '\x11', '\x10'},
-		{'\x57', '\xF7', '\x60'}
-	}, {{'\x0E', '\x4E', '\x10'},
+	}, {	{'\x0E', '\x4E', '\x10'},
 		{'\x0B', '\xFC', '\xE0'}
-	}, {{'\x88', '\xF8', '\x80'},
-		{'\x92', '\x22', '\xA0'}
-	}, {{'\x2A', '\xFA', '\x20'},
+	}, {	{'\x91', '\x11', '\x10'},
+		{'\x59', '\xFC', '\xE0'}
+	}, {	{'\x91', '\x11', '\x10'},
+		{'\x57', '\xF7', '\x60'}
+	}, {	{'\x22', '\x22', '\x20'},
+		{'\x92', '\xFC', '\xE0'}
+	}, {	{'\x2A', '\xFA', '\x20'},
 		{'\x92', '\x2C', '\xE0'}
-	}, {{'\x12', '\x22', '\x10'},
-		{'\x5E', '\xFC', '\xE0'}}};
+	}, {	{'\x88', '\xF8', '\x80'},
+		{'\x92', '\x22', '\xA0'}
+}};
 
 const static uint8_t capturable_textures[capturable_capacity][tile_height][(tile_width + 1) / 2] = {
-	{   {'\x00', '\xB1', '\xFC', '\x00'},
+	{	{'\x00', '\xB1', '\xFC', '\x00'},
 		{'\x00', '\xB1', '\xB1', '\x1C'},
 		{'\xB1', '\x1C', '\xB1', '\x1C'},
 		{'\xB1', '\x1C', '\x00', '\x00'},
-	}, {{'\x00', '\x00', '\x00', '\x00'},
+	}, {	{'\x00', '\x00', '\x00', '\x00'},
 		{'\xB9', '\x2B', '\xF2', '\xAC'},
 		{'\xB1', '\x11', '\x11', '\x1C'},
 		{'\xB1', '\x11', '\x11', '\x1C'},
-	}, {{'\x00', '\x00', '\x9F', '\xA0'},
+	}, {	{'\x00', '\x00', '\x9F', '\xA0'},
 		{'\x00', '\x00', '\xC1', '\xB0'},
 		{'\x22', '\x22', '\xC1', '\xB2'},
 		{'\xB1', '\x11', '\x11', '\x1C'},
-	}, {{'\x00', '\x00', '\x00', '\x00'},
+	}, {	{'\x00', '\x00', '\x00', '\x00'},
 		{'\x00', '\x00', '\xBC', '\xFC'},
 		{'\x22', '\x22', '\xBC', '\x1C'},
 		{'\xB1', '\x11', '\x11', '\x1C'},
-	}, {{'\x00', '\xBE', '\xFC', '\x00'},
+	}, {	{'\x00', '\xBE', '\xFC', '\x00'},
 		{'\x00', '\xB1', '\x1C', '\x00'},
 		{'\xB1', '\x11', '\x11', '\x1C'},
-		{'\xB1', '\x11', '\x11', '\x1C'}}};
+		{'\xB1', '\x11', '\x11', '\x1C'}
+}};
 
 const static uint8_t unit_symbols[14] = {' ', '_', 'o', 'x', '<', '>', 'v', '^', '\\', '/', '[', ']', '-', '='};
 const static uint8_t player_styles[players_capacity + 1] = {'\xF4', '\xF1', '\xF3', '\xF8', '\xF8', '\xF8'};
 const static uint8_t player_symbols[players_capacity + 1] = {'1', '2', '3', '4', '5', ' '};
-const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 5, 6, 4, 9, 7, 6, 5, 6, 5};
+const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 5, 6, 5, 6, 9, 7, 5, 6, 5};
 /*
 0 int
 1 mech
@@ -177,9 +179,9 @@ const static health_t units_damage[model_capacity][model_capacity] = {
 	{0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  65,  115, 0,    0,  90},
 	{0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   55,  25,  55}};
 
-const static grid_t models_min_range[model_capacity] = {0, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 1, 0, 0};
-const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 0, 0, 6, 0, 0};
-const static gold_t models_cost[model_capacity] = {1, 3, 4, 7, 16, 6, 15, 8, 12, 20, 22, 9, 28, 18, 20};
+const static grid_t models_min_range[model_capacity] = {0, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 0, 0, 2};
+const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 0, 0, 0, 0, 6};
+const static gold_t models_cost[model_capacity] = {1, 3, 4, 7, 16, 6, 15, 8, 12, 9, 22, 20, 20, 18, 28};
 const static model_t buildable_models_range[capturable_capacity] = {0, 9, 3, 3, 0};
 const static model_t buildable_models_offset[capturable_capacity] = {0, 0, 9, 12, 0};
 
