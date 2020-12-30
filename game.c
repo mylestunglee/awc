@@ -72,15 +72,15 @@ static bool game_parse_movement(struct game* const game, const char input) {
 	return false;
 }
 
-// Build try to build a unit
+// Build try to build a unit, assume build enabled
 static bool game_parse_build(struct game* const game, const char input) {
 	const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
 	const model_t value = input - '1';
 
-	if (value >= buildable_models_range[capturable])
+	if (value >= buildable_models[capturable + 1] - buildable_models[capturable])
 		return false;
 
-	const model_t model = value + buildable_models_offset[capturable];
+	const model_t model = value + buildable_models[capturable];
 	const gold_t cost = gold_scale * models_cost[model];
 
 	if (game->golds[game->turn] < cost)
@@ -97,7 +97,7 @@ static bool game_parse_build(struct game* const game, const char input) {
 		.y = game->y,
 		.enabled = false});
 
-	// Build attempted, so don't fall through to next key-press cases
+	// Build successful, so don't fall through to next key-press cases
 	return true;
 }
 
@@ -131,10 +131,15 @@ static bool game_build_enabled(const struct game* const game) {
 	// 2. There is no unit on the tile
 	// 3. The capturable has buildable units
 	// 4. No unit is selected
+
+	if (game->territory[game->y][game->x] != game->turn)
+		return false;
+
+	const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
+
 	return
-		game->territory[game->y][game->x] == game->turn &&
 		game->units.grid[game->y][game->x] == null_unit &&
-		buildable_models_range[game->map[game->y][game->x] - terrian_capacity] &&
+		buildable_models[capturable] < buildable_models[capturable + 1] &&
 		game->selected == null_unit;
 }
 
@@ -333,8 +338,8 @@ static void print_build_text(const struct game* const game) {
 	const tile_t capturable = tile - terrian_capacity;
 
 	printf("in build mode:");
-	for (model_t model = 0; model < buildable_models_range[capturable]; ++model) {
-		printf("("model_format") %s ", model + 1, model_names[model + buildable_models_offset[capturable]]);
+	for (model_t model = buildable_models[capturable]; model < buildable_models[capturable + 1]; ++model) {
+		printf("("model_format") %s ", model + 1, model_names[model]);
 	}
 }
 
