@@ -128,6 +128,10 @@ static void update_max_energy(
 	*update_y = y;
 }
 
+static bool is_enemy(const struct game* const game, const player_t player) {
+	return bitmatrix_get(game->alliances, game->turn, player);
+}
+
 static energy_t find_nearest_capturable(
 	struct game* const game,
 	grid_t* const nearest_x,
@@ -143,11 +147,7 @@ static energy_t find_nearest_capturable(
 			if (game->map[y][x] < tile_capturable_lower_bound)
 				continue;
 
-			// Tile is enemy territory
-			if (bitmatrix_get(
-				game->alliances,
-				game->territory[y][x],
-				game->turn))
+			if (is_enemy(game, game->territory[y][x]))
 				continue;
 
 			update_max_energy(game, x, y, &max_energy, nearest_x, nearest_y);
@@ -256,11 +256,7 @@ static energy_t find_nearest_attackee_target(
 
 	for (player_t player = 0; player < players_capacity; ++player) {
 
-		// Attackee is unfriendly
-		if (bitmatrix_get(
-			game->alliances,
-			attacker->player,
-			player))
+		if (is_enemy(game, player))
 			continue;
 
 		unit_t curr = game->units.firsts[player];
@@ -389,7 +385,39 @@ static void interact_units(struct game* const game) {
 		interact_unit(game, &units->data[curr]);
 		curr = units->nexts[curr];
 	}
+}
 
+static void accumulate_distribution(
+	const struct game* const game,
+	const player_t player,
+	health_wide_t distribution[model_capacity]) {
+
+	const struct units* const units = &game->units;
+	unit_t curr = units->firsts[player];
+	while (curr != null_unit) {
+		const struct unit* const unit = &units->data[curr];
+		distribution[unit->model] += unit->health;
+		curr = units->nexts[curr];
+	}
+}
+
+static void populate_distributions(
+	const struct game* const game,
+	health_wide_t friendly_distribution[model_capacity],
+	health_wide_t enemy_distribution[model_capacity]) {
+
+	for (player_t player = 0; player < players_capacity; ++player) {
+		if (is_enemy(game, player))
+			accumulate_distribution(game, player, enemy_distribution);
+		else
+			accumulate_distribution(game, player, friendly_distribution);
+	}
+}
+
+static void build_units(struct game* const game) {
+	health_wide_t friendly_distribution[model_capacity] = {0};
+	health_wide_t enemy_distribution[model_capacity] = {0};
+	populate_distributions(game, friendly_distribution, enemy_distribution);
 }
 
 void bot_play(struct game* const game) {
@@ -397,6 +425,6 @@ void bot_play(struct game* const game) {
 	game->selected = null_unit;
 	grid_clear_uint8(game->labels);
 
-	// Apply bot interaction
 	interact_units(game);
+	build_units(game);
 }

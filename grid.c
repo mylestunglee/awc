@@ -1,27 +1,16 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 #include "bitarray.h"
 #include "definitions.h"
 #include "grid.h"
 
 void grid_clear_uint8(uint8_t grid[grid_size][grid_size]) {
-	grid_t y = 0;
-	do {
-		grid_t x = 0;
-		do {
-			grid[y][x] = 0;
-		} while (++x);
-	} while (++y);
+	memset(grid, 0, grid_size * grid_size);
 }
 
-void grid_clear_energy(energy_t workspace[grid_size][grid_size]) {
-	grid_t y = 0;
-	do {
-		grid_t x = 0;
-		do
-			workspace[y][x] = 0;
-		while (++x);
-	} while (++y);
+void grid_clear_energy(energy_t energies[grid_size][grid_size]) {
+	memset(energies, 0, sizeof(energy_t) * grid_size * grid_size);
 }
 
 void grid_clear_territory(player_t territory[grid_size][grid_size]) {
