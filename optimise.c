@@ -69,6 +69,25 @@ static void add_rows(
 	add_surplus_rows(problem, &row_offset);
 }
 
+static void add_distribution_columns(glp_prob* const problem, int* const column_offset) {
+	glp_add_cols(problem, model_capacity * model_capacity);
+
+	for (model_t m = 0; m < model_capacity; ++m) {
+		for (model_t n = 0; n < model_capacity; ++n) {
+			char name[symbolic_name_length];
+			snprintf(name, symbolic_name_length, "x_{"model_format","model_format"}", m + 1, n + 1);
+			glp_set_col_name(problem, *column_offset, name);
+			glp_set_col_bnds(problem, *column_offset, GLP_DB, 0.0, 1.0);
+			++*column_offset;
+		}
+	}
+}
+
+static void add_columns(glp_prob* const problem) {
+	int column_offset = 1;
+	add_distribution_columns(problem, &column_offset);
+}
+
 void optimise_build_allocations(
 	const health_wide_t friendly_distribution[model_capacity],
 	const health_wide_t enemy_distribution[model_capacity],
@@ -84,6 +103,7 @@ void optimise_build_allocations(
 	glp_set_prob_name(problem, "build_allocations");
 	glp_set_obj_dir(problem, GLP_MAX);
 	add_rows(problem, buildable_allocations, budget);
+	add_columns(problem);
 
 	glp_simplex(problem, NULL);
 	(void)problem;
