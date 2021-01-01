@@ -14,6 +14,7 @@ typedef int16_t grid_wide_t;
 typedef uint16_t list_t;
 typedef uint16_t energy_t;
 typedef uint8_t tile_t;
+typedef uint16_t tile_wide_t;
 typedef uint8_t player_t;
 typedef uint16_t player_wide_t;
 typedef int16_t gold_t;

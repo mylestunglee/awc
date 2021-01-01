@@ -3,6 +3,7 @@
 #include "grid.h"
 #include "game.h"
 #include "action.h"
+#include "optimise.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -414,10 +415,38 @@ static void populate_distributions(
 	}
 }
 
+static void populate_buildable_allocations(
+	const struct game* const game,
+	tile_wide_t buildable_allocations[model_capacity]) {
+
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			if (game->territory[y][x] != game->turn)
+				continue;
+
+			const tile_t capturable = game->map[y][x] - terrian_capacity;
+			for (model_t model = buildable_models[capturable]; model < buildable_models[capturable + 1]; ++model)
+				++buildable_allocations[model];
+		} while (++x);
+	} while (++y);
+}
+
 static void build_units(struct game* const game) {
 	health_wide_t friendly_distribution[model_capacity] = {0};
 	health_wide_t enemy_distribution[model_capacity] = {0};
 	populate_distributions(game, friendly_distribution, enemy_distribution);
+	tile_wide_t buildable_allocations[model_capacity] = {0};
+	populate_buildable_allocations(game, buildable_allocations);
+	tile_wide_t build_allocations[model_capacity] = {0};
+	optimise_build_allocations(
+		friendly_distribution,
+		enemy_distribution,
+		buildable_allocations,
+		game->golds[game->turn],
+		build_allocations);
+	// TODO: build units with build_allocation
 }
 
 void bot_play(struct game* const game) {
