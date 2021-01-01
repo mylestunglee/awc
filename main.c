@@ -1,8 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "game.h"
+#include "optimise.h"
 
 int main(int argc, char* argv[]) {
+
+	health_wide_t friendly_distribution[model_capacity] = {0};
+	health_wide_t enemy_distribution[model_capacity] = {0};
+	tile_wide_t buildable_allocations[model_capacity] = {0};
+	gold_t budget = 10;
+	tile_wide_t build_allocations[model_capacity] = {0};
+	optimise_build_allocations(
+		friendly_distribution,
+		enemy_distribution,
+		buildable_allocations,
+		budget,
+		build_allocations);
+
+	return 0;
+
 	if (argc != 2) {
 		fprintf(stderr, "Usage: awc GAME_STATE\n");
 		return 1;
