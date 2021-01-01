@@ -4,6 +4,7 @@
 #include "optimise.h"
 
 int main(int argc, char* argv[]) {
+	struct game* const game = malloc(sizeof(struct game));
 
 	health_wide_t friendly_distribution[model_capacity] = {0};
 	health_wide_t enemy_distribution[model_capacity] = {0};
@@ -15,7 +16,8 @@ int main(int argc, char* argv[]) {
 		enemy_distribution,
 		buildable_allocations,
 		budget,
-		build_allocations);
+		build_allocations,
+		&game->list.nodes);
 
 	return 0;
 
@@ -24,7 +26,6 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	struct game* const game = malloc(sizeof(struct game));
 
 	if (game == NULL) {
 		fprintf(stderr, "Insufficent memory\n");

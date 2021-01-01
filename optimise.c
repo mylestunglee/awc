@@ -1,8 +1,10 @@
-
-#include "optimise.h"
-
 #include <glpk.h>
 #include <stdio.h>
+#include <assert.h>
+
+#include "optimise.h"
+#include "list.h"
+
 #define symbolic_name_length 16
 
 static void add_distribution_rows(glp_prob* const problem, int* const row_offset) {
@@ -145,11 +147,12 @@ void optimise_build_allocations(
 	const health_wide_t enemy_distribution[model_capacity],
 	const tile_wide_t buildable_allocations[model_capacity],
 	const gold_t budget,
-	tile_wide_t build_allocation[model_capacity]) {
+	tile_wide_t build_allocation[model_capacity],
+	void* const workspace) {
 
-	(void)friendly_distribution;
-	(void)enemy_distribution;
-	(void)build_allocation;
+	assert (sizeof(struct sparse_matrix) < sizeof(struct list_node) * list_capacity);
+	struct sparse_matrix* const sparse_matrix = workspace;
+	(void)sparse_matrix;
 
 	glp_prob* const problem = glp_create_prob();
 	glp_set_prob_name(problem, "build_allocations");
@@ -158,5 +161,4 @@ void optimise_build_allocations(
 	add_columns(problem, friendly_distribution, enemy_distribution, buildable_allocations);
 
 	glp_simplex(problem, NULL);
-	(void)problem;
 }

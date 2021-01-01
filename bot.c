@@ -440,12 +440,14 @@ static void build_units(struct game* const game) {
 	tile_wide_t buildable_allocations[model_capacity] = {0};
 	populate_buildable_allocations(game, buildable_allocations);
 	tile_wide_t build_allocations[model_capacity] = {0};
+
 	optimise_build_allocations(
 		friendly_distribution,
 		enemy_distribution,
 		buildable_allocations,
 		game->golds[game->turn],
-		build_allocations);
+		build_allocations,
+		&game->list.nodes);
 	// TODO: build units with build_allocation
 }
 
