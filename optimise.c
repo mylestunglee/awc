@@ -116,14 +116,18 @@ static void add_allocation_columns(
 	}
 }
 
+static void add_ratio_column(glp_prob* const problem, int* const column_offset) {
+	glp_set_col_name(problem, *column_offset, "r");
+	++*column_offset;
+}
+
 static void add_columns(
 	glp_prob* const problem,
 	const health_wide_t friendly_distribution[model_capacity],
 	const health_wide_t enemy_distribution[model_capacity],
 	const tile_wide_t buildable_allocations[model_capacity]) {
 
-
-	glp_add_cols(problem, 2 * model_capacity * model_capacity);
+	glp_add_cols(problem, 1 + 2 * model_capacity * model_capacity);
 
 	int column_offset = 1;
 	add_distribution_columns(problem, friendly_distribution, enemy_distribution, &column_offset);
@@ -133,6 +137,7 @@ static void add_columns(
 		enemy_distribution,
 		buildable_allocations,
 		&column_offset);
+	add_ratio_column(problem, &column_offset);
 }
 
 void optimise_build_allocations(
@@ -155,4 +160,3 @@ void optimise_build_allocations(
 	glp_simplex(problem, NULL);
 	(void)problem;
 }
-
