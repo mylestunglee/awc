@@ -29,12 +29,9 @@ static void add_allocation_rows(
 		snprintf(name, symbolic_name_length, "v_"model_format, model + 1);
 		glp_set_row_name(problem, *row_offset, name);
 
-		/*// Row lower and upper bounds cannot be equal with GLP_DB
 		if (buildable_allocations[model])
 			glp_set_row_bnds(problem, *row_offset, GLP_DB, 0.0, (double)buildable_allocations[model]);
-		else
-			glp_set_row_bnds(problem, *row_offset, GLP_FX, 0.0, 0.0);
-*/
+
 		++*row_offset;
 	}
 }
@@ -79,17 +76,8 @@ static void add_distribution_columns(
 		for (model_t n = 0; n < model_capacity; ++n) {
 			char name[symbolic_name_length];
 			snprintf(name, symbolic_name_length, "x_{"model_format","model_format"}", m + 1, n + 1);
-			printf("var %s %d\n", name, *column_offset);
 			glp_set_col_name(problem, *column_offset, name);
-
-			/*if (
-				friendly_distribution[m] == 0 ||
-				enemy_distribution[n] == 0 ||
-				units_damage[m][n] == 0)*/
-				glp_set_col_bnds(problem, *column_offset, GLP_FX, 0.0, 0.0);
-			/*else
-				glp_set_col_bnds(problem, *column_offset, GLP_DB, 0.0, 1.0);*/
-
+			glp_set_col_bnds(problem, *column_offset, GLP_DB, 0.0, 1.0);
 			++*column_offset;
 		}
 	}
@@ -106,15 +94,9 @@ static void add_allocation_columns(
 		for (model_t n = 0; n < model_capacity; ++n) {
 			char name[symbolic_name_length];
 			snprintf(name, symbolic_name_length, "y_{"model_format","model_format"}", m + 1, n + 1);
-			printf("var %s %d\n", name, *column_offset);
 			glp_set_col_name(problem, *column_offset, name);
 
-			if (
-				buildable_allocations[m] == 0 ||
-				enemy_distribution[n] == 0 ||
-				units_damage[m][n] == 0)
-				glp_set_col_bnds(problem, *column_offset, GLP_FX, 0.0, 0.0);
-			else
+			if (buildable_allocations[m])
 				glp_set_col_bnds(problem, *column_offset, GLP_DB, 0.0, (double)buildable_allocations[m]);
 
 			++*column_offset;
@@ -165,8 +147,6 @@ static void sparse_matrix_set(
 	matrix->is[matrix->entries] = i + 1;
 	matrix->js[matrix->entries] = j + 1;
 	matrix->values[matrix->entries] = value;
-
-	printf("set [%i] [%i,%i] %f\n", i, j / model_capacity, j % model_capacity, value);
 }
 
 static void set_sum_coefficients(
@@ -244,25 +224,21 @@ static void populate_coefficients(
 
 	int row_offset = 0;
 
-	printf("set u,x\n");
 	set_sum_coefficients(coefficients, row_offset, 0);
 	row_offset += model_capacity;
 
-	printf("set v,y\n");
 	set_sum_coefficients(
 		coefficients,
 		row_offset,
 		model_capacity * model_capacity);
 	row_offset += model_capacity;
 
-	printf("set c,y\n");
 	set_cost_coefficients(
 		coefficients,
 		row_offset,
 		model_capacity * model_capacity);
 	++row_offset;
 
-	printf("set s,x\n");
 	set_surplus_distribution_coefficients(
 		coefficients,
 		friendly_distribution,
@@ -270,7 +246,6 @@ static void populate_coefficients(
 		row_offset,
 		0);
 
-	printf("set s,y\n");
 	set_surplus_distribution_coefficients(
 		coefficients,
 		NULL,
@@ -278,7 +253,6 @@ static void populate_coefficients(
 		row_offset,
 		model_capacity * model_capacity);
 
-	printf("set s,r\n");
 	set_surplus_ratio_coefficients(
 		coefficients,
 		enemy_distribution,
@@ -301,7 +275,7 @@ static void populate_build_allocation(
 		for (model_t n = 0; n < model_capacity; ++n)
 			build_allocation[m] += glp_get_col_prim(
 				problem,
-				1 + n + m * model_capacity);
+				1 + n + m * model_capacity + model_capacity * model_capacity);
 }
 
 void optimise_build_allocations(
@@ -323,12 +297,12 @@ void optimise_build_allocations(
 
 	populate_build_allocation(problem, build_allocation);
 
-	int p = model_capacity;
+	/*int p = model_capacity;
 
-	/*for (model_t m = 0; m < model_capacity; ++m)
+	for (model_t m = 0; m < model_capacity; ++m)
 		for (model_t n = 0; n < model_capacity; ++n)
 			printf("result x[%d,%d]=%f\n", m, n, glp_get_col_prim(
-				problem, 1 + n + m*p));*/
+				problem, 1 + n + m*p));
 
 	for (model_t m = 0; m < model_capacity; ++m)
 		for (model_t n = 0; n < model_capacity; ++n)
@@ -349,5 +323,5 @@ void optimise_build_allocations(
 
 	for (model_t m = 0; m < model_capacity; ++m)
 		printf("result s[%d]=%f\n", m, glp_get_row_prim(
-			problem, 2 + 2*p));
+			problem, 2 + 2*p));*/
 }
