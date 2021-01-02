@@ -439,7 +439,7 @@ static void build_units(struct game* const game) {
 	populate_distributions(game, friendly_distribution, enemy_distribution);
 	tile_wide_t buildable_allocations[model_capacity] = {0};
 	populate_buildable_allocations(game, buildable_allocations);
-	tile_wide_t build_allocations[model_capacity] = {0};
+	double build_allocations[model_capacity] = {0};
 
 	optimise_build_allocations(
 		friendly_distribution,
