@@ -415,9 +415,9 @@ static void populate_distributions(
 	}
 }
 
-static void populate_buildable_allocations(
+static void populate_capturables(
 	const struct game* const game,
-	tile_wide_t buildable_allocations[model_capacity]) {
+	tile_wide_t capturables[capturable_capacity]) {
 
 	grid_t y = 0;
 	do {
@@ -427,8 +427,7 @@ static void populate_buildable_allocations(
 				continue;
 
 			const tile_t capturable = game->map[y][x] - terrian_capacity;
-			for (model_t model = buildable_models[capturable]; model < buildable_models[capturable + 1]; ++model)
-				++buildable_allocations[model];
+			++capturables[capturable];
 		} while (++x);
 	} while (++y);
 }
@@ -437,17 +436,18 @@ static void build_units(struct game* const game) {
 	health_wide_t friendly_distribution[model_capacity] = {0};
 	health_wide_t enemy_distribution[model_capacity] = {0};
 	populate_distributions(game, friendly_distribution, enemy_distribution);
-	tile_wide_t buildable_allocations[model_capacity] = {0};
-	populate_buildable_allocations(game, buildable_allocations);
+	tile_wide_t capturables[capturable_capacity] = {0};
+	populate_capturables(game, capturables);
 	double build_allocations[model_capacity] = {0};
 
 	optimise_build_allocations(
 		friendly_distribution,
 		enemy_distribution,
-		buildable_allocations,
+		capturables,
 		game->golds[game->turn],
 		build_allocations,
 		&game->list.nodes);
+
 	// TODO: build units with build_allocation
 }
 

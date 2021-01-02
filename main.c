@@ -8,26 +8,27 @@ int main(int argc, char* argv[]) {
 
 	health_wide_t friendly_distribution[model_capacity] = {0};
 	health_wide_t enemy_distribution[model_capacity] = {0};
-	tile_wide_t buildable_allocations[model_capacity] = {0};
+	tile_wide_t capturables[capturable_capacity] = {0};
 	gold_t budget = 0;
 	double build_allocations[model_capacity] = {0};
 
-	budget = 10;
-	enemy_distribution[0] = 1;
-	for (model_t m = 0; m < model_capacity; ++m)
-		buildable_allocations[m] = 10;
+	budget = 16;
+	enemy_distribution[4] = 1;
+	enemy_distribution[10] = 1;
+	friendly_distribution[3] = 40;
+	capturables[3] = 2;
 
 	optimise_build_allocations(
 		friendly_distribution,
 		enemy_distribution,
-		buildable_allocations,
+		capturables,
 		budget,
 		build_allocations,
 		&game->list.nodes);
 
 	printf("result=");
 	for (model_t m = 0; m < model_capacity; ++m)
-		printf("%f ", build_allocations[m]);
+		printf("(%d) %s %f\n", m, model_names[m], build_allocations[m]);
 	printf("\n");
 
 	return 0;

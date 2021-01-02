@@ -46,6 +46,7 @@ typedef int16_t gold_t;
 #define health_wide_format "%u"
 #define gold_format "%hd"
 #define enabled_format "%8s"
+#define tile_format "%hhu"
 
 // Graphics
 #define tile_width 8
