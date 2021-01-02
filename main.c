@@ -15,7 +15,6 @@ int main(int argc, char* argv[]) {
 	budget = 16;
 	enemy_distribution[4] = 1;
 	enemy_distribution[10] = 1;
-	friendly_distribution[3] = 40;
 	capturables[3] = 2;
 
 	optimise_build_allocations(
@@ -26,9 +25,9 @@ int main(int argc, char* argv[]) {
 		build_allocations,
 		&game->list.nodes);
 
-	printf("result=");
+	printf("result =\n");
 	for (model_t m = 0; m < model_capacity; ++m)
-		printf("(%d) %s %f\n", m, model_names[m], build_allocations[m]);
+		printf("    (%d) %s %f\n", m, model_names[m], build_allocations[m]);
 	printf("\n");
 
 	return 0;

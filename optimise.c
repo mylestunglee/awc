@@ -138,7 +138,6 @@ static void sparse_matrix_set(
 	matrix->is[matrix->entries] = i + 1;
 	matrix->js[matrix->entries] = j + 1;
 	matrix->values[matrix->entries] = value;
-	printf("set %d %d %d %f\n", matrix->entries, i, j, value);
 }
 
 static void set_sum_coefficients(
@@ -273,7 +272,7 @@ static void populate_coefficients(
 		coefficients->values);
 }
 
-static void populate_build_allocation(
+static void populate_build_allocations(
 	glp_prob* const problem,
 	double build_allocation[model_capacity]) {
 
@@ -281,7 +280,7 @@ static void populate_build_allocation(
 		for (model_t n = 0; n < model_capacity; ++n)
 			build_allocation[m] += glp_get_col_prim(
 				problem,
-				1 + n + m * model_capacity + model_capacity * model_capacity);
+					1 + n + m * model_capacity + model_capacity * model_capacity);
 }
 
 void optimise_build_allocations(
@@ -301,7 +300,7 @@ void optimise_build_allocations(
 
 	glp_simplex(problem, NULL);
 
-	populate_build_allocation(problem, build_allocation);
+	populate_build_allocations(problem, build_allocation);
 
 	/*int p = model_capacity;
 
