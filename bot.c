@@ -438,7 +438,7 @@ static void build_units(struct game* const game) {
 	populate_distributions(game, friendly_distribution, enemy_distribution);
 	tile_wide_t capturables[capturable_capacity] = {0};
 	populate_capturables(game, capturables);
-	double build_allocations[model_capacity] = {0};
+	tile_wide_t build_allocations[model_capacity] = {0};
 
 	optimise_build_allocations(
 		friendly_distribution,

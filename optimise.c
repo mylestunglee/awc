@@ -92,6 +92,7 @@ static void add_allocation_columns(
 			snprintf(name, symbolic_name_length, "y_{"model_format","model_format"}", m + 1, n + 1);
 			glp_set_col_name(problem, *column_offset, name);
 			glp_set_col_bnds(problem, *column_offset, GLP_LO, 0.0, 0.0);
+			glp_set_col_kind(problem, *column_offset, GLP_IV);
 			++*column_offset;
 		}
 	}
@@ -274,13 +275,21 @@ static void populate_coefficients(
 
 static void populate_build_allocations(
 	glp_prob* const problem,
-	double build_allocation[model_capacity]) {
+	tile_wide_t build_allocation[model_capacity]) {
 
 	for (model_t m = 0; m < model_capacity; ++m)
 		for (model_t n = 0; n < model_capacity; ++n)
-			build_allocation[m] += glp_get_col_prim(
+			build_allocation[m] += glp_mip_col_val(
 				problem,
 					1 + n + m * model_capacity + model_capacity * model_capacity);
+}
+
+static int solve(glp_prob* const problem) {
+	glp_iocp parameters;
+	glp_init_iocp(&parameters);
+	parameters.presolve = GLP_ON;
+	parameters.msg_lev = GLP_MSG_ERR;
+	return glp_intopt(problem, &parameters);
 }
 
 void optimise_build_allocations(
@@ -288,7 +297,7 @@ void optimise_build_allocations(
 	const health_wide_t enemy_distribution[model_capacity],
 	const tile_wide_t capturables[capturable_capacity],
 	const gold_t budget,
-	double build_allocation[model_capacity],
+	tile_wide_t build_allocation[model_capacity],
 	void* const workspace) {
 
 	glp_prob* const problem = glp_create_prob();
@@ -298,35 +307,10 @@ void optimise_build_allocations(
 	add_columns(problem, friendly_distribution, enemy_distribution);
 	populate_coefficients(problem, friendly_distribution, enemy_distribution, workspace);
 
-	glp_simplex(problem, NULL);
+	const int error = solve(problem);
 
-	populate_build_allocations(problem, build_allocation);
+	if (!error)
+		populate_build_allocations(problem, build_allocation);
 
-	/*int p = model_capacity;
-
-	for (model_t m = 0; m < model_capacity; ++m)
-		for (model_t n = 0; n < model_capacity; ++n)
-			printf("result x[%d,%d]=%f\n", m, n, glp_get_col_prim(
-				problem, 1 + n + m*p));
-
-	for (model_t m = 0; m < model_capacity; ++m)
-		for (model_t n = 0; n < model_capacity; ++n)
-			printf("result y[%d,%d]=%f\n", m, n, glp_get_col_prim(
-				problem, 1 + n + m*p + p*p));
-
-	printf("result r=%f\n", glp_get_col_prim(problem, 1 + 2*p*p));
-
-	for (model_t m = 0; m < model_capacity; ++m)
-		printf("result u[%d]=%f\n", m, glp_get_row_prim(
-			problem, 1 + m));
-
-	for (model_t m = 0; m < model_capacity; ++m)
-		printf("result v[%d]=%f\n", m, glp_get_row_prim(
-			problem, 1 + m + p));
-
-	printf("result c=%f\n", glp_get_row_prim(problem, 1 + 2*p));
-
-	for (model_t m = 0; m < model_capacity; ++m)
-		printf("result s[%d]=%f\n", m, glp_get_row_prim(
-			problem, 2 + 2*p));*/
+	glp_delete_prob(problem);
 }

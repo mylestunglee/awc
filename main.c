@@ -10,12 +10,12 @@ int main(int argc, char* argv[]) {
 	health_wide_t enemy_distribution[model_capacity] = {0};
 	tile_wide_t capturables[capturable_capacity] = {0};
 	gold_t budget = 0;
-	double build_allocations[model_capacity] = {0};
+	tile_wide_t build_allocations[model_capacity] = {0};
 
 	budget = 16;
 	enemy_distribution[4] = 1;
 	enemy_distribution[10] = 1;
-	capturables[3] = 2;
+	capturables[1] = 4;
 
 	optimise_build_allocations(
 		friendly_distribution,
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 
 	printf("result =\n");
 	for (model_t m = 0; m < model_capacity; ++m)
-		printf("    (%d) %s %f\n", m, model_names[m], build_allocations[m]);
+		printf("%4d %12s %2d\n", m, model_names[m], build_allocations[m]);
 	printf("\n");
 
 	return 0;
