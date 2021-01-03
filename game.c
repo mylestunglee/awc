@@ -80,25 +80,7 @@ static bool game_parse_build(struct game* const game, const char input) {
 	if (value >= buildable_models[capturable + 1] - buildable_models[capturable])
 		return false;
 
-	const model_t model = value + buildable_models[capturable];
-	const gold_t cost = gold_scale * models_cost[model];
-
-	if (game->golds[game->turn] < cost)
-		return false;
-
-	game->golds[game->turn] -= cost;
-
-	// Error may occur when units is full
-	units_insert(&game->units, (struct unit){
-		.health = health_max,
-		.model = model,
-		.player = game->turn,
-		.x = game->x,
-		.y = game->y,
-		.enabled = false});
-
-	// Build successful, so don't fall through to next key-press cases
-	return true;
+	return !action_build(game, value + buildable_models[capturable]);
 }
 
 static bool game_parse_file(struct game* const game, const char input) {
@@ -235,8 +217,8 @@ void game_simulate_attack(
 		*counter_damage = calc_damage(game, attackee, attacker);
 }
 
-static void game_handle_attack(struct game* const game) {
-	action_handle_attack(game);
+static void game_attack(struct game* const game) {
+	action_attack(game);
 
         game->units.data[game->selected].enabled = false;
 	game->selected = null_unit;
@@ -390,7 +372,7 @@ void game_loop(struct game* const game) {
 
 		if (input == ' ') {
 			if (attack_enabled) {
-				game_handle_attack(game);
+				game_attack(game);
 			} else
 				game_handle_action(game);
 		} else if (input == 'n') {

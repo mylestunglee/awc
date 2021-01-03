@@ -46,7 +46,7 @@ static void handle_ranged_attack(
 	const struct unit* const attackee) {
 	game->x = attackee->x;
 	game->y = attackee->y;
-	action_handle_attack(game);
+	action_attack(game);
 	attacker->enabled = false;
 }
 
@@ -93,7 +93,7 @@ static void handle_direct_attack(
 	game->y = y;
 	game->prev_x = adjacent_x[best_i];
 	game->prev_y = adjacent_y[best_i];
-	action_handle_attack(game);
+	action_attack(game);
 	attacker->enabled = false;
 }
 
