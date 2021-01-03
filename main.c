@@ -4,39 +4,12 @@
 #include "optimise.h"
 
 int main(int argc, char* argv[]) {
-	struct game* const game = malloc(sizeof(struct game));
-
-	health_wide_t friendly_distribution[model_capacity] = {0};
-	health_wide_t enemy_distribution[model_capacity] = {0};
-	tile_wide_t capturables[capturable_capacity] = {0};
-	gold_t budget = 0;
-	tile_wide_t build_allocations[model_capacity] = {0};
-
-	budget = 16;
-	enemy_distribution[4] = 1;
-	enemy_distribution[10] = 1;
-	capturables[1] = 4;
-
-	optimise_build_allocations(
-		friendly_distribution,
-		enemy_distribution,
-		capturables,
-		budget,
-		build_allocations,
-		&game->list.nodes);
-
-	printf("result =\n");
-	for (model_t m = 0; m < model_capacity; ++m)
-		printf("%4d %12s %2d\n", m, model_names[m], build_allocations[m]);
-	printf("\n");
-
-	return 0;
-
 	if (argc != 2) {
 		fprintf(stderr, "Usage: awc GAME_STATE\n");
 		return 1;
 	}
 
+	struct game* const game = malloc(sizeof(struct game));
 
 	if (game == NULL) {
 		fprintf(stderr, "Insufficent memory\n");

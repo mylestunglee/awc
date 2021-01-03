@@ -178,13 +178,10 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 		if (node.energy < cost)
 			continue;
 
-		// Cannot pass through enemy units
+		// TODO: enable pass through friendly units
+		// Cannot pass through units
 		const unit_t node_unit_index = game->units.grid[node.y][node.x];
-		if (node_unit_index != null_unit &&
-			!bitmatrix_get(
-				game->alliances,
-				game->units.data[node_unit_index].player,
-				cursor_unit->player))
+		if (node_unit_index != null_unit && !(node.x == game->x && node.y == game->y))
 			continue;
 
 		const energy_t energy = node.energy - cost;

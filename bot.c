@@ -466,6 +466,40 @@ static void default_build_allocations(
 		build_allocations[0] = capturable_allocatable;
 }
 
+static void realise_build_allocations(
+	struct game* const game,
+	tile_wide_t build_allocations[model_capacity]) {
+
+	grid_t y = 0;
+	do {
+		grid_t x = 0;
+		do {
+			if (game->territory[y][x] != game->turn)
+				continue;
+
+			if (game->units.grid[y][x] != null_unit)
+				continue;
+
+			const tile_t capturable = game->map[y][x] - terrian_capacity;
+
+			for (model_t model = buildable_models[capturable]; model < buildable_models[capturable + 1]; ++model) {
+				if (build_allocations[model] == 0)
+					continue;
+
+				game->x = x;
+				game->y = y;
+				bool error = action_build(game, model);
+
+				if (error)
+					return;
+
+				--build_allocations[model];
+				break;
+			}
+		} while (++x);
+	} while (++y);
+}
+
 static void build_units(struct game* const game) {
 	if (capturable_capacity == 0)
 		return;
@@ -493,8 +527,7 @@ static void build_units(struct game* const game) {
 			game->golds[game->turn],
 			build_allocations);
 
-	// TODO: build units with build_allocation
-	// realise_build_allocations(game, capturables);
+	realise_build_allocations(game, capturables);
 }
 
 void bot_play(struct game* const game) {
