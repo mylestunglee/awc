@@ -145,7 +145,7 @@ static energy_t find_nearest_capturable(
 		grid_t x = 0;
 		do {
 			// Tile is capturable
-			if (game->map[y][x] < tile_capturable_lower_bound)
+			if (game->map[y][x] < terrian_capacity)
 				continue;
 
 			if (is_enemy(game, game->territory[y][x]))
@@ -307,10 +307,13 @@ static bool find_nearest_target(
 		&attackee_target_x,
 		&attackee_target_y);
 
-	const energy_t capturable_energy = find_nearest_capturable(
-		game,
-		&capturable_x,
-		&capturable_y);
+	energy_t capturable_energy = 0;
+
+	if (unit->model < unit_capturable_upper_bound)
+		find_nearest_capturable(
+			game,
+			&capturable_x,
+			&capturable_y);
 
 	if (attackee_target_energy > capturable_energy) {
 		*nearest_x = attackee_target_x;
@@ -351,7 +354,7 @@ static void move_towards_target(
 
 static void handle_nonlocal(struct game* const game, struct unit* const unit) {
 	// Number of turns of unit movement to look ahead
-	const energy_t look_ahead = 4;
+	const energy_t look_ahead = 16;
 
 	assert(game->x == unit->x);
 	assert(game->y == unit->y);

@@ -17,7 +17,7 @@ typedef uint8_t tile_t;
 typedef uint16_t tile_wide_t;
 typedef uint8_t player_t;
 typedef uint16_t player_wide_t;
-typedef int16_t gold_t;
+typedef int32_t gold_t;
 
 #define grid_size (grid_wide_t)256
 #define health_max (health_t)0xff
@@ -26,7 +26,7 @@ typedef int16_t gold_t;
 #define terrian_capacity 10
 #define capturable_capacity 5
 #define tile_capacity (terrian_capacity + capturable_capacity)
-#define list_capacity (list_t)0xffff
+#define list_capacity 0x10000
 #define units_capacity (unit_t)0xff
 #define null_unit units_capacity
 #define players_capacity 5
@@ -44,7 +44,7 @@ typedef int16_t gold_t;
 #define model_format "%hhu"
 #define turn_format "%hhu"
 #define health_wide_format "%u"
-#define gold_format "%hd"
+#define gold_format "%d"
 #define enabled_format "%8s"
 #define tile_format "%hhu"
 
@@ -143,7 +143,6 @@ const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 
 #define tile_bridge 9
 #define tile_city 10
 #define tile_HQ 14
-#define tile_capturable_lower_bound 10
 
 const static uint8_t unit_movement_types[model_capacity] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
 const static energy_t movement_type_cost[movement_types_capacity][tile_capacity] = {

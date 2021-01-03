@@ -53,7 +53,7 @@ void action_handle_capture(struct game* const game)
 	if (unit->model >= unit_capturable_upper_bound)
 		return;
 
-	if (game->map[game->y][game->x] < tile_capturable_lower_bound)
+	if (game->map[game->y][game->x] < terrian_capacity)
 		return;
 
 
