@@ -432,7 +432,45 @@ static void populate_capturables(
 	} while (++y);
 }
 
+static bool is_nonzero_capturables(const tile_wide_t capturables[capturable_capacity]) {
+	for (tile_t capturable = 0; capturable < capturable_capacity; ++capturable)
+		if (capturables[capturable])
+			return true;
+
+	return false;
+}
+
+// Maximise infantry build allocations
+static void default_build_allocations(
+	const tile_wide_t capturables[capturable_capacity],
+	const gold_t budget,
+	tile_wide_t build_allocations[model_capacity]) {
+
+	// Find infantry-buildable capturable
+	tile_t capturable = 0;
+	while (capturable < capturable_capacity &&
+		buildable_models[capturable] == 0 &&
+		buildable_models[capturable] > 0) {
+
+		++capturable;
+	}
+	assert (capturable < capturable_capacity);
+
+	// Populate build_allocations
+	const tile_wide_t budget_allocatable = budget / models_cost[0];
+	const tile_wide_t capturable_allocatable = capturables[capturable];
+
+	if (budget_allocatable < capturable_allocatable)
+		build_allocations[0] = budget_allocatable;
+	else
+		build_allocations[0] = capturable_allocatable;
+}
+
 static void build_units(struct game* const game) {
+	if (capturable_capacity == 0)
+		return;
+
+	// Prepare build allocation decision structures
 	health_wide_t friendly_distribution[model_capacity] = {0};
 	health_wide_t enemy_distribution[model_capacity] = {0};
 	populate_distributions(game, friendly_distribution, enemy_distribution);
@@ -440,15 +478,23 @@ static void build_units(struct game* const game) {
 	populate_capturables(game, capturables);
 	tile_wide_t build_allocations[model_capacity] = {0};
 
-	optimise_build_allocations(
-		friendly_distribution,
-		enemy_distribution,
-		capturables,
-		game->golds[game->turn],
-		build_allocations,
-		&game->list.nodes);
+	// Perform build allocation decision
+	if (is_nonzero_capturables(capturables))
+		optimise_build_allocations(
+			friendly_distribution,
+			enemy_distribution,
+			capturables,
+			game->golds[game->turn],
+			build_allocations,
+			&game->list.nodes);
+	else
+		default_build_allocations(
+			capturables,
+			game->golds[game->turn],
+			build_allocations);
 
 	// TODO: build units with build_allocation
+	// realise_build_allocations(game, capturables);
 }
 
 void bot_play(struct game* const game) {
