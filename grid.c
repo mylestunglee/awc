@@ -192,7 +192,6 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 
 		game->energies[node.y][node.x] = node.energy;
 
-
 		// Mark unit-free tiles as accessible but ships cannot block bridges
 		if ((node_unit_index == null_unit || node_unit_index == cursor_unit_index) &&
 			(tile != tile_bridge || movement_type != movement_type_ship)) {
