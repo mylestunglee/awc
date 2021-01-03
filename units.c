@@ -9,7 +9,7 @@ void units_initialise(struct units* const units) {
 	units->size = 0;
 	// Setup indices
 	for (unit_t i = 0; i < units_capacity; ++i)
-		units->frees[i] = i;
+		units->frees[i] = (i + 1) % units_capacity;
 
 	for (player_t i = 0; i < players_capacity; ++i)
 		units->firsts[i] = null_unit;
@@ -30,10 +30,10 @@ static unit_t units_frees_insert(struct units* const units, const struct unit* c
 		return null_unit;
 
 	const unit_t index = units->start;
-	units->data[index] = *unit;
-	units->start = (units->start + 1) % units_capacity;
+	units->start = units->frees[units->start];
+	units->frees[index] = null_unit;
 	++units->size;
-
+	units->data[index] = *unit;
 	return index;
 }
 
@@ -72,8 +72,10 @@ bool units_insert(struct units* const units, const struct unit unit) {
 
 static void units_frees_delete(struct units* const units, const unit_t index) {
 	assert(units->size > 0);
+	assert(units->frees[index] == null_unit);
 
-	units->frees[(units_capacity + units->start - units->size) % units_capacity] = index;
+	units->frees[index] = units->start;
+	units->start = index;
 	--units->size;
 }
 
