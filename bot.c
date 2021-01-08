@@ -130,7 +130,7 @@ static void update_max_energy(
 }
 
 static bool is_enemy(const struct game* const game, const player_t player) {
-	return bitmatrix_get(game->alliances, game->turn, player);
+	return !bitmatrix_get(game->alliances, game->turn, player);
 }
 
 static energy_t find_nearest_capturable(
@@ -532,7 +532,7 @@ static void build_units(struct game* const game) {
 			game->golds[game->turn],
 			build_allocations);
 
-	realise_build_allocations(game, capturables);
+	realise_build_allocations(game, build_allocations);
 }
 
 void bot_play(struct game* const game) {

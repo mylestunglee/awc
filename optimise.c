@@ -281,7 +281,7 @@ static void populate_build_allocations(
 		for (model_t n = 0; n < model_capacity; ++n)
 			build_allocation[m] += glp_mip_col_val(
 				problem,
-					1 + n + m * model_capacity + model_capacity * model_capacity);
+				1 + n + m * model_capacity + model_capacity * model_capacity);
 }
 
 static int solve(glp_prob* const problem) {
@@ -297,7 +297,7 @@ void optimise_build_allocations(
 	const health_wide_t enemy_distribution[model_capacity],
 	const tile_wide_t capturables[capturable_capacity],
 	const gold_t budget,
-	tile_wide_t build_allocation[model_capacity],
+	tile_wide_t build_allocations[model_capacity],
 	void* const workspace) {
 
 	glp_prob* const problem = glp_create_prob();
@@ -308,9 +308,8 @@ void optimise_build_allocations(
 	populate_coefficients(problem, friendly_distribution, enemy_distribution, workspace);
 
 	const int error = solve(problem);
-
-	if (!error)
-		populate_build_allocations(problem, build_allocation);
+	assert (!error);
+	populate_build_allocations(problem, build_allocations);
 
 	glp_delete_prob(problem);
 }
