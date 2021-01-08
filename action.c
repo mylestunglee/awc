@@ -84,7 +84,7 @@ void action_attack(struct game* const game) {
 	game_simulate_attack(game, &damage, &counter_damage);
 
 	// Apply damage
-	if (damage > attackee->health) {
+	if (damage >= attackee->health) {
 		units_delete(&game->units, attackee_index);
 		return;
 	}
@@ -96,7 +96,7 @@ void action_attack(struct game* const game) {
 		return;
 
 	// Apply counter damage
-	if (counter_damage > attacker->health) {
+	if (counter_damage >= attacker->health) {
 		units_delete(&game->units, game->selected);
 		return;
 	}

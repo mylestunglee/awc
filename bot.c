@@ -129,8 +129,8 @@ static void update_max_energy(
 	*update_y = y;
 }
 
-static bool is_enemy(const struct game* const game, const player_t player) {
-	return !bitmatrix_get(game->alliances, game->turn, player);
+static bool is_friendly(const struct game* const game, const player_t player) {
+	return bitmatrix_get(game->alliances, game->turn, player);
 }
 
 static energy_t find_nearest_capturable(
@@ -148,7 +148,7 @@ static energy_t find_nearest_capturable(
 			if (game->map[y][x] < terrian_capacity)
 				continue;
 
-			if (is_enemy(game, game->territory[y][x]))
+			if (is_friendly(game, game->territory[y][x]))
 				continue;
 
 			update_max_energy(game, x, y, &max_energy, nearest_x, nearest_y);
@@ -259,7 +259,7 @@ static energy_t find_nearest_attackee_target(
 
 	for (player_t player = 0; player < players_capacity; ++player) {
 
-		if (is_enemy(game, player))
+		if (is_friendly(game, player))
 			continue;
 
 		unit_t curr = game->units.firsts[player];
@@ -267,25 +267,24 @@ static energy_t find_nearest_attackee_target(
 			const struct unit* const attackee = &game->units.data[curr];
 
 			// Attackee is attackable
-			if (units_damage[attacker->model][attackee->model] == 0)
-				continue;
-
-			// If attacker is ranged
-			if (models_min_range[attacker->model])
-				find_nearest_attackee_target_ranged(
-					game,
-					attacker,
-					attackee,
-					&max_energy,
-					nearest_x,
-					nearest_y);
-			else
-				find_nearest_attackee_target_direct(
-					game,
-					attackee,
-					&max_energy,
-					nearest_x,
-					nearest_y);
+			if (units_damage[attacker->model][attackee->model] > 0) {
+				// If attacker is ranged
+				if (models_min_range[attacker->model])
+					find_nearest_attackee_target_ranged(
+						game,
+						attacker,
+						attackee,
+						&max_energy,
+						nearest_x,
+						nearest_y);
+				else
+					find_nearest_attackee_target_direct(
+						game,
+						attackee,
+						&max_energy,
+						nearest_x,
+						nearest_y);
+			}
 
 			curr = game->units.nexts[curr];
 		}
@@ -413,12 +412,21 @@ static void populate_distributions(
 	health_wide_t enemy_distribution[model_capacity]) {
 
 	for (player_t player = 0; player < players_capacity; ++player) {
-		if (is_enemy(game, player))
-			accumulate_distribution(game, player, enemy_distribution);
-		else
+		if (is_friendly(game, player))
 			accumulate_distribution(game, player, friendly_distribution);
+		else
+			accumulate_distribution(game, player, enemy_distribution);
 	}
 }
+
+static bool is_nonzero_distribution(const health_wide_t distribution[model_capacity]) {
+	for (model_t model = 0; model < model_capacity; ++model)
+		if (distribution[model])
+			return true;
+
+	return false;
+}
+
 
 static void populate_capturables(
 	const struct game* const game,
@@ -437,14 +445,6 @@ static void populate_capturables(
 	} while (++y);
 }
 
-static bool is_nonzero_capturables(const tile_wide_t capturables[capturable_capacity]) {
-	for (tile_t capturable = 0; capturable < capturable_capacity; ++capturable)
-		if (capturables[capturable])
-			return true;
-
-	return false;
-}
-
 // Maximise infantry build allocations
 static void default_build_allocations(
 	const tile_wide_t capturables[capturable_capacity],
@@ -454,8 +454,7 @@ static void default_build_allocations(
 	// Find infantry-buildable capturable
 	tile_t capturable = 0;
 	while (capturable < capturable_capacity &&
-		buildable_models[capturable] == 0 &&
-		buildable_models[capturable] > 0) {
+		buildable_models[capturable + 1] == 0) {
 
 		++capturable;
 	}
@@ -518,7 +517,7 @@ static void build_units(struct game* const game) {
 	tile_wide_t build_allocations[model_capacity] = {0};
 
 	// Perform build allocation decision
-	if (is_nonzero_capturables(capturables))
+	if (is_nonzero_distribution(enemy_distribution))
 		optimise_build_allocations(
 			friendly_distribution,
 			enemy_distribution,
