@@ -238,7 +238,7 @@ static void repair_units(struct game* const game)
 			if (unit->health >= health_max - heal)
 				heal = health_max - unit->health;
 
-			unit->health += heal_rate;
+			unit->health += heal;
 			game->golds[game->turn] -= (models_cost[unit->model] * gold_scale * (gold_t)heal) / (gold_t)health_max;
 		}
 

@@ -372,6 +372,10 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
 
 static void interact_unit(struct game* const game, struct unit* const unit) {
 	assert (game->turn == unit->player);
+
+	if (!unit->enabled)
+		return;
+
 	game->selected = game->units.grid[unit->y][unit->x];
 	handle_local(game, unit);
 
