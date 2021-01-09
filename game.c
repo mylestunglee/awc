@@ -230,15 +230,16 @@ static void repair_units(struct game* const game)
 	unit_t curr = game->units.firsts[game->turn];
 	while (curr != null_unit) {
 		struct unit* const unit = &game->units.data[curr];
-		if (game->territory[unit->y][unit->x] == game->turn &&
-			unit->health < health_max) {
+		if (game->territory[unit->y][unit->x] == game->turn && unit->health < health_max) {
+
+			health_t heal = heal_rate;
+
 			// Cap heal at maximum health
-			if (unit->health >= health_max - heal_rate)
-				unit->health = health_max;
-			else
-				unit->health += heal_rate;
-			// Deduct heal cost
-			game->golds[game->turn] -= models_cost[unit->model];
+			if (unit->health >= health_max - heal)
+				heal = health_max - unit->health;
+
+			unit->health += heal_rate;
+			game->golds[game->turn] -= (models_cost[unit->model] * gold_scale * (gold_t)heal) / (gold_t)health_max;
 		}
 
 		curr = game->units.nexts[curr];
@@ -263,6 +264,14 @@ static void start_turn(struct game* const game) {
 	units_set_enabled(&game->units, game->turn, true);
 	game->golds[game->turn] += gold_scale * game->incomes[game->turn];
 	repair_units(game);
+
+	// Select a unit
+	const unit_t unit = game->units.firsts[game->turn];
+	if (unit == null_unit)
+		return;
+
+	game->x = game->units.data[unit].x;
+	game->y = game->units.data[unit].y;
 }
 
 static bool is_bot(const struct game* const game, const player_t player) {

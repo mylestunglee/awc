@@ -31,7 +31,7 @@ typedef int32_t gold_t;
 #define null_unit units_capacity
 #define players_capacity 5
 #define null_player players_capacity
-#define heal_rate (health_t)16
+#define heal_rate (health_t)51
 #define defense_max (health_wide_t)10
 #define attack_max (health_wide_t)100
 
