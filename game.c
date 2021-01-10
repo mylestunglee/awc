@@ -30,9 +30,65 @@ static void game_preload(struct game* const game) {
 	bitarray_clear(game->alliances, sizeof(game->alliances));
 }
 
+static bool game_build_enabled(const struct game* const game) {
+	// The state is build enabled iff:
+	// 1. The player owns the selected capturable
+	// 2. There is no unit on the tile
+	// 3. The capturable has buildable units
+	// 4. No unit is selected
+
+	if (game->territory[game->y][game->x] != game->turn)
+		return false;
+
+	const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
+
+	return
+		game->units.grid[game->y][game->x] == null_unit &&
+		buildable_models[capturable] < buildable_models[capturable + 1] &&
+		game->selected == null_unit;
+}
+
+static void move_cursor_to_interactable(struct game* const game) {
+	// Attempt to select a unit
+	const unit_t unit = game->units.firsts[game->turn];
+
+	if (unit != null_unit) {
+		game->x = game->units.data[unit].x;
+		game->y = game->units.data[unit].y;
+		return;
+	}
+
+	// Attempt to select a buildable
+	bool hq_found = false;
+	grid_t hq_x, hq_y;
+
+	game->y = 0;
+	do {
+		do {
+			if (game_build_enabled(game))
+				return;
+
+			if (game->map[game->y][game->x] == tile_HQ && game->territory[game->y][game->x] == game->turn) {
+				hq_found = true;
+				hq_x = game->x;
+				hq_y = game->y;
+			}
+		} while (++game->x);
+	} while (++game->y);
+
+	// Attempt to select a HQ
+	if (hq_found) {
+		game->x = hq_x;
+		game->y = hq_y;
+	}
+
+	// game->x, game->y undefined when no interactable
+}
+
 static void game_postload(struct game* const game) {
 	grid_correct_map(game->territory, game->map);
 	grid_compute_incomes(game->territory, game->incomes);
+	move_cursor_to_interactable(game);
 }
 
 bool game_load(struct game* const game, const char* const filename) {
@@ -105,24 +161,6 @@ static bool game_parse_file(struct game* const game, const char input) {
 		printf("IO error");
 
 	return true;
-}
-
-static bool game_build_enabled(const struct game* const game) {
-	// The state is build enabled iff:
-	// 1. The player owns the selected capturable
-	// 2. There is no unit on the tile
-	// 3. The capturable has buildable units
-	// 4. No unit is selected
-
-	if (game->territory[game->y][game->x] != game->turn)
-		return false;
-
-	const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
-
-	return
-		game->units.grid[game->y][game->x] == null_unit &&
-		buildable_models[capturable] < buildable_models[capturable + 1] &&
-		game->selected == null_unit;
 }
 
 static bool game_attack_enabled(const struct game* const game) {
@@ -264,14 +302,6 @@ static void start_turn(struct game* const game) {
 	units_set_enabled(&game->units, game->turn, true);
 	game->golds[game->turn] += gold_scale * game->incomes[game->turn];
 	repair_units(game);
-
-	// Select a unit
-	const unit_t unit = game->units.firsts[game->turn];
-	if (unit == null_unit)
-		return;
-
-	game->x = game->units.data[unit].x;
-	game->y = game->units.data[unit].y;
 }
 
 static bool is_bot(const struct game* const game, const player_t player) {
@@ -304,6 +334,8 @@ static void next_turn(struct game* const game) {
 		next_alive_turn(game);
 		start_turn(game);
 	} while (exists_alive_non_bot(game) && is_bot(game, game->turn));
+
+	move_cursor_to_interactable(game);
 }
 
 static void print_normal_text(const struct game* const game) {
@@ -367,7 +399,6 @@ void game_loop(struct game* const game) {
 		// Compute possible actions
 		attack_enabled = game_attack_enabled(game);
 		build_enabled = game_build_enabled(game);
-
 
 		// Switch 0-9 keys between building and save/loading states
 		if (build_enabled) {
