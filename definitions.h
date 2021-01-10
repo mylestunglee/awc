@@ -183,7 +183,7 @@ const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 
 const static gold_t models_cost[model_capacity] = {1, 3, 4, 7, 16, 6, 15, 8, 12, 9, 22, 20, 20, 18, 28};
 const static model_t buildable_models[capturable_capacity + 1] = {0, 0, 9, 12, model_capacity, model_capacity};
 
-#define gold_scale 10
+#define gold_scale 1000
 #define bitarray_size(bits) (bits + 7) / 8
 
 #endif
