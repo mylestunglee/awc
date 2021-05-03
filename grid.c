@@ -162,7 +162,8 @@ static void explore_node(
 	if (node->energy < cost)
 		return;
 
-	// Cannot pass through enemy units
+	// If friendly_passable, then cannot pass through enemy units
+	// If not friendly_passable, then cannot pass through non-self units
 	// cursor_unit->player may not be equals to game->turn because the inspected unit
 	// may not be ours
 	const unit_t node_unit_index = game->units.grid[node->y][node->x];
@@ -172,7 +173,8 @@ static void explore_node(
 		cursor_unit->player,
 		node_unit_player);
 
-	if (node_unit_index != null_unit && !(friendly_passable && friendly_node_unit))
+	if (node_unit_index != null_unit && node_unit_index != cursor_unit_index &&
+		!(friendly_passable && friendly_node_unit))
 		return;
 
 	const energy_t energy = node->energy - cost;
