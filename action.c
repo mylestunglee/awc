@@ -7,6 +7,9 @@
 static void action_capture(struct game* const game) {
 	const player_t loser = game->territory[game->y][game->x];
 
+	// Cannot recapture friendly capturable
+	assert(loser != game->turn);
+
 	// If the enemy loses their HQ
 	if (game->map[game->y][game->x] == tile_HQ) {
 		assert(loser != null_player);
@@ -29,11 +32,8 @@ static void action_capture(struct game* const game) {
 	} else if (loser != null_player)
 		--game->incomes[loser];
 
-	// Reveal does not need to be set because a unit is assumed to be capturing locally
-	if (loser != game->turn) {
-		game->territory[game->y][game->x] = game->turn;
-		++game->incomes[game->turn];
-	}
+	game->territory[game->y][game->x] = game->turn;
+	++game->incomes[game->turn];
 }
 
 void action_handle_capture(struct game* const game)
