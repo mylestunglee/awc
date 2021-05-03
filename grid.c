@@ -137,12 +137,12 @@ static void grid_explore_mark_attackable_ranged(
 
 
 // Recursively marks tiles that are accessible or attackable from the cursor tile
-void grid_explore(struct game* const game, const bool label_attackable_tiles) {
-	grid_explore_recursive(game, label_attackable_tiles, 1);
+void grid_explore(struct game* const game, const bool label_attackable_tiles, const bool friendly_passable) {
+	grid_explore_recursive(game, label_attackable_tiles, friendly_passable, 1);
 }
 
 // Use scalar > 1 when looking ahead multiple turns
-void grid_explore_recursive(struct game* const game, const bool label_attackable_tiles, const energy_t scalar) {
+void grid_explore_recursive(struct game* const game, const bool label_attackable_tiles, const bool friendly_passable, const energy_t scalar) {
 	struct list* const list = &game->list;
 
 	assert (list_empty(list));
@@ -178,10 +178,15 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 		if (node.energy < cost)
 			continue;
 
-		// TODO: enable pass through friendly units
-		// Cannot pass through units
+		// Cannot pass through enemy units
 		const unit_t node_unit_index = game->units.grid[node.y][node.x];
-		if (node_unit_index != null_unit && !(node.x == game->x && node.y == game->y))
+		const player_t node_unit_player = game->units.data[node_unit_index].player;
+		const bool friendly_node_unit = bitmatrix_get(
+			game->alliances,
+			game->turn,
+			node_unit_player);
+
+		if (node_unit_index != null_unit && !(friendly_passable && friendly_node_unit))
 			continue;
 
 		const energy_t energy = node.energy - cost;
@@ -193,8 +198,8 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 		game->energies[node.y][node.x] = node.energy;
 
 		// Mark unit-free tiles as accessible but ships cannot block bridges
-		if ((node_unit_index == null_unit || node_unit_index == cursor_unit_index) &&
-			(tile != tile_bridge || movement_type != movement_type_ship)) {
+		if (node_unit_index == null_unit &&
+			!(tile == tile_bridge && movement_type == movement_type_ship)) {
 
 			game->labels[node.y][node.x] |= accessible_bit;
 			grid_explore_mark_attackable_direct(game, node.x, node.y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);

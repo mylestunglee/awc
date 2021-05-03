@@ -191,7 +191,7 @@ static void handle_local(struct game* const game, struct unit* const unit) {
 	game->y = unit->y;
 
 	// Scan for local targets
-	grid_explore(game, false);
+	grid_explore(game, false, true);
 	handle_attack(game, unit);
 
 	if (unit->enabled)
@@ -345,6 +345,8 @@ static void move_towards_target(
 		y = node.y;
 	}
 
+	assert(accessible_bit & game->labels[y][x]);
+
 	list_initialise(list);
 	units_move(&game->units, game->units.grid[unit->y][unit->x], x, y);
 	unit->enabled = false;
@@ -359,7 +361,7 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
 	assert(game->y == unit->y);
 
 	// label_attackable_tiles argument=false is unimportant because attack_bit is unread
-	grid_explore_recursive(game, false, look_ahead);
+	grid_explore_recursive(game, false, false, look_ahead);
 	grid_t x, y;
 	bool found = find_nearest_target(game, unit, &x, &y);
 
