@@ -141,6 +141,64 @@ void grid_explore(struct game* const game, const bool label_attackable_tiles, co
 	grid_explore_recursive(game, label_attackable_tiles, friendly_passable, 1);
 }
 
+static void explore_node(
+		struct game* const game,
+		const struct list_node* const node,
+		const bool label_attackable_tiles,
+		const bool friendly_passable)
+{
+	const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
+	const struct unit* const cursor_unit = &game->units.data[cursor_unit_index];
+	const uint8_t movement_type = unit_movement_types[cursor_unit->model];
+
+	const tile_t tile = game->map[node->y][node->x];
+	const energy_t cost = movement_type_cost[movement_type][tile];
+
+	// Inaccessible terrian
+	if (cost == 0)
+		return;
+
+	// Not enough energy to keep moving
+	if (node->energy < cost)
+		return;
+
+	// Cannot pass through enemy units
+	// cursor_unit->player may not be equals to game->turn because the inspected unit
+	// may not be ours
+	const unit_t node_unit_index = game->units.grid[node->y][node->x];
+	const player_t node_unit_player = game->units.data[node_unit_index].player;
+	const bool friendly_node_unit = bitmatrix_get(
+		game->alliances,
+		cursor_unit->player,
+		node_unit_player);
+
+	if (node_unit_index != null_unit && !(friendly_passable && friendly_node_unit))
+		return;
+
+	const energy_t energy = node->energy - cost;
+
+	// Do not re-compute explored areas
+	if (game->energies[node->y][node->x] > energy)
+		return;
+
+	game->energies[node->y][node->x] = node->energy;
+
+	// Mark unit-free tiles as accessible but ships cannot block bridges
+	if (node_unit_index == null_unit &&
+		!(tile == tile_bridge && movement_type == movement_type_ship)) {
+
+		game->labels[node->y][node->x] |= accessible_bit;
+		grid_explore_mark_attackable_direct(game, node->x, node->y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);
+	}
+
+	// Explore adjacent tiles
+	struct list* const list = &game->list;
+	list_insert(list, (struct list_node){.x = node->x + 1, .y = node->y, .energy = energy});
+	list_insert(list, (struct list_node){.x = node->x - 1, .y = node->y, .energy = energy});
+	list_insert(list, (struct list_node){.x = node->x, .y = node->y + 1, .energy = energy});
+	list_insert(list, (struct list_node){.x = node->x, .y = node->y - 1, .energy = energy});
+}
+
 // Use scalar > 1 when looking ahead multiple turns
 void grid_explore_recursive(struct game* const game, const bool label_attackable_tiles, const bool friendly_passable, const energy_t scalar) {
 	struct list* const list = &game->list;
@@ -167,49 +225,7 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 
 	while (!list_empty(list)) {
 		const struct list_node node = list_front_pop(list);
-		const tile_t tile = game->map[node.y][node.x];
-		const energy_t cost = movement_type_cost[movement_type][tile];
-
-		// Inaccessible terrian
-		if (cost == 0)
-			continue;
-
-		// Not enough energy to keep moving
-		if (node.energy < cost)
-			continue;
-
-		// Cannot pass through enemy units
-		const unit_t node_unit_index = game->units.grid[node.y][node.x];
-		const player_t node_unit_player = game->units.data[node_unit_index].player;
-		const bool friendly_node_unit = bitmatrix_get(
-			game->alliances,
-			game->turn,
-			node_unit_player);
-
-		if (node_unit_index != null_unit && !(friendly_passable && friendly_node_unit))
-			continue;
-
-		const energy_t energy = node.energy - cost;
-
-		// Do not re-compute explored areas
-		if (game->energies[node.y][node.x] > energy)
-			continue;
-
-		game->energies[node.y][node.x] = node.energy;
-
-		// Mark unit-free tiles as accessible but ships cannot block bridges
-		if (node_unit_index == null_unit &&
-			!(tile == tile_bridge && movement_type == movement_type_ship)) {
-
-			game->labels[node.y][node.x] |= accessible_bit;
-			grid_explore_mark_attackable_direct(game, node.x, node.y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);
-		}
-
-		// Explore adjacent tiles
-		list_insert(list, (struct list_node){.x = node.x + 1, .y = node.y, .energy = energy});
-		list_insert(list, (struct list_node){.x = node.x - 1, .y = node.y, .energy = energy});
-		list_insert(list, (struct list_node){.x = node.x, .y = node.y + 1, .energy = energy});
-		list_insert(list, (struct list_node){.x = node.x, .y = node.y - 1, .energy = energy});
+		explore_node(game, &node, label_attackable_tiles, friendly_passable);
 	}
 
 	// Allow stuck units to wait
