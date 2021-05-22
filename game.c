@@ -233,14 +233,12 @@ static void game_handle_action(struct game* const game) {
 	// Select unit iff:
 	// 1. A unit is not already selected
 	// 2. The unit is enabled
-	// 3. The unit has possible moves
 	if (game->selected == null_unit && unit != null_unit) {
 		const bool select = game->units.data[unit].enabled;
 
 		// Remove highlighting of disabled units
-		if (select) {
+		if (select)
 			grid_clear_uint8(game->labels);
-		}
 
 		// Allow highlighting of disabled units
 		grid_explore(game, !select, true);
