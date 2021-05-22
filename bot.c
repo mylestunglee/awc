@@ -47,7 +47,6 @@ static void handle_ranged_attack(
 	game->x = attackee->x;
 	game->y = attackee->y;
 	action_attack(game);
-	attacker->enabled = false;
 }
 
 static void handle_direct_attack(

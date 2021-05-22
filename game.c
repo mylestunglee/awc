@@ -151,6 +151,11 @@ static unit_t suggest_next_unit(struct game* const game, const unit_t hint) {
 	}
 }
 
+static void reset_selection(struct game* const game) {
+	game->selected = null_unit;
+	grid_clear_uint8(game->labels);
+}
+
 // Selects the next enabled unit of the current turn, returns true iff unit was selected
 static bool select_next_unit(struct game* const game) {
 	const struct units* units = &game->units;
@@ -169,15 +174,25 @@ static bool select_next_unit(struct game* const game) {
 	const struct unit* const next_unit = &game->units.data[next_unit_index];
 	game->x = next_unit->x;
 	game->y = next_unit->y;
-
-	game->selected = null_unit;
-	grid_clear_uint8(game->labels);
+	reset_selection(game);
 
 	return true;
 }
 
 static bool parse_select_next_unit(struct game* const game, const char input) {
 	return input == 'm' && select_next_unit(game);
+}
+
+static bool parse_self_distruct_unit(struct game* const game, const char input) {
+	if (input != 'k')
+		return false;
+
+	if (game->selected == null_unit)
+		return false;
+
+	units_delete(&game->units, game->selected);
+	reset_selection(game);
+	return true;
 }
 
 // Build try to build a unit, assume build enabled
@@ -256,8 +271,7 @@ static void game_handle_action(struct game* const game) {
 			game->units.data[game->selected].enabled = false;
 		}
 
-		game->selected = null_unit;
-		grid_clear_uint8(game->labels);
+		reset_selection(game);
 	}
 }
 
@@ -305,10 +319,7 @@ void game_simulate_attack(
 
 static void game_attack(struct game* const game) {
 	action_attack(game);
-
-        game->units.data[game->selected].enabled = false;
-	game->selected = null_unit;
-	grid_clear_uint8(game->labels);
+	reset_selection(game);
 }
 
 static void repair_units(struct game* const game)
@@ -341,8 +352,7 @@ static bool is_alive(const struct game* const game, const player_t player) {
 }
 
 static void end_turn(struct game* const game) {
-	game->selected = null_unit;
-	grid_clear_uint8(game->labels);
+	reset_selection(game);
 	units_set_enabled(&game->units, game->turn, false);
 }
 
@@ -445,6 +455,9 @@ void game_loop(struct game* const game) {
 			continue;
 
 		if (parse_select_next_unit(game, input))
+			continue;
+
+		if (parse_self_distruct_unit(game, input))
 			continue;
 
 		// Compute possible actions

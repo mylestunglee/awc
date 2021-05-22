@@ -73,6 +73,7 @@ void action_attack(struct game* const game) {
 	struct unit* const attacker = &game->units.data[game->selected];
 	const unit_t attackee_index = game->units.grid[game->y][game->x];
 	struct unit* const attackee = &game->units.data[attackee_index];
+	assert(attacker->enabled);
 
 	// If unit is direct, move to attack
 	const bool ranged = models_min_range[attacker->model];
@@ -102,6 +103,7 @@ void action_attack(struct game* const game) {
 	}
 
 	attacker->health -= counter_damage;
+	attacker->enabled = false;
 }
 
 // Build unit at (game->x, game->y), returns true iff build is successful
