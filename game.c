@@ -98,7 +98,7 @@ bool game_load(struct game* const game, const char* const filename) {
 	return error;
 }
 
-static bool game_parse_movement(struct game* const game, const char input) {
+static bool parse_panning(struct game* const game, const char input) {
 	switch (input) {
 		case 'w': {
 			game->prev_x = game->x;
@@ -128,8 +128,60 @@ static bool game_parse_movement(struct game* const game, const char input) {
 	return false;
 }
 
+// Returns the unit index of the cyclic next unit of the same player
+// If no unit can be suggested, null_player is returned
+static unit_t suggest_next_unit(struct game* const game, const unit_t hint) {
+	const struct units* units = &game->units;
+	unit_t next_unit = hint;
+	if (hint == null_unit)
+		next_unit = units->firsts[game->turn];
+
+	while (true) {
+		if (units->data[next_unit].enabled)
+			return next_unit;
+		next_unit = units->nexts[next_unit];
+		if (next_unit == null_unit) {
+			if (hint == null_unit)
+				return null_unit;
+			else
+				next_unit = units->firsts[game->turn];
+		}
+		if (next_unit == hint)
+			return null_unit;
+	}
+}
+
+// Selects the next enabled unit of the current turn, returns true iff unit was selected
+static bool select_next_unit(struct game* const game) {
+	const struct units* units = &game->units;
+	const unit_t cursor_unit = units->grid[game->y][game->x];
+	unit_t next_unit_index;
+	if (cursor_unit != null_unit &&
+		units->data[cursor_unit].player == game->turn &&
+		units->data[cursor_unit].enabled)
+		next_unit_index = suggest_next_unit(game, units->nexts[cursor_unit]);
+	else
+		next_unit_index = suggest_next_unit(game, null_unit);
+
+	if (next_unit_index == null_unit || next_unit_index == game->selected)
+		return false;
+
+	const struct unit* const next_unit = &game->units.data[next_unit_index];
+	game->x = next_unit->x;
+	game->y = next_unit->y;
+
+	game->selected = null_unit;
+	grid_clear_uint8(game->labels);
+
+	return true;
+}
+
+static bool parse_select_next_unit(struct game* const game, const char input) {
+	return input == 'm' && select_next_unit(game);
+}
+
 // Build try to build a unit, assume build enabled
-static bool game_parse_build(struct game* const game, const char input) {
+static bool parse_build(struct game* const game, const char input) {
 	const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
 	const model_t value = input - '1';
 
@@ -139,7 +191,7 @@ static bool game_parse_build(struct game* const game, const char input) {
 	return !action_build(game, value + buildable_models[capturable]);
 }
 
-static bool game_parse_file(struct game* const game, const char input) {
+static bool parse_file(struct game* const game, const char input) {
 	bool error;
 
 	switch (input) {
@@ -198,10 +250,8 @@ static void game_handle_action(struct game* const game) {
 			game->selected = unit;
 	} else {
 		// Move to accessible tile when cursor is not over unit
-		if (game->selected != unit &&
+		if (game->selected != null_unit &&
 			game->labels[game->y][game->x] & accessible_bit) {
-
-			assert(game->selected != null_unit);
 
 			units_move(&game->units, game->selected, game->x, game->y);
 			action_handle_capture(game);
@@ -388,13 +438,16 @@ void game_loop(struct game* const game) {
 		render(game, attack_enabled, build_enabled);
 		print_text(game, attack_enabled, build_enabled);
 
-		char input = getch();
+		const char input = getch();
 
 		if (input == '\n' || input == 'q')
 			break;
 
-		// Fix case skipping
-		game_parse_movement(game, input);
+		if (parse_panning(game, input))
+			continue;
+
+		if (parse_select_next_unit(game, input))
+			continue;
 
 		// Compute possible actions
 		attack_enabled = game_attack_enabled(game);
@@ -405,10 +458,10 @@ void game_loop(struct game* const game) {
 			// Assume tile to be capturable
 			assert(game->map[game->y][game->x] >= terrian_capacity);
 
-			if (game_parse_build(game, input))
+			if (parse_build(game, input))
 				build_enabled = false;
 		} else
-			game_parse_file(game, input);
+			parse_file(game, input);
 
 		if (input == ' ') {
 			if (attack_enabled) {
