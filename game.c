@@ -244,7 +244,7 @@ static bool calc_attack_enabled(const struct game* const game) {
 		game->labels[game->y][game->x] & attackable_bit;
 }
 
-static void game_handle_action(struct game* const game) {
+static void handle_unit_selection(struct game* const game) {
 	const unit_t unit = game->units.grid[game->y][game->x];
 
 	// Select unit iff:
@@ -473,6 +473,11 @@ void game_loop(struct game* const game) {
 		if (input == 'q')
 			break;
 
+		if (input == 'n') {
+			next_turn(game);
+			continue;
+		}
+
 		if (parse_panning(game, input))
 			continue;
 
@@ -492,12 +497,10 @@ void game_loop(struct game* const game) {
 			continue;
 
 		if (input == ' ') {
-			if (attack_enabled) {
+			if (attack_enabled)
 				game_attack(game);
-			} else
-				game_handle_action(game);
-		} else if (input == 'n') {
-			next_turn(game);
+			else
+				handle_unit_selection(game);
 		}
 	} while (true);
 
