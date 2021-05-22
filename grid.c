@@ -24,15 +24,19 @@ void grid_clear_territory(player_t territory[grid_size][grid_size]) {
 }
 
 void grid_clear_player_territory(
+	tile_t map[grid_size][grid_size],
 	player_t territory[grid_size][grid_size],
-	const player_t loser) {
+	const player_t player) {
 
 	grid_t y = 0;
 	do {
 		grid_t x = 0;
 		do
-			if (territory[y][x] == loser)
+			if (territory[y][x] == player) {
 				territory[y][x] = null_player;
+				if (map[y][x] == tile_HQ)
+					map[y][x] = tile_city;
+			}
 		while (++x);
 	} while (++y);
 }
@@ -46,14 +50,12 @@ void grid_correct_map(
 	do {
 		grid_t x = 0;
 		do {
-			if (territory[y][x] > players_capacity) {
+			if (territory[y][x] > players_capacity)
 				territory[y][x] = null_player;
-			}
-
-			if (territory[y][x] == null_player && map[y][x] == tile_HQ)
-				map[y][x] = tile_city;
 		} while (++x);
 	} while (++y);
+
+	grid_clear_player_territory(territory, map, null_player);
 }
 
 void grid_compute_incomes(player_t territory[grid_size][grid_size], gold_t incomes[players_capacity]) {

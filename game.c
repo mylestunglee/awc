@@ -30,7 +30,7 @@ static void game_preload(struct game* const game) {
 	bitarray_clear(game->alliances, sizeof(game->alliances));
 }
 
-static bool game_build_enabled(const struct game* const game) {
+static bool calc_build_enabled(const struct game* const game) {
 	// The state is build enabled iff:
 	// 1. The player owns the selected capturable
 	// 2. There is no unit on the tile
@@ -65,7 +65,7 @@ static void move_cursor_to_interactable(struct game* const game) {
 	game->y = 0;
 	do {
 		do {
-			if (game_build_enabled(game))
+			if (calc_build_enabled(game))
 				return;
 
 			if (game->map[game->y][game->x] == tile_HQ && game->territory[game->y][game->x] == game->turn) {
@@ -197,6 +197,8 @@ static bool parse_self_distruct_unit(struct game* const game, const char input) 
 
 // Build try to build a unit, assume build enabled
 static bool parse_build(struct game* const game, const char input) {
+	assert(game->map[game->y][game->x] >= terrian_capacity);
+
 	const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
 	const model_t value = input - '1';
 
@@ -230,7 +232,7 @@ static bool parse_file(struct game* const game, const char input) {
 	return true;
 }
 
-static bool game_attack_enabled(const struct game* const game) {
+static bool calc_attack_enabled(const struct game* const game) {
 	// The state is attack enabled iff:
 	// 1. A unit is selected
 	// 2. Previous selected tile is accessible if direct attack
@@ -396,6 +398,26 @@ static void next_turn(struct game* const game) {
 	move_cursor_to_interactable(game);
 }
 
+static bool at_least_two_alive_players(const struct game* const game) {
+	player_t alive_players = 0;
+	for (player_t player = 0; player < players_capacity; ++player)
+		if (is_alive(game, player))
+			++alive_players;
+	return alive_players >= 2;
+}
+
+static bool parse_surrender(struct game* const game, const char input) {
+	if (input != 'K')
+		return false;
+
+	if (!at_least_two_alive_players(game))
+		return false;
+
+	action_remove_player(game, game->turn);
+	next_turn(game);
+	return true;
+}
+
 static void print_normal_text(const struct game* const game) {
 	printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u", game->turn, game->x, game->y,
 		tile_names[game->map[game->y][game->x]],
@@ -439,8 +461,8 @@ static void print_text(
 
 void game_loop(struct game* const game) {
 	do {
-		bool attack_enabled = game_attack_enabled(game);
-		bool build_enabled = game_build_enabled(game);
+		const bool attack_enabled = calc_attack_enabled(game);
+		const bool build_enabled = calc_build_enabled(game);
 		assert(!(attack_enabled && build_enabled));
 
 		render(game, attack_enabled, build_enabled);
@@ -448,7 +470,7 @@ void game_loop(struct game* const game) {
 
 		const char input = getch();
 
-		if (input == '\n' || input == 'q')
+		if (input == 'q')
 			break;
 
 		if (parse_panning(game, input))
@@ -460,19 +482,14 @@ void game_loop(struct game* const game) {
 		if (parse_self_distruct_unit(game, input))
 			continue;
 
-		// Compute possible actions
-		attack_enabled = game_attack_enabled(game);
-		build_enabled = game_build_enabled(game);
+		if (parse_surrender(game, input))
+			continue;
 
-		// Switch 0-9 keys between building and save/loading states
-		if (build_enabled) {
-			// Assume tile to be capturable
-			assert(game->map[game->y][game->x] >= terrian_capacity);
+		if (build_enabled && parse_build(game, input))
+			continue;
 
-			if (parse_build(game, input))
-				build_enabled = false;
-		} else
-			parse_file(game, input);
+		if (parse_file(game, input))
+			continue;
 
 		if (input == ' ') {
 			if (attack_enabled) {

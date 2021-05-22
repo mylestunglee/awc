@@ -3,6 +3,13 @@
 #include "bitarray.h"
 #include <assert.h>
 
+void action_remove_player(struct game* const game, const player_t player) {
+	assert(player != null_player);
+	units_delete_player(&game->units, player);
+	grid_clear_player_territory(game->map, game->territory, player);
+	game->incomes[player] = 0;
+}
+
 // Occurs when unit captures enemy capturable
 static void action_capture(struct game* const game) {
 	const player_t loser = game->territory[game->y][game->x];
@@ -11,25 +18,9 @@ static void action_capture(struct game* const game) {
 	assert(loser != game->turn);
 
 	// If the enemy loses their HQ
-	if (game->map[game->y][game->x] == tile_HQ) {
-		assert(loser != null_player);
-		assert(loser != game->turn);
-
-		// Remove units
-		units_delete_player(&game->units, loser);
-
-		// HQ must be owned
-		assert(loser != null_player);
-		assert(loser != game->turn);
-
-		// Remove territory
-		grid_clear_player_territory(game->territory, loser);
-
-		// Change HQ into a city
-		game->map[game->y][game->x] = tile_city;
-
-		game->incomes[loser] = 0;
-	} else if (loser != null_player)
+	if (game->map[game->y][game->x] == tile_HQ)
+		action_remove_player(game, loser);
+	else if (loser != null_player)
 		--game->incomes[loser];
 
 	game->territory[game->y][game->x] = game->turn;
