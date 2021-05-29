@@ -24,7 +24,8 @@ void units_initialise(struct units* const units) {
 	} while (++y);
 }
 
-static unit_t units_frees_insert(struct units* const units, const struct unit* const unit) {
+static unit_t frees_insert(struct units* const units, const struct unit* const unit) {
+	assert (units->size <= units_capacity);
 	// Check space to insert unit
 	if (units->size == units_capacity)
 		return null_unit;
@@ -38,7 +39,7 @@ static unit_t units_frees_insert(struct units* const units, const struct unit* c
 }
 
 static unit_t units_players_insert(struct units* const units, const struct unit* const unit) {
-	unit_t index = units_frees_insert(units, unit);
+	unit_t index = frees_insert(units, unit);
 	// Propagate failure
 	if (index == null_unit)
 		return null_unit;
@@ -118,54 +119,6 @@ void units_move(struct units* const units, const unit_t unit, const grid_t x, co
 	units->data[unit].y = y;
 	units->grid[old_y][old_x] = null_unit;
 	units->grid[y][x] = unit;
-}
-
-// Prints queue of free indices
-void units_frees_print(const struct units* const units) {
-	assert(units_capacity > 0);
-
-	const unit_t verboseness = 3;
-
-	unit_t j = units->start;
-	for (unit_t i = 0; i < units_capacity - units->size; ++i) {
-		if (i < verboseness || i >= units_capacity - units->size - verboseness) {
-			printf(unit_format" ", units->frees[j]);
-		} else if (i == 3) {
-			printf("... ");
-		}
-
-		j = (j + 1) % units_capacity;
-	}
-	printf("\n");
-}
-
-// Print linked lists of index and unit type pairs across all players
-void units_players_print(const struct units* const units) {
-	for (player_t player = 0; player < players_capacity; ++player) {
-		unit_t curr = units->firsts[player];
-		printf(player_format": ["unit_format"]", player, curr);
-		while (curr != null_unit) {
-			const unit_t next = units->nexts[curr];
-			printf("->["unit_format": "unit_format" ("grid_format", "grid_format") "unit_format"]", curr, units->prevs[curr], units->data[curr].x, units->data[curr].y, next);
-			curr = next;
-		}
-		printf("\n");
-	}
-}
-
-// Prints mapping from grid to unit indices
-void units_grid_print(const struct units* const units) {
-	printf("{");
-	grid_t y = 0;
-	do {
-		grid_t x = 0;
-		do
-		{
-			if (units->grid[y][x] != null_unit)
-				printf("("grid_format", "grid_format"): "unit_format" ", x, y, units->grid[y][x]);
-		} while (++x);
-	} while (++y);
-	printf("}\n");
 }
 
 // Sets enabled property for each unit of a player
