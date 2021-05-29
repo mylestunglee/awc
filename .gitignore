@@ -1,8 +1,4 @@
-*
-!.gitignore
-!*.c
-!*.h
-!Makefile
-!maps
-!test/Makefile
-!test/*.cpp
+awc
+test/test
+*.o
+*.txt

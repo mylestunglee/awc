@@ -1,8 +1,6 @@
 #include <assert.h>
-#include <stdio.h>
 #include "units.h"
 
-// Time complexity: O(units_capacity + players_capacity + grid_size^2)
 void units_initialise(struct units* const units) {
 	// Set counters
 	units->start = 0;
@@ -24,7 +22,7 @@ void units_initialise(struct units* const units) {
 	} while (++y);
 }
 
-static unit_t frees_insert(struct units* const units, const struct unit* const unit) {
+static unit_t insert_with_frees(struct units* const units, const struct unit* const unit) {
 	assert (units->size <= units_capacity);
 	// Check space to insert unit
 	if (units->size == units_capacity)
@@ -38,8 +36,8 @@ static unit_t frees_insert(struct units* const units, const struct unit* const u
 	return index;
 }
 
-static unit_t units_players_insert(struct units* const units, const struct unit* const unit) {
-	unit_t index = frees_insert(units, unit);
+static unit_t insert_with_players(struct units* const units, const struct unit* const unit) {
+	unit_t index = insert_with_frees(units, unit);
 	// Propagate failure
 	if (index == null_unit)
 		return null_unit;
@@ -61,9 +59,9 @@ static unit_t units_players_insert(struct units* const units, const struct unit*
 bool units_insert(struct units* const units, const struct unit unit) {
 	assert(units->grid[unit.y][unit.x] == null_unit);
 
-	const unit_t index = units_players_insert(units, &unit);
+	const unit_t index = insert_with_players(units, &unit);
 
-	// units_players_insert may fail when units data structure is at capacity
+	// insert_with_players may fail when units data structure is at capacity
 	if (index == null_unit)
 		return true;
 
