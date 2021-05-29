@@ -69,7 +69,7 @@ bool units_insert(struct units* const units, const struct unit unit) {
 	return false;
 }
 
-static void units_frees_delete(struct units* const units, const unit_t index) {
+static void delete_with_frees(struct units* const units, const unit_t index) {
 	assert(units->size > 0);
 	assert(units->frees[index] == null_unit);
 
@@ -78,7 +78,7 @@ static void units_frees_delete(struct units* const units, const unit_t index) {
 	--units->size;
 }
 
-static void units_players_delete(struct units* const units, const unit_t index) {
+static void delete_with_players(struct units* const units, const unit_t index) {
 	const player_t player = units->data[index].player;
 
 	// Link firsts or prevs to skip over index
@@ -93,12 +93,12 @@ static void units_players_delete(struct units* const units, const unit_t index) 
 		units->prevs[units->nexts[index]] = units->prevs[index];
 	}
 
-	units_frees_delete(units, index);
+	delete_with_frees(units, index);
 }
 
 void units_delete(struct units* const units, const unit_t unit_index) {
 	assert(unit_index != null_unit);
-	units_players_delete(units, unit_index);
+	delete_with_players(units, unit_index);
 	const struct unit* const unit = &units->data[unit_index];
 	units->grid[unit->y][unit->x] = null_unit;
 }
