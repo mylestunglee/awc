@@ -6,7 +6,7 @@ LIBRARIES = -lglpk
 .PHONY: default all clean test
 
 default: $(TARGET)
-all: default
+all: default test
 
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
@@ -19,5 +19,9 @@ HEADERS = $(wildcard *.h)
 $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBRARIES) -o $@
 
+test:
+	$(MAKE) -C test test
+
 clean:
-	rm $(TARGET) $(OBJECTS)
+	rm -f $(TARGET) $(OBJECTS)
+	$(MAKE) -C test clean
