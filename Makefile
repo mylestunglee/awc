@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -g -Wall -pedantic
 LIBRARIES = -lglpk
 
-.PHONY: default all clean
+.PHONY: default all clean test
 
 default: $(TARGET)
 all: default
@@ -17,8 +17,7 @@ HEADERS = $(wildcard *.h)
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LIBRARIES) -Wall -o $@
+	$(CC) $(OBJECTS) $(LIBRARIES) -o $@
 
 clean:
-	-rm -f *.o
-	-rm -f $(TARGET)
+	rm $(TARGET) $(OBJECTS)

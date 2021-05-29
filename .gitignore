@@ -1,4 +1,8 @@
-*.swp
-*.o
-awc
-*.txt
+*
+!.gitignore
+!*.c
+!*.h
+!Makefile
+!maps
+!test/Makefile
+!test/*.cpp
