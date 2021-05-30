@@ -108,13 +108,14 @@ bool action_build(struct game* const game, const model_t model)
 	game->golds[game->turn] -= cost;
 
 	// Error may occur when units is full
-	const bool error = units_insert(&game->units, (struct unit){
+	const struct unit unit = {
 		.health = health_max,
 		.model = model,
 		.player = game->turn,
 		.x = game->x,
 		.y = game->y,
-		.enabled = false});
+		.enabled = false};
+	const bool error = units_insert(&game->units, unit);
 
 	return error;
 }

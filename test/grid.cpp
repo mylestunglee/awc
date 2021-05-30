@@ -1,7 +1,4 @@
-#include <gtest/gtest.h>
-#include "../grid.c"
-#include "../bitarray.c"
-#include "../list.c"
+#include "game_fixture.hpp"
 
 class grid_fixture : public ::testing::Test {
 protected:

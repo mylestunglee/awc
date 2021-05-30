@@ -61,8 +61,8 @@ static void handle_direct_attack(
 
 	const grid_t x = attackee->x;
 	const grid_t y = attackee->y;
-	const grid_t adjacent_x[] = {x + 1, x, x - 1, x};
-	const grid_t adjacent_y[] = {y, y - 1, y, y + 1};
+	const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
+	const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
 
 	// Each tile has four adjacent tiles
 	for (uint8_t i = 0; i < 4; ++i) {
@@ -234,8 +234,8 @@ static void find_nearest_attackee_target_direct(
 
 	const grid_t x = attackee->x;
 	const grid_t y = attackee->y;
-	const grid_t adjacent_x[] = {x + 1, x, x - 1, x};
-	const grid_t adjacent_y[] = {y, y - 1, y, y + 1};
+	const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
+	const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
 
 	for (uint8_t i = 0; i < 4; ++i)
 		update_max_energy(

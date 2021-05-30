@@ -48,25 +48,27 @@ static void file_load_bot(uint8_t* const bots, const char* const tokens) {
 static void file_load_unit(struct units* const units, const char* const tokens, const model_t model) {
 	grid_t x, y;
 	player_t player;
-	health_wide_t health;
+	health_t health;
 	char enabled[8];
 	if (sscanf(tokens,
 			player_format
 			grid_format
 			grid_format
-			health_wide_format
+			health_format
 			enabled_format,
 			&player, &x, &y, &health, enabled) != 5)
 		return;
 
-	if (player < players_capacity)
-		units_insert(units, (struct unit){
+	if (player < players_capacity) {
+		const struct unit unit = {
+			.health = health,
 			.model = model,
+			.player = player,
 			.x = x,
 			.y = y,
-			.health = health,
-			.player = player,
-			.enabled = !strcmp(enabled, "enabled")});
+			.enabled = !strcmp(enabled, "enabled")};
+		units_insert(units, unit);
+	}
 }
 
 static void file_load_gold(gold_t golds[players_capacity], const char* const tokens) {
@@ -203,7 +205,7 @@ static void file_save_territory(const player_t territory[grid_size][grid_size], 
 		grid_t x = 0;
 		do {
 			if (territory[y][x] != null_player)
-				fprintf(file, "territory "player_format" "grid_format" "grid_format"\n", territory[y][x], x, y);
+				fprintf(file, "territory " player_format " " grid_format " " grid_format "\n", territory[y][x], x, y);
 		} while (++x);
 	} while (++y);
 }
@@ -211,13 +213,13 @@ static void file_save_territory(const player_t territory[grid_size][grid_size], 
 static void file_save_golds(const gold_t golds[players_capacity], FILE* const file) {
 	for (player_t player = 0; player < players_capacity; ++player)
 		if (golds[player])
-			fprintf(file, "gold "player_format" "gold_format"\n", player, golds[player]);
+			fprintf(file, "gold " player_format " " gold_format "\n", player, golds[player]);
 }
 
 static void file_save_bots(const uint8_t* const bots, FILE* const file) {
 	for (player_t player = 0; player < players_capacity; ++player)
 		if (bitarray_get(bots, player))
-			fprintf(file, "bot "player_format"\n", player);
+			fprintf(file, "bot " player_format "\n", player);
 }
 
 static void file_save_teams(const uint8_t* const alliances, FILE* const file) {
@@ -265,7 +267,7 @@ static void file_save_teams(const uint8_t* const alliances, FILE* const file) {
 			// Print team
 			fprintf(file, "team");
 			for (player_t r = 0; r < size; ++r)
-				fprintf(file, " "player_format, team[r]);
+				fprintf(file, " " player_format, team[r]);
 			fprintf(file, "\n");
 		}
 }
@@ -276,7 +278,7 @@ bool file_save(const struct game* const game, const char* const filename) {
 	if (!file)
 		return true;
 
-	fprintf(file, "turn "turn_format"\n", game->turn);
+	fprintf(file, "turn " turn_format "\n", game->turn);
 	file_save_map(game, file);
 	file_save_units(&game->units, file);
 	file_save_territory(game->territory, file);

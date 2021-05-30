@@ -442,7 +442,7 @@ static void print_build_text(const struct game* const game) {
 
 	printf("in build mode:");
 	for (model_t model = buildable_models[capturable]; model < buildable_models[capturable + 1]; ++model) {
-		printf("("model_format") %s ", model + 1, model_names[model]);
+		printf("(" model_format ") %s ", model + 1, model_names[model]);
 	}
 }
 
