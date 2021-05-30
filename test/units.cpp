@@ -51,9 +51,7 @@ TEST_F(units_fixture, insert_with_frees_sets_next_start) {
 }
 
 TEST_F(units_fixture, insert_with_frees_inserts_unit) {
-    struct unit unit;
-    unit.x = 2;
-    unit.y = 3;
+    struct unit unit{.x = 2, .y = 3};
     auto index = insert_with_frees(units, &unit);
     ASSERT_NE(index, null_unit);
     ASSERT_EQ(units->data[index].x, 2);
@@ -69,8 +67,7 @@ TEST_F(units_fixture, insert_with_frees_fails_when_full) {
 
 TEST_F(units_fixture, insert_with_players_sets_links_on_first_unit) {
     units->start = 2;
-    struct unit unit;
-    unit.player = 3;
+    struct unit unit{.player = 3};
     auto index = insert_with_players(units, &unit);
     ASSERT_EQ(index, 2);
     ASSERT_EQ(units->nexts[index], null_unit);
@@ -80,9 +77,8 @@ TEST_F(units_fixture, insert_with_players_sets_links_on_first_unit) {
 
 TEST_F(units_fixture, insert_with_players_set_links_second_unit) {
     units->start = 3;
-    struct unit first_unit, second_unit;
-    first_unit.player = 2;
-    second_unit.player = 2;
+    struct unit first_unit{.player = 2};
+    struct unit second_unit{.player = 2};
     auto first_index = insert_with_players(units, &first_unit);
     auto second_index = insert_with_players(units, &second_unit);
     ASSERT_EQ(first_index, 3);
@@ -102,9 +98,7 @@ TEST_F(units_fixture, insert_with_players_propogates_failure) {
 }
 
 TEST_F(units_fixture, units_insert_sets_grid) {
-    struct unit unit;
-    unit.x = 2;
-    unit.y = 3;
+    struct unit unit{.x = 2, .y = 3};
     auto error = units_insert(units, unit);
     ASSERT_FALSE(error);
     auto index = units->grid[3][2];
@@ -133,8 +127,7 @@ TEST_F(units_fixture, delete_with_frees_links_free_index) {
 
 TEST_F(units_fixture, delete_with_players_deletes_first_unit) {
     units->start = 2;
-    struct unit unit;
-    unit.player = 3;
+    struct unit unit{.player = 3};
     auto first_index = insert_with_players(units, &unit);
     auto second_index = insert_with_players(units, &unit);
     delete_with_players(units, first_index);
@@ -143,8 +136,7 @@ TEST_F(units_fixture, delete_with_players_deletes_first_unit) {
 
 TEST_F(units_fixture, delete_with_players_deletes_middle_unit) {
     units->start = 2;
-    struct unit unit;
-    unit.player = 3;
+    struct unit unit{.player = 3};
     auto first_index = insert_with_players(units, &unit);
     auto second_index = insert_with_players(units, &unit);
     auto third_index = insert_with_players(units, &unit);
@@ -154,18 +146,14 @@ TEST_F(units_fixture, delete_with_players_deletes_middle_unit) {
 }
 
 TEST_F(units_fixture, units_delete_unsets_grid) {
-    struct unit unit;
-    unit.x = 2;
-    unit.y = 3;
+    struct unit unit{.x = 2, .y = 3};
     units_insert(units, unit);
     units_delete(units, units->grid[3][2]);
     ASSERT_EQ(units->grid[3][2], null_unit);
 }
 
 TEST_F(units_fixture, units_move_relocates_unit) {
-    struct unit unit;
-    unit.x = 2;
-    unit.y = 3;
+    struct unit unit{.x = 2, .y = 3};
     units_insert(units, unit);
     auto index = units->grid[3][2];
     units_move(units, index, 5, 7);
@@ -174,11 +162,7 @@ TEST_F(units_fixture, units_move_relocates_unit) {
 }
 
 TEST_F(units_fixture, units_set_enabled_sets_enabled) {
-    struct unit unit;
-    unit.enabled = false;
-    unit.player = 2;
-    unit.x = 3;
-    unit.y = 5;
+    struct unit unit{.player = 2, .x = 3, .y = 5, .enabled = false};
     units_insert(units, unit);
     unit.y = 7;
     units_insert(units, unit);
@@ -188,10 +172,7 @@ TEST_F(units_fixture, units_set_enabled_sets_enabled) {
 }
 
 TEST_F(units_fixture, units_delete_player_deletes_all_player_units) {
-    struct unit unit;
-    unit.player = 2;
-    unit.x = 3;
-    unit.y = 5;
+    struct unit unit{.player = 2, .x = 3, .y = 5};
     units_insert(units, unit);
     unit.y = 7;
     units_insert(units, unit);

@@ -1,4 +1,5 @@
 awc
-test/test
+test/*.o
+test/*.test
 *.o
 *.txt

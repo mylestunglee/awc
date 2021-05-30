@@ -1,23 +1,23 @@
 TARGET = test
 CXX = g++
-CXXFLAGS = -g -Wall -pedantic -funsigned-char
+CXXFLAGS = -g -Wall -pedantic -funsigned-char -std=c++2a
 LIBRARIES = -lgtest_main  -lgtest -lpthread
 
 .PHONY: default all clean
 
-default: $(TARGET)
+TARGETS = $(patsubst %.cpp, %.test, $(wildcard *.cpp))
+OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
+
+.PRECIOUS: $(TARGETS) $(OBJECTS)
+
+default: $(TARGETS)
 all: default
 
-OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-HEADERS = $(wildcard *.h)
-
-%.o: %.cpp $(HEADERS)
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(LIBRARIES) -c $< -o $@
 
-.PRECIOUS: $(TARGET) $(OBJECTS)
-
-$(TARGET): $(OBJECTS)
-	$(CXX) $(OBJECTS) $(LIBRARIES) -o $@
+%.test: %.o
+	$(CXX) $< $(LIBRARIES) -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -f $(TARGETS) $(OBJECTS)

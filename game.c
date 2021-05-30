@@ -68,7 +68,7 @@ static void move_cursor_to_interactable(struct game* const game) {
 			if (calc_build_enabled(game))
 				return;
 
-			if (game->map[game->y][game->x] == tile_HQ && game->territory[game->y][game->x] == game->turn) {
+			if (game->map[game->y][game->x] == tile_hq && game->territory[game->y][game->x] == game->turn) {
 				hq_found = true;
 				hq_x = game->x;
 				hq_y = game->y;
@@ -86,7 +86,7 @@ static void move_cursor_to_interactable(struct game* const game) {
 }
 
 static void game_postload(struct game* const game) {
-	grid_correct_map(game->territory, game->map);
+	grid_correct(game->territory, game->map);
 	grid_compute_incomes(game->territory, game->incomes);
 	move_cursor_to_interactable(game);
 }

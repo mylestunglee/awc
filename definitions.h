@@ -138,11 +138,12 @@ const static energy_t unit_movement_ranges[model_capacity] = {3, 2, 8, 6, 5, 5, 
 
 #define unit_capturable_upper_bound 2
 #define movement_type_ship 5
+#define tile_void 0
 #define tile_forest 2
 #define tile_mountain 3
 #define tile_bridge 9
 #define tile_city 10
-#define tile_HQ 14
+#define tile_hq 14
 
 const static uint8_t unit_movement_types[model_capacity] = {0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
 const static energy_t movement_type_cost[movement_types_capacity][tile_capacity] = {

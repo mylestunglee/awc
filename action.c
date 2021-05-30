@@ -18,7 +18,7 @@ static void action_capture(struct game* const game) {
 	assert(loser != game->turn);
 
 	// If the enemy loses their HQ
-	if (game->map[game->y][game->x] == tile_HQ)
+	if (game->map[game->y][game->x] == tile_hq)
 		action_remove_player(game, loser);
 	else if (loser != null_player)
 		--game->incomes[loser];

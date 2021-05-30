@@ -20,7 +20,7 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBRARIES) -o $@
 
 test:
-	$(MAKE) -C test test
+	$(MAKE) -C test
 
 clean:
 	rm -f $(TARGET) $(OBJECTS)

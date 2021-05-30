@@ -34,7 +34,7 @@ void grid_clear_player_territory(
 		do
 			if (territory[y][x] == player) {
 				territory[y][x] = null_player;
-				if (map[y][x] == tile_HQ)
+				if (map[y][x] == tile_hq)
 					map[y][x] = tile_city;
 			}
 		while (++x);
@@ -42,7 +42,7 @@ void grid_clear_player_territory(
 }
 
 // Normalise invalid map territory state
-void grid_correct_map(
+void grid_correct(
 	player_t territory[grid_size][grid_size],
 	tile_t map[grid_size][grid_size]) {
 
@@ -52,10 +52,12 @@ void grid_correct_map(
 		do {
 			if (territory[y][x] > players_capacity)
 				territory[y][x] = null_player;
+			if (map[y][x] > tile_capacity)
+				map[y][x] = tile_void;
 		} while (++x);
 	} while (++y);
 
-	grid_clear_player_territory(territory, map, null_player);
+	grid_clear_player_territory(map, territory, null_player);
 }
 
 void grid_compute_incomes(player_t territory[grid_size][grid_size], gold_t incomes[players_capacity]) {
@@ -86,11 +88,13 @@ static void grid_explore_mark_attackable_tile(
 	}
 
 	const unit_t index = game->units.grid[y][x];
+	if (index != null_unit)
+		return;
+	
 	const struct unit* const unit = &game->units.data[index];
 
 	// Mark tiles without friendly units as attackable
-	if (index != null_unit &&
-		!bitmatrix_get(game->alliances, unit->player, player) &&
+	if (!bitmatrix_get(game->alliances, unit->player, player) &&
 		units_damage[model][unit->model])
 		game->labels[y][x] |= attackable_bit;
 }
@@ -197,10 +201,16 @@ static void explore_node(
 
 	// Explore adjacent tiles
 	struct list* const list = &game->list;
-	list_insert(list, (struct list_node){.x = node->x + 1, .y = node->y, .energy = energy});
-	list_insert(list, (struct list_node){.x = node->x - 1, .y = node->y, .energy = energy});
-	list_insert(list, (struct list_node){.x = node->x, .y = node->y + 1, .energy = energy});
-	list_insert(list, (struct list_node){.x = node->x, .y = node->y - 1, .energy = energy});
+
+	struct list_node east = {.x = (grid_t)(node->x + 1), .y = node->y, .energy = energy};
+	struct list_node west = {.x = (grid_t)(node->x - 1), .y = node->y, .energy = energy};
+	struct list_node south = {.x = node->x, .y = (grid_t)(node->y + 1), .energy = energy};
+	struct list_node north = {.x = node->x, .y = (grid_t)(node->y - 1), .energy = energy};
+
+	list_insert(list, east);
+	list_insert(list, west);
+	list_insert(list, south);
+	list_insert(list, north);
 }
 
 // Use scalar > 1 when looking ahead multiple turns
@@ -221,11 +231,13 @@ void grid_explore_recursive(struct game* const game, const bool label_attackable
 
 	grid_explore_mark_attackable_ranged(game, game->x, game->y, cursor_unit->model, cursor_unit->player, label_attackable_tiles);
 
-	list_insert(list, (struct list_node){
+	struct list_node node = {
 		.x = game->x,
 		.y = game->y,
 		.energy = init_energy
-	});
+	};
+
+	list_insert(list, node);
 
 	while (!list_empty(list)) {
 		const struct list_node node = list_front_pop(list);
@@ -243,12 +255,13 @@ void grid_find_path(struct game* const game, grid_t x, grid_t y) {
 	energy_t prev_energy = 0;
 
 	while (true) {
-		list_insert(&game->list, (struct list_node){.x = x, .y = y, .energy = game->energies[y][x]});
+		struct list_node list_node = {.x = x, .y = y, .energy = game->energies[y][x]};
+		list_insert(&game->list, list_node);
 
 		energy_t next_energy = 0;
 
-		const grid_t adjacent_x[] = {x + 1, x, x - 1, x};
-		const grid_t adjacent_y[] = {y, y - 1, y, y + 1};
+		const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
+		const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
 
 		for (uint8_t i = 0; i < 4; ++i) {
 			energy_t energy = game->energies[adjacent_y[i]][adjacent_x[i]];
