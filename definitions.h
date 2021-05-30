@@ -179,8 +179,8 @@ const static health_t units_damage[model_capacity][model_capacity] = {
 	{0,   0,   0,   0,   0,   0,   0,   0,   0,   115, 55,  65,  90,  0,   0  },
 	{95,  90,  90,  85,  55,  80,  85,  85,  90,  0,   0,   0,   0,  95,  50 }};
 
-const static grid_t models_min_range[model_capacity] = {0, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 0, 0, 2};
-const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 0, 0, 0, 0, 6};
+const static grid_t models_min_range[model_capacity] = {0, 0, 0, 0, 0, 2, 3, 0, 2, 0, 0, 0, 0, 0, 2};
+const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 3, 6, 0, 5, 0, 0, 0, 0, 0, 7};
 const static gold_t models_cost[model_capacity] = {1, 3, 4, 7, 16, 6, 15, 8, 12, 9, 22, 20, 20, 18, 28};
 const static model_t buildable_models[capturable_capacity + 1] = {0, 0, 9, 12, model_capacity, model_capacity};
 

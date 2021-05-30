@@ -75,6 +75,82 @@ TEST_F(grid_fixture, grid_compute_incomes_computes_incomes) {
     ASSERT_EQ(incomes[2], 3);
 }
 
+TEST_F(game_fixture, grid_explore_mark_attackable_tile_marks_when_label_attackable_tiles_flagged) {
+    grid_explore_mark_attackable_tile(game, 2, 3, 5, 7, true);
+    ASSERT_EQ(game->labels[3][2], attackable_bit);
+}
+
+TEST_F(game_fixture, grid_explore_mark_attackable_tile_marks_when_damagable_enemy_unit) {
+    ASSERT_GE(players_capacity, 2);
+    constexpr model_t infantry = 0;
+    ASSERT_NE(units_damage[infantry][infantry], 0);
+    struct unit enemy_unit = {.player = 1, .x = 3, .y = 5};
+    units_insert(&game->units, enemy_unit);
+    grid_explore_mark_attackable_tile(game, 2, 3, infantry, 0, true);
+    ASSERT_EQ(game->labels[3][2], attackable_bit);
+}
+
+TEST_F(game_fixture, grid_explore_mark_attackable_tile_unmarked_when_undamagable_enemy_unit) {
+    ASSERT_GE(players_capacity, 2);
+    constexpr model_t infantry = 0;
+    constexpr model_t missles = 9;
+    ASSERT_NE(units_damage[missles][infantry], 0);
+    struct unit enemy_unit = {.player = 1, .x = 3, .y = 5};
+    units_insert(&game->units, enemy_unit);
+    grid_explore_mark_attackable_tile(game, 2, 3, missles, 0, true);
+    ASSERT_EQ(game->labels[3][5], 0);
+}
+
+TEST_F(game_fixture, grid_explore_mark_attackable_tile_unmarked_when_friendly_unit) {
+    ASSERT_GE(players_capacity, 2);
+    constexpr model_t infantry = 0;
+    ASSERT_NE(units_damage[infantry][infantry], 0);
+    struct unit enemy_unit = {.player = 1, .x = 3, .y = 5};
+    units_insert(&game->units, enemy_unit);
+    bitmatrix_set(game->alliances, 0, 1);
+    grid_explore_mark_attackable_tile(game, 2, 3, infantry, 0, true);
+    ASSERT_EQ(game->labels[3][5], 0);
+}
+
+TEST_F(game_fixture, grid_explore_mark_attackable_direct_marks_adjacent_tiles_with_direct_unit) {
+    ASSERT_GE(players_capacity, 2);
+    constexpr model_t infantry = 0;
+    ASSERT_EQ(models_min_range[infantry], 0);
+    grid_explore_mark_attackable_direct(game, 2, 3, infantry, 7, true);
+    ASSERT_EQ(game->labels[3][3], attackable_bit);
+    ASSERT_EQ(game->labels[3][1], attackable_bit);
+    ASSERT_EQ(game->labels[4][2], attackable_bit);
+    ASSERT_EQ(game->labels[2][2], attackable_bit);
+}
+
+TEST_F(game_fixture, grid_explore_mark_attackable_direct_unmarked_with_indirect_unit) {
+    ASSERT_GE(players_capacity, 2);
+    constexpr model_t artillery = 5;
+    ASSERT_GT(models_min_range[artillery], 0);
+    grid_explore_mark_attackable_direct(game, 2, 3, artillery, 7, true);
+    ASSERT_EQ(game->labels[3][3], 0);
+}
+
+TEST_F(game_fixture, grid_explore_mark_attackable_ranged_marks_with_correct_range) {
+    constexpr model_t artillery = 5;
+    ASSERT_GT(models_min_range[artillery], 0);
+    grid_explore_mark_attackable_ranged(game, 2, 10, artillery, 5, true);
+    ASSERT_EQ(game->labels[10][2], 0);
+    ASSERT_EQ(game->labels[11][2], 0);
+    ASSERT_EQ(game->labels[12][2], attackable_bit);
+    ASSERT_EQ(game->labels[13][2], attackable_bit);
+    ASSERT_EQ(game->labels[14][2], 0);
+}
+
+TEST_F(game_fixture, grid_explore_mark_attackable_ranged_unmarked_with_direct_unit) {
+    constexpr model_t infantry = 0;
+    ASSERT_EQ(models_min_range[infantry], 0);
+    grid_explore_mark_attackable_ranged(game, 2, 3, infantry, 5, true);
+    for (auto x = 0; x < grid_size; ++x)
+        for (auto y = 0; y < grid_size; ++y)
+            ASSERT_EQ(game->labels[y][x], 0);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

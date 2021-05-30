@@ -129,9 +129,8 @@ static void grid_explore_mark_attackable_ranged(
 	const grid_wide_t max_range = models_max_range[model];
 
 	// Range attack only applies to positive ranged models
-	if (!min_range)
+	if (min_range == 0)
 		return;
-
 
 	for (grid_wide_t j = -max_range; j <= max_range; ++j)
 		for (grid_wide_t i = -max_range; i <= max_range; ++i) {
