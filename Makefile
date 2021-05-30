@@ -22,6 +22,9 @@ $(TARGET): $(OBJECTS)
 test:
 	$(MAKE) -C test
 
+format:
+	clang-format -style=file -i *.c *.h test/*.cpp
+
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 	$(MAKE) -C test clean

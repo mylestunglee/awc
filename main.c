@@ -1,31 +1,31 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "game.h"
 #include "optimise.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char* argv[]) {
-	if (argc != 2) {
-		fprintf(stderr, "Usage: awc GAME_STATE\n");
-		return 1;
-	}
+    if (argc != 2) {
+        fprintf(stderr, "Usage: awc GAME_STATE\n");
+        return 1;
+    }
 
-	struct game* const game = malloc(sizeof(struct game));
+    struct game* const game = malloc(sizeof(struct game));
 
-	if (game == NULL) {
-		fprintf(stderr, "Insufficent memory\n");
-		return 1;
-	}
+    if (game == NULL) {
+        fprintf(stderr, "Insufficent memory\n");
+        return 1;
+    }
 
-	const bool error = game_load(game, argv[1]);
+    const bool error = game_load(game, argv[1]);
 
-	if (error) {
-		fprintf(stderr, "Failed to load GAME_STATE\n");
-		return 1;
-	}
+    if (error) {
+        fprintf(stderr, "Failed to load GAME_STATE\n");
+        return 1;
+    }
 
-	game_loop(game);
+    game_loop(game);
 
-	free(game);
+    free(game);
 
-	return 0;
+    return 0;
 }

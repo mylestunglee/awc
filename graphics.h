@@ -1,8 +1,8 @@
 #ifndef graphics_h
 #define graphics_h
 
-#include <assert.h>
 #include "game.h"
+#include <assert.h>
 
 void render(const struct game* const, const bool, const bool);
 

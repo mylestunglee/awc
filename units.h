@@ -1,27 +1,27 @@
 #ifndef units_h
 #define units_h
 
-#include <stdbool.h>
 #include "definitions.h"
+#include <stdbool.h>
 
 struct unit {
-	health_t health;
-	model_t model;
-	player_t player;
-	grid_t x;
-	grid_t y;
-	bool enabled;
+    health_t health;
+    model_t model;
+    player_t player;
+    grid_t x;
+    grid_t y;
+    bool enabled;
 };
 
 struct units {
-	struct unit data[units_capacity];
-	unit_t start;
-	unit_t size;
-	unit_t frees[units_capacity];
-	player_t firsts[players_capacity];
-	unit_t prevs[units_capacity];
-	unit_t nexts[units_capacity];
-	unit_t grid[grid_size][grid_size];
+    struct unit data[units_capacity];
+    unit_t start;
+    unit_t size;
+    unit_t frees[units_capacity];
+    player_t firsts[players_capacity];
+    unit_t prevs[units_capacity];
+    unit_t nexts[units_capacity];
+    unit_t grid[grid_size][grid_size];
 };
 
 void units_initialise(struct units* const);
