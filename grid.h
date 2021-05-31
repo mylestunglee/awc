@@ -17,4 +17,20 @@ void grid_explore_recursive(struct game* const, const bool, const bool,
                             const energy_t);
 void grid_find_path(struct game* const, grid_t x, grid_t y);
 
+#ifdef expose_grid_internals
+
+void grid_explore_mark_attackable_tile(struct game* const, const grid_t,
+                                       const grid_t, const model_t,
+                                       const player_t, const bool);
+
+void grid_explore_mark_attackable_direct(struct game* const, const grid_t,
+                                         const grid_t, const model_t,
+                                         const player_t, const bool);
+
+void grid_explore_mark_attackable_ranged(struct game* const, const grid_t,
+                                         const grid_t, const model_t,
+                                         const player_t, const bool);
+
+#endif
+
 #endif

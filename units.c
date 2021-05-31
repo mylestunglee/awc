@@ -22,8 +22,8 @@ void units_initialise(struct units* const units) {
     } while (++y);
 }
 
-static unit_t insert_with_frees(struct units* const units,
-                                const struct unit* const unit) {
+unit_t insert_with_frees(struct units* const units,
+                         const struct unit* const unit) {
     assert(units->size <= units_capacity);
     // Check space to insert unit
     if (units->size == units_capacity)
@@ -37,8 +37,8 @@ static unit_t insert_with_frees(struct units* const units,
     return index;
 }
 
-static unit_t insert_with_players(struct units* const units,
-                                  const struct unit* const unit) {
+unit_t insert_with_players(struct units* const units,
+                           const struct unit* const unit) {
     unit_t index = insert_with_frees(units, unit);
     // Propagate failure
     if (index == null_unit)
@@ -71,7 +71,7 @@ bool units_insert(struct units* const units, const struct unit unit) {
     return false;
 }
 
-static void delete_with_frees(struct units* const units, const unit_t index) {
+void delete_with_frees(struct units* const units, const unit_t index) {
     assert(units->size > 0);
     assert(units->frees[index] == null_unit);
 
@@ -80,7 +80,7 @@ static void delete_with_frees(struct units* const units, const unit_t index) {
     --units->size;
 }
 
-static void delete_with_players(struct units* const units, const unit_t index) {
+void delete_with_players(struct units* const units, const unit_t index) {
     const player_t player = units->data[index].player;
 
     // Link firsts or prevs to skip over index

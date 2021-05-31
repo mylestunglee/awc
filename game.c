@@ -8,7 +8,7 @@
 #include "grid.h"
 #include <stdio.h>
 
-static void game_preload(struct game* const game) {
+void game_initialise(struct game* const game) {
     // TODO: fix order
     game->x = 0;
     game->y = 0;
@@ -92,7 +92,7 @@ static void game_postload(struct game* const game) {
 }
 
 bool game_load(struct game* const game, const char* const filename) {
-    game_preload(game);
+    game_initialise(game);
     const bool error = file_load(game, filename);
     game_postload(game);
     return error;

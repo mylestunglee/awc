@@ -1,4 +1,5 @@
-#include "../units.c"
+#define expose_units_internals
+#include "../units.h"
 #include <gtest/gtest.h>
 
 class units_fixture : public ::testing::Test {

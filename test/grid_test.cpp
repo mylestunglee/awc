@@ -1,3 +1,6 @@
+#define expose_grid_internals
+#include "../bitarray.h"
+#include "../grid.h"
 #include "game_fixture.hpp"
 
 class grid_fixture : public ::testing::Test {

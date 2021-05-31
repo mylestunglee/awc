@@ -31,4 +31,13 @@ void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
 void units_set_enabled(struct units* const, const player_t, const bool);
 void units_delete_player(struct units* const, const player_t);
 
+#ifdef expose_units_internals
+
+unit_t insert_with_frees(struct units* const, const struct unit* const);
+unit_t insert_with_players(struct units* const, const struct unit* const);
+void delete_with_frees(struct units* const, const unit_t);
+void delete_with_players(struct units* const, const unit_t);
+
+#endif
+
 #endif

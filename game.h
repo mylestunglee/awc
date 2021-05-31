@@ -24,6 +24,7 @@ struct game {
         (players_capacity * (players_capacity - 1)) / 2)];
 };
 
+void game_initialise(struct game* const);
 bool game_load(struct game* const, const char* const);
 void game_loop(struct game* const);
 
