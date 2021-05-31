@@ -31,6 +31,10 @@ void grid_explore_mark_attackable_ranged(struct game* const, const grid_t,
                                          const grid_t, const model_t,
                                          const player_t, const bool);
 
+bool is_node_unexplorable(const struct game* const,
+                          const struct list_node* const, const player_t,
+                          const movement_t);
+
 #endif
 
 #endif

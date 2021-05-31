@@ -137,6 +137,7 @@ void grid_explore_mark_attackable_ranged(struct game* const game,
         }
 }
 
+// player may not equal game->turn
 bool is_node_unexplorable(const struct game* const game,
                           const struct list_node* const node,
                           const player_t player, const movement_t movement) {
@@ -147,19 +148,15 @@ bool is_node_unexplorable(const struct game* const game,
     if (cost == 0)
         return true;
 
-    assert(node->energy > 0);
+    const unit_t unit = game->units.grid[node->y][node->x];
+    if (unit != null_unit) {
+        const player_t node_player = game->units.data[unit].player;
+        const bool enemy_unit =
+            !bitmatrix_get(game->alliances, player, node_player);
 
-    // If friendly_passable, then cannot pass through enemy units
-    // If not friendly_passable, then cannot pass through non-self units
-    // cursor_unit->player may not be equals to game->turn because the inspected
-    // unit may not be ours
-    const unit_t node_unit_index = game->units.grid[node->y][node->x];
-    const player_t node_unit_player = game->units.data[node_unit_index].player;
-    const bool friendly_node_unit =
-        bitmatrix_get(game->alliances, player, node_unit_player);
-
-    if (node_unit_index != null_unit && !friendly_node_unit)
-        return true;
+        if (enemy_unit)
+            return true;
+    }
 
     // Do not re-compute explored areas
     if (game->energies[node->y][node->x] > node->energy)
@@ -183,6 +180,8 @@ bool is_node_accessible(const struct game* const game,
 void explore_adjacent_tiles(struct game* const game,
                             const struct list_node* const node,
                             const movement_t movement) {
+    assert(node->energy > 0);
+
     struct list* const list = &game->list;
 
     const grid_t x = node->x;
