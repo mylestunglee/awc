@@ -144,25 +144,22 @@ void grid_explore(struct game* const game, const bool label_attackable_tiles,
     grid_explore_recursive(game, label_attackable_tiles, friendly_passable, 1);
 }
 
-static void explore_node(struct game* const game,
+energy_t explore_node_deplete_energy(struct game* const game,
                          const struct list_node* const node,
-                         const bool label_attackable_tiles,
-                         const bool friendly_passable) {
-    const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
-    assert(cursor_unit_index != null_unit);
-    const struct unit* const cursor_unit = &game->units.data[cursor_unit_index];
-    const uint8_t movement_type = unit_movement_types[cursor_unit->model];
-
+                         const player_t player,
+                         const model_t model) {
+    const movement_t movement = unit_movement_types[model];
     const tile_t tile = game->map[node->y][node->x];
-    const energy_t cost = movement_type_cost[movement_type][tile];
+    const energy_t cost = movement_type_cost[movement][tile];
 
     // Inaccessible terrian
     if (cost == 0)
-        return;
+        return 0;
 
+    const energy_t energy = node->energy > cost ? node->energy - cost : 0;
     // Not enough energy to keep moving
-    if (node->energy < cost)
-        return;
+    if (energy == 0)
+        return 0;
 
     // If friendly_passable, then cannot pass through enemy units
     // If not friendly_passable, then cannot pass through non-self units
@@ -171,27 +168,43 @@ static void explore_node(struct game* const game,
     const unit_t node_unit_index = game->units.grid[node->y][node->x];
     const player_t node_unit_player = game->units.data[node_unit_index].player;
     const bool friendly_node_unit =
-        bitmatrix_get(game->alliances, cursor_unit->player, node_unit_player);
+        bitmatrix_get(game->alliances, player, node_unit_player);
 
-    if (node_unit_index != null_unit && node_unit_index != cursor_unit_index &&
-        !(friendly_passable && friendly_node_unit))
-        return;
-
-    const energy_t energy = node->energy - cost;
+    if (node_unit_index != null_unit && !friendly_node_unit)
+        return 0;
 
     // Do not re-compute explored areas
     if (game->energies[node->y][node->x] > energy)
+        return 0;
+
+    return energy;
+}
+
+void explore_node(struct game* const game,
+                         const struct list_node* const node,
+                         const player_t player,
+                         const model_t model,
+                         const bool label_attackable_tiles) {
+
+    const energy_t energy = explore_node_deplete_energy(
+        game, node, player, model);
+
+    if (energy == 0)
         return;
 
     game->energies[node->y][node->x] = node->energy;
 
+    const unit_t node_unit_index = game->units.grid[node->y][node->x];
+    const tile_t tile = game->map[node->y][node->x];
+    const movement_t movement = unit_movement_types[model];
+
     // Mark unit-free tiles as accessible but ships cannot block bridges
     if (node_unit_index == null_unit &&
-        !(tile == tile_bridge && movement_type == movement_type_ship)) {
+        !(tile == tile_bridge && movement == movement_type_ship)) {
 
         game->labels[node->y][node->x] |= accessible_bit;
         grid_explore_mark_attackable_direct(
-            game, node->x, node->y, cursor_unit->model, cursor_unit->player,
+            game, node->x, node->y, model, player,
             label_attackable_tiles);
     }
 
@@ -227,14 +240,20 @@ void grid_explore_recursive(struct game* const game,
     // Use cursor instead of selected property because we want to highlight
     // non-selectable enemy units
     const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
-    const struct unit* const cursor_unit = &game->units.data[cursor_unit_index];
-    const uint8_t movement_type = unit_movement_types[cursor_unit->model];
+    const struct unit cursor_unit = game->units.data[cursor_unit_index];
+    // pop unit from units so unit cannot interfere with its own pathfinding
+    units_delete(&game->units, cursor_unit_index);
+    assert(game->units.grid[game->y][game->x] == null_unit);
+
+    const model_t model = cursor_unit.model;
+    const player_t player = cursor_unit.player;
+
+    const movement_t movement_type = unit_movement_types[model];
     const energy_t init_energy =
-        scalar * unit_movement_ranges[cursor_unit->model] +
-        movement_type_cost[movement_type][game->map[game->y][game->x]];
+        scalar * unit_movement_ranges[movement_type] + 1;
 
     grid_explore_mark_attackable_ranged(game, game->x, game->y,
-                                        cursor_unit->model, cursor_unit->player,
+                                        model, player,
                                         label_attackable_tiles);
 
     struct list_node node = {.x = game->x, .y = game->y, .energy = init_energy};
@@ -243,11 +262,12 @@ void grid_explore_recursive(struct game* const game,
 
     while (!list_empty(list)) {
         const struct list_node node = list_front_pop(list);
-        explore_node(game, &node, label_attackable_tiles, friendly_passable);
+        explore_node(game, &node,
+            friendly_passable ? player : null_player,
+            model, label_attackable_tiles);
     }
 
-    // Allow stuck units to wait
-    game->labels[game->y][game->x] |= accessible_bit;
+    units_insert(&game->units, cursor_unit);
 }
 
 // Populates game.list with coordinates along the path to maximal energy
