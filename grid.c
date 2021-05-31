@@ -144,22 +144,20 @@ void grid_explore(struct game* const game, const bool label_attackable_tiles,
     grid_explore_recursive(game, label_attackable_tiles, friendly_passable, 1);
 }
 
-energy_t explore_node_deplete_energy(struct game* const game,
-                         const struct list_node* const node,
-                         const player_t player,
-                         const model_t model) {
+bool is_node_unexplorable(struct game* const game,
+                          const struct list_node* const node,
+                          const player_t player, const model_t model) {
     const movement_t movement = unit_movement_types[model];
     const tile_t tile = game->map[node->y][node->x];
     const energy_t cost = movement_type_cost[movement][tile];
 
     // Inaccessible terrian
     if (cost == 0)
-        return 0;
+        return true;
 
-    const energy_t energy = node->energy > cost ? node->energy - cost : 0;
     // Not enough energy to keep moving
-    if (energy == 0)
-        return 0;
+    if (node->energy == 0)
+        return true;
 
     // If friendly_passable, then cannot pass through enemy units
     // If not friendly_passable, then cannot pass through non-self units
@@ -171,25 +169,52 @@ energy_t explore_node_deplete_energy(struct game* const game,
         bitmatrix_get(game->alliances, player, node_unit_player);
 
     if (node_unit_index != null_unit && !friendly_node_unit)
-        return 0;
+        return true;
 
     // Do not re-compute explored areas
-    if (game->energies[node->y][node->x] > energy)
-        return 0;
+    if (game->energies[node->y][node->x] > node->energy)
+        return true;
 
-    return energy;
+    return false;
 }
 
-void explore_node(struct game* const game,
-                         const struct list_node* const node,
-                         const player_t player,
-                         const model_t model,
-                         const bool label_attackable_tiles) {
+void explore_adjacent_tiles(struct game* const game,
+                            const struct list_node* const node,
+                            const model_t model) {
 
-    const energy_t energy = explore_node_deplete_energy(
-        game, node, player, model);
+    const movement_t movement = unit_movement_types[model];
 
-    if (energy == 0)
+    struct list* const list = &game->list;
+
+    const grid_t x = node->x;
+    const grid_t y = node->y;
+
+    const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
+    const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
+
+    for (uint8_t i = 0; i < 4; ++i) {
+        const grid_t x = adjacent_x[i];
+        const grid_t y = adjacent_y[i];
+        const tile_t tile = game->map[y][x];
+        const energy_t cost = movement_type_cost[movement][tile];
+
+        struct list_node adjacent_node = {
+            .x = x,
+            .y = y,
+            .energy = node->energy > cost ? node->energy - cost : 0};
+
+        if (adjacent_node.energy == 0)
+            continue;
+
+        list_insert(list, adjacent_node);
+    }
+}
+
+void explore_node(struct game* const game, const struct list_node* const node,
+                  const player_t player, const model_t model,
+                  const bool label_attackable_tiles) {
+
+    if (is_node_unexplorable(game, node, player, model))
         return;
 
     game->energies[node->y][node->x] = node->energy;
@@ -203,27 +228,11 @@ void explore_node(struct game* const game,
         !(tile == tile_bridge && movement == movement_type_ship)) {
 
         game->labels[node->y][node->x] |= accessible_bit;
-        grid_explore_mark_attackable_direct(
-            game, node->x, node->y, model, player,
-            label_attackable_tiles);
+        grid_explore_mark_attackable_direct(game, node->x, node->y, model,
+                                            player, label_attackable_tiles);
     }
 
-    // Explore adjacent tiles
-    struct list* const list = &game->list;
-
-    struct list_node east = {
-        .x = (grid_t)(node->x + 1), .y = node->y, .energy = energy};
-    struct list_node west = {
-        .x = (grid_t)(node->x - 1), .y = node->y, .energy = energy};
-    struct list_node south = {
-        .x = node->x, .y = (grid_t)(node->y + 1), .energy = energy};
-    struct list_node north = {
-        .x = node->x, .y = (grid_t)(node->y - 1), .energy = energy};
-
-    list_insert(list, east);
-    list_insert(list, west);
-    list_insert(list, south);
-    list_insert(list, north);
+    explore_adjacent_tiles(game, node, model);
 }
 
 // Use scalar > 1 when looking ahead multiple turns
@@ -252,8 +261,7 @@ void grid_explore_recursive(struct game* const game,
     const energy_t init_energy =
         scalar * unit_movement_ranges[movement_type] + 1;
 
-    grid_explore_mark_attackable_ranged(game, game->x, game->y,
-                                        model, player,
+    grid_explore_mark_attackable_ranged(game, game->x, game->y, model, player,
                                         label_attackable_tiles);
 
     struct list_node node = {.x = game->x, .y = game->y, .energy = init_energy};
@@ -262,9 +270,8 @@ void grid_explore_recursive(struct game* const game,
 
     while (!list_empty(list)) {
         const struct list_node node = list_front_pop(list);
-        explore_node(game, &node,
-            friendly_passable ? player : null_player,
-            model, label_attackable_tiles);
+        explore_node(game, &node, friendly_passable ? player : null_player,
+                     model, label_attackable_tiles);
     }
 
     units_insert(&game->units, cursor_unit);
