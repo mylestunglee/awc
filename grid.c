@@ -150,6 +150,7 @@ static void explore_node(struct game* const game,
                          const bool label_attackable_tiles,
                          const bool friendly_passable) {
     const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
+    assert (cursor_unit_index != null_unit);
     const struct unit* const cursor_unit = &game->units.data[cursor_unit_index];
     const uint8_t movement_type = unit_movement_types[cursor_unit->model];
 
