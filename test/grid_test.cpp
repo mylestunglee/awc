@@ -90,9 +90,9 @@ TEST_F(game_fixture,
     ASSERT_GE(players_capacity, 2);
     constexpr model_t infantry = 0;
     ASSERT_NE(units_damage[infantry][infantry], 0);
-    struct unit enemy_unit = {.player = 1, .x = 3, .y = 5};
+    struct unit enemy_unit = {.player = 1, .x = 2, .y = 3};
     units_insert(&game->units, enemy_unit);
-    grid_explore_mark_attackable_tile(game, 2, 3, infantry, 0, true);
+    grid_explore_mark_attackable_tile(game, 2, 3, infantry, 0, false);
     ASSERT_EQ(game->labels[3][2], attackable_bit);
 }
 
@@ -100,12 +100,12 @@ TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_undamagable_enemy_unit) {
     ASSERT_GE(players_capacity, 2);
     constexpr model_t infantry = 0;
-    constexpr model_t missles = 9;
-    ASSERT_NE(units_damage[missles][infantry], 0);
-    struct unit enemy_unit = {.player = 1, .x = 3, .y = 5};
+    constexpr model_t missles = 8;
+    ASSERT_EQ(units_damage[missles][infantry], 0);
+    struct unit enemy_unit = {.player = 1, .x = 2, .y = 3};
     units_insert(&game->units, enemy_unit);
-    grid_explore_mark_attackable_tile(game, 2, 3, missles, 0, true);
-    ASSERT_EQ(game->labels[3][5], 0);
+    grid_explore_mark_attackable_tile(game, 2, 3, missles, 0, false);
+    ASSERT_EQ(game->labels[3][2], 0);
 }
 
 TEST_F(game_fixture,
@@ -113,11 +113,16 @@ TEST_F(game_fixture,
     ASSERT_GE(players_capacity, 2);
     constexpr model_t infantry = 0;
     ASSERT_NE(units_damage[infantry][infantry], 0);
-    struct unit enemy_unit = {.player = 1, .x = 3, .y = 5};
+    struct unit enemy_unit = {.player = 1, .x = 3, .y = 2};
     units_insert(&game->units, enemy_unit);
     bitmatrix_set(game->alliances, 0, 1);
-    grid_explore_mark_attackable_tile(game, 2, 3, infantry, 0, true);
-    ASSERT_EQ(game->labels[3][5], 0);
+    grid_explore_mark_attackable_tile(game, 2, 3, infantry, 0, false);
+    ASSERT_EQ(game->labels[3][2], 0);
+}
+
+TEST_F(game_fixture, grid_explore_mark_attackable_tile_unmarked_when_no_unit) {
+    grid_explore_mark_attackable_tile(game, 2, 3, 5, 0, false);
+    ASSERT_EQ(game->labels[3][2], 0);
 }
 
 TEST_F(
