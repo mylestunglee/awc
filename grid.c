@@ -178,10 +178,6 @@ bool is_node_accessible(const struct game* const game,
 void explore_adjacent_tiles(struct game* const game,
                             const struct list_node* const node,
                             const movement_t movement) {
-    assert(node->energy > 0);
-
-    struct list* const list = &game->list;
-
     const grid_t x = node->x;
     const grid_t y = node->y;
 
@@ -189,24 +185,25 @@ void explore_adjacent_tiles(struct game* const game,
     const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
 
     for (uint8_t i = 0; i < 4; ++i) {
-        const grid_t x = adjacent_x[i];
-        const grid_t y = adjacent_y[i];
-        const tile_t tile = game->map[y][x];
+        const grid_t x_i = adjacent_x[i];
+        const grid_t y_i = adjacent_y[i];
+        const tile_t tile = game->map[y_i][x_i];
         const energy_t cost = movement_type_cost[movement][tile];
 
         if (node->energy <= cost)
             continue;
 
         struct list_node adjacent_node = {
-            .x = x, .y = y, .energy = (energy_t)(node->energy - cost)};
+            .x = x_i, .y = y_i, .energy = (energy_t)(node->energy - cost)};
 
-        list_insert(list, adjacent_node);
+        list_insert(&game->list, adjacent_node);
     }
 }
 
 void explore_node(struct game* const game, const struct list_node* const node,
                   const player_t player, const model_t model,
                   const bool label_attackable_tiles) {
+    assert(node->energy > 0);
 
     const movement_t movement = unit_movement_types[model];
     if (is_node_unexplorable(game, node, player, movement))
