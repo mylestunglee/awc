@@ -168,13 +168,11 @@ bool is_node_unexplorable(const struct game* const game,
 bool is_node_accessible(const struct game* const game,
                         const struct list_node* const node,
                         const movement_t movement) {
-
-    const unit_t node_unit_index = game->units.grid[node->y][node->x];
+    const bool unoccupied = game->units.grid[node->y][node->x] == null_unit;
     const tile_t tile = game->map[node->y][node->x];
-
-    // Mark unit-free tiles as accessible but ships cannot block bridges
-    return (node_unit_index == null_unit &&
-            !(tile == tile_bridge && movement == movement_type_ship));
+    const bool ship_on_bridge =
+        tile == tile_bridge && movement == movement_type_ship;
+    return unoccupied && !ship_on_bridge;
 }
 
 void explore_adjacent_tiles(struct game* const game,

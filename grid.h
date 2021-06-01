@@ -35,6 +35,9 @@ bool is_node_unexplorable(const struct game* const,
                           const struct list_node* const, const player_t,
                           const movement_t);
 
+bool is_node_accessible(const struct game* const, const struct list_node* const,
+                        const movement_t);
+
 #endif
 
 #endif

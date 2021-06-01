@@ -169,14 +169,16 @@ TEST_F(game_fixture,
             ASSERT_EQ(game->labels[y][x], 0);
 }
 
-TEST_F(game_fixture, is_node_unexplorable_when_inaccessible_terrian) {
+TEST_F(game_fixture,
+       is_node_unexplorable_returns_true_when_inaccessible_terrian) {
     game->map[3][2] = tile_void;
     struct list_node node = {.x = 2, .y = 3};
     auto unexplorable = is_node_unexplorable(game, &node, 0, 0);
     ASSERT_TRUE(unexplorable);
 }
 
-TEST_F(game_fixture, is_node_unexplorable_when_blocked_by_enemy_unit) {
+TEST_F(game_fixture,
+       is_node_unexplorable_returns_true_when_blocked_by_enemy_unit) {
     struct unit unit = {.player = 1, .x = 2, .y = 3};
     units_insert(&game->units, unit);
     struct list_node node = {.x = 2, .y = 3};
@@ -184,7 +186,7 @@ TEST_F(game_fixture, is_node_unexplorable_when_blocked_by_enemy_unit) {
     ASSERT_TRUE(unexplorable);
 }
 
-TEST_F(game_fixture, is_node_unexplorable_when_visited) {
+TEST_F(game_fixture, is_node_unexplorable_returns_true_when_visited) {
     game->energies[2][3] = 7;
     struct list_node node = {.x = 2, .y = 3, .energy = 5};
     auto unexplorable = is_node_unexplorable(game, &node, 0, 0);
@@ -196,6 +198,28 @@ TEST_F(game_fixture, is_node_unexplorable_returns_false_when_explorable) {
     struct list_node node = {.x = 2, .y = 3};
     auto unexplorable = is_node_unexplorable(game, &node, 0, 0);
     ASSERT_FALSE(unexplorable);
+}
+
+TEST_F(game_fixture, is_node_accessible_returns_true_when_accessible) {
+    ASSERT_NE(movement_type_ship, 0);
+    struct list_node node = {.x = 2, .y = 3};
+    auto accessible = is_node_accessible(game, &node, 0);
+    ASSERT_TRUE(accessible);
+}
+
+TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
+    struct unit unit = {.x = 2, .y = 3};
+    units_insert(&game->units, unit);
+    struct list_node node = {.x = 2, .y = 3};
+    auto accessible = is_node_accessible(game, &node, 0);
+    ASSERT_FALSE(accessible);
+}
+
+TEST_F(game_fixture, is_node_accessible_returns_false_when_ship_on_bridge) {
+    game->map[3][2] = tile_bridge;
+    struct list_node node = {.x = 2, .y = 3};
+    auto accessible = is_node_accessible(game, &node, movement_type_ship);
+    ASSERT_FALSE(accessible);
 }
 
 int main(int argc, char** argv) {
