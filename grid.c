@@ -140,14 +140,7 @@ void grid_explore_mark_attackable_ranged(struct game* const game,
 // player may not equal game->turn
 bool is_node_unexplorable(const struct game* const game,
                           const struct list_node* const node,
-                          const player_t player, const movement_t movement) {
-    const tile_t tile = game->map[node->y][node->x];
-    const energy_t cost = movement_type_cost[movement][tile];
-
-    // Inaccessible terrian
-    if (cost == 0)
-        return true;
-
+                          const player_t player) {
     const unit_t unit = game->units.grid[node->y][node->x];
     if (unit != null_unit) {
         const player_t node_player = game->units.data[unit].player;
@@ -190,6 +183,9 @@ void explore_adjacent_tiles(struct game* const game,
         const tile_t tile = game->map[y_i][x_i];
         const energy_t cost = movement_type_cost[movement][tile];
 
+        if (cost == 0)
+            continue;
+
         if (node->energy <= cost)
             continue;
 
@@ -205,20 +201,24 @@ void explore_node(struct game* const game, const struct list_node* const node,
                   const bool label_attackable_tiles) {
     assert(node->energy > 0);
 
-    const movement_t movement = unit_movement_types[model];
-    if (is_node_unexplorable(game, node, player, movement))
+    if (is_node_unexplorable(game, node, player))
         return;
 
     game->energies[node->y][node->x] = node->energy;
 
+    const movement_t movement = unit_movement_types[model];
     if (is_node_accessible(game, node, movement)) {
-
         game->labels[node->y][node->x] |= accessible_bit;
         grid_explore_mark_attackable_direct(game, node->x, node->y, model,
                                             player, label_attackable_tiles);
     }
 
     explore_adjacent_tiles(game, node, movement);
+}
+
+energy_t init_exploration_energy(const energy_t scalar, const model_t model) {
+    const movement_t movement_type = unit_movement_types[model];
+    return scalar * unit_movement_ranges[movement_type] + 1;
 }
 
 // Use scalar > 1 when looking ahead multiple turns
@@ -238,19 +238,16 @@ void grid_explore_recursive(struct game* const game,
     const struct unit cursor_unit = game->units.data[cursor_unit_index];
     // pop unit from units so unit cannot interfere with its own pathfinding
     units_delete(&game->units, cursor_unit_index);
-    assert(game->units.grid[game->y][game->x] == null_unit);
 
     const model_t model = cursor_unit.model;
     const player_t player = cursor_unit.player;
 
-    const movement_t movement_type = unit_movement_types[model];
-    const energy_t init_energy =
-        scalar * unit_movement_ranges[movement_type] + 1;
-
     grid_explore_mark_attackable_ranged(game, game->x, game->y, model, player,
                                         label_attackable_tiles);
 
-    struct list_node node = {.x = game->x, .y = game->y, .energy = init_energy};
+    struct list_node node = {.x = game->x,
+                             .y = game->y,
+                             .energy = init_exploration_energy(scalar, model)};
 
     list_insert(list, node);
 
@@ -274,12 +271,12 @@ void grid_explore(struct game* const game, const bool label_attackable_tiles,
 void grid_find_path(struct game* const game, grid_t x, grid_t y) {
     assert(list_empty(&game->list));
 
-    energy_t prev_energy = 0;
+    energy_t prev_energy = game->energies[y][x];
 
     while (true) {
-        struct list_node list_node = {
+        struct list_node node = {
             .x = x, .y = y, .energy = game->energies[y][x]};
-        list_insert(&game->list, list_node);
+        list_insert(&game->list, node);
 
         energy_t next_energy = 0;
 
@@ -296,7 +293,7 @@ void grid_find_path(struct game* const game, grid_t x, grid_t y) {
             }
         }
 
-        if (next_energy < prev_energy)
+        if (next_energy <= prev_energy)
             return;
 
         prev_energy = next_energy;

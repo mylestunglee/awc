@@ -60,6 +60,7 @@ unit_t insert_with_players(struct units* const units,
 
 bool units_insert(struct units* const units, const struct unit unit) {
     assert(units->grid[unit.y][unit.x] == null_unit);
+    assert(unit.player != null_player);
 
     const unit_t index = insert_with_players(units, &unit);
 

@@ -149,6 +149,7 @@ const static energy_t unit_movement_ranges[model_capacity] = {
 #define unit_capturable_upper_bound 2
 #define movement_type_ship 5
 #define tile_void 0
+#define tile_plains 1
 #define tile_forest 2
 #define tile_mountain 3
 #define tile_bridge 9
