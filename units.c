@@ -1,5 +1,6 @@
 #include "units.h"
 #include <assert.h>
+#include <stddef.h>
 
 void units_initialise(struct units* const units) {
     // Set counters
@@ -154,4 +155,26 @@ struct unit* units_get_at(struct units* const units, const grid_t x,
 struct unit* units_get_by(struct units* const units, const unit_t unit) {
     assert(unit != null_unit);
     return &units->data[unit];
+}
+
+struct unit* units_get_by_safe(struct units* const units, const unit_t unit) {
+    if (unit == null_unit)
+        return NULL;
+
+    return units_get_by(units, unit);
+}
+
+struct unit* units_get_first(struct units* const units, const player_t player) {
+    return units_get_by_safe(units, units->firsts[player]);
+}
+
+unit_t index_by_pointer(const struct units* const units, const struct unit* const unit) {
+    assert(unit - (struct unit*)&units->data != null_unit);
+    return unit - (struct unit*)&units->data;
+}
+
+struct unit* units_get_next(struct units* const units, const struct unit* const unit) {
+    assert (unit == NULL);
+    const unit_t index = index_by_pointer(units, unit);
+    return units_get_by_safe(units, units->nexts[index]);
 }

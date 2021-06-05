@@ -18,7 +18,7 @@ struct units {
     unit_t start;
     unit_t size;
     unit_t frees[units_capacity];
-    player_t firsts[players_capacity];
+    unit_t firsts[players_capacity];
     unit_t prevs[units_capacity];
     unit_t nexts[units_capacity];
     unit_t grid[grid_size][grid_size];
@@ -33,6 +33,9 @@ void units_set_enabled(struct units* const, const player_t, const bool);
 void units_delete_player(struct units* const, const player_t);
 struct unit* units_get_at(struct units* const, const grid_t, const grid_t);
 struct unit* units_get_by(struct units* const, const unit_t);
+struct unit* units_get_by_safe(struct units* const, const unit_t);
+struct unit* units_get_first(struct units* const, const player_t);
+struct unit* units_get_next(struct units* const, const struct unit* const);
 
 #ifdef expose_units_internals
 
@@ -40,6 +43,7 @@ unit_t insert_with_frees(struct units* const, const struct unit* const);
 unit_t insert_with_players(struct units* const, const struct unit* const);
 void delete_with_frees(struct units* const, const unit_t);
 void delete_with_players(struct units* const, const unit_t);
+unit_t index_by_pointer(const struct units* const, const struct unit* const);
 
 #endif
 

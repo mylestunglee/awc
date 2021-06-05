@@ -246,10 +246,8 @@ static energy_t find_nearest_attackee_target(struct game* const game,
         if (is_friendly(game, player))
             continue;
 
-        unit_t curr = game->units.firsts[player];
-        while (curr != null_unit) {
-            const struct unit* const attackee = &game->units.data[curr];
-
+        struct unit* attackee = units_get_first(&game->units, player);
+        while (attackee) {
             // Attackee is attackable
             if (units_damage[attacker->model][attackee->model] > 0) {
                 // If attacker is ranged
@@ -262,7 +260,7 @@ static energy_t find_nearest_attackee_target(struct game* const game,
                         game, attackee, &max_energy, nearest_x, nearest_y);
             }
 
-            curr = game->units.nexts[curr];
+            attackee = units_get_next(&game->units, attackee);
         }
     }
 
@@ -359,10 +357,10 @@ static void interact_units(struct game* const game) {
     assert(game->selected == null_unit);
 
     struct units* const units = &game->units;
-    unit_t curr = units->firsts[game->turn];
-    while (curr != null_unit) {
-        interact_unit(game, &units->data[curr]);
-        curr = units->nexts[curr];
+    struct unit* unit = units_get_first(units, game->turn);
+    while (unit) {
+        interact_unit(game, unit);
+        unit = units_get_next(units, unit);
     }
 }
 
