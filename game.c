@@ -59,9 +59,7 @@ static void move_cursor_to_interactable(struct game* const game) {
     }
 
     // Attempt to select a buildable
-    bool hq_found = false;
-    grid_t hq_x, hq_y;
-
+    game->x = 0;
     game->y = 0;
     do {
         do {
@@ -69,19 +67,10 @@ static void move_cursor_to_interactable(struct game* const game) {
                 return;
 
             if (game->map[game->y][game->x] == tile_hq &&
-                game->territory[game->y][game->x] == game->turn) {
-                hq_found = true;
-                hq_x = game->x;
-                hq_y = game->y;
-            }
+                game->territory[game->y][game->x] == game->turn)
+                return;
         } while (++game->x);
     } while (++game->y);
-
-    // Attempt to select a HQ
-    if (hq_found) {
-        game->x = hq_x;
-        game->y = hq_y;
-    }
 
     // game->x, game->y undefined when no interactable
 }
