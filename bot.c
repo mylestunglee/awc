@@ -173,12 +173,8 @@ static void handle_capture(struct game* const game, struct unit* const unit) {
 
     game->x = x;
     game->y = y;
-    units_move(&game->units, game->units.grid[unit->y][unit->x], x, y);
-
-    action_handle_capture(game);
+    action_move(game);
     assert(game->territory[y][x] == unit->player);
-
-    unit->enabled = false;
 }
 
 // Attempt single-turn operation
@@ -192,9 +188,15 @@ static void handle_local(struct game* const game, struct unit* const unit) {
     // Scan for local targets
     grid_explore(game, false, true);
     handle_attack(game, unit);
+    if (!unit->enabled) {
+        grid_clear_uint8(game->labels);
+        return;    
+    }
 
-    if (unit->enabled)
-        handle_capture(game, unit);
+    handle_capture(game, unit);
+
+    if (!unit->enabled)
+        return;
 
     grid_clear_uint8(game->labels);
 }

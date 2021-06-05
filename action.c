@@ -108,3 +108,10 @@ bool action_build(struct game* const game, const model_t model) {
 
     return error;
 }
+
+void action_move(struct game* const game) {
+    grid_clear_uint8(game->labels);
+    units_move(&game->units, game->units.selected, game->x, game->y);
+    action_handle_capture(game);
+    units_disable_selection(&game->units);
+}

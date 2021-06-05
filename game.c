@@ -126,7 +126,8 @@ static void reset_selection(struct game* const game) {
 // selected
 // TODO: implement when a hovering over a unit
 static bool select_next_unit(struct game* const game) {
-    const struct unit* const unit = units_const_get_first(&game->units, game->turn);
+    const struct unit* const unit =
+        units_const_get_first(&game->units, game->turn);
     if (!unit)
         return false;
 
@@ -238,7 +239,6 @@ static bool calc_attack_enabled(const struct game* const game) {
 }
 
 static void select_unit(struct game* const game) {
-    grid_clear_uint8(game->labels);
     grid_explore(game, false, true);
     units_select_at(&game->units, game->x, game->y);
 }
@@ -247,34 +247,24 @@ static void highlight_unit(struct game* const game) {
     grid_explore(game, true, true);
 }
 
-static void move_unit(struct game* const game) {
-    units_move(&game->units, game->units.selected, game->x, game->y);
-    action_handle_capture(game);
-    units_disable_selection(&game->units);
-}
-
 static void handle_unit_selection(struct game* const game) {
-    const unit_t unit = game->units.grid[game->y][game->x];
-
+    const struct unit* unit =
+        units_const_get_at(&game->units, game->x, game->y);
+    const bool selected = units_has_selection(&game->units);
 
     // Select unit iff:
     // 1. A unit is not already selected
     // 2. The unit is enabled
-    if (game->units.selected == null_unit && unit != null_unit) {
-        const bool select = game->units.data[unit].enabled;
-
-        if (select)
+    if (!selected && unit) {
+        if (unit->enabled) {
+            grid_clear_uint8(game->labels);
             select_unit(game);
-        else
+        } else
             highlight_unit(game);
     } else {
         // Move to accessible tile when cursor is not over unit
-        if (game->units.selected != null_unit &&
-            game->labels[game->y][game->x] & accessible_bit) {
-
-            move_unit(game);
-            grid_clear_uint8(game->labels);
-
+        if (selected && game->labels[game->y][game->x] & accessible_bit) {
+            action_move(game);
         } else
             reset_selection(game);
     }
