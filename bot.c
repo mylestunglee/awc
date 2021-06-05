@@ -7,9 +7,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static unit_t find_attackee(struct game* const game,
-                            const struct unit* const attacker) {
-    unit_t best_attackee = null_unit;
+static const struct unit* find_attackee(struct game* const game,
+                                        const struct unit* const attacker) {
+    const struct unit* best_attackee = NULL;
     health_wide_t best_metric = 0;
 
     grid_t y = 0;
@@ -26,16 +26,21 @@ static unit_t find_attackee(struct game* const game,
             health_t damage, counter_damage;
             game_simulate_attack(game, &damage, &counter_damage);
 
-            const unit_t attackee_index = game->units.grid[y][x];
             const struct unit* const attackee =
-                &game->units.data[attackee_index];
-            health_wide_t metric =
-                (health_wide_t)damage * models_cost[attackee->model] -
+                units_get_at(&game->units, x, y);
+            const health_wide_t damage_metric =
+                (health_wide_t)damage * models_cost[attackee->model];
+            const health_wide_t counter_damage_metric =
                 (health_wide_t)counter_damage * models_cost[attacker->model];
 
-            if (metric > best_metric || best_attackee == null_unit) {
+            if (counter_damage_metric > damage_metric)
+                continue;
+
+            const health_wide_t metric = damage_metric - counter_damage_metric;
+
+            if (metric > best_metric) {
                 best_metric = metric;
-                best_attackee = attackee_index;
+                best_attackee = attackee;
             }
         } while (++x);
     } while (++y);
@@ -100,12 +105,10 @@ static void handle_direct_attack(struct game* const game,
 
 static void handle_attack(struct game* const game,
                           struct unit* const attacker) {
-    const unit_t attackee_index = find_attackee(game, attacker);
+    const struct unit* const attackee = find_attackee(game, attacker);
 
-    if (attackee_index == null_unit)
+    if (attackee == NULL)
         return;
-
-    const struct unit* const attackee = &game->units.data[attackee_index];
 
     if (models_min_range[attacker->model])
         handle_ranged_attack(game, attacker, attackee);

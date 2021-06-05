@@ -58,17 +58,17 @@ unit_t insert_with_players(struct units* const units,
     return index;
 }
 
-bool units_insert(struct units* const units, const struct unit unit) {
-    assert(units->grid[unit.y][unit.x] == null_unit);
-    assert(unit.player != null_player);
+bool units_insert(struct units* const units, const struct unit* const unit) {
+    assert(units->grid[unit->y][unit->x] == null_unit);
+    assert(unit->player != null_player);
 
-    const unit_t index = insert_with_players(units, &unit);
+    const unit_t index = insert_with_players(units, unit);
 
     // insert_with_players may fail when units data structure is at capacity
     if (index == null_unit)
         return true;
 
-    units->grid[unit.y][unit.x] = index;
+    units->grid[unit->y][unit->x] = index;
     return false;
 }
 
@@ -106,6 +106,12 @@ void units_delete(struct units* const units, const unit_t unit_index) {
     units->grid[unit->y][unit->x] = null_unit;
 }
 
+void units_delete_at(struct units* const units, const grid_t x,
+                     const grid_t y) {
+    assert(units->grid[y][x] != null_unit);
+    units_delete(units, units->grid[y][x]);
+}
+
 void units_move(struct units* const units, const unit_t unit, const grid_t x,
                 const grid_t y) {
     const grid_t old_x = units->data[unit].x;
@@ -138,4 +144,14 @@ void units_set_enabled(struct units* const units, const player_t player,
 void units_delete_player(struct units* const units, const player_t player) {
     while (units->firsts[player] != null_unit)
         units_delete(units, units->firsts[player]);
+}
+
+struct unit* units_get_at(struct units* const units, const grid_t x,
+                          const grid_t y) {
+    return units_get_by(units, units->grid[y][x]);
+}
+
+struct unit* units_get_by(struct units* const units, const unit_t unit) {
+    assert(unit != null_unit);
+    return &units->data[unit];
 }

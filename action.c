@@ -28,9 +28,7 @@ static void action_capture(struct game* const game) {
 }
 
 void action_handle_capture(struct game* const game) {
-    assert(game->selected != null_unit);
-
-    const struct unit* const unit = &game->units.data[game->selected];
+    const struct unit* const unit = units_get_by(&game->units, game->selected);
 
     assert(unit->player == game->turn);
     assert(unit->x == game->x);
@@ -54,12 +52,8 @@ void action_handle_capture(struct game* const game) {
 }
 
 void action_attack(struct game* const game) {
-    assert(game->units.grid[game->y][game->x] != null_unit);
-    assert(game->selected != null_unit);
-
-    struct unit* const attacker = &game->units.data[game->selected];
-    const unit_t attackee_index = game->units.grid[game->y][game->x];
-    struct unit* const attackee = &game->units.data[attackee_index];
+    struct unit* const attacker = units_get_by(&game->units, game->selected);
+    struct unit* const attackee = units_get_at(&game->units, game->x, game->y);
     assert(attacker->enabled);
 
     // If unit is direct, move to attack
@@ -73,7 +67,7 @@ void action_attack(struct game* const game) {
 
     // Apply damage
     if (damage >= attackee->health) {
-        units_delete(&game->units, attackee_index);
+        units_delete_at(&game->units, game->x, game->y);
         return;
     }
 
@@ -109,7 +103,7 @@ bool action_build(struct game* const game, const model_t model) {
                               .x = game->x,
                               .y = game->y,
                               .enabled = false};
-    const bool error = units_insert(&game->units, unit);
+    const bool error = units_insert(&game->units, &unit);
 
     return error;
 }

@@ -257,7 +257,7 @@ void grid_explore_recursive(struct game* const game,
                      model, label_attackable_tiles);
     }
 
-    units_insert(&game->units, cursor_unit);
+    units_insert(&game->units, &cursor_unit);
 }
 
 // Recursively marks tiles that are accessible or attackable from the cursor

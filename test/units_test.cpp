@@ -106,7 +106,7 @@ TEST_F(units_fixture, units_insert_sets_grid) {
     struct unit unit {
         .x = 2, .y = 3
     };
-    auto error = units_insert(units, unit);
+    auto error = units_insert(units, &unit);
     ASSERT_FALSE(error);
     auto index = units->grid[3][2];
     ASSERT_NE(index, null_unit);
@@ -118,7 +118,7 @@ TEST_F(units_fixture, units_insert_sets_grid) {
 TEST_F(units_fixture, units_insert_propogates_failure) {
     struct unit unit;
     units->size = units_capacity;
-    auto error = units_insert(units, unit);
+    auto error = units_insert(units, &unit);
     ASSERT_TRUE(error);
 }
 
@@ -160,7 +160,7 @@ TEST_F(units_fixture, units_delete_unsets_grid) {
     struct unit unit {
         .x = 2, .y = 3
     };
-    units_insert(units, unit);
+    units_insert(units, &unit);
     units_delete(units, units->grid[3][2]);
     ASSERT_EQ(units->grid[3][2], null_unit);
 }
@@ -169,7 +169,7 @@ TEST_F(units_fixture, units_move_relocates_unit) {
     struct unit unit {
         .x = 2, .y = 3
     };
-    units_insert(units, unit);
+    units_insert(units, &unit);
     auto index = units->grid[3][2];
     units_move(units, index, 5, 7);
     ASSERT_EQ(units->grid[3][2], null_unit);
@@ -180,9 +180,9 @@ TEST_F(units_fixture, units_set_enabled_sets_enabled) {
     struct unit unit {
         .player = 2, .x = 3, .y = 5, .enabled = false
     };
-    units_insert(units, unit);
+    units_insert(units, &unit);
     unit.y = 7;
-    units_insert(units, unit);
+    units_insert(units, &unit);
     units_set_enabled(units, 2, true);
     ASSERT_TRUE(units->data[units->grid[5][3]].enabled);
     ASSERT_TRUE(units->data[units->grid[7][3]].enabled);
@@ -192,9 +192,9 @@ TEST_F(units_fixture, units_delete_player_deletes_all_player_units) {
     struct unit unit {
         .player = 2, .x = 3, .y = 5
     };
-    units_insert(units, unit);
+    units_insert(units, &unit);
     unit.y = 7;
-    units_insert(units, unit);
+    units_insert(units, &unit);
     units_delete_player(units, 2);
     ASSERT_EQ(units->size, 0);
 }

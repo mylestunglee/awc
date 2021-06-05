@@ -25,11 +25,14 @@ struct units {
 };
 
 void units_initialise(struct units* const);
-bool units_insert(struct units* const, const struct unit);
+bool units_insert(struct units* const, const struct unit* const);
 void units_delete(struct units* const, const unit_t);
+void units_delete_at(struct units* const, const grid_t, const grid_t);
 void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
 void units_set_enabled(struct units* const, const player_t, const bool);
 void units_delete_player(struct units* const, const player_t);
+struct unit* units_get_at(struct units* const, const grid_t, const grid_t);
+struct unit* units_get_by(struct units* const, const unit_t);
 
 #ifdef expose_units_internals
 

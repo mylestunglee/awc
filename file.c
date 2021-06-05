@@ -67,7 +67,7 @@ static void file_load_unit(struct units* const units, const char* const tokens,
                                   .x = x,
                                   .y = y,
                                   .enabled = !strcmp(enabled, "enabled")};
-        units_insert(units, unit);
+        units_insert(units, &unit);
     }
 }
 
