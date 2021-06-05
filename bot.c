@@ -20,9 +20,6 @@ static const struct unit* find_attackee(struct game* const game,
             if (!(game->labels[y][x] & attackable_bit))
                 continue;
 
-            game->x = x;
-            game->y = y;
-
             health_t damage, counter_damage;
             game_simulate_attack(game, &damage, &counter_damage);
 

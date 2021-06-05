@@ -146,8 +146,9 @@ bool is_node_unexplorable(const struct game* const game,
         const player_t node_player = game->units.data[unit].player;
         const bool enemy_unit =
             !bitmatrix_get(game->alliances, player, node_player);
+        const bool non_init_tile = node->x != game->x || node->y != game->y;
 
-        if (enemy_unit)
+        if (enemy_unit && non_init_tile)
             return true;
     }
 
@@ -236,8 +237,6 @@ void grid_explore_recursive(struct game* const game,
     // non-selectable enemy units
     const unit_t cursor_unit_index = game->units.grid[game->y][game->x];
     const struct unit cursor_unit = game->units.data[cursor_unit_index];
-    // pop unit from units so unit cannot interfere with its own pathfinding
-    units_delete(&game->units, cursor_unit_index);
 
     const model_t model = cursor_unit.model;
     const player_t player = cursor_unit.player;
@@ -256,8 +255,6 @@ void grid_explore_recursive(struct game* const game,
         explore_node(game, &node, friendly_passable ? player : null_player,
                      model, label_attackable_tiles);
     }
-
-    units_insert(&game->units, &cursor_unit);
 }
 
 // Recursively marks tiles that are accessible or attackable from the cursor
