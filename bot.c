@@ -345,13 +345,14 @@ static void interact_unit(struct game* const game, struct unit* const unit) {
     if (!unit->enabled)
         return;
 
-    game->units.selected = game->units.grid[unit->y][unit->x];
+    // TODO: tidy selection by pointer?
+    units_select_at(&game->units, unit->x, unit->y);
     handle_local(game, unit);
 
     if (unit->enabled)
         handle_nonlocal(game, unit);
 
-    game->units.selected = null_unit;
+    units_clear_selection(&game->units);
 }
 
 static void interact_units(struct game* const game) {

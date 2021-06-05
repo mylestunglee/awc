@@ -28,7 +28,7 @@ static void action_capture(struct game* const game) {
 }
 
 void action_handle_capture(struct game* const game) {
-    const struct unit* const unit = units_get_by(&game->units, game->units.selected);
+    const struct unit* const unit = units_const_get_selected(&game->units);
 
     assert(unit->player == game->turn);
     assert(unit->x == game->x);
@@ -52,14 +52,15 @@ void action_handle_capture(struct game* const game) {
 }
 
 void action_attack(struct game* const game) {
-    struct unit* const attacker = units_get_by(&game->units, game->units.selected);
+    struct unit* const attacker = units_get_selected(&game->units);
     struct unit* const attackee = units_get_at(&game->units, game->x, game->y);
     assert(attacker->enabled);
 
     // If unit is direct, move to attack
     const bool ranged = models_min_range[attacker->model];
     if (!ranged)
-        units_move(&game->units, game->units.selected, game->prev_x, game->prev_y);
+        units_move(&game->units, game->units.selected, game->prev_x,
+                   game->prev_y);
 
     // Compute damage
     health_t damage, counter_damage;
@@ -79,7 +80,7 @@ void action_attack(struct game* const game) {
 
     // Apply counter damage
     if (counter_damage >= attacker->health) {
-        units_delete(&game->units, game->units.selected);
+        units_delete_selected(&game->units);
         return;
     }
 

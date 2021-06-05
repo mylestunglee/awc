@@ -262,7 +262,8 @@ static bool calc_attack_enabled(const struct game* const game) {
     //     a. Selected unit can attack with positive damage
     //     b. Attacker and attackee are in different teams
     return game->units.selected != null_unit &&
-           (models_min_range[units_const_get_by(&game->units, game->units.selected)
+           (models_min_range[units_const_get_by(&game->units,
+                                                game->units.selected)
                                  ->model] ||
             game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
            game->labels[game->y][game->x] & attackable_bit;

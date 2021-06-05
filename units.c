@@ -115,6 +115,10 @@ void units_delete_at(struct units* const units, const grid_t x,
     units_delete(units, units->grid[y][x]);
 }
 
+void units_delete_selected(struct units* const units) {
+    units_delete(units, units->selected);
+}
+
 void units_move(struct units* const units, const unit_t unit, const grid_t x,
                 const grid_t y) {
     const grid_t old_x = units->data[unit].x;
@@ -212,4 +216,22 @@ const struct unit* units_const_get_next(const struct units* const units,
     assert(unit != NULL);
     const unit_t index = index_by_pointer(units, unit);
     return units_const_get_by_safe(units, units->nexts[index]);
+}
+
+struct unit* units_get_selected(struct units* const units) {
+    return units_get_by(units, units->selected);
+}
+
+const struct unit* units_const_get_selected(const struct units* const units) {
+    return units_const_get_by(units, units->selected);
+}
+
+void units_select_at(struct units* const units, const grid_t x,
+                     const grid_t y) {
+    assert(units->grid[y][x] != null_unit);
+    units->selected = units->grid[y][x];
+}
+
+void units_clear_selection(struct units* const units) {
+    units->selected = null_unit;
 }
