@@ -83,6 +83,10 @@ void grid_explore_mark_attackable_tile(struct game* const game, const grid_t x,
         return;
     }
 
+    // Skip self-attack
+    if (game->x == x && game->y == y)
+        return;
+
     const unit_t index = game->units.grid[y][x];
     if (index == null_unit)
         return;
@@ -146,9 +150,9 @@ bool is_node_unexplorable(const struct game* const game,
         const player_t node_player = game->units.data[unit].player;
         const bool enemy_unit =
             !bitmatrix_get(game->alliances, player, node_player);
-        const bool non_init_tile = node->x != game->x || node->y != game->y;
+        const bool init_tile = node->x == game->x && node->y == game->y;
 
-        if (enemy_unit && non_init_tile)
+        if (enemy_unit && !init_tile)
             return true;
     }
 
@@ -163,10 +167,11 @@ bool is_node_accessible(const struct game* const game,
                         const struct list_node* const node,
                         const movement_t movement) {
     const bool unoccupied = game->units.grid[node->y][node->x] == null_unit;
+    const bool init_tile = node->x == game->x && node->y == game->y;
     const tile_t tile = game->map[node->y][node->x];
     const bool ship_on_bridge =
         tile == tile_bridge && movement == movement_type_ship;
-    return unoccupied && !ship_on_bridge;
+    return (unoccupied || init_tile) && !ship_on_bridge;
 }
 
 void explore_adjacent_tiles(struct game* const game,

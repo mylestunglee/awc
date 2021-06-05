@@ -169,9 +169,17 @@ const struct unit* units_const_get_by(const struct units* const units,
     return &units->data[unit];
 }
 
+const struct unit* units_const_get_by_safe(const struct units* const units,
+                                           const unit_t unit) {
+    if (unit == null_unit)
+        return NULL;
+
+    return units_const_get_by(units, unit);
+}
+
 const struct unit* units_const_get_at(const struct units* const units,
                                       const grid_t x, const grid_t y) {
-    return units_const_get_by(units, units->grid[y][x]);
+    return units_const_get_by_safe(units, units->grid[y][x]);
 }
 
 struct unit* units_get_by(struct units* const units, const unit_t unit) {
@@ -201,14 +209,6 @@ struct unit* units_get_next(struct units* const units,
     assert(unit != NULL);
     const unit_t index = index_by_pointer(units, unit);
     return units_get_by_safe(units, units->nexts[index]);
-}
-
-const struct unit* units_const_get_by_safe(const struct units* const units,
-                                           const unit_t unit) {
-    if (unit == null_unit)
-        return NULL;
-
-    return units_const_get_by(units, unit);
 }
 
 const struct unit* units_const_get_first(const struct units* const units,
