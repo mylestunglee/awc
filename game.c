@@ -49,11 +49,12 @@ static bool calc_build_enabled(const struct game* const game) {
 
 static void move_cursor_to_interactable(struct game* const game) {
     // Attempt to select a unit
-    const unit_t unit = game->units.firsts[game->turn];
+    const struct unit* const unit =
+        units_const_get_first(&game->units, game->turn);
 
-    if (unit != null_unit) {
-        game->x = game->units.data[unit].x;
-        game->y = game->units.data[unit].y;
+    if (unit) {
+        game->x = unit->x;
+        game->y = unit->y;
         return;
     }
 
@@ -273,7 +274,8 @@ static bool calc_attack_enabled(const struct game* const game) {
     //     a. Selected unit can attack with positive damage
     //     b. Attacker and attackee are in different teams
     return game->selected != null_unit &&
-           (models_min_range[game->units.data[game->selected].model] ||
+           (models_min_range[units_const_get_by(&game->units, game->selected)
+                                 ->model] ||
             game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
            game->labels[game->y][game->x] & attackable_bit;
 }
@@ -328,11 +330,10 @@ static health_t calc_damage(const struct game* const game,
 void game_simulate_attack(const struct game* const game, health_t* const damage,
                           health_t* const counter_damage) {
 
-    assert(game->selected != null_unit);
-
-    const struct unit* const attacker = &game->units.data[game->selected];
-    const unit_t attackee_index = game->units.grid[game->y][game->x];
-    const struct unit* const attackee = &game->units.data[attackee_index];
+    const struct unit* const attacker =
+        units_const_get_by(&game->units, game->selected);
+    const struct unit* const attackee =
+        units_const_get_at(&game->units, game->x, game->y);
 
     *damage = calc_damage(game, attacker, attackee);
 
@@ -342,8 +343,8 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
         return;
     }
 
-    // Ranged units do not receive to give counter-attacks
-    if (models_min_range[attacker->model] || models_min_range[attackee->model])
+    // Ranged units do not give counter-attacks
+    if (models_min_range[attackee->model])
         *counter_damage = 0;
     else
         *counter_damage = calc_damage(game, attackee, attacker);
@@ -355,9 +356,8 @@ static void game_attack(struct game* const game) {
 }
 
 static void repair_units(struct game* const game) {
-    unit_t curr = game->units.firsts[game->turn];
-    while (curr != null_unit) {
-        struct unit* const unit = &game->units.data[curr];
+    struct unit* unit = units_get_first(&game->units, game->turn);
+    while (unit) {
         if (game->territory[unit->y][unit->x] == game->turn &&
             unit->health < health_max) {
 
@@ -373,7 +373,7 @@ static void repair_units(struct game* const game) {
                 (gold_t)health_max;
         }
 
-        curr = game->units.nexts[curr];
+        unit = units_get_next(&game->units, unit);
     }
 }
 

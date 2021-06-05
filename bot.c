@@ -27,7 +27,7 @@ static const struct unit* find_attackee(struct game* const game,
             game_simulate_attack(game, &damage, &counter_damage);
 
             const struct unit* const attackee =
-                units_get_at(&game->units, x, y);
+                units_const_get_at(&game->units, x, y);
             const health_wide_t damage_metric =
                 (health_wide_t)damage * models_cost[attackee->model];
             const health_wide_t counter_damage_metric =
@@ -246,7 +246,8 @@ static energy_t find_nearest_attackee_target(struct game* const game,
         if (is_friendly(game, player))
             continue;
 
-        struct unit* attackee = units_get_first(&game->units, player);
+        const struct unit* attackee =
+            units_const_get_first(&game->units, player);
         while (attackee) {
             // Attackee is attackable
             if (units_damage[attacker->model][attackee->model] > 0) {
@@ -260,7 +261,7 @@ static energy_t find_nearest_attackee_target(struct game* const game,
                         game, attackee, &max_energy, nearest_x, nearest_y);
             }
 
-            attackee = units_get_next(&game->units, attackee);
+            attackee = units_const_get_next(&game->units, attackee);
         }
     }
 
@@ -369,11 +370,10 @@ accumulate_distribution(const struct game* const game, const player_t player,
                         health_wide_t distribution[model_capacity]) {
 
     const struct units* const units = &game->units;
-    unit_t curr = units->firsts[player];
-    while (curr != null_unit) {
-        const struct unit* const unit = &units->data[curr];
+    const struct unit* unit = units_const_get_first(units, player);
+    while (unit) {
         distribution[unit->model] += unit->health;
-        curr = units->nexts[curr];
+        unit = units_const_get_next(units, unit);
     }
 }
 

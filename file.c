@@ -180,15 +180,14 @@ static void file_save_map(const struct game* const game, FILE* const file) {
 
 static void file_save_units(const struct units* const units, FILE* const file) {
     for (player_t player = 0; player < players_capacity; ++player) {
-        unit_t curr = units->firsts[player];
-        while (curr != null_unit) {
-            const struct unit* const unit = &units->data[curr];
+        const struct unit* unit = units_const_get_first(units, player);
+        while (unit) {
             fprintf(file,
                     model_name_format " " player_format " " grid_format
                                       " " grid_format " " health_format " %s\n",
                     model_names[unit->model], unit->player, unit->x, unit->y,
                     unit->health, unit->enabled ? "enabled" : "disabled");
-            curr = units->nexts[curr];
+            unit = units_const_get_next(units, unit);
         }
     }
 }

@@ -152,6 +152,17 @@ struct unit* units_get_at(struct units* const units, const grid_t x,
     return units_get_by(units, units->grid[y][x]);
 }
 
+const struct unit* units_const_get_by(const struct units* const units,
+                                      const unit_t unit) {
+    assert(unit != null_unit);
+    return &units->data[unit];
+}
+
+const struct unit* units_const_get_at(const struct units* const units,
+                                      const grid_t x, const grid_t y) {
+    return units_const_get_by(units, units->grid[y][x]);
+}
+
 struct unit* units_get_by(struct units* const units, const unit_t unit) {
     assert(unit != null_unit);
     return &units->data[unit];
@@ -168,13 +179,35 @@ struct unit* units_get_first(struct units* const units, const player_t player) {
     return units_get_by_safe(units, units->firsts[player]);
 }
 
-unit_t index_by_pointer(const struct units* const units, const struct unit* const unit) {
+unit_t index_by_pointer(const struct units* const units,
+                        const struct unit* const unit) {
     assert(unit - (struct unit*)&units->data != null_unit);
     return unit - (struct unit*)&units->data;
 }
 
-struct unit* units_get_next(struct units* const units, const struct unit* const unit) {
-    assert (unit == NULL);
+struct unit* units_get_next(struct units* const units,
+                            const struct unit* const unit) {
+    assert(unit != NULL);
     const unit_t index = index_by_pointer(units, unit);
     return units_get_by_safe(units, units->nexts[index]);
+}
+
+const struct unit* units_const_get_by_safe(const struct units* const units,
+                                           const unit_t unit) {
+    if (unit == null_unit)
+        return NULL;
+
+    return units_const_get_by(units, unit);
+}
+
+const struct unit* units_const_get_first(const struct units* const units,
+                                         const player_t player) {
+    return units_const_get_by_safe(units, units->firsts[player]);
+}
+
+const struct unit* units_const_get_next(const struct units* const units,
+                                        const struct unit* const unit) {
+    assert(unit != NULL);
+    const unit_t index = index_by_pointer(units, unit);
+    return units_const_get_by_safe(units, units->nexts[index]);
 }
