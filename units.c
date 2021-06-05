@@ -21,6 +21,8 @@ void units_initialise(struct units* const units) {
             units->grid[y][x] = null_unit;
         } while (++x);
     } while (++y);
+
+    units->selected = null_unit;
 }
 
 unit_t insert_with_frees(struct units* const units,

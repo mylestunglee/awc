@@ -22,6 +22,7 @@ struct units {
     unit_t prevs[units_capacity];
     unit_t nexts[units_capacity];
     unit_t grid[grid_size][grid_size];
+    unit_t selected;
 };
 
 void units_initialise(struct units* const);

@@ -345,17 +345,17 @@ static void interact_unit(struct game* const game, struct unit* const unit) {
     if (!unit->enabled)
         return;
 
-    game->selected = game->units.grid[unit->y][unit->x];
+    game->units.selected = game->units.grid[unit->y][unit->x];
     handle_local(game, unit);
 
     if (unit->enabled)
         handle_nonlocal(game, unit);
 
-    game->selected = null_unit;
+    game->units.selected = null_unit;
 }
 
 static void interact_units(struct game* const game) {
-    assert(game->selected == null_unit);
+    assert(game->units.selected == null_unit);
 
     struct units* const units = &game->units;
     struct unit* unit = units_get_first(units, game->turn);
@@ -501,7 +501,7 @@ static void build_units(struct game* const game) {
 
 void bot_play(struct game* const game) {
     // Clear previous user interaction
-    game->selected = null_unit;
+    game->units.selected = null_unit;
     grid_clear_uint8(game->labels);
 
     interact_units(game);

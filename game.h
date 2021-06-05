@@ -9,7 +9,6 @@ struct game {
     struct units units;
     grid_t x;
     grid_t y;
-    unit_t selected;
     uint8_t labels[grid_size][grid_size];
     energy_t energies[grid_size][grid_size];
     struct list list;

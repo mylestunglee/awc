@@ -17,7 +17,6 @@ void game_initialise(struct game* const game) {
     grid_clear_energy(game->energies);
     grid_clear_territory(game->territory);
     units_initialise(&game->units);
-    game->selected = null_unit;
     list_initialise(&game->list);
     game->turn = 0;
 
@@ -44,7 +43,7 @@ static bool calc_build_enabled(const struct game* const game) {
 
     return game->units.grid[game->y][game->x] == null_unit &&
            buildable_models[capturable] < buildable_models[capturable + 1] &&
-           game->selected == null_unit;
+           game->units.selected == null_unit;
 }
 
 static void move_cursor_to_interactable(struct game* const game) {
@@ -142,7 +141,7 @@ static unit_t suggest_next_unit(struct game* const game, const unit_t hint) {
 }
 
 static void reset_selection(struct game* const game) {
-    game->selected = null_unit;
+    game->units.selected = null_unit;
     grid_clear_uint8(game->labels);
 }
 
@@ -159,7 +158,7 @@ static bool select_next_unit(struct game* const game) {
     else
         next_unit_index = suggest_next_unit(game, null_unit);
 
-    if (next_unit_index == null_unit || next_unit_index == game->selected)
+    if (next_unit_index == null_unit || next_unit_index == game->units.selected)
         return false;
 
     const struct unit* const next_unit = &game->units.data[next_unit_index];
@@ -179,10 +178,10 @@ static bool parse_self_distruct_unit(struct game* const game,
     if (input != 'k')
         return false;
 
-    if (game->selected == null_unit)
+    if (game->units.selected == null_unit)
         return false;
 
-    units_delete(&game->units, game->selected);
+    units_delete(&game->units, game->units.selected);
     reset_selection(game);
     return true;
 }
@@ -262,8 +261,8 @@ static bool calc_attack_enabled(const struct game* const game) {
     // 3. Selected tile is attackable, which implies:
     //     a. Selected unit can attack with positive damage
     //     b. Attacker and attackee are in different teams
-    return game->selected != null_unit &&
-           (models_min_range[units_const_get_by(&game->units, game->selected)
+    return game->units.selected != null_unit &&
+           (models_min_range[units_const_get_by(&game->units, game->units.selected)
                                  ->model] ||
             game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
            game->labels[game->y][game->x] & attackable_bit;
@@ -275,7 +274,7 @@ static void handle_unit_selection(struct game* const game) {
     // Select unit iff:
     // 1. A unit is not already selected
     // 2. The unit is enabled
-    if (game->selected == null_unit && unit != null_unit) {
+    if (game->units.selected == null_unit && unit != null_unit) {
         const bool select = game->units.data[unit].enabled;
 
         // Remove highlighting of disabled units
@@ -287,15 +286,15 @@ static void handle_unit_selection(struct game* const game) {
         grid_clear_energy(game->energies);
 
         if (select)
-            game->selected = unit;
+            game->units.selected = unit;
     } else {
         // Move to accessible tile when cursor is not over unit
-        if (game->selected != null_unit &&
+        if (game->units.selected != null_unit &&
             game->labels[game->y][game->x] & accessible_bit) {
 
-            units_move(&game->units, game->selected, game->x, game->y);
+            units_move(&game->units, game->units.selected, game->x, game->y);
             action_handle_capture(game);
-            game->units.data[game->selected].enabled = false;
+            game->units.data[game->units.selected].enabled = false;
         }
 
         reset_selection(game);
@@ -320,7 +319,7 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
                           health_t* const counter_damage) {
 
     const struct unit* const attacker =
-        units_const_get_by(&game->units, game->selected);
+        units_const_get_by(&game->units, game->units.selected);
     const struct unit* const attackee =
         units_const_get_at(&game->units, game->x, game->y);
 
