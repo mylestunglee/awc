@@ -117,53 +117,21 @@ static bool parse_panning(struct game* const game, const char input) {
     return false;
 }
 
-// Returns the unit index of the cyclic next unit of the same player
-// If no unit can be suggested, null_player is returned
-static unit_t suggest_next_unit(struct game* const game, const unit_t hint) {
-    const struct units* units = &game->units;
-    unit_t next_unit = hint;
-    if (hint == null_unit)
-        next_unit = units->firsts[game->turn];
-
-    while (true) {
-        if (units->data[next_unit].enabled)
-            return next_unit;
-        next_unit = units->nexts[next_unit];
-        if (next_unit == null_unit) {
-            if (hint == null_unit)
-                return null_unit;
-            else
-                next_unit = units->firsts[game->turn];
-        }
-        if (next_unit == hint)
-            return null_unit;
-    }
-}
-
 static void reset_selection(struct game* const game) {
-    game->units.selected = null_unit;
+    units_clear_selection(&game->units);
     grid_clear_uint8(game->labels);
 }
 
 // Selects the next enabled unit of the current turn, returns true iff unit was
 // selected
+// TODO: implement when a hovering over a unit
 static bool select_next_unit(struct game* const game) {
-    const struct units* units = &game->units;
-    const unit_t cursor_unit = units->grid[game->y][game->x];
-    unit_t next_unit_index;
-    if (cursor_unit != null_unit &&
-        units->data[cursor_unit].player == game->turn &&
-        units->data[cursor_unit].enabled)
-        next_unit_index = suggest_next_unit(game, units->nexts[cursor_unit]);
-    else
-        next_unit_index = suggest_next_unit(game, null_unit);
-
-    if (next_unit_index == null_unit || next_unit_index == game->units.selected)
+    const struct unit* const unit = units_const_get_first(&game->units, game->turn);
+    if (!unit)
         return false;
 
-    const struct unit* const next_unit = &game->units.data[next_unit_index];
-    game->x = next_unit->x;
-    game->y = next_unit->y;
+    game->x = unit->x;
+    game->y = unit->y;
     reset_selection(game);
 
     return true;
@@ -269,8 +237,25 @@ static bool calc_attack_enabled(const struct game* const game) {
            game->labels[game->y][game->x] & attackable_bit;
 }
 
+static void select_unit(struct game* const game) {
+    grid_clear_uint8(game->labels);
+    grid_explore(game, false, true);
+    units_select_at(&game->units, game->x, game->y);
+}
+
+static void highlight_unit(struct game* const game) {
+    grid_explore(game, true, true);
+}
+
+static void move_unit(struct game* const game) {
+    units_move(&game->units, game->units.selected, game->x, game->y);
+    action_handle_capture(game);
+    units_disable_selection(&game->units);
+}
+
 static void handle_unit_selection(struct game* const game) {
     const unit_t unit = game->units.grid[game->y][game->x];
+
 
     // Select unit iff:
     // 1. A unit is not already selected
@@ -278,27 +263,20 @@ static void handle_unit_selection(struct game* const game) {
     if (game->units.selected == null_unit && unit != null_unit) {
         const bool select = game->units.data[unit].enabled;
 
-        // Remove highlighting of disabled units
         if (select)
-            grid_clear_uint8(game->labels);
-
-        // Allow highlighting of disabled units
-        grid_explore(game, !select, true);
-        grid_clear_energy(game->energies);
-
-        if (select)
-            game->units.selected = unit;
+            select_unit(game);
+        else
+            highlight_unit(game);
     } else {
         // Move to accessible tile when cursor is not over unit
         if (game->units.selected != null_unit &&
             game->labels[game->y][game->x] & accessible_bit) {
 
-            units_move(&game->units, game->units.selected, game->x, game->y);
-            action_handle_capture(game);
-            game->units.data[game->units.selected].enabled = false;
-        }
+            move_unit(game);
+            grid_clear_uint8(game->labels);
 
-        reset_selection(game);
+        } else
+            reset_selection(game);
     }
 }
 

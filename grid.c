@@ -265,6 +265,7 @@ void grid_explore_recursive(struct game* const game,
 void grid_explore(struct game* const game, const bool label_attackable_tiles,
                   const bool friendly_passable) {
     grid_explore_recursive(game, label_attackable_tiles, friendly_passable, 1);
+    grid_clear_energy(game->energies);
 }
 
 // Populates game.list with coordinates along the path to maximal energy

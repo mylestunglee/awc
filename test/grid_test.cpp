@@ -309,7 +309,7 @@ TEST_F(game_fixture, grid_explore_explores_with_correct_residual_energies) {
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
-    grid_explore(game, false, false);
+    grid_explore_recursive(game, false, false, 1);
     ASSERT_EQ(game->energies[3][2], 4);
     ASSERT_EQ(game->energies[3][3], 3);
     ASSERT_EQ(game->energies[3][4], 2);
@@ -453,3 +453,5 @@ int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
+// TODO: test grid_explore clears energy

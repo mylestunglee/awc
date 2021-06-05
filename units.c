@@ -136,6 +136,10 @@ void units_move(struct units* const units, const unit_t unit, const grid_t x,
     units->grid[y][x] = unit;
 }
 
+void units_move_selection(struct units* const units, const grid_t x, const grid_t y) {
+    units_move(units, units->selected, x, y);
+}
+
 // Sets enabled property for each unit of a player
 void units_set_enabled(struct units* const units, const player_t player,
                        const bool enabled) {
@@ -228,10 +232,19 @@ const struct unit* units_const_get_selected(const struct units* const units) {
 
 void units_select_at(struct units* const units, const grid_t x,
                      const grid_t y) {
+    assert(units->selected == null_unit);
     assert(units->grid[y][x] != null_unit);
     units->selected = units->grid[y][x];
 }
 
 void units_clear_selection(struct units* const units) {
     units->selected = null_unit;
+}
+
+bool units_has_selection(const struct units* const units) {
+    return units->selected != null_unit;
+}
+
+void units_disable_selection(struct units* const units) {
+    units_get_by(units, units->selected)->enabled = false;
 }

@@ -197,7 +197,6 @@ static void handle_local(struct game* const game, struct unit* const unit) {
         handle_capture(game, unit);
 
     grid_clear_uint8(game->labels);
-    grid_clear_energy(game->energies);
 }
 
 static void find_nearest_attackee_target_ranged(
