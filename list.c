@@ -10,12 +10,12 @@ bool list_empty(const struct list* const list) {
     return list->start == list->end;
 }
 
-void list_insert(struct list* const list, const struct list_node node) {
+void list_insert(struct list* const list, const struct list_node* const node) {
     // If full then silently fail
     if (list->start == (list_t)(list->end + 1))
         return;
 
-    list->nodes[list->end++] = node;
+    list->nodes[list->end++] = *node;
 }
 
 struct list_node list_front_pop(struct list* const list) {
