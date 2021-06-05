@@ -1,5 +1,6 @@
 awc
 test/*.o
-test/*.test
+test/*_test
+!test/*_test.cpp
 *.o
 *.txt
