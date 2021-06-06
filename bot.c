@@ -187,15 +187,15 @@ static void handle_local(struct game* const game, struct unit* const unit) {
     handle_attack(game, unit);
     if (!unit->enabled) {
         grid_clear_uint8(game->labels);
-        return;    
+        return;
     }
 
     handle_capture(game, unit);
+    grid_clear_energy(game->energies);
 
     if (!unit->enabled)
         return;
 
-    grid_clear_energy(game->energies);
     grid_clear_uint8(game->labels);
 }
 

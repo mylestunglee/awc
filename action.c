@@ -111,7 +111,7 @@ bool action_build(struct game* const game, const model_t model) {
 
 void action_move(struct game* const game) {
     grid_clear_uint8(game->labels);
-    units_move(&game->units, game->units.selected, game->x, game->y);
+    units_move_selection(&game->units, game->x, game->y);
     action_handle_capture(game);
     units_disable_selection(&game->units);
 }

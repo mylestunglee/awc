@@ -290,8 +290,7 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
 
     const struct unit* const attacker =
         units_const_get_by(&game->units, game->units.selected);
-    struct unit attackee =
-        *units_const_get_at(&game->units, game->x, game->y);
+    struct unit attackee = *units_const_get_at(&game->units, game->x, game->y);
 
     *damage = calc_damage(game, attacker, &attackee);
 
