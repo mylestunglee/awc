@@ -314,7 +314,7 @@ static void move_towards_target(struct game* const game,
     assert(accessible_bit & game->labels[y][x]);
 
     list_initialise(list);
-    units_move(&game->units, game->units.grid[unit->y][unit->x], x, y);
+    units_move_selection(&game->units, x, y);
     unit->enabled = false;
 }
 
@@ -451,7 +451,7 @@ realise_build_allocations(struct game* const game,
             if (game->territory[y][x] != game->turn)
                 continue;
 
-            if (game->units.grid[y][x] != null_unit)
+            if (units_const_get_at(&game->units, x, y))
                 continue;
 
             const tile_t capturable = game->map[y][x] - terrian_capacity;
@@ -463,7 +463,7 @@ realise_build_allocations(struct game* const game,
 
                 game->x = x;
                 game->y = y;
-                bool error = action_build(game, model);
+                const bool error = action_build(game, model);
 
                 if (error)
                     return;
