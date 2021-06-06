@@ -240,6 +240,7 @@ static bool calc_attack_enabled(const struct game* const game) {
 
 static void select_unit(struct game* const game) {
     grid_explore(game, false, true);
+    grid_clear_energy(game->energies);
     units_select_at(&game->units, game->x, game->y);
 }
 
@@ -289,22 +290,24 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
 
     const struct unit* const attacker =
         units_const_get_by(&game->units, game->units.selected);
-    const struct unit* const attackee =
-        units_const_get_at(&game->units, game->x, game->y);
+    struct unit attackee =
+        *units_const_get_at(&game->units, game->x, game->y);
 
-    *damage = calc_damage(game, attacker, attackee);
+    *damage = calc_damage(game, attacker, &attackee);
 
     // Apply damage
-    if (*damage > attackee->health) {
+    if (*damage > attackee.health) {
         *counter_damage = 0;
         return;
     }
 
+    attackee.health -= *damage;
+
     // Ranged units do not give counter-attacks
-    if (models_min_range[attackee->model])
+    if (models_min_range[attackee.model])
         *counter_damage = 0;
     else
-        *counter_damage = calc_damage(game, attackee, attacker);
+        *counter_damage = calc_damage(game, &attackee, attacker);
 }
 
 static void game_attack(struct game* const game) {

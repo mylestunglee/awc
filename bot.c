@@ -195,6 +195,7 @@ static void handle_local(struct game* const game, struct unit* const unit) {
     if (!unit->enabled)
         return;
 
+    grid_clear_energy(game->energies);
     grid_clear_uint8(game->labels);
 }
 
