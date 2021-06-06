@@ -59,7 +59,7 @@ void action_attack(struct game* const game) {
     // If unit is direct, move to attack
     const bool ranged = models_min_range[attacker->model];
     if (!ranged)
-        units_move(&game->units, game->units.selected, game->prev_x,
+        units_move_selection(&game->units, game->prev_x,
                    game->prev_y);
 
     // Compute damage

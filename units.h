@@ -30,7 +30,6 @@ bool units_insert(struct units* const, const struct unit* const);
 void units_delete(struct units* const, const unit_t);
 void units_delete_at(struct units* const, const grid_t, const grid_t);
 void units_delete_selected(struct units* const);
-void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
 void units_move_selection(struct units* const, const grid_t, const grid_t);
 void units_set_enabled(struct units* const, const player_t, const bool);
 void units_delete_player(struct units* const, const player_t);
@@ -54,6 +53,7 @@ void units_disable_selection(struct units* const);
 
 #ifdef expose_units_internals
 
+void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
 unit_t insert_with_frees(struct units* const, const struct unit* const);
 unit_t insert_with_players(struct units* const, const struct unit* const);
 void delete_with_frees(struct units* const, const unit_t);
