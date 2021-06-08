@@ -193,11 +193,6 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
         *counter_damage = calc_damage(game, &attackee, attacker);
 }
 
-void game_attack(struct game* const game) {
-    action_attack(game);
-    reset_selection(game);
-}
-
 static void repair_units(struct game* const game) {
     struct unit* unit = units_get_first(&game->units, game->turn);
     while (unit) {

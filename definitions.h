@@ -60,7 +60,6 @@ typedef uint8_t movement_t;
 #define selection_symbol '+'
 #define accessible_bit 1
 #define attackable_bit 2
-#define bot_target_bit 4
 #define accessible_style '\xe0'
 #define attackable_style '\x90'
 #define accessible_attackable_style '\xd0'

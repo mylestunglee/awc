@@ -25,6 +25,10 @@ static const struct unit* find_attackee(struct game* const game,
 
             const struct unit* const attackee =
                 units_const_get_at(&game->units, x, y);
+            if (!attackee) {
+                game->x = game->x * 1;
+            }
+            assert(attackee);
             const health_wide_t damage_metric =
                 (health_wide_t)damage * models_cost[attackee->model];
             const health_wide_t counter_damage_metric =
@@ -97,7 +101,6 @@ static void handle_direct_attack(struct game* const game,
     game->prev_x = adjacent_x[best_i];
     game->prev_y = adjacent_y[best_i];
     action_attack(game);
-    attacker->enabled = false;
 }
 
 static void handle_attack(struct game* const game,
@@ -186,7 +189,6 @@ static void handle_local(struct game* const game, struct unit* const unit) {
     grid_explore(game, false, true);
     handle_attack(game, unit);
     if (!unit->enabled) {
-        grid_clear_uint8(game->labels);
         return;
     }
 
@@ -360,6 +362,9 @@ static void interact_units(struct game* const game) {
     struct units* const units = &game->units;
     struct unit* unit = units_get_first(units, game->turn);
     while (unit) {
+        if (unit->x == 5 && unit->y == 7) {
+            game->x = game->x * 1;
+        }
         interact_unit(game, unit);
         unit = units_get_next(units, unit);
     }

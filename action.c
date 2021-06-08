@@ -47,7 +47,11 @@ void action_handle_capture(struct game* const game) {
 void action_attack(struct game* const game) {
     struct unit* const attacker = units_get_selected(&game->units);
     struct unit* const attackee = units_get_at(&game->units, game->x, game->y);
+    assert(attacker);
     assert(attacker->enabled);
+    assert(game->labels[game->y][game->x] & attackable_bit);
+    grid_clear_uint8(game->labels);
+    attacker->enabled = false;
 
     // If unit is direct, move to attack
     const bool ranged = models_min_range[attacker->model];
@@ -58,6 +62,8 @@ void action_attack(struct game* const game) {
     health_t damage, counter_damage;
     game_simulate_attack(game, &damage, &counter_damage);
 
+    units_clear_selection(&game->units);
+
     // Apply damage
     if (damage >= attackee->health) {
         units_delete_at(&game->units, game->x, game->y);
@@ -67,17 +73,16 @@ void action_attack(struct game* const game) {
     attackee->health -= damage;
 
     // Ranged units do not receive counter-attacks
-    if (ranged)
+    if (ranged) {
         return;
+    }
 
     // Apply counter damage
     if (counter_damage >= attacker->health) {
         units_delete_selected(&game->units);
-        return;
+    } else {
+        attacker->health -= counter_damage;
     }
-
-    attacker->health -= counter_damage;
-    attacker->enabled = false;
 }
 
 // Build unit at (game->x, game->y), returns true iff build is successful

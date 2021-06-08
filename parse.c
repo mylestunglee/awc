@@ -122,7 +122,7 @@ bool parse_space(struct game* const game, const char input,
         return false;
 
     if (attack_enabled)
-        game_attack(game);
+        action_attack(game);
     else
         game_handle_unit_selection(game);
     return true;

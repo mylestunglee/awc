@@ -31,7 +31,6 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
 
 bool game_select_next_unit(struct game* const game);
 void game_handle_unit_selection(struct game* const game);
-void game_attack(struct game* const game);
 void game_print_text(const struct game* const game, const bool attack_enabled,
                      const bool build_enabled);
 void game_next_turn(struct game* const game);
