@@ -28,7 +28,7 @@ static void repair_units(struct game* const game) {
 
 static void end_turn(struct game* const game) {
     units_clear_selection(&game->units);
-    grid_clear_uint8(game->labels);
+    grid_clear_labels(game);
     units_set_enabled(&game->units, game->turn, false);
 }
 

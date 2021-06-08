@@ -233,6 +233,7 @@ void grid_explore_recursive(struct game* const game,
                             const bool friendly_passable,
                             const energy_t scalar) {
     grid_clear_energy(game->energies);
+    game->dirty_labels = true;
     struct list* const list = &game->list;
 
     assert(list_empty(list));

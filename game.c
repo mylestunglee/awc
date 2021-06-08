@@ -58,7 +58,7 @@ bool game_load(struct game* const game, const char* const filename) {
 
 static void reset_selection(struct game* const game) {
     units_clear_selection(&game->units);
-    grid_clear_uint8(game->labels);
+    grid_clear_labels(game);
 }
 
 // Selects the next enabled unit of the current turn, returns true iff unit was
@@ -111,7 +111,7 @@ void game_handle_unit_selection(struct game* const game) {
     // 2. The unit is enabled
     if (!selected && unit) {
         if (unit->enabled) {
-            grid_clear_uint8(game->labels);
+            grid_clear_labels(game);
             select_unit(game);
         } else
             highlight_unit(game);

@@ -197,7 +197,8 @@ static void handle_local(struct game* const game, struct unit* const unit) {
     if (!unit->enabled)
         return;
 
-    grid_clear_uint8(game->labels);
+    assert(game->dirty_labels);
+    grid_clear_labels(game);
 }
 
 static void find_nearest_attackee_target_ranged(
@@ -335,7 +336,8 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
     if (found)
         move_towards_target(game, unit, x, y);
 
-    grid_clear_uint8(game->labels);
+    assert(game->dirty_labels);
+    grid_clear_labels(game);
 }
 
 static void interact_unit(struct game* const game, struct unit* const unit) {
@@ -503,9 +505,8 @@ static void build_units(struct game* const game) {
 }
 
 void bot_play(struct game* const game) {
-    // Clear previous user interaction
-    game->units.selected = null_unit;
-    grid_clear_uint8(game->labels);
+    units_clear_selection(&game->units);
+    grid_clear_labels(game);
 
     interact_units(game);
     build_units(game);
