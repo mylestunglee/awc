@@ -94,7 +94,7 @@ bool parse_surrender(struct game* const game, const char input) {
     if (input != 'K')
         return false;
 
-    return game_surrender(game);
+    return action_surrender(game);
 }
 
 bool parse_select_next_unit(struct game* const game, const char input) {

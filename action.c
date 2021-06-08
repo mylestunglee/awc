@@ -3,13 +3,6 @@
 #include "grid.h"
 #include <assert.h>
 
-void action_remove_player(struct game* const game, const player_t player) {
-    assert(player != null_player);
-    units_delete_player(&game->units, player);
-    grid_clear_player_territory(game->map, game->territory, player);
-    game->incomes[player] = 0;
-}
-
 // Occurs when unit captures enemy capturable
 static void action_capture(struct game* const game) {
     const player_t loser = game->territory[game->y][game->x];
@@ -19,7 +12,7 @@ static void action_capture(struct game* const game) {
 
     // If the enemy loses their HQ
     if (game->map[game->y][game->x] == tile_hq)
-        action_remove_player(game, loser);
+        game_remove_player(game, loser);
     else if (loser != null_player)
         --game->incomes[loser];
 
@@ -132,5 +125,22 @@ bool action_self_destruct_selection(struct game* const game) {
     units_clear_selection(&game->units);
     grid_clear_uint8(game->labels);
     // if bot calls this function, then clear energies
+    return true;
+}
+
+bool at_least_two_alive_players(const struct game* const game) {
+    player_t alive_players = 0;
+    for (player_t player = 0; player < players_capacity; ++player)
+        if (game_is_alive(game, player))
+            ++alive_players;
+    return alive_players >= 2;
+}
+
+bool action_surrender(struct game* const game) {
+    if (!at_least_two_alive_players(game))
+        return false;
+
+    game_remove_player(game, game->turn);
+    game_next_turn(game);
     return true;
 }

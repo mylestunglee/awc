@@ -273,23 +273,6 @@ void game_next_turn(struct game* const game) {
     move_cursor_to_interactable(game);
 }
 
-static bool at_least_two_alive_players(const struct game* const game) {
-    player_t alive_players = 0;
-    for (player_t player = 0; player < players_capacity; ++player)
-        if (game_is_alive(game, player))
-            ++alive_players;
-    return alive_players >= 2;
-}
-
-bool game_surrender(struct game* const game) {
-    if (!at_least_two_alive_players(game))
-        return false;
-
-    action_remove_player(game, game->turn);
-    game_next_turn(game);
-    return true;
-}
-
 static void print_normal_text(const struct game* const game) {
     printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u\n",
            game->turn, game->x, game->y,
@@ -321,7 +304,7 @@ static void print_build_text(const struct game* const game) {
 }
 
 void game_print_text(const struct game* const game, const bool attack_enabled,
-                const bool build_enabled) {
+                     const bool build_enabled) {
 
     if (attack_enabled)
         print_attack_text(game);
@@ -329,4 +312,11 @@ void game_print_text(const struct game* const game, const bool attack_enabled,
         print_build_text(game);
     else
         print_normal_text(game);
+}
+
+void game_remove_player(struct game* const game, const player_t player) {
+    assert(player != null_player);
+    units_delete_player(&game->units, player);
+    grid_clear_player_territory(game->map, game->territory, player);
+    game->incomes[player] = 0;
 }
