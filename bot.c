@@ -193,7 +193,6 @@ static void handle_local(struct game* const game, struct unit* const unit) {
     }
 
     handle_capture(game, unit);
-    grid_clear_energy(game->energies);
 
     if (!unit->enabled)
         return;
@@ -337,7 +336,6 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
         move_towards_target(game, unit, x, y);
 
     grid_clear_uint8(game->labels);
-    grid_clear_energy(game->energies);
 }
 
 static void interact_unit(struct game* const game, struct unit* const unit) {

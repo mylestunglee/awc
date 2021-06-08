@@ -232,6 +232,7 @@ void grid_explore_recursive(struct game* const game,
                             const bool label_attackable_tiles,
                             const bool friendly_passable,
                             const energy_t scalar) {
+    grid_clear_energy(game->energies);
     struct list* const list = &game->list;
 
     assert(list_empty(list));
@@ -299,5 +300,12 @@ void grid_find_path(struct game* const game, grid_t x, grid_t y) {
             return;
 
         prev_energy = next_energy;
+    }
+}
+
+void grid_clear_labels(struct game* const game) {
+    if (game->dirty_labels) {
+        grid_clear_uint8(game->labels);
+        game->dirty_labels = false;
     }
 }

@@ -21,6 +21,7 @@ struct game {
     uint8_t bots[bitarray_size(players_capacity)];
     uint8_t alliances[bitarray_size(
         (players_capacity * (players_capacity - 1)) / 2)];
+    bool dirty_labels;
 };
 
 void game_initialise(struct game* const);

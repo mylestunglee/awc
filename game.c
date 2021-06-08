@@ -12,7 +12,6 @@ void game_initialise(struct game* const game) {
     game->y = 0;
     grid_clear_uint8(game->map);
     grid_clear_uint8(game->labels);
-    grid_clear_energy(game->energies);
     grid_clear_territory(game->territory);
     units_initialise(&game->units);
     list_initialise(&game->list);
@@ -25,6 +24,7 @@ void game_initialise(struct game* const game) {
 
     bitarray_clear(game->bots, sizeof(game->bots));
     bitarray_clear(game->alliances, sizeof(game->alliances));
+    game->dirty_labels = false;
 }
 
 bool game_build_enabled(const struct game* const game) {
@@ -94,7 +94,6 @@ bool game_attack_enabled(const struct game* const game) {
 
 static void select_unit(struct game* const game) {
     grid_explore(game, false, true);
-    grid_clear_energy(game->energies);
     units_select_at(&game->units, game->x, game->y);
 }
 

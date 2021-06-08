@@ -9,11 +9,12 @@ TARGETS = $(patsubst %_test.cpp, %_test, $(wildcard *_test.cpp))
 FIXTURE_OBJECTS = $(patsubst %_fixture.cpp, %_fixture.o, $(wildcard *_fixture.cpp))
 TEST_OBJECTS = $(patsubst %_test.cpp, %_test.o, $(wildcard *_test.cpp))
 SOURCE_OBJECTS = $(patsubst ../%.c, %.o, $(filter-out ../main.c, $(wildcard ../*.c)))
+HEADERS = $(wildcard ../*.h)
 
 .PRECIOUS: $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS) $(SOURCE_OBJECTS)
 
 # build source objects
-%.o: ../%.c
+%.o: ../%.c $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(LIBRARIES) -c $< -o $@
 
 # build test objects

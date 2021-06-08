@@ -63,11 +63,10 @@ void action_attack(struct game* const game) {
     health_t damage, counter_damage;
     game_simulate_attack(game, &damage, &counter_damage);
 
-    units_clear_selection(&game->units);
-
     // Apply damage
     if (damage >= attackee->health) {
         units_delete_at(&game->units, game->x, game->y);
+        units_clear_selection(&game->units);
         return;
     }
 
@@ -75,6 +74,7 @@ void action_attack(struct game* const game) {
 
     // Ranged units do not receive counter-attacks
     if (ranged) {
+        units_clear_selection(&game->units);
         return;
     }
 
@@ -83,6 +83,7 @@ void action_attack(struct game* const game) {
         units_delete_selected(&game->units);
     } else {
         attacker->health -= counter_damage;
+        units_clear_selection(&game->units);
     }
 }
 
