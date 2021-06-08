@@ -1,11 +1,8 @@
 #include "parse.h"
+#include "action.h"
 #include "file.h"
 #include "turn.h"
 #include <stdio.h>
-
-#include "action.h"
-#include "console.h"
-#include "graphics.h"
 
 bool parse_file(struct game* const game, const char input) {
     bool error;
@@ -129,45 +126,37 @@ bool parse_space(struct game* const game, const char input,
     return true;
 }
 
-void parse_main(struct game* const game) {
-    do {
-        const bool attack_enabled = game_attack_enabled(game);
-        const bool build_enabled = game_build_enabled(game);
-        assert(!(attack_enabled && build_enabled));
+bool parse_command(struct game* const game, const char input,
+                   bool attack_enabled, bool build_enabled) {
 
-        render(game, attack_enabled, build_enabled);
-        game_print_text(game, attack_enabled, build_enabled);
+    if (input == 'q')
+        return true;
 
-        const char input = getch();
+    if (input == 'n') {
+        turn_next(game);
+        return false;
+    }
 
-        if (input == 'q')
-            break;
+    if (parse_panning(game, input))
+        return false;
 
-        if (input == 'n') {
-            turn_next(game);
-            continue;
-        }
+    if (parse_select_next_unit(game, input))
+        return false;
 
-        if (parse_panning(game, input))
-            continue;
+    if (parse_self_destruct_unit(game, input))
+        return false;
 
-        if (parse_select_next_unit(game, input))
-            continue;
+    if (parse_surrender(game, input))
+        return false;
 
-        if (parse_self_destruct_unit(game, input))
-            continue;
+    if (build_enabled && parse_build(game, input))
+        return false;
 
-        if (parse_surrender(game, input))
-            continue;
+    if (parse_file(game, input))
+        return false;
 
-        if (build_enabled && parse_build(game, input))
-            continue;
+    if (parse_space(game, input, attack_enabled))
+        return false;
 
-        if (parse_file(game, input))
-            continue;
-
-        if (parse_space(game, input, attack_enabled))
-            continue;
-
-    } while (true);
+    return false;
 }

@@ -1,4 +1,4 @@
-#include "parse.h"
+#include "controller.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    parse_main(game);
+    controller_run(game);
 
     free(game);
 
