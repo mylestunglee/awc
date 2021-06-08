@@ -34,7 +34,7 @@ bool game_select_next_unit(struct game* const game);
 void game_handle_unit_selection(struct game* const game);
 void game_attack(struct game* const game);
 void print_text(const struct game* const game, const bool attack_enabled,
-                       const bool build_enabled);
+                const bool build_enabled);
 void next_turn(struct game* const game);
 bool calc_attack_enabled(const struct game* const game);
 bool calc_build_enabled(const struct game* const game);

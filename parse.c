@@ -2,9 +2,9 @@
 #include "file.h"
 #include <stdio.h>
 
+#include "action.h"
 #include "console.h"
 #include "graphics.h"
-#include "action.h"
 
 bool parse_file(struct game* const game, const char input) {
     bool error;
@@ -109,22 +109,22 @@ bool parse_build(struct game* const game, const char input) {
     return !action_build(game, model);
 }
 
-bool parse_self_destruct_unit(struct game* const game,
-                                     const char input) {
+bool parse_self_destruct_unit(struct game* const game, const char input) {
     if (input != 'k')
         return false;
 
     return action_self_destruct_selection(game);
 }
 
-bool parse_space(struct game* const game, const char input, const bool attack_enabled) {
+bool parse_space(struct game* const game, const char input,
+                 const bool attack_enabled) {
     if (input != ' ')
         return false;
 
     if (attack_enabled)
         game_attack(game);
     else
-        game_handle_unit_selection(game);  
+        game_handle_unit_selection(game);
     return true;
 }
 
@@ -167,6 +167,6 @@ void parse_main(struct game* const game) {
 
         if (parse_space(game, input, attack_enabled))
             continue;
-        
+
     } while (true);
 }

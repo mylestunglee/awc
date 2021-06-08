@@ -4,8 +4,8 @@
 #include "bot.h"
 #include "file.h"
 #include "grid.h"
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
 
 void game_initialise(struct game* const game) {
     // TODO: fix order
@@ -302,7 +302,8 @@ static void print_attack_text(const struct game* const game) {
     health_t damage, counter_damage;
     game_simulate_attack(game, &damage, &counter_damage);
     const health_wide_t percent = 100;
-    printf("Damage: %u%% Counter-damage: %u%%\n", (damage * percent) / health_max,
+    printf("Damage: %u%% Counter-damage: %u%%\n",
+           (damage * percent) / health_max,
            (counter_damage * percent) / health_max);
 }
 
@@ -320,7 +321,7 @@ static void print_build_text(const struct game* const game) {
 }
 
 void print_text(const struct game* const game, const bool attack_enabled,
-                       const bool build_enabled) {
+                const bool build_enabled) {
 
     if (attack_enabled)
         print_attack_text(game);
