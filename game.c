@@ -7,6 +7,7 @@
 #include "graphics.h"
 #include "grid.h"
 #include <stdio.h>
+#include "parse.h"
 
 void game_initialise(struct game* const game) {
     // TODO: fix order
@@ -87,36 +88,6 @@ bool game_load(struct game* const game, const char* const filename) {
     return error;
 }
 
-static bool parse_panning(struct game* const game, const char input) {
-    switch (input) {
-    case 'w': {
-        game->prev_x = game->x;
-        game->prev_y = game->y;
-        --game->y;
-        return true;
-    }
-    case 'a': {
-        game->prev_x = game->x;
-        game->prev_y = game->y;
-        --game->x;
-        return true;
-    }
-    case 's': {
-        game->prev_x = game->x;
-        game->prev_y = game->y;
-        ++game->y;
-        return true;
-    }
-    case 'd': {
-        game->prev_x = game->x;
-        game->prev_y = game->y;
-        ++game->x;
-        return true;
-    }
-    }
-    return false;
-}
-
 static void reset_selection(struct game* const game) {
     units_clear_selection(&game->units);
     grid_clear_uint8(game->labels);
@@ -164,59 +135,7 @@ static bool parse_build(struct game* const game, const char input) {
     return !action_build(game, value + buildable_models[capturable]);
 }
 
-static bool parse_file(struct game* const game, const char input) {
-    bool error;
 
-    switch (input) {
-    case '1': {
-        error = game_load(game, "state1.txt");
-        break;
-    }
-    case '2': {
-        error = game_load(game, "state2.txt");
-        break;
-    }
-    case '3': {
-        error = game_load(game, "state3.txt");
-        break;
-    }
-    case '4': {
-        error = game_load(game, "state4.txt");
-        break;
-    }
-    case '5': {
-        error = game_load(game, "state5.txt");
-        break;
-    }
-    case '6': {
-        error = file_save(game, "state1.txt");
-        break;
-    }
-    case '7': {
-        error = file_save(game, "state2.txt");
-        break;
-    }
-    case '8': {
-        error = file_save(game, "state3.txt");
-        break;
-    }
-    case '9': {
-        error = file_save(game, "state4.txt");
-        break;
-    }
-    case '0': {
-        error = file_save(game, "state5.txt");
-        break;
-    }
-    default:
-        return false;
-    }
-
-    if (error)
-        printf("IO error");
-
-    return true;
-}
 
 static bool calc_attack_enabled(const struct game* const game) {
     // The state is attack enabled iff:
@@ -392,16 +311,13 @@ static bool at_least_two_alive_players(const struct game* const game) {
     return alive_players >= 2;
 }
 
-static bool parse_surrender(struct game* const game, const char input) {
-    if (input != 'K')
-        return false;
-
+bool game_surrender(struct game* const game) {
     if (!at_least_two_alive_players(game))
         return false;
 
     action_remove_player(game, game->turn);
     next_turn(game);
-    return true;
+    return true;    
 }
 
 static void print_normal_text(const struct game* const game) {
