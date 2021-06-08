@@ -7,5 +7,9 @@ bool parse_file(struct game* const game, const char input);
 bool parse_panning(struct game* const game, const char input);
 bool parse_surrender(struct game* const game, const char input);
 bool parse_select_next_unit(struct game* const game, const char input);
+bool parse_build(struct game* const game, const char input);
+bool parse_self_destruct_unit(struct game* const game, const char input);
+bool parse_space(struct game* const game, const char input, const bool attack_enabled);
+void parse_main(struct game* const game);
 
 #endif

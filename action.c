@@ -91,6 +91,7 @@ void action_attack(struct game* const game) {
 bool action_build(struct game* const game, const model_t model) {
     const gold_t cost = gold_scale * models_cost[model];
 
+    assert(game->map[game->y][game->x] >= terrian_capacity);
     const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
 
     if (model < buildable_models[capturable])

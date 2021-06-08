@@ -1,5 +1,4 @@
-#include "game.h"
-#include "optimise.h"
+#include "parse.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,7 +22,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    game_loop(game);
+    parse_main(game);
 
     free(game);
 

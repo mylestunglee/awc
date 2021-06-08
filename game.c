@@ -2,12 +2,10 @@
 #include "action.h"
 #include "bitarray.h"
 #include "bot.h"
-#include "console.h"
 #include "file.h"
-#include "graphics.h"
 #include "grid.h"
-#include "parse.h"
 #include <stdio.h>
+#include <assert.h>
 
 void game_initialise(struct game* const game) {
     // TODO: fix order
@@ -30,7 +28,7 @@ void game_initialise(struct game* const game) {
     bitarray_clear(game->alliances, sizeof(game->alliances));
 }
 
-static bool calc_build_enabled(const struct game* const game) {
+bool calc_build_enabled(const struct game* const game) {
     // The state is build enabled iff:
     // 1. The player owns the selected capturable
     // 2. There is no unit on the tile
@@ -109,26 +107,7 @@ bool game_select_next_unit(struct game* const game) {
     return true;
 }
 
-static bool parse_self_distruct_unit(struct game* const game,
-                                     const char input) {
-    if (input != 'k')
-        return false;
-
-    return action_self_destruct_selection(game);
-}
-
-// Build try to build a unit, assume build enabled
-static bool parse_build(struct game* const game, const char input) {
-    assert(game->map[game->y][game->x] >= terrian_capacity);
-
-    const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
-    const model_t value = input - '1';
-    const model_t model = value + buildable_models[capturable];
-
-    return !action_build(game, model);
-}
-
-static bool calc_attack_enabled(const struct game* const game) {
+bool calc_attack_enabled(const struct game* const game) {
     // The state is attack enabled iff:
     // 1. A unit is selected
     // 2. Previous selected tile is accessible if direct attack
@@ -153,7 +132,7 @@ static void highlight_unit(struct game* const game) {
     grid_explore(game, true, true);
 }
 
-static void handle_unit_selection(struct game* const game) {
+void game_handle_unit_selection(struct game* const game) {
     const struct unit* unit =
         units_const_get_at(&game->units, game->x, game->y);
     const bool selected = units_has_selection(&game->units);
@@ -214,7 +193,7 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
         *counter_damage = calc_damage(game, &attackee, attacker);
 }
 
-static void game_attack(struct game* const game) {
+void game_attack(struct game* const game) {
     action_attack(game);
     reset_selection(game);
 }
@@ -281,7 +260,7 @@ static bool exists_alive_non_bot(const struct game* const game) {
     return false;
 }
 
-static void next_turn(struct game* const game) {
+void next_turn(struct game* const game) {
     do {
         if (is_bot(game, game->turn))
             bot_play(game);
@@ -339,7 +318,7 @@ static void print_build_text(const struct game* const game) {
     }
 }
 
-static void print_text(const struct game* const game, const bool attack_enabled,
+void print_text(const struct game* const game, const bool attack_enabled,
                        const bool build_enabled) {
 
     if (attack_enabled)
@@ -348,53 +327,4 @@ static void print_text(const struct game* const game, const bool attack_enabled,
         print_build_text(game);
     else
         print_normal_text(game);
-}
-
-void game_loop(struct game* const game) {
-    do {
-        const bool attack_enabled = calc_attack_enabled(game);
-        const bool build_enabled = calc_build_enabled(game);
-        assert(!(attack_enabled && build_enabled));
-
-        render(game, attack_enabled, build_enabled);
-        print_text(game, attack_enabled, build_enabled);
-
-        const char input = getch();
-
-        if (input == 'q')
-            break;
-
-        if (input == 'n') {
-            next_turn(game);
-            continue;
-        }
-
-        if (parse_panning(game, input))
-            continue;
-
-        if (parse_select_next_unit(game, input))
-            continue;
-
-        if (parse_self_distruct_unit(game, input))
-            continue;
-
-        if (parse_surrender(game, input))
-            continue;
-
-        if (build_enabled && parse_build(game, input))
-            continue;
-
-        if (parse_file(game, input))
-            continue;
-
-        if (input == ' ') {
-            if (attack_enabled)
-                game_attack(game);
-            else
-                handle_unit_selection(game);
-        }
-    } while (true);
-
-    // New line after print text
-    printf("\n");
 }
