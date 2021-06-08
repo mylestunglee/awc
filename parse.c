@@ -1,6 +1,6 @@
 #include "parse.h"
-#include <stdio.h>
 #include "file.h"
+#include <stdio.h>
 
 bool parse_file(struct game* const game, const char input) {
     bool error;
@@ -93,3 +93,6 @@ bool parse_surrender(struct game* const game, const char input) {
     return game_surrender(game);
 }
 
+bool parse_select_next_unit(struct game* const game, const char input) {
+    return input == 'm' && game_select_next_unit(game);
+}

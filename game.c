@@ -6,8 +6,8 @@
 #include "file.h"
 #include "graphics.h"
 #include "grid.h"
-#include <stdio.h>
 #include "parse.h"
+#include <stdio.h>
 
 void game_initialise(struct game* const game) {
     // TODO: fix order
@@ -44,7 +44,7 @@ static bool calc_build_enabled(const struct game* const game) {
 
     return !units_const_get_at(&game->units, game->x, game->y) &&
            buildable_models[capturable] < buildable_models[capturable + 1] &&
-           units_has_selection(&game->units);
+           !units_has_selection(&game->units);
 }
 
 static void move_cursor_to_interactable(struct game* const game) {
@@ -96,7 +96,7 @@ static void reset_selection(struct game* const game) {
 // Selects the next enabled unit of the current turn, returns true iff unit was
 // selected
 // TODO: implement when a hovering over a unit
-static bool select_next_unit(struct game* const game) {
+bool game_select_next_unit(struct game* const game) {
     const struct unit* const unit =
         units_const_get_first(&game->units, game->turn);
     if (!unit)
@@ -107,10 +107,6 @@ static bool select_next_unit(struct game* const game) {
     reset_selection(game);
 
     return true;
-}
-
-static bool parse_select_next_unit(struct game* const game, const char input) {
-    return input == 'm' && select_next_unit(game);
 }
 
 static bool parse_self_distruct_unit(struct game* const game,
@@ -127,15 +123,10 @@ static bool parse_build(struct game* const game, const char input) {
 
     const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
     const model_t value = input - '1';
+    const model_t model = value + buildable_models[capturable];
 
-    if (value >=
-        buildable_models[capturable + 1] - buildable_models[capturable])
-        return false;
-
-    return !action_build(game, value + buildable_models[capturable]);
+    return !action_build(game, model);
 }
-
-
 
 static bool calc_attack_enabled(const struct game* const game) {
     // The state is attack enabled iff:
@@ -317,7 +308,7 @@ bool game_surrender(struct game* const game) {
 
     action_remove_player(game, game->turn);
     next_turn(game);
-    return true;    
+    return true;
 }
 
 static void print_normal_text(const struct game* const game) {

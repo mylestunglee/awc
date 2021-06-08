@@ -59,8 +59,7 @@ void action_attack(struct game* const game) {
     // If unit is direct, move to attack
     const bool ranged = models_min_range[attacker->model];
     if (!ranged)
-        units_move_selection(&game->units, game->prev_x,
-                   game->prev_y);
+        units_move_selection(&game->units, game->prev_x, game->prev_y);
 
     // Compute damage
     health_t damage, counter_damage;
@@ -91,6 +90,14 @@ void action_attack(struct game* const game) {
 // Build unit at (game->x, game->y), returns true iff build is successful
 bool action_build(struct game* const game, const model_t model) {
     const gold_t cost = gold_scale * models_cost[model];
+
+    const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
+
+    if (model < buildable_models[capturable])
+        return true;
+
+    if (model >= buildable_models[capturable + 1])
+        return true;
 
     if (game->golds[game->turn] < cost)
         return true;

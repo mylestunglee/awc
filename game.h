@@ -31,5 +31,6 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
                           health_t* const counter_damage);
 
 bool game_surrender(struct game* const game);
+bool game_select_next_unit(struct game* const game);
 
 #endif
