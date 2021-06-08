@@ -28,7 +28,7 @@ void game_initialise(struct game* const game) {
     bitarray_clear(game->alliances, sizeof(game->alliances));
 }
 
-bool calc_build_enabled(const struct game* const game) {
+bool game_build_enabled(const struct game* const game) {
     // The state is build enabled iff:
     // 1. The player owns the selected capturable
     // 2. There is no unit on the tile
@@ -61,7 +61,7 @@ static void move_cursor_to_interactable(struct game* const game) {
     game->y = 0;
     do {
         do {
-            if (calc_build_enabled(game))
+            if (game_build_enabled(game))
                 return;
 
             if (game->map[game->y][game->x] == tile_hq &&
@@ -107,7 +107,7 @@ bool game_select_next_unit(struct game* const game) {
     return true;
 }
 
-bool calc_attack_enabled(const struct game* const game) {
+bool game_attack_enabled(const struct game* const game) {
     // The state is attack enabled iff:
     // 1. A unit is selected
     // 2. Previous selected tile is accessible if direct attack
@@ -224,7 +224,7 @@ static void repair_units(struct game* const game) {
 // 1. The player has units
 // 2. The player has a HQ, implied by a positive income
 //    This holds because when a player loses their HQ, income is nullified
-static bool is_alive(const struct game* const game, const player_t player) {
+bool game_is_alive(const struct game* const game, const player_t player) {
     return game->units.firsts[player] != null_unit || game->incomes[player] > 0;
 }
 
@@ -246,7 +246,7 @@ static bool is_bot(const struct game* const game, const player_t player) {
 static void next_alive_turn(struct game* const game) {
     for (player_t i = 0; i < players_capacity; ++i) {
         game->turn = (game->turn + 1) % players_capacity;
-        if (is_alive(game, game->turn))
+        if (game_is_alive(game, game->turn))
             return;
     }
     assert(false);
@@ -254,13 +254,13 @@ static void next_alive_turn(struct game* const game) {
 
 static bool exists_alive_non_bot(const struct game* const game) {
     for (player_t player = 0; player < players_capacity; ++player)
-        if (is_alive(game, player) && !is_bot(game, player))
+        if (game_is_alive(game, player) && !is_bot(game, player))
             return true;
 
     return false;
 }
 
-void next_turn(struct game* const game) {
+void game_next_turn(struct game* const game) {
     do {
         if (is_bot(game, game->turn))
             bot_play(game);
@@ -276,7 +276,7 @@ void next_turn(struct game* const game) {
 static bool at_least_two_alive_players(const struct game* const game) {
     player_t alive_players = 0;
     for (player_t player = 0; player < players_capacity; ++player)
-        if (is_alive(game, player))
+        if (game_is_alive(game, player))
             ++alive_players;
     return alive_players >= 2;
 }
@@ -286,7 +286,7 @@ bool game_surrender(struct game* const game) {
         return false;
 
     action_remove_player(game, game->turn);
-    next_turn(game);
+    game_next_turn(game);
     return true;
 }
 
@@ -320,7 +320,7 @@ static void print_build_text(const struct game* const game) {
     printf("\n");
 }
 
-void print_text(const struct game* const game, const bool attack_enabled,
+void game_print_text(const struct game* const game, const bool attack_enabled,
                 const bool build_enabled) {
 
     if (attack_enabled)

@@ -130,12 +130,12 @@ bool parse_space(struct game* const game, const char input,
 
 void parse_main(struct game* const game) {
     do {
-        const bool attack_enabled = calc_attack_enabled(game);
-        const bool build_enabled = calc_build_enabled(game);
+        const bool attack_enabled = game_attack_enabled(game);
+        const bool build_enabled = game_build_enabled(game);
         assert(!(attack_enabled && build_enabled));
 
         render(game, attack_enabled, build_enabled);
-        print_text(game, attack_enabled, build_enabled);
+        game_print_text(game, attack_enabled, build_enabled);
 
         const char input = getch();
 
@@ -143,7 +143,7 @@ void parse_main(struct game* const game) {
             break;
 
         if (input == 'n') {
-            next_turn(game);
+            game_next_turn(game);
             continue;
         }
 
