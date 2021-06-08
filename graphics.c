@@ -44,12 +44,9 @@ static bool render_unit(const struct game* const game, const grid_t x,
         unit_top > tile_y || tile_y >= unit_top + unit_height)
         return false;
 
-    const unit_t unit_index = game->units.grid[y][x];
-
-    if (unit_index == null_unit)
+    const struct unit* const unit = units_const_get_at(&game->units, x, y);
+    if (!unit)
         return false;
-
-    const struct unit* const unit = &game->units.data[unit_index];
 
     const model_t model = unit->model;
     uint8_t texture =
@@ -151,12 +148,10 @@ static bool render_health_bar(const struct game* const game, const grid_t x,
     if (tile_x < unit_left || tile_x >= unit_left + unit_width)
         return false;
 
-    const unit_t unit_index = game->units.grid[y][x];
-
-    if (unit_index == null_unit)
+    const struct unit* const unit = units_const_get_at(&game->units, x, y);
+    if (!unit)
         return false;
 
-    const struct unit* const unit = &game->units.data[unit_index];
     const health_t health = unit->health;
 
     // Hide health bar on full-health units

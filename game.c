@@ -41,9 +41,9 @@ static bool calc_build_enabled(const struct game* const game) {
 
     const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
 
-    return game->units.grid[game->y][game->x] == null_unit &&
+    return !units_const_get_at(&game->units, game->x, game->y) &&
            buildable_models[capturable] < buildable_models[capturable + 1] &&
-           game->units.selected == null_unit;
+           units_has_selection(&game->units);
 }
 
 static void move_cursor_to_interactable(struct game* const game) {
