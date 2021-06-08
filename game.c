@@ -56,7 +56,7 @@ bool game_load(struct game* const game, const char* const filename) {
     return error;
 }
 
-static void reset_selection(struct game* const game) {
+void game_reset_selection(struct game* const game) {
     units_clear_selection(&game->units);
     grid_clear_labels(game);
 }
@@ -72,7 +72,7 @@ bool game_select_next_unit(struct game* const game) {
 
     game->x = unit->x;
     game->y = unit->y;
-    reset_selection(game);
+    game_reset_selection(game);
 
     return true;
 }
@@ -120,7 +120,7 @@ void game_handle_unit_selection(struct game* const game) {
         if (selected && game->labels[game->y][game->x] & accessible_bit) {
             action_move(game);
         } else
-            reset_selection(game);
+            game_reset_selection(game);
     }
 }
 

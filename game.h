@@ -27,17 +27,17 @@ struct game {
 void game_initialise(struct game* const);
 bool game_load(struct game* const, const char* const);
 
-void game_simulate_attack(const struct game* const game, health_t* const damage,
-                          health_t* const counter_damage);
+void game_simulate_attack(const struct game* const, health_t* const,
+                          health_t* const);
 
-bool game_select_next_unit(struct game* const game);
-void game_handle_unit_selection(struct game* const game);
-void game_print_text(const struct game* const game, const bool attack_enabled,
-                     const bool build_enabled);
-bool game_attack_enabled(const struct game* const game);
-bool game_build_enabled(const struct game* const game);
-bool game_is_alive(const struct game* const game, const player_t player);
-bool game_is_bot(const struct game* const game, const player_t player);
-void game_remove_player(struct game* const game, const player_t player);
+bool game_select_next_unit(struct game* const);
+void game_handle_unit_selection(struct game* const);
+void game_print_text(const struct game* const, const bool, const bool);
+bool game_attack_enabled(const struct game* const);
+bool game_build_enabled(const struct game* const);
+bool game_is_alive(const struct game* const, const player_t);
+bool game_is_bot(const struct game* const, const player_t);
+void game_remove_player(struct game* const, const player_t);
+void game_reset_selection(struct game* const);
 
 #endif

@@ -120,10 +120,10 @@ bool action_build(struct game* const game, const model_t model) {
 
 void action_move(struct game* const game) {
     assert(game->dirty_labels);
-    grid_clear_labels(game);
     units_move_selection(&game->units, game->x, game->y);
     action_handle_capture(game);
     units_disable_selection(&game->units);
+    game_reset_selection(game);
 }
 
 bool action_self_destruct_selection(struct game* const game) {
@@ -131,9 +131,8 @@ bool action_self_destruct_selection(struct game* const game) {
         return false;
 
     units_delete(&game->units, game->units.selected);
-    units_clear_selection(&game->units);
     assert(game->dirty_labels);
-    grid_clear_labels(game);
+    game_reset_selection(game);
     return true;
 }
 
