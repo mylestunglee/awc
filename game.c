@@ -1,7 +1,6 @@
 #include "game.h"
 #include "action.h"
 #include "bitarray.h"
-#include "bot.h"
 #include "file.h"
 #include "grid.h"
 #include <assert.h>
@@ -45,38 +44,9 @@ bool game_build_enabled(const struct game* const game) {
            !units_has_selection(&game->units);
 }
 
-static void move_cursor_to_interactable(struct game* const game) {
-    // Attempt to select a unit
-    const struct unit* const unit =
-        units_const_get_first(&game->units, game->turn);
-
-    if (unit) {
-        game->x = unit->x;
-        game->y = unit->y;
-        return;
-    }
-
-    // Attempt to select a buildable
-    game->x = 0;
-    game->y = 0;
-    do {
-        do {
-            if (game_build_enabled(game))
-                return;
-
-            if (game->map[game->y][game->x] == tile_hq &&
-                game->territory[game->y][game->x] == game->turn)
-                return;
-        } while (++game->x);
-    } while (++game->y);
-
-    // game->x, game->y undefined when no interactable
-}
-
 static void game_postload(struct game* const game) {
     grid_correct(game->territory, game->map);
     grid_compute_incomes(game->territory, game->incomes);
-    move_cursor_to_interactable(game);
 }
 
 bool game_load(struct game* const game, const char* const filename) {
@@ -193,28 +163,6 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
         *counter_damage = calc_damage(game, &attackee, attacker);
 }
 
-static void repair_units(struct game* const game) {
-    struct unit* unit = units_get_first(&game->units, game->turn);
-    while (unit) {
-        if (game->territory[unit->y][unit->x] == game->turn &&
-            unit->health < health_max) {
-
-            health_t heal = heal_rate;
-
-            // Cap heal at maximum health
-            if (unit->health >= health_max - heal)
-                heal = health_max - unit->health;
-
-            unit->health += heal;
-            game->golds[game->turn] -=
-                (models_cost[unit->model] * gold_scale * (gold_t)heal) /
-                (gold_t)health_max;
-        }
-
-        unit = units_get_next(&game->units, unit);
-    }
-}
-
 // A player is alive iff:
 // 1. The player has units
 // 2. The player has a HQ, implied by a positive income
@@ -223,49 +171,8 @@ bool game_is_alive(const struct game* const game, const player_t player) {
     return game->units.firsts[player] != null_unit || game->incomes[player] > 0;
 }
 
-static void end_turn(struct game* const game) {
-    reset_selection(game);
-    units_set_enabled(&game->units, game->turn, false);
-}
-
-static void start_turn(struct game* const game) {
-    units_set_enabled(&game->units, game->turn, true);
-    game->golds[game->turn] += gold_scale * game->incomes[game->turn];
-    repair_units(game);
-}
-
-static bool is_bot(const struct game* const game, const player_t player) {
+bool game_is_bot(const struct game* const game, const player_t player) {
     return bitarray_get(game->bots, player);
-}
-
-static void next_alive_turn(struct game* const game) {
-    for (player_t i = 0; i < players_capacity; ++i) {
-        game->turn = (game->turn + 1) % players_capacity;
-        if (game_is_alive(game, game->turn))
-            return;
-    }
-    assert(false);
-}
-
-static bool exists_alive_non_bot(const struct game* const game) {
-    for (player_t player = 0; player < players_capacity; ++player)
-        if (game_is_alive(game, player) && !is_bot(game, player))
-            return true;
-
-    return false;
-}
-
-void game_next_turn(struct game* const game) {
-    do {
-        if (is_bot(game, game->turn))
-            bot_play(game);
-
-        end_turn(game);
-        next_alive_turn(game);
-        start_turn(game);
-    } while (exists_alive_non_bot(game) && is_bot(game, game->turn));
-
-    move_cursor_to_interactable(game);
 }
 
 static void print_normal_text(const struct game* const game) {

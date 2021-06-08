@@ -1,5 +1,6 @@
 #include "parse.h"
 #include "file.h"
+#include "turn.h"
 #include <stdio.h>
 
 #include "action.h"
@@ -143,7 +144,7 @@ void parse_main(struct game* const game) {
             break;
 
         if (input == 'n') {
-            game_next_turn(game);
+            turn_next(game);
             continue;
         }
 

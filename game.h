@@ -33,10 +33,10 @@ bool game_select_next_unit(struct game* const game);
 void game_handle_unit_selection(struct game* const game);
 void game_print_text(const struct game* const game, const bool attack_enabled,
                      const bool build_enabled);
-void game_next_turn(struct game* const game);
 bool game_attack_enabled(const struct game* const game);
 bool game_build_enabled(const struct game* const game);
 bool game_is_alive(const struct game* const game, const player_t player);
+bool game_is_bot(const struct game* const game, const player_t player);
 void game_remove_player(struct game* const game, const player_t player);
 
 #endif

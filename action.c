@@ -1,6 +1,7 @@
 #include "action.h"
 #include "bitarray.h"
 #include "grid.h"
+#include "turn.h"
 #include <assert.h>
 
 // Occurs when unit captures enemy capturable
@@ -146,6 +147,6 @@ bool action_surrender(struct game* const game) {
         return false;
 
     game_remove_player(game, game->turn);
-    game_next_turn(game);
+    turn_next(game);
     return true;
 }
