@@ -147,12 +147,7 @@ static bool parse_self_distruct_unit(struct game* const game,
     if (input != 'k')
         return false;
 
-    if (game->units.selected == null_unit)
-        return false;
-
-    units_delete(&game->units, game->units.selected);
-    reset_selection(game);
-    return true;
+    return action_self_destruct_selection(game);
 }
 
 // Build try to build a unit, assume build enabled

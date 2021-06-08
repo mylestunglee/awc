@@ -115,3 +115,14 @@ void action_move(struct game* const game) {
     action_handle_capture(game);
     units_disable_selection(&game->units);
 }
+
+bool action_self_destruct_selection(struct game* const game) {
+    if (!units_has_selection(&game->units))
+        return false;
+
+    units_delete(&game->units, game->units.selected);
+    units_clear_selection(&game->units);
+    grid_clear_uint8(game->labels);
+    // if bot calls this function, then clear energies
+    return true;
+}
