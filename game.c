@@ -291,7 +291,7 @@ bool game_surrender(struct game* const game) {
 }
 
 static void print_normal_text(const struct game* const game) {
-    printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u",
+    printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u\n",
            game->turn, game->x, game->y,
            tile_names[game->map[game->y][game->x]],
            game->territory[game->y][game->x], game->labels[game->y][game->x],
@@ -302,7 +302,7 @@ static void print_attack_text(const struct game* const game) {
     health_t damage, counter_damage;
     game_simulate_attack(game, &damage, &counter_damage);
     const health_wide_t percent = 100;
-    printf("Damage: %u%% Counter-damage: %u%%", (damage * percent) / health_max,
+    printf("Damage: %u%% Counter-damage: %u%%\n", (damage * percent) / health_max,
            (counter_damage * percent) / health_max);
 }
 
@@ -316,6 +316,7 @@ static void print_build_text(const struct game* const game) {
          model < buildable_models[capturable + 1]; ++model) {
         printf("(" model_format ") %s ", model + 1, model_names[model]);
     }
+    printf("\n");
 }
 
 void print_text(const struct game* const game, const bool attack_enabled,

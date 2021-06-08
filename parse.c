@@ -169,7 +169,4 @@ void parse_main(struct game* const game) {
             continue;
         
     } while (true);
-
-    // New line after print text
-    printf("\n");
 }
