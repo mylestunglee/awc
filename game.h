@@ -38,6 +38,5 @@ bool game_build_enabled(const struct game* const);
 bool game_is_alive(const struct game* const, const player_t);
 bool game_is_bot(const struct game* const, const player_t);
 void game_remove_player(struct game* const, const player_t);
-void game_reset_selection(struct game* const);
 
 #endif

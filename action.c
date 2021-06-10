@@ -123,7 +123,7 @@ void action_move(struct game* const game) {
     units_move_selection(&game->units, game->x, game->y);
     action_handle_capture(game);
     units_disable_selection(&game->units);
-    game_reset_selection(game);
+    action_deselect(game);
 }
 
 bool action_self_destruct_selection(struct game* const game) {
@@ -132,7 +132,7 @@ bool action_self_destruct_selection(struct game* const game) {
 
     units_delete(&game->units, game->units.selected);
     assert(game->dirty_labels);
-    game_reset_selection(game);
+    action_deselect(game);
     return true;
 }
 
@@ -151,4 +151,9 @@ bool action_surrender(struct game* const game) {
     game_remove_player(game, game->turn);
     turn_next(game);
     return true;
+}
+
+void action_deselect(struct game* const game) {
+    units_clear_selection(&game->units);
+    grid_clear_labels(game);
 }

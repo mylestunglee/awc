@@ -56,7 +56,7 @@ bool game_load(struct game* const game, const char* const filename) {
     return error;
 }
 
-void game_reset_selection(struct game* const game) {
+static void game_reset_selection(struct game* const game) {
     units_clear_selection(&game->units);
     grid_clear_labels(game);
 }

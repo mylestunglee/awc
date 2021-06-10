@@ -505,7 +505,7 @@ static void build_units(struct game* const game) {
 }
 
 void bot_play(struct game* const game) {
-    game_reset_selection(game);
+    action_deselect(game);
     interact_units(game);
     build_units(game);
 }
