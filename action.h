@@ -5,10 +5,12 @@
 
 void action_attack(struct game* const);
 bool action_build(struct game* const, const model_t);
-void action_move(struct game* const game);
+bool action_move(struct game* const game);
 bool action_self_destruct_selection(struct game* const game);
 bool action_surrender(struct game* const game);
-void action_deselect(struct game* const game);
+bool action_deselect(struct game* const game);
+bool action_select(struct game* const game);
+bool action_highlight(struct game* const game);
 
 #ifdef expose_action_internals
 

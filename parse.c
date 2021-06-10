@@ -119,11 +119,12 @@ bool parse_space(struct game* const game, const char input,
     if (input != ' ')
         return false;
 
-    if (attack_enabled)
+    if (attack_enabled) {
         action_attack(game);
-    else
-        game_handle_unit_selection(game);
-    return true;
+        return true;
+    }
+
+    return false;
 }
 
 bool parse_command(struct game* const game, const char input,
@@ -156,6 +157,18 @@ bool parse_command(struct game* const game, const char input,
         return false;
 
     if (parse_space(game, input, attack_enabled))
+        return false;
+
+    if (input == ' ' && action_select(game))
+        return false;
+
+    if (input == ' ' && action_highlight(game))
+        return false;
+
+    if (input == ' ' && action_move(game))
+        return false;
+
+    if (input == ' ' && action_deselect(game))
         return false;
 
     return false;

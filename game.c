@@ -92,38 +92,6 @@ bool game_attack_enabled(const struct game* const game) {
            game->labels[game->y][game->x] & attackable_bit;
 }
 
-static void select_unit(struct game* const game) {
-    grid_explore(game, false, true);
-    units_select_at(&game->units, game->x, game->y);
-}
-
-static void highlight_unit(struct game* const game) {
-    grid_explore(game, true, true);
-}
-
-void game_handle_unit_selection(struct game* const game) {
-    const struct unit* unit =
-        units_const_get_at(&game->units, game->x, game->y);
-    const bool selected = units_has_selection(&game->units);
-
-    // Select unit iff:
-    // 1. A unit is not already selected
-    // 2. The unit is enabled
-    if (!selected && unit) {
-        if (unit->enabled) {
-            grid_clear_labels(game);
-            select_unit(game);
-        } else
-            highlight_unit(game);
-    } else {
-        // Move to accessible tile when cursor is not over unit
-        if (selected && game->labels[game->y][game->x] & accessible_bit) {
-            action_move(game);
-        } else
-            game_reset_selection(game);
-    }
-}
-
 // Calculate damage when attacker attacks attackee
 static health_t calc_damage(const struct game* const game,
                             const struct unit* const attacker,

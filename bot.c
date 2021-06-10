@@ -173,7 +173,8 @@ static void handle_capture(struct game* const game, struct unit* const unit) {
 
     game->x = x;
     game->y = y;
-    action_move(game);
+    bool success = action_move(game);
+    assert(success);
     assert(game->territory[y][x] == unit->player);
 }
 

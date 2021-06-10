@@ -118,12 +118,17 @@ bool action_build(struct game* const game, const model_t model) {
     return error;
 }
 
-void action_move(struct game* const game) {
-    assert(game->dirty_labels);
-    units_move_selection(&game->units, game->x, game->y);
-    action_handle_capture(game);
-    units_disable_selection(&game->units);
-    action_deselect(game);
+bool action_move(struct game* const game) {
+    const bool selected = units_has_selection(&game->units);
+    if (selected && game->labels[game->y][game->x] & accessible_bit) {
+        assert(game->dirty_labels);
+        units_move_selection(&game->units, game->x, game->y);
+        action_handle_capture(game);
+        units_disable_selection(&game->units);
+        action_deselect(game);
+        return true;
+    }
+    return false;
 }
 
 bool action_self_destruct_selection(struct game* const game) {
@@ -153,7 +158,36 @@ bool action_surrender(struct game* const game) {
     return true;
 }
 
-void action_deselect(struct game* const game) {
+bool action_deselect(struct game* const game) {
     units_clear_selection(&game->units);
     grid_clear_labels(game);
+    return true;
+}
+
+bool action_select(struct game* const game) {
+    const struct unit* unit =
+        units_const_get_at(&game->units, game->x, game->y);
+    const bool selected = units_has_selection(&game->units);
+
+    if (!selected && unit && unit->enabled) {
+        grid_clear_labels(game);
+        grid_explore(game, false, true);
+        units_select_at(&game->units, game->x, game->y);
+        return true;
+    }
+
+    return false;
+}
+
+bool action_highlight(struct game* const game) {
+    const struct unit* unit =
+        units_const_get_at(&game->units, game->x, game->y);
+    const bool selected = units_has_selection(&game->units);
+
+    if (!selected && unit && unit->enabled) {
+        grid_explore(game, true, true);
+        return true;
+    }
+
+    return false;
 }
