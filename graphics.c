@@ -1,5 +1,4 @@
 #include "graphics.h"
-#include "bitarray.h"
 #include "console.h"
 #include <stdio.h>
 

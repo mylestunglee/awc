@@ -94,7 +94,7 @@ void grid_explore_mark_attackable_tile(struct game* const game, const grid_t x,
     const struct unit* const unit = &game->units.data[index];
 
     // Mark tiles without friendly units as attackable
-    if (!bitmatrix_get(game->alliances, unit->player, player) &&
+    if (!bitmatrix_get(game->alliances, player, unit->player) &&
         units_damage[model][unit->model])
         game->labels[y][x] |= attackable_bit;
 }

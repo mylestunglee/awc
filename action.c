@@ -1,5 +1,4 @@
 #include "action.h"
-#include "bitarray.h"
 #include "grid.h"
 #include "turn.h"
 #include <assert.h>
@@ -38,8 +37,7 @@ void action_handle_capture(struct game* const game) {
     if (game->map[game->y][game->x] < terrian_capacity)
         return;
 
-    if (bitmatrix_get(game->alliances, game->territory[game->y][game->x],
-                      unit->player))
+    if (game_is_friendly(game, game->territory[game->y][game->x]))
         return;
 
     action_capture(game);

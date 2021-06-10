@@ -1,6 +1,5 @@
 #include "bot.h"
 #include "action.h"
-#include "bitarray.h"
 #include "game.h"
 #include "grid.h"
 #include "optimise.h"
@@ -130,10 +129,6 @@ static void update_max_energy(const struct game* const game, grid_t x, grid_t y,
     *update_y = y;
 }
 
-static bool is_friendly(const struct game* const game, const player_t player) {
-    return bitmatrix_get(game->alliances, game->turn, player);
-}
-
 static energy_t find_nearest_capturable(struct game* const game,
                                         grid_t* const nearest_x,
                                         grid_t* const nearest_y) {
@@ -147,7 +142,7 @@ static energy_t find_nearest_capturable(struct game* const game,
             if (game->map[y][x] < terrian_capacity)
                 continue;
 
-            if (is_friendly(game, game->territory[y][x]))
+            if (game_is_friendly(game, game->territory[y][x]))
                 continue;
 
             update_max_energy(game, x, y, &max_energy, nearest_x, nearest_y);
@@ -245,7 +240,7 @@ static energy_t find_nearest_attackee_target(struct game* const game,
 
     for (player_t player = 0; player < players_capacity; ++player) {
 
-        if (is_friendly(game, player))
+        if (game_is_friendly(game, player))
             continue;
 
         const struct unit* attackee =
@@ -389,7 +384,7 @@ populate_distributions(const struct game* const game,
                        health_wide_t enemy_distribution[model_capacity]) {
 
     for (player_t player = 0; player < players_capacity; ++player) {
-        if (is_friendly(game, player))
+        if (game_is_friendly(game, player))
             accumulate_distribution(game, player, friendly_distribution);
         else
             accumulate_distribution(game, player, enemy_distribution);

@@ -56,11 +56,6 @@ bool game_load(struct game* const game, const char* const filename) {
     return error;
 }
 
-static void game_reset_selection(struct game* const game) {
-    units_clear_selection(&game->units);
-    grid_clear_labels(game);
-}
-
 // Selects the next enabled unit of the current turn, returns true iff unit was
 // selected
 // TODO: implement when a hovering over a unit
@@ -72,7 +67,9 @@ bool game_select_next_unit(struct game* const game) {
 
     game->x = unit->x;
     game->y = unit->y;
-    game_reset_selection(game);
+
+    units_clear_selection(&game->units);
+    grid_clear_labels(game);
 
     return true;
 }
@@ -140,6 +137,10 @@ bool game_is_alive(const struct game* const game, const player_t player) {
 
 bool game_is_bot(const struct game* const game, const player_t player) {
     return bitarray_get(game->bots, player);
+}
+
+bool game_is_friendly(const struct game* const game, const player_t player) {
+    return bitmatrix_get(game->alliances, game->turn, player);
 }
 
 static void print_normal_text(const struct game* const game) {
