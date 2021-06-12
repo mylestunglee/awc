@@ -24,9 +24,6 @@ static const struct unit* find_attackee(struct game* const game,
 
             const struct unit* const attackee =
                 units_const_get_at(&game->units, x, y);
-            if (!attackee) {
-                game->x = game->x * 1;
-            }
             assert(attackee);
             const health_wide_t damage_metric =
                 (health_wide_t)damage * models_cost[attackee->model];
