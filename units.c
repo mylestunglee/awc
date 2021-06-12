@@ -249,3 +249,9 @@ bool units_has_selection(const struct units* const units) {
 void units_disable_selection(struct units* const units) {
     units_get_by(units, units->selected)->enabled = false;
 }
+
+bool units_mergable(const struct unit* const source, const struct unit* const target) {
+    assert(source);
+    assert(target);
+    return source->player == target->player && !(source->health == health_max && target->health == health_max) && source->model == target->model;
+}

@@ -195,22 +195,29 @@ TEST_F(game_fixture, is_node_unexplorable_returns_false_when_explorable) {
 TEST_F(game_fixture, is_node_accessible_returns_true_when_accessible) {
     ASSERT_NE(movement_type_ship, 0);
     struct list_node node = {.x = 2, .y = 3};
-    auto accessible = is_node_accessible(game, &node, 0);
+    struct unit unit = {.x = 0, .y = 0};
+    units_insert(&game->units, &unit);
+    auto accessible = is_node_accessible(game, &node);
     ASSERT_TRUE(accessible);
 }
 
 TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
-    struct unit unit = {.x = 2, .y = 3};
-    units_insert(&game->units, &unit);
+    struct unit target = {.health = health_max, .x = 2, .y = 3};
+    units_insert(&game->units, &target);
+    struct unit source = {.health = health_max, .x = 0, .y = 0};
+    units_insert(&game->units, &source);
     struct list_node node = {.x = 2, .y = 3};
-    auto accessible = is_node_accessible(game, &node, 0);
+    auto accessible = is_node_accessible(game, &node);
     ASSERT_FALSE(accessible);
 }
 
 TEST_F(game_fixture, is_node_accessible_returns_false_when_ship_on_bridge) {
     game->map[3][2] = tile_bridge;
+    const model_t unit_submarine = 12;
+    struct unit unit = { .model = unit_submarine, .x = 0, .y = 0};
+    units_insert(&game->units, &unit);
     struct list_node node = {.x = 2, .y = 3};
-    auto accessible = is_node_accessible(game, &node, movement_type_ship);
+    auto accessible = is_node_accessible(game, &node);
     ASSERT_FALSE(accessible);
 }
 
@@ -280,12 +287,16 @@ TEST_F(game_fixture, explore_node_does_not_explore_occupied_tile) {
 }
 
 TEST_F(game_fixture, explore_node_sets_energies) {
+    struct unit unit = {.x = 0, .y = 0};
+    units_insert(&game->units, &unit);
     struct list_node node = {.x = 2, .y = 3, .energy = 5};
     explore_node(game, &node, null_player, 0, false);
     ASSERT_EQ(game->energies[3][2], 5);
 }
 
 TEST_F(game_fixture, explore_node_sets_attackable_label_if_accessible) {
+    struct unit unit = {.x = 0, .y = 0};
+    units_insert(&game->units, &unit);
     game->map[3][2] = tile_plains;
     struct list_node node = {.x = 2, .y = 3, .energy = 5};
     explore_node(game, &node, null_player, 0, true);
@@ -293,6 +304,8 @@ TEST_F(game_fixture, explore_node_sets_attackable_label_if_accessible) {
 }
 
 TEST_F(game_fixture, explore_node_explores_adjacent_tiles) {
+    struct unit unit = {.x = 0, .y = 0};
+    units_insert(&game->units, &unit);
     struct list_node node = {.x = 2, .y = 3, .energy = 5};
     game->map[3][3] = tile_plains;
     explore_node(game, &node, null_player, 0, false);

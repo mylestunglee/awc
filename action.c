@@ -116,11 +116,19 @@ bool action_build(struct game* const game, const model_t model) {
     return error;
 }
 
+static void action_merge(struct game* const game) {
+    (void)game;
+}
+
 bool action_move(struct game* const game) {
     const bool selected = units_has_selection(&game->units);
     if (selected && game->labels[game->y][game->x] & accessible_bit) {
         assert(game->dirty_labels);
-        units_move_selection(&game->units, game->x, game->y);
+        if (units_const_get_at(&game->units, game->x, game->y)) {
+            action_merge(game);
+        } else {
+            units_move_selection(&game->units, game->x, game->y);
+        }
         action_handle_capture(game);
         units_disable_selection(&game->units);
         action_deselect(game);

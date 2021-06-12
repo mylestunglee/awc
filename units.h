@@ -50,6 +50,7 @@ void units_select_at(struct units* const, const grid_t, const grid_t);
 void units_clear_selection(struct units* const);
 bool units_has_selection(const struct units* const);
 void units_disable_selection(struct units* const);
+bool units_mergable(const struct unit* const, const struct unit* const);
 
 #ifdef expose_units_internals
 

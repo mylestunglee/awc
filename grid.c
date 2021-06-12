@@ -145,11 +145,10 @@ void grid_explore_mark_attackable_ranged(struct game* const game,
 bool is_node_unexplorable(const struct game* const game,
                           const struct list_node* const node,
                           const player_t player) {
-    const unit_t unit = game->units.grid[node->y][node->x];
-    if (unit != null_unit) {
-        const player_t node_player = game->units.data[unit].player;
+    const struct unit* const unit = units_const_get_at(&game->units, node->x, node->y);
+    if (unit) {
         const bool enemy_unit =
-            !bitmatrix_get(game->alliances, player, node_player);
+            !bitmatrix_get(game->alliances, player, unit->player);
         const bool init_tile = node->x == game->x && node->y == game->y;
 
         if (enemy_unit && !init_tile)
@@ -164,19 +163,21 @@ bool is_node_unexplorable(const struct game* const game,
 }
 
 bool is_node_accessible(const struct game* const game,
-                        const struct list_node* const node,
-                        const movement_t movement) {
-    const bool unoccupied = game->units.grid[node->y][node->x] == null_unit;
-    const bool init_tile = node->x == game->x && node->y == game->y;
+                        const struct list_node* const node) {
+    const struct unit* const source = units_const_get_at(&game->units, game->x, game->y);
+    assert(source);
+    const struct unit* const target = units_const_get_at(&game->units, node->x, node->y);
+    const bool unoccupied = !target;
+    const bool init_tile = source == target;
     const tile_t tile = game->map[node->y][node->x];
     const bool ship_on_bridge =
-        tile == tile_bridge && movement == movement_type_ship;
-    return (unoccupied || init_tile) && !ship_on_bridge;
+        tile == tile_bridge && unit_movement_types[source->model] == movement_type_ship;
+    return init_tile || ((unoccupied || units_mergable(source, target)) && !ship_on_bridge);
 }
 
 void explore_adjacent_tiles(struct game* const game,
                             const struct list_node* const node,
-                            const movement_t movement) {
+                            const model_t model) {
     const grid_t x = node->x;
     const grid_t y = node->y;
 
@@ -187,6 +188,7 @@ void explore_adjacent_tiles(struct game* const game,
         const grid_t x_i = adjacent_x[i];
         const grid_t y_i = adjacent_y[i];
         const tile_t tile = game->map[y_i][x_i];
+        const movement_t movement = unit_movement_types[model];
         const energy_t cost = movement_type_cost[movement][tile];
 
         if (cost == 0)
@@ -212,14 +214,13 @@ void explore_node(struct game* const game, const struct list_node* const node,
 
     game->energies[node->y][node->x] = node->energy;
 
-    const movement_t movement = unit_movement_types[model];
-    if (is_node_accessible(game, node, movement)) {
+    if (is_node_accessible(game, node)) {
         game->labels[node->y][node->x] |= accessible_bit;
         grid_explore_mark_attackable_direct(game, node->x, node->y, model,
                                             player, label_attackable_tiles);
     }
 
-    explore_adjacent_tiles(game, node, movement);
+    explore_adjacent_tiles(game, node, model);
 }
 
 energy_t init_exploration_energy(const energy_t scalar, const model_t model) {
