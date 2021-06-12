@@ -3,7 +3,7 @@ CXX = g++
 CXXFLAGS = -g -Wall -pedantic -funsigned-char -std=c++2a
 LIBRARIES = -lgtest_main  -lgtest -lglpk
 
-.PHONY: default clean
+.PHONY: default clean run
 
 TARGETS = $(patsubst %_test.cpp, %_test, $(wildcard *_test.cpp))
 FIXTURE_OBJECTS = $(patsubst %_fixture.cpp, %_fixture.o, $(wildcard *_fixture.cpp))
@@ -30,6 +30,9 @@ HEADERS = $(wildcard ../*.h)
 	$(CXX) $< $(SOURCE_OBJECTS) $(FIXTURE_OBJECTS) $(LIBRARIES) -o $@
 
 default: $(TARGETS)
+
+run: $(TARGETS)
+	@bash run_tests.sh $(TARGETS)
 
 clean:
 	rm -f $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS) $(SOURCE_OBJECTS)
