@@ -259,3 +259,10 @@ bool units_mergable(const struct unit* const source,
            !(source->health == health_max && target->health == health_max) &&
            source->model == target->model;
 }
+
+bool units_exists(const struct units* const units, const grid_t x,
+                  const grid_t y) {
+    return units->grid[y][x] != null_unit;
+}
+
+bool units_ranged(const model_t model) { return models_min_range[model] > 0; }

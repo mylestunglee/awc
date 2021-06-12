@@ -9,10 +9,6 @@ void grid_clear_uint8(uint8_t grid[grid_size][grid_size]) {
     memset(grid, 0, grid_size * grid_size);
 }
 
-void grid_clear_energy(energy_t energies[grid_size][grid_size]) {
-    memset(energies, 0, sizeof(energy_t) * grid_size * grid_size);
-}
-
 void grid_clear_territory(player_t territory[grid_size][grid_size]) {
     grid_t y = 0;
     do {
@@ -71,32 +67,34 @@ void grid_compute_incomes(player_t territory[grid_size][grid_size],
     } while (++y);
 }
 
+void grid_clear_labels(struct game* const game) {
+    if (game->dirty_labels) {
+        grid_clear_uint8(game->labels);
+        game->dirty_labels = false;
+    }
+}
+
+void grid_clear_energy(energy_t energies[grid_size][grid_size]) {
+    memset(energies, 0, sizeof(energy_t) * grid_size * grid_size);
+}
+
 // Marks a tile as attackable if position relates to attackable unit
 void grid_explore_mark_attackable_tile(struct game* const game, const grid_t x,
                                        const grid_t y, const model_t model,
                                        const player_t player,
                                        const bool label_attackable_tiles) {
-
-    // By-pass checks when label attackable tiles forcefully
-    if (label_attackable_tiles) {
-        game->labels[y][x] |= attackable_bit;
-        return;
+    if (!label_attackable_tiles) {
+        const struct unit* const unit = units_const_get_at(&game->units, x, y);
+        if (!unit)
+            return;
+        const bool friendly = bitmatrix_get(game->alliances, player, unit->player);
+        const bool self = game->x == x && game->y == y;
+        const bool undamagable = units_damage[model][unit->model] == 0;
+        if (self || friendly || undamagable)
+            return;
     }
 
-    // Skip self-attack
-    if (game->x == x && game->y == y)
-        return;
-
-    const unit_t index = game->units.grid[y][x];
-    if (index == null_unit)
-        return;
-
-    const struct unit* const unit = &game->units.data[index];
-
-    // Mark tiles without friendly units as attackable
-    if (!bitmatrix_get(game->alliances, player, unit->player) &&
-        units_damage[model][unit->model])
-        game->labels[y][x] |= attackable_bit;
+    game->labels[y][x] |= attackable_bit;
 }
 
 void grid_explore_mark_attackable_direct(struct game* const game,
@@ -104,9 +102,7 @@ void grid_explore_mark_attackable_direct(struct game* const game,
                                          const model_t model,
                                          const player_t player,
                                          const bool label_attackable_tiles) {
-
-    // Direct attack only applies to 0-ranged models
-    if (models_min_range[model])
+    if (units_ranged(model))
         return;
 
     grid_explore_mark_attackable_tile(game, x + 1, y, model, player,
@@ -125,19 +121,19 @@ void grid_explore_mark_attackable_ranged(struct game* const game,
                                          const player_t player,
                                          const bool label_attackable_tiles) {
 
+    if (!units_ranged(model))
+        return;
+
     const grid_wide_t min_range = models_min_range[model];
     const grid_wide_t max_range = models_max_range[model];
-
-    // Range attack only applies to positive ranged models
-    if (min_range == 0)
-        return;
 
     for (grid_wide_t j = -max_range; j <= max_range; ++j)
         for (grid_wide_t i = -max_range; i <= max_range; ++i) {
             const grid_wide_t distance = abs(i) + abs(j);
             if (min_range <= distance && distance <= max_range)
                 grid_explore_mark_attackable_tile(
-                    game, x + i, y + j, model, player, label_attackable_tiles);
+                    game, (grid_wide_t)x + i, (grid_wide_t)y + j, model, player,
+                    label_attackable_tiles);
         }
 }
 
@@ -148,19 +144,16 @@ bool is_node_unexplorable(const struct game* const game,
     const struct unit* const unit =
         units_const_get_at(&game->units, node->x, node->y);
     if (unit) {
-        const bool enemy_unit =
+        const bool unfriendly =
             !bitmatrix_get(game->alliances, player, unit->player);
         const bool init_tile = node->x == game->x && node->y == game->y;
 
-        if (enemy_unit && !init_tile)
+        if (unfriendly && !init_tile)
             return true;
     }
 
     // Do not re-compute explored areas
-    if (game->energies[node->y][node->x] > node->energy)
-        return true;
-
-    return false;
+    return game->energies[node->y][node->x] > node->energy;
 }
 
 bool is_node_accessible(const struct game* const game,
@@ -307,12 +300,5 @@ void grid_find_path(struct game* const game, grid_t x, grid_t y) {
             return;
 
         prev_energy = next_energy;
-    }
-}
-
-void grid_clear_labels(struct game* const game) {
-    if (game->dirty_labels) {
-        grid_clear_uint8(game->labels);
-        game->dirty_labels = false;
     }
 }

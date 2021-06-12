@@ -51,6 +51,8 @@ void units_clear_selection(struct units* const);
 bool units_has_selection(const struct units* const);
 void units_disable_selection(struct units* const);
 bool units_mergable(const struct unit* const, const struct unit* const);
+bool units_exists(const struct units* const, const grid_t, const grid_t);
+bool units_ranged(const model_t);
 
 #ifdef expose_units_internals
 
