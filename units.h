@@ -64,7 +64,7 @@ unit_t index_by_pointer(const struct units* const, const struct unit* const);
 struct unit* units_get_by_safe(struct units* const, const unit_t);
 const struct unit* units_const_get_by_safe(const struct units* const,
                                            const unit_t);
-
+// units_const_get_selected
 #endif
 
 #endif

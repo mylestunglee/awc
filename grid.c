@@ -145,7 +145,8 @@ void grid_explore_mark_attackable_ranged(struct game* const game,
 bool is_node_unexplorable(const struct game* const game,
                           const struct list_node* const node,
                           const player_t player) {
-    const struct unit* const unit = units_const_get_at(&game->units, node->x, node->y);
+    const struct unit* const unit =
+        units_const_get_at(&game->units, node->x, node->y);
     if (unit) {
         const bool enemy_unit =
             !bitmatrix_get(game->alliances, player, unit->player);
@@ -164,15 +165,19 @@ bool is_node_unexplorable(const struct game* const game,
 
 bool is_node_accessible(const struct game* const game,
                         const struct list_node* const node) {
-    const struct unit* const source = units_const_get_at(&game->units, game->x, game->y);
+    const struct unit* const source =
+        units_const_get_at(&game->units, game->x, game->y);
     assert(source);
-    const struct unit* const target = units_const_get_at(&game->units, node->x, node->y);
+    const struct unit* const target =
+        units_const_get_at(&game->units, node->x, node->y);
     const bool unoccupied = !target;
     const bool init_tile = source == target;
     const tile_t tile = game->map[node->y][node->x];
     const bool ship_on_bridge =
-        tile == tile_bridge && unit_movement_types[source->model] == movement_type_ship;
-    return init_tile || ((unoccupied || units_mergable(source, target)) && !ship_on_bridge);
+        tile == tile_bridge &&
+        unit_movement_types[source->model] == movement_type_ship;
+    return init_tile ||
+           ((unoccupied || units_mergable(source, target)) && !ship_on_bridge);
 }
 
 void explore_adjacent_tiles(struct game* const game,

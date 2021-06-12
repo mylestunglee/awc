@@ -43,8 +43,32 @@ void action_handle_capture(struct game* const game) {
     action_capture(game);
 }
 
+void action_move_selected(struct game* const game, const grid_t x,
+                          const grid_t y) {
+    const struct unit* const source = units_get_selected(&game->units);
+    struct unit* const target = units_get_at(&game->units, x, y);
+
+    if (source == target)
+        return;
+
+    if (!target) {
+        units_move_selection(&game->units, x, y);
+        return;
+    }
+
+    // handle merge
+    assert(units_mergable(source, target));
+    health_wide_t merged_health =
+        (health_wide_t)source->health + (health_wide_t)target->health;
+    if (merged_health > (health_wide_t)health_max)
+        merged_health = health_max;
+    units_delete_selected(&game->units);
+    target->health = merged_health;
+    units_select_at(&game->units, x, y);
+}
+
 void action_attack(struct game* const game) {
-    struct unit* const attacker = units_get_selected(&game->units);
+    struct unit* attacker = units_get_selected(&game->units);
     struct unit* const attackee = units_get_at(&game->units, game->x, game->y);
     assert(attacker);
     assert(attacker->enabled);
@@ -55,8 +79,10 @@ void action_attack(struct game* const game) {
 
     // If unit is direct, move to attack
     const bool ranged = models_min_range[attacker->model];
-    if (!ranged)
-        units_move_selection(&game->units, game->prev_x, game->prev_y);
+    if (!ranged) {
+        action_move_selected(game, game->prev_x, game->prev_y);
+        attacker = units_get_selected(&game->units);
+    }
 
     // Compute damage
     health_t damage, counter_damage;
@@ -116,19 +142,11 @@ bool action_build(struct game* const game, const model_t model) {
     return error;
 }
 
-static void action_merge(struct game* const game) {
-    (void)game;
-}
-
 bool action_move(struct game* const game) {
     const bool selected = units_has_selection(&game->units);
     if (selected && game->labels[game->y][game->x] & accessible_bit) {
         assert(game->dirty_labels);
-        if (units_const_get_at(&game->units, game->x, game->y)) {
-            action_merge(game);
-        } else {
-            units_move_selection(&game->units, game->x, game->y);
-        }
+        action_move_selected(game, game->x, game->y);
         action_handle_capture(game);
         units_disable_selection(&game->units);
         action_deselect(game);

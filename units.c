@@ -117,6 +117,7 @@ void units_delete_at(struct units* const units, const grid_t x,
 
 void units_delete_selected(struct units* const units) {
     units_delete(units, units->selected);
+    units_clear_selection(units);
 }
 
 void units_move(struct units* const units, const unit_t unit, const grid_t x,
@@ -158,9 +159,16 @@ void units_delete_player(struct units* const units, const player_t player) {
         units_delete(units, units->firsts[player]);
 }
 
+struct unit* units_get_by_safe(struct units* const units, const unit_t unit) {
+    if (unit == null_unit)
+        return NULL;
+
+    return units_get_by(units, unit);
+}
+
 struct unit* units_get_at(struct units* const units, const grid_t x,
                           const grid_t y) {
-    return units_get_by(units, units->grid[y][x]);
+    return units_get_by_safe(units, units->grid[y][x]);
 }
 
 const struct unit* units_const_get_by(const struct units* const units,
@@ -185,13 +193,6 @@ const struct unit* units_const_get_at(const struct units* const units,
 struct unit* units_get_by(struct units* const units, const unit_t unit) {
     assert(unit != null_unit);
     return &units->data[unit];
-}
-
-struct unit* units_get_by_safe(struct units* const units, const unit_t unit) {
-    if (unit == null_unit)
-        return NULL;
-
-    return units_get_by(units, unit);
 }
 
 struct unit* units_get_first(struct units* const units, const player_t player) {
@@ -250,8 +251,11 @@ void units_disable_selection(struct units* const units) {
     units_get_by(units, units->selected)->enabled = false;
 }
 
-bool units_mergable(const struct unit* const source, const struct unit* const target) {
+bool units_mergable(const struct unit* const source,
+                    const struct unit* const target) {
     assert(source);
     assert(target);
-    return source->player == target->player && !(source->health == health_max && target->health == health_max) && source->model == target->model;
+    return source->player == target->player &&
+           !(source->health == health_max && target->health == health_max) &&
+           source->model == target->model;
 }

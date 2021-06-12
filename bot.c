@@ -312,7 +312,7 @@ static void move_towards_target(struct game* const game,
     assert(accessible_bit & game->labels[y][x]);
 
     list_initialise(list);
-    units_move_selection(&game->units, x, y);
+    action_move_selected(game, x, y);
     unit->enabled = false;
 }
 

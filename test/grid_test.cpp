@@ -214,7 +214,7 @@ TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
 TEST_F(game_fixture, is_node_accessible_returns_false_when_ship_on_bridge) {
     game->map[3][2] = tile_bridge;
     const model_t unit_submarine = 12;
-    struct unit unit = { .model = unit_submarine, .x = 0, .y = 0};
+    struct unit unit = {.model = unit_submarine, .x = 0, .y = 0};
     units_insert(&game->units, &unit);
     struct list_node node = {.x = 2, .y = 3};
     auto accessible = is_node_accessible(game, &node);
