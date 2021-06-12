@@ -87,7 +87,8 @@ void grid_explore_mark_attackable_tile(struct game* const game, const grid_t x,
         const struct unit* const unit = units_const_get_at(&game->units, x, y);
         if (!unit)
             return;
-        const bool friendly = bitmatrix_get(game->alliances, player, unit->player);
+        const bool friendly =
+            bitmatrix_get(game->alliances, player, unit->player);
         const bool self = game->x == x && game->y == y;
         const bool undamagable = units_damage[model][unit->model] == 0;
         if (self || friendly || undamagable)
