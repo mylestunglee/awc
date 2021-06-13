@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 class units_fixture : public ::testing::Test {
-  protected:
+protected:
     units_fixture() : units(new struct units) { units_initialise(units); }
     ~units_fixture() { delete units; }
     struct units* const units;

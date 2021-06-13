@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 class list_fixture : public ::testing::Test {
-  protected:
+protected:
     list_fixture() : list(new struct list) { list_initialise(list); }
     ~list_fixture() { delete list; }
     struct list* const list;
