@@ -4,6 +4,9 @@
 #include "definitions.h"
 #include <stdbool.h>
 
+typedef uint8_t unit_t;
+#define capture_completion (health_wide_t)0x1fe // double health_max
+
 struct unit {
     health_t health;
     model_t model;
@@ -11,6 +14,7 @@ struct unit {
     grid_t x;
     grid_t y;
     bool enabled;
+    health_wide_t capture_progress;
 };
 
 struct units {
@@ -53,6 +57,7 @@ void units_disable_selection(struct units* const);
 bool units_mergable(const struct unit* const, const struct unit* const);
 bool units_exists(const struct units* const, const grid_t, const grid_t);
 bool units_ranged(const model_t);
+bool units_update_capture_progress(struct units* const);
 
 #ifdef expose_units_internals
 

@@ -266,3 +266,18 @@ bool units_exists(const struct units* const units, const grid_t x,
 }
 
 bool units_ranged(const model_t model) { return models_min_range[model] > 0; }
+
+bool units_update_capture_progress(struct units* const units) {
+    struct unit* const selected = units_get_selected(units);
+
+    if (selected->model >= unit_capturable_upper_bound)
+        return false;
+
+    assert(selected->capture_progress < capture_completion);
+    selected->capture_progress += selected->health;
+    if (selected->capture_progress >= capture_completion) {
+        selected->capture_progress = 0;
+        return true;
+    }
+    return false;
+}

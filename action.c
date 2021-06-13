@@ -20,6 +20,7 @@ static void action_capture(struct game* const game) {
     ++game->incomes[game->turn];
 }
 
+// refactor to if capturable
 void action_handle_capture(struct game* const game) {
     const struct unit* const unit = units_const_get_selected(&game->units);
 
@@ -147,7 +148,8 @@ bool action_move(struct game* const game) {
     if (selected && game->labels[game->y][game->x] & accessible_bit) {
         assert(game->dirty_labels);
         action_move_selected(game, game->x, game->y);
-        action_handle_capture(game);
+        if (units_update_capture_progress(&game->units))
+            action_handle_capture(game);
         units_disable_selection(&game->units);
         action_deselect(game);
         return true;

@@ -5,7 +5,6 @@
 
 // Types
 
-typedef uint8_t unit_t;
 typedef uint8_t health_t;
 typedef uint32_t health_wide_t;
 typedef uint8_t model_t;

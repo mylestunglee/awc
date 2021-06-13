@@ -149,6 +149,12 @@ static void print_normal_text(const struct game* const game) {
            tile_names[game->map[game->y][game->x]],
            game->territory[game->y][game->x], game->labels[game->y][game->x],
            game->golds[game->turn]);
+
+    const struct unit* unit =
+        units_const_get_at(&game->units, game->x, game->y);
+    if (unit)
+        printf("unit health=" health_format " model=%s capture_progress=%u",
+               unit->health, model_names[unit->model], unit->capture_progress);
 }
 
 static void print_attack_text(const struct game* const game) {
