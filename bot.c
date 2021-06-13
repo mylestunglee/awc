@@ -121,6 +121,9 @@ static void update_max_energy(const struct game* const game, grid_t x, grid_t y,
     if (energy <= *max_energy)
         return;
 
+    if (!(game->labels[y][x] & accessible_bit))
+        return;
+
     *max_energy = energy;
     *update_x = x;
     *update_y = y;
@@ -167,7 +170,6 @@ static void handle_capture(struct game* const game, struct unit* const unit) {
     game->y = y;
     bool success = action_move(game);
     assert(success);
-    assert(game->territory[y][x] == unit->player);
 }
 
 // Attempt single-turn operation
@@ -288,7 +290,8 @@ static bool find_nearest_target(struct game* const game,
 }
 
 static void move_towards_target(struct game* const game,
-                                struct unit* const unit, grid_t x, grid_t y) {
+                                struct unit* const unit, const grid_t x,
+                                const grid_t y) {
 
     grid_find_path(game, x, y);
 
@@ -302,15 +305,14 @@ static void move_towards_target(struct game* const game,
     while (!list_empty(list) &&
            list_back_peek(list).energy >= accessible_energy) {
         const struct list_node node = list_back_pop(list);
-        x = node.x;
-        y = node.y;
+        game->x = node.x;
+        game->y = node.y;
     }
 
-    assert(accessible_bit & game->labels[y][x]);
+    assert(accessible_bit & game->labels[game->y][game->x]);
 
-    list_initialise(list);
-    action_move_selected(game, x, y);
-    unit->enabled = false;
+    const bool success = action_move(game);
+    assert(success);
 }
 
 static void handle_nonlocal(struct game* const game, struct unit* const unit) {
@@ -328,9 +330,10 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
 
     if (found)
         move_towards_target(game, unit, x, y);
-
-    assert(game->dirty_labels);
-    grid_clear_labels(game);
+    else {
+        assert(game->dirty_labels);
+        grid_clear_labels(game);
+    }
 }
 
 static void interact_unit(struct game* const game, struct unit* const unit) {

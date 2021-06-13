@@ -133,6 +133,7 @@ void units_move(struct units* const units, const unit_t unit, const grid_t x,
     assert(units->grid[y][x] == null_unit);
     units->data[unit].x = x;
     units->data[unit].y = y;
+    units->data[unit].capture_progress = 0;
     units->grid[old_y][old_x] = null_unit;
     units->grid[y][x] = unit;
 }
@@ -267,14 +268,12 @@ bool units_exists(const struct units* const units, const grid_t x,
 
 bool units_ranged(const model_t model) { return models_min_range[model] > 0; }
 
-bool units_update_capture_progress(struct units* const units) {
+bool units_update_capture_progress(struct units* const units,
+                                   const health_t progress) {
     struct unit* const selected = units_get_selected(units);
 
-    if (selected->model >= unit_capturable_upper_bound)
-        return false;
-
     assert(selected->capture_progress < capture_completion);
-    selected->capture_progress += selected->health;
+    selected->capture_progress += progress;
     if (selected->capture_progress >= capture_completion) {
         selected->capture_progress = 0;
         return true;

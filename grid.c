@@ -236,7 +236,7 @@ void grid_explore_recursive(struct game* const game,
     game->dirty_labels = true;
     struct list* const list = &game->list;
 
-    assert(list_empty(list));
+    list_initialise(&game->list);
     assert(game->units.grid[game->y][game->x] != null_unit);
     assert(scalar > 0);
 
@@ -273,7 +273,7 @@ void grid_explore(struct game* const game, const bool label_attackable_tiles,
 
 // Populates game.list with coordinates along the path to maximal energy
 void grid_find_path(struct game* const game, grid_t x, grid_t y) {
-    assert(list_empty(&game->list));
+    list_initialise(&game->list);
 
     energy_t prev_energy = game->energies[y][x];
 

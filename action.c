@@ -21,7 +21,7 @@ static void action_capture(struct game* const game) {
 }
 
 // refactor to if capturable
-void action_handle_capture(struct game* const game) {
+bool is_capture_progressable(const struct game* const game) {
     const struct unit* const unit = units_const_get_selected(&game->units);
 
     assert(unit->player == game->turn);
@@ -33,39 +33,46 @@ void action_handle_capture(struct game* const game) {
     // 2. The tile is capturable
     // 3. The tile is owned by an enemy
     if (unit->model >= unit_capturable_upper_bound)
-        return;
+        return false;
 
     if (game->map[game->y][game->x] < terrian_capacity)
-        return;
+        return false;
 
     if (game_is_friendly(game, game->territory[game->y][game->x]))
-        return;
+        return false;
 
-    action_capture(game);
+    return true;
 }
 
-void action_move_selected(struct game* const game, const grid_t x,
-                          const grid_t y) {
+static health_t merge_health(const health_t source, const health_t target) {
+    health_wide_t merged_health = (health_wide_t)source + (health_wide_t)target;
+    if (merged_health > (health_wide_t)health_max)
+        merged_health = health_max;
+    return merged_health;
+}
+
+// returns health after merge
+health_t action_move_selected(struct game* const game, const grid_t x,
+                              const grid_t y) {
     const struct unit* const source = units_get_selected(&game->units);
     struct unit* const target = units_get_at(&game->units, x, y);
 
     if (source == target)
-        return;
+        return source->health;
 
     if (!target) {
         units_move_selection(&game->units, x, y);
-        return;
+        return source->health;
     }
 
     // handle merge
     assert(units_mergable(source, target));
-    health_wide_t merged_health =
-        (health_wide_t)source->health + (health_wide_t)target->health;
-    if (merged_health > (health_wide_t)health_max)
-        merged_health = health_max;
+    const health_t merged_health = merge_health(source->health, target->health);
     units_delete_selected(&game->units);
-    target->health = merged_health;
     units_select_at(&game->units, x, y);
+    health_t gained_health = merged_health - target->health;
+    target->health = merged_health;
+    return gained_health;
 }
 
 void action_attack(struct game* const game) {
@@ -137,7 +144,8 @@ bool action_build(struct game* const game, const model_t model) {
                               .player = game->turn,
                               .x = game->x,
                               .y = game->y,
-                              .enabled = false};
+                              .enabled = false,
+                              .capture_progress = 0};
     const bool error = units_insert(&game->units, &unit);
 
     return error;
@@ -147,9 +155,11 @@ bool action_move(struct game* const game) {
     const bool selected = units_has_selection(&game->units);
     if (selected && game->labels[game->y][game->x] & accessible_bit) {
         assert(game->dirty_labels);
-        action_move_selected(game, game->x, game->y);
-        if (units_update_capture_progress(&game->units))
-            action_handle_capture(game);
+        const health_t capture_progress =
+            action_move_selected(game, game->x, game->y);
+        if (is_capture_progressable(game) &&
+            units_update_capture_progress(&game->units, capture_progress))
+            action_capture(game);
         units_disable_selection(&game->units);
         action_deselect(game);
         return true;

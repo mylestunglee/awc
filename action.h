@@ -11,8 +11,7 @@ bool action_surrender(struct game* const game);
 bool action_deselect(struct game* const game);
 bool action_select(struct game* const game);
 bool action_highlight(struct game* const game);
-void action_move_selected(struct game* const game, const grid_t x,
-                          const grid_t y);
+
 #ifdef expose_action_internals
 
 void action_handle_capture(struct game* const);
