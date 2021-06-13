@@ -22,6 +22,9 @@ $(TARGET): $(OBJECTS)
 test:
 	$(MAKE) -C test
 
+runtest:
+	$(MAKE) -C test run
+
 format:
 	clang-format -style=file -i *.c *.h test/*.cpp
 

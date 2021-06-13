@@ -4,7 +4,12 @@
 #include "game_fixture.hpp"
 
 class grid_fixture : public ::testing::Test {
-  protected:
+protected:
+    grid_fixture() {
+        grid_clear_uint8(map);
+        grid_clear_energy(energies);
+        grid_clear_territory(territory);
+    }
     tile_t map[grid_size][grid_size];
     energy_t energies[grid_size][grid_size];
     player_t territory[grid_size][grid_size];
