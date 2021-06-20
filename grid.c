@@ -150,7 +150,8 @@ bool is_node_unexplorable(const struct game* const game,
         const bool unfriendly =
             !bitmatrix_get(game->alliances, player, target->player);
         const bool noninit_tile = source != target;
-        const bool unpassable = unit_pass_type[source->model] == unit_pass_type[target->model];
+        const bool unpassable =
+            unit_pass_type[source->model] == unit_pass_type[target->model];
 
         if (unfriendly && noninit_tile && unpassable)
             return true;
@@ -233,7 +234,6 @@ energy_t init_exploration_energy(const energy_t scalar, const model_t model) {
 // Use scalar > 1 when looking ahead multiple turns
 void grid_explore_recursive(struct game* const game,
                             const bool label_attackable_tiles,
-                            const bool friendly_passable,
                             const energy_t scalar) {
     grid_clear_energy(game->energies);
     game->dirty_labels = true;
@@ -262,16 +262,14 @@ void grid_explore_recursive(struct game* const game,
 
     while (!list_empty(list)) {
         const struct list_node node = list_front_pop(list);
-        explore_node(game, &node, friendly_passable ? player : null_player,
-                     model, label_attackable_tiles);
+        explore_node(game, &node, player, model, label_attackable_tiles);
     }
 }
 
 // Recursively marks tiles that are accessible or attackable from the cursor
 // tile
-void grid_explore(struct game* const game, const bool label_attackable_tiles,
-                  const bool friendly_passable) {
-    grid_explore_recursive(game, label_attackable_tiles, friendly_passable, 1);
+void grid_explore(struct game* const game, const bool label_attackable_tiles) {
+    grid_explore_recursive(game, label_attackable_tiles, 1);
 }
 
 // Populates game.list with coordinates along the path to maximal energy

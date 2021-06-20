@@ -181,7 +181,7 @@ static void handle_local(struct game* const game, struct unit* const unit) {
     game->y = unit->y;
 
     // Scan for local targets
-    grid_explore(game, false, true);
+    grid_explore(game, false);
     handle_attack(game, unit);
     if (!unit->enabled) {
         return;
@@ -276,7 +276,8 @@ static bool find_nearest_target(struct game* const game,
     energy_t capturable_energy = 0;
 
     if (unit->model < unit_capturable_upper_bound)
-        capturable_energy = find_nearest_capturable(game, &capturable_x, &capturable_y);
+        capturable_energy =
+            find_nearest_capturable(game, &capturable_x, &capturable_y);
 
     if (attackee_target_energy > capturable_energy) {
         *nearest_x = attackee_target_x;
@@ -326,7 +327,7 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
 
     // label_attackable_tiles argument=false is unimportant because attack_bit
     // is unread
-    grid_explore_recursive(game, false, false, look_ahead);
+    grid_explore_recursive(game, false, look_ahead);
     grid_t x, y;
     bool found = find_nearest_target(game, unit, &x, &y);
 

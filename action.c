@@ -207,7 +207,7 @@ bool action_select(struct game* const game) {
 
     if (!selected && unit && unit->enabled) {
         grid_clear_labels(game);
-        grid_explore(game, false, true);
+        grid_explore(game, false);
         units_select_at(&game->units, game->x, game->y);
         return true;
     }
@@ -221,7 +221,7 @@ bool action_highlight(struct game* const game) {
     const bool selected = units_has_selection(&game->units);
 
     if (!selected && unit && unit->enabled) {
-        grid_explore(game, true, true);
+        grid_explore(game, true);
         return true;
     }
 

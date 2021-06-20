@@ -173,13 +173,26 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        is_node_unexplorable_returns_true_when_blocked_by_enemy_unit) {
+    insert_unit({.x = 0, .y = 0});
     insert_unit({.player = 1, .x = 2, .y = 3});
     struct list_node node = {.x = 2, .y = 3};
     auto unexplorable = is_node_unexplorable(game, &node, 0);
     ASSERT_TRUE(unexplorable);
 }
 
+TEST_F(game_fixture,
+       is_node_unexplorable_returns_false_when_blocked_by_passable_unit) {
+    constexpr model_t infantry = 0;
+    constexpr model_t helicopter = 9;
+    insert_unit({.model = infantry, .x = 0, .y = 0});
+    insert_unit({.model = helicopter, .player = 1, .x = 2, .y = 3});
+    struct list_node node = {.x = 2, .y = 3};
+    auto unexplorable = is_node_unexplorable(game, &node, 0);
+    ASSERT_FALSE(unexplorable);
+}
+
 TEST_F(game_fixture, is_node_unexplorable_returns_true_when_visited) {
+    insert_unit({.x = 0, .y = 0});
     game->energies[3][2] = 7;
     struct list_node node = {.x = 2, .y = 3, .energy = 5};
     auto unexplorable = is_node_unexplorable(game, &node, 0);
@@ -187,6 +200,7 @@ TEST_F(game_fixture, is_node_unexplorable_returns_true_when_visited) {
 }
 
 TEST_F(game_fixture, is_node_unexplorable_returns_false_when_explorable) {
+    insert_unit({.x = 0, .y = 0});
     game->map[3][2] = tile_plains;
     struct list_node node = {.x = 2, .y = 3};
     auto unexplorable = is_node_unexplorable(game, &node, 0);
@@ -289,6 +303,7 @@ TEST_F(game_fixture,
 }
 
 TEST_F(game_fixture, explore_node_does_not_explore_occupied_tile) {
+    insert_unit({.x = 0, .y = 0});
     insert_unit({.player = 1, .x = 2, .y = 3});
     struct list_node node = {.x = 2, .y = 3, .energy = 5};
     explore_node(game, &node, null_player, 0, false);
@@ -334,7 +349,7 @@ TEST_F(game_fixture, grid_explore_explores_with_correct_residual_energies) {
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
-    grid_explore_recursive(game, false, false, 1);
+    grid_explore_recursive(game, false, 1);
     ASSERT_EQ(game->energies[3][2], 4);
     ASSERT_EQ(game->energies[3][3], 3);
     ASSERT_EQ(game->energies[3][4], 2);
@@ -352,7 +367,7 @@ TEST_F(game_fixture, grid_explore_labels_accessible_tiles) {
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
-    grid_explore(game, false, false);
+    grid_explore(game, false);
     ASSERT_EQ(game->labels[3][2], accessible_bit);
     ASSERT_EQ(game->labels[3][3], accessible_bit);
     ASSERT_EQ(game->labels[3][4], accessible_bit);
@@ -368,7 +383,7 @@ TEST_F(game_fixture, grid_explore_labels_actionable_attack) {
     units_insert(&game->units, &bob);
     game->x = 2;
     game->y = 3;
-    grid_explore(game, false, false);
+    grid_explore(game, false);
     ASSERT_EQ(game->labels[3][3], attackable_bit);
 }
 
@@ -378,7 +393,7 @@ TEST_F(game_fixture, grid_explore_labels_potential_attack) {
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
-    grid_explore(game, true, false);
+    grid_explore(game, true);
     ASSERT_EQ(game->labels[3][3], attackable_bit);
 }
 
@@ -392,23 +407,8 @@ TEST_F(game_fixture, grid_explore_is_blocked_by_units) {
     units_insert(&game->units, &bob);
     game->x = 2;
     game->y = 3;
-    grid_explore(game, false, false);
+    grid_explore(game, false);
     ASSERT_EQ(game->labels[3][4], 0);
-}
-
-TEST_F(game_fixture,
-       grid_explore_is_unblocked_by_friendly_units_when_friendly_passable) {
-    game->map[3][3] = tile_plains;
-    game->map[3][4] = tile_plains;
-    constexpr model_t infantry = 0;
-    struct unit alice = {.model = infantry, .player = 1, .x = 2, .y = 3};
-    units_insert(&game->units, &alice);
-    struct unit bob = {.model = infantry, .player = 1, .x = 3, .y = 3};
-    units_insert(&game->units, &bob);
-    game->x = 2;
-    game->y = 3;
-    grid_explore(game, false, true);
-    ASSERT_EQ(game->labels[3][4], accessible_bit);
 }
 
 TEST_F(
@@ -419,7 +419,7 @@ TEST_F(
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
-    grid_explore(game, false, false);
+    grid_explore(game, false);
     ASSERT_EQ(game->labels[3][2], accessible_bit);
 }
 
@@ -430,7 +430,7 @@ TEST_F(game_fixture, grid_explore_merges_labels) {
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
-    grid_explore(game, true, false);
+    grid_explore(game, true);
     ASSERT_EQ(game->labels[3][2], accessible_bit | attackable_bit);
 }
 
@@ -440,7 +440,7 @@ TEST_F(game_fixture, grid_explore_recursive_initial_energy_scales) {
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
-    grid_explore_recursive(game, false, false, 5);
+    grid_explore_recursive(game, false, 5);
     ASSERT_EQ(game->energies[3][2], 16);
 }
 
