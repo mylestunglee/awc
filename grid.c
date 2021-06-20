@@ -142,14 +142,17 @@ void grid_explore_mark_attackable_ranged(struct game* const game,
 bool is_node_unexplorable(const struct game* const game,
                           const struct list_node* const node,
                           const player_t player) {
-    const struct unit* const unit =
+    const struct unit* const source =
+        units_const_get_at(&game->units, game->x, game->y);
+    const struct unit* const target =
         units_const_get_at(&game->units, node->x, node->y);
-    if (unit) {
+    if (target) {
         const bool unfriendly =
-            !bitmatrix_get(game->alliances, player, unit->player);
-        const bool init_tile = node->x == game->x && node->y == game->y;
+            !bitmatrix_get(game->alliances, player, target->player);
+        const bool noninit_tile = source != target;
+        const bool unpassable = unit_pass_type[source->model] == unit_pass_type[target->model];
 
-        if (unfriendly && !init_tile)
+        if (unfriendly && noninit_tile && unpassable)
             return true;
     }
 

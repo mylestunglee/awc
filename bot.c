@@ -276,7 +276,7 @@ static bool find_nearest_target(struct game* const game,
     energy_t capturable_energy = 0;
 
     if (unit->model < unit_capturable_upper_bound)
-        find_nearest_capturable(game, &capturable_x, &capturable_y);
+        capturable_energy = find_nearest_capturable(game, &capturable_x, &capturable_y);
 
     if (attackee_target_energy > capturable_energy) {
         *nearest_x = attackee_target_x;
@@ -305,8 +305,10 @@ static void move_towards_target(struct game* const game,
     while (!list_empty(list) &&
            list_back_peek(list).energy >= accessible_energy) {
         const struct list_node node = list_back_pop(list);
-        game->x = node.x;
-        game->y = node.y;
+        if (accessible_bit & game->labels[node.y][node.x]) {
+            game->x = node.x;
+            game->y = node.y;
+        }
     }
 
     assert(accessible_bit & game->labels[game->y][game->x]);
