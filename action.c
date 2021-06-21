@@ -155,12 +155,12 @@ bool action_move(struct game* const game) {
     const bool selected = units_has_selection(&game->units);
     if (selected && game->labels[game->y][game->x] & accessible_bit) {
         assert(game->dirty_labels);
+        units_disable_selection(&game->units);
         const health_t capture_progress =
             action_move_selected(game, game->x, game->y);
         if (is_capture_progressable(game) &&
             units_update_capture_progress(&game->units, capture_progress))
             action_capture(game);
-        units_disable_selection(&game->units);
         action_deselect(game);
         return true;
     }
