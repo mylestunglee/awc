@@ -4,8 +4,8 @@ CLEAR='\033[0m' # No Color
 
 for test; do
 	if ./$test &> /dev/null; then
-		echo -e $GREEN$test: "SUCCESS"$CLEAR
+		echo -e $test: $GREEN"SUCCESS"$CLEAR
 	else
-		echo -e $RED$test "FAILURE"$CLEAR
+		echo -e $test $RED"FAILURE"$CLEAR
 	fi
 done
