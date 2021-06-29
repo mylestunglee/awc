@@ -32,7 +32,6 @@ void game_simulate_attack(const struct game* const, health_t* const,
 
 bool game_select_next_unit(struct game* const);
 void game_handle_unit_selection(struct game* const);
-void game_print_text(const struct game* const, const bool, const bool);
 bool game_attack_enabled(const struct game* const);
 bool game_build_enabled(const struct game* const);
 bool game_is_alive(const struct game* const, const player_t);

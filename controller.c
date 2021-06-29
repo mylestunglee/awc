@@ -12,7 +12,6 @@ void controller_run(struct game* const game) {
         assert(!(attack_enabled && build_enabled));
 
         render(game, attack_enabled, build_enabled);
-        game_print_text(game, attack_enabled, build_enabled);
 
         const char input = getch();
 

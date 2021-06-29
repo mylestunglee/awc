@@ -143,53 +143,6 @@ bool game_is_friendly(const struct game* const game, const player_t player) {
     return bitmatrix_get(game->alliances, game->turn, player);
 }
 
-static void print_normal_text(const struct game* const game) {
-    printf("turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u\n",
-           game->turn, game->x, game->y,
-           tile_names[game->map[game->y][game->x]],
-           game->territory[game->y][game->x], game->labels[game->y][game->x],
-           game->golds[game->turn]);
-
-    const struct unit* unit =
-        units_const_get_at(&game->units, game->x, game->y);
-    if (unit)
-        printf("unit health=" health_format " model=%s capture_progress=%u",
-               unit->health, model_names[unit->model], unit->capture_progress);
-}
-
-static void print_attack_text(const struct game* const game) {
-    health_t damage, counter_damage;
-    game_simulate_attack(game, &damage, &counter_damage);
-    const health_wide_t percent = 100;
-    printf("Damage: %u%% Counter-damage: %u%%\n",
-           (damage * percent) / health_max,
-           (counter_damage * percent) / health_max);
-}
-
-static void print_build_text(const struct game* const game) {
-    const tile_t tile = game->map[game->y][game->x];
-    assert(tile >= terrian_capacity);
-    const tile_t capturable = tile - terrian_capacity;
-
-    printf("in build mode:");
-    for (model_t model = buildable_models[capturable];
-         model < buildable_models[capturable + 1]; ++model) {
-        printf("(" model_format ") %s ", model + 1, model_names[model]);
-    }
-    printf("\n");
-}
-
-void game_print_text(const struct game* const game, const bool attack_enabled,
-                     const bool build_enabled) {
-    return;
-    if (attack_enabled)
-        print_attack_text(game);
-    else if (build_enabled)
-        print_build_text(game);
-    else
-        print_normal_text(game);
-}
-
 void game_remove_player(struct game* const game, const player_t player) {
     assert(player != null_player);
     units_delete_player(&game->units, player);

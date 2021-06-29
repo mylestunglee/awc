@@ -170,23 +170,19 @@ static bool render_selection(const struct game* const game, const grid_t x,
         return false;
 
     if (top && left)
-        *symbol = 0x250c;
+        *symbol = L'┌';
     else if (top && right)
-        *symbol = 0x2510;
+        *symbol = L'┐';
     else if (bottom && left)
-        *symbol = 0x2514;
+        *symbol = L'└';
     else if (bottom && right)
-        *symbol = 0x2518;
-    else if (top)
-        *symbol = 0x2500;
-    else if (bottom)
-        *symbol = 0x2500;
-    else if (left)
-        *symbol = 0x2502;
-    else if (right)
-        *symbol = 0x2502;
+        *symbol = L'┘';
+    else if (top || bottom)
+        *symbol = L'─';
+    else if (left || right)
+        *symbol = L'│';
     else
-        *symbol = '#';
+        assert(false);
 
     const tile_t tile = game->map[y][x];
 
@@ -213,17 +209,17 @@ static void render_bar(uint32_t progress, uint32_t completion,
                        const grid_t tile_x, wchar_t* const symbol,
                        uint8_t* const style) {
     // Set health bar colour
-    const uint8_t styles[4] = {'\x90', '\x30', '\xB0', '\xA0'};
-    *style = styles[(4 * progress) / completion];
+    const uint8_t styles[3] = {'\x90', '\xB0', '\xA0'};
+    *style = styles[(3 * progress) / completion];
 
-    const wchar_t symbols[5] = {' ', '[', '|', ']', '='};
-    int8_t steps = ((4 * unit_width + 1) * progress) / completion -
-                   4 * (tile_x - unit_left);
+    const wchar_t symbols[9] = {' ', L'▏', L'▎', L'▍', L'▌', L'▋', L'▊', L'▉', L'█'};
+    int8_t steps = ((8 * unit_width + 1) * progress) / completion -
+                   8 * (tile_x - unit_left);
 
     if (steps < 0)
         steps = 0;
-    else if (steps > 4)
-        steps = 4;
+    else if (steps > 8)
+        steps = 8;
 
     *symbol = symbols[steps];
 }
@@ -396,7 +392,53 @@ static void reset_cursor() {
     wprintf(L"\033[2J\033[1;1H");
 }
 
-static void reset_black() { printf("%c[30;40m", '\x1B'); }
+static void reset_black() { wprintf(L"%c[30;40m", '\x1B'); }
+
+static void print_normal_text(const struct game* const game) {
+    wprintf(L"turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u\n",
+           game->turn, game->x, game->y,
+           tile_names[game->map[game->y][game->x]],
+           game->territory[game->y][game->x], game->labels[game->y][game->x],
+           game->golds[game->turn]);
+
+    const struct unit* unit =
+        units_const_get_at(&game->units, game->x, game->y);
+    if (unit)
+        wprintf(L"unit health=" health_format " model=%s capture_progress=%u",
+               unit->health, model_names[unit->model], unit->capture_progress);
+}
+
+static void print_attack_text(const struct game* const game) {
+    health_t damage, counter_damage;
+    game_simulate_attack(game, &damage, &counter_damage);
+    const health_wide_t percent = 100;
+    wprintf(L"Damage: %u%% Counter-damage: %u%%\n",
+           (damage * percent) / health_max,
+           (counter_damage * percent) / health_max);
+}
+
+static void print_build_text(const struct game* const game) {
+    const tile_t tile = game->map[game->y][game->x];
+    assert(tile >= terrian_capacity);
+    const tile_t capturable = tile - terrian_capacity;
+
+    wprintf(L"in build mode:");
+    for (model_t model = buildable_models[capturable];
+         model < buildable_models[capturable + 1]; ++model) {
+        wprintf(L"(" model_format ") %s ", model + 1, model_names[model]);
+    }
+    wprintf(L"\n");
+}
+
+static void print_text(const struct game* const game, const bool attack_enabled,
+                     const bool build_enabled) {
+    if (attack_enabled)
+        print_attack_text(game);
+    else if (build_enabled)
+        print_build_text(game);
+    else
+        print_normal_text(game);
+}
 
 void render(const struct game* const game, const bool attack_enabled,
             const bool build_enabled) {
@@ -442,6 +484,8 @@ void render(const struct game* const game, const bool attack_enabled,
             wprintf(L"\n");
         }
     }
+
+    print_text(game, attack_enabled, build_enabled);
 }
 
 #include <stdlib.h>
