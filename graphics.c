@@ -2,6 +2,82 @@
 #include "console.h"
 #include <stdio.h>
 
+#define tile_width 8
+#define tile_height 4
+#define unit_left 1
+#define unit_top 1
+#define unit_width 5
+#define unit_height 2
+
+#define selection_symbol '+'
+#define accessible_style '\xe0'
+#define attackable_style '\x90'
+#define accessible_attackable_style '\xd0'
+#define buildable_style '\xf0'
+
+#define vertical_bit 1
+#define horizontal_bit 2
+
+const static uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
+                                         '^', '\\', '/', '[', ']', '-', '='};
+const static uint8_t player_styles[players_capacity + 1] = {
+    '\xF4', '\xF1', '\xF3', '\xF8', '\xF8', '\xF8'};
+const static uint8_t player_symbols[players_capacity + 1] = {'1', '2', '3',
+                                                             '4', '5', ' '};
+
+const static uint8_t tile_styles[terrian_capacity] = {
+    '\x80', '\xA2', '\x32', '\x13', '\x3B',
+    '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
+const static uint8_t
+    unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
+        {{'\x03', '\xF3', '\x00'}, {'\x08', '\x88', '\x00'}},
+        {{'\x0E', '\xFE', '\x00'}, {'\x08', '\x88', '\x00'}},
+        {{'\x0A', '\xFD', '\x00'}, {'\x03', '\x33', '\x00'}},
+        {{'\xAB', '\xFC', '\xD0'}, {'\x3E', '\xEE', '\x30'}},
+        {{'\xB1', '\xFC', '\xE0'}, {'\x3E', '\xEE', '\x30'}},
+        {{'\x08', '\xF8', '\x00'}, {'\x03', '\xE3', '\x00'}},
+        {{'\x88', '\xF8', '\x80'}, {'\x33', '\x33', '\x30'}},
+        {{'\x0A', '\xFA', '\x00'}, {'\x03', '\xE3', '\x00'}},
+        {{'\xAA', '\xFA', '\xA0'}, {'\x33', '\x33', '\x30'}},
+        {{'\x0E', '\x4E', '\x10'}, {'\x0B', '\xFC', '\xE0'}},
+        {{'\x91', '\x11', '\x10'}, {'\x59', '\xFC', '\xE0'}},
+        {{'\x91', '\x11', '\x10'}, {'\x57', '\xF7', '\x60'}},
+        {{'\x22', '\x22', '\x20'}, {'\x92', '\xFC', '\xE0'}},
+        {{'\x2A', '\xFA', '\x20'}, {'\x92', '\x2C', '\xE0'}},
+        {{'\x88', '\xF8', '\x80'}, {'\x92', '\x22', '\xA0'}}};
+
+const static uint8_t
+    capturable_textures[capturable_capacity][tile_height]
+                       [(tile_width + 1) / 2] = {
+                           {
+                               {'\x00', '\xB1', '\xFC', '\x00'},
+                               {'\x00', '\xB1', '\xB1', '\x1C'},
+                               {'\xB1', '\x1C', '\xB1', '\x1C'},
+                               {'\xB1', '\x1C', '\x00', '\x00'},
+                           },
+                           {
+                               {'\x00', '\x00', '\x00', '\x00'},
+                               {'\xB9', '\x2B', '\xF2', '\xAC'},
+                               {'\xB1', '\x11', '\x11', '\x1C'},
+                               {'\xB1', '\x11', '\x11', '\x1C'},
+                           },
+                           {
+                               {'\x00', '\x00', '\x9F', '\xA0'},
+                               {'\x00', '\x00', '\xC1', '\xB0'},
+                               {'\x22', '\x22', '\xC1', '\xB2'},
+                               {'\xB1', '\x11', '\x11', '\x1C'},
+                           },
+                           {
+                               {'\x00', '\x00', '\x00', '\x00'},
+                               {'\x00', '\x00', '\xBC', '\xFC'},
+                               {'\x22', '\x22', '\xBC', '\x1C'},
+                               {'\xB1', '\x11', '\x11', '\x1C'},
+                           },
+                           {{'\x00', '\xBE', '\xFC', '\x00'},
+                            {'\x00', '\xB1', '\x1C', '\x00'},
+                            {'\xB1', '\x11', '\x11', '\x1C'},
+                            {'\xB1', '\x11', '\x11', '\x1C'}}};
+
 static void render_pixel(uint8_t symbol, const uint8_t style,
                          const uint8_t prev_style) {
     if (style != prev_style) {
@@ -47,9 +123,8 @@ static bool render_unit(const struct game* const game, const grid_t x,
     if (!unit)
         return false;
 
-    const model_t model = unit->model;
     uint8_t texture =
-        unit_textures[model][tile_y - unit_top][(tile_x - unit_left) / 2];
+        unit_textures[unit->model][tile_y - unit_top][(tile_x - unit_left) / 2];
 
     // Extract 4-bits corresponding to texture coordinate
     if ((tile_x - unit_left) % 2 == 0)
@@ -88,27 +163,26 @@ static bool render_selection(const struct game* const game, const grid_t x,
     uint8_t edges = 0;
 
     if (tile_x == 0)
-        ++edges;
+        edges |= vertical_bit;
     if (tile_x == tile_width - 1)
-        ++edges;
+        edges |= vertical_bit;
     if (tile_y == 0)
-        edges += 2;
+        edges |= horizontal_bit;
     if (tile_y == tile_height - 1)
-        edges += 2;
+        edges |= horizontal_bit;
 
     switch (edges) {
-    case 0: {
+    case 0:
         return false;
-    }
-    case 1: {
+    case vertical_bit: {
         *symbol = '|';
         break;
     }
-    case 2: {
+    case horizontal_bit: {
         *symbol = '-';
         break;
     }
-    case 3: {
+    case horizontal_bit | vertical_bit: {
         *symbol = '+';
         break;
     }

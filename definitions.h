@@ -48,91 +48,22 @@ typedef uint8_t movement_t;
 #define enabled_format "%8s"
 #define tile_format "%hhu"
 
-// Graphics
-#define tile_width 8
-#define tile_height 4
-#define unit_left 1
-#define unit_top 1
-#define unit_width 5
-#define unit_height 2
-
-#define selection_symbol '+'
 #define accessible_bit 1
 #define attackable_bit 2
-#define accessible_style '\xe0'
-#define attackable_style '\x90'
-#define accessible_attackable_style '\xd0'
-#define buildable_style '\xf0'
+
+const static uint8_t tile_symbols[tile_capacity] = {
+    '.', '"', 'Y', '^', ':', '~', '*', '\'', '-', '=', 'C', 'F', 'A', 'S', 'H'};
+
+const static char* const model_names[model_capacity] = {
+    "infantry",  "mech",    "recon",     "tank",    "battletank",
+    "artillery", "rockets", "antiair",   "missles", "battlecopter",
+    "fighter",   "bomber",  "submarine", "crusier", "battleship"};
 
 const static char* const tile_names[tile_capacity] = {
     "void", "plains",  "forest",  "mountains", "beach",
     "sea",  "reef",    "river",   "road",      "bridge",
     "city", "factory", "airport", "habour",    "HQ"};
-const static char* const model_names[model_capacity] = {
-    "infantry",  "mech",    "recon",     "tank",    "battletank",
-    "artillery", "rockets", "antiair",   "missles", "battlecopter",
-    "fighter",   "bomber",  "submarine", "crusier", "battleship"};
-const static uint8_t tile_symbols[tile_capacity] = {
-    '.', '"', 'Y', '^', ':', '~', '*', '\'', '-', '=', 'C', 'F', 'A', 'S', 'H'};
-const static uint8_t tile_styles[terrian_capacity] = {
-    '\x80', '\xA2', '\x32', '\x13', '\x3B',
-    '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
-const static uint8_t
-    unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
-        {{'\x03', '\xF3', '\x00'}, {'\x08', '\x88', '\x00'}},
-        {{'\x0E', '\xFE', '\x00'}, {'\x08', '\x88', '\x00'}},
-        {{'\x0A', '\xFD', '\x00'}, {'\x03', '\x33', '\x00'}},
-        {{'\xAB', '\xFC', '\xD0'}, {'\x3E', '\xEE', '\x30'}},
-        {{'\xB1', '\xFC', '\xE0'}, {'\x3E', '\xEE', '\x30'}},
-        {{'\x08', '\xF8', '\x00'}, {'\x03', '\xE3', '\x00'}},
-        {{'\x88', '\xF8', '\x80'}, {'\x33', '\x33', '\x30'}},
-        {{'\x0A', '\xFA', '\x00'}, {'\x03', '\xE3', '\x00'}},
-        {{'\xAA', '\xFA', '\xA0'}, {'\x33', '\x33', '\x30'}},
-        {{'\x0E', '\x4E', '\x10'}, {'\x0B', '\xFC', '\xE0'}},
-        {{'\x91', '\x11', '\x10'}, {'\x59', '\xFC', '\xE0'}},
-        {{'\x91', '\x11', '\x10'}, {'\x57', '\xF7', '\x60'}},
-        {{'\x22', '\x22', '\x20'}, {'\x92', '\xFC', '\xE0'}},
-        {{'\x2A', '\xFA', '\x20'}, {'\x92', '\x2C', '\xE0'}},
-        {{'\x88', '\xF8', '\x80'}, {'\x92', '\x22', '\xA0'}}};
 
-const static uint8_t
-    capturable_textures[capturable_capacity][tile_height]
-                       [(tile_width + 1) / 2] = {
-                           {
-                               {'\x00', '\xB1', '\xFC', '\x00'},
-                               {'\x00', '\xB1', '\xB1', '\x1C'},
-                               {'\xB1', '\x1C', '\xB1', '\x1C'},
-                               {'\xB1', '\x1C', '\x00', '\x00'},
-                           },
-                           {
-                               {'\x00', '\x00', '\x00', '\x00'},
-                               {'\xB9', '\x2B', '\xF2', '\xAC'},
-                               {'\xB1', '\x11', '\x11', '\x1C'},
-                               {'\xB1', '\x11', '\x11', '\x1C'},
-                           },
-                           {
-                               {'\x00', '\x00', '\x9F', '\xA0'},
-                               {'\x00', '\x00', '\xC1', '\xB0'},
-                               {'\x22', '\x22', '\xC1', '\xB2'},
-                               {'\xB1', '\x11', '\x11', '\x1C'},
-                           },
-                           {
-                               {'\x00', '\x00', '\x00', '\x00'},
-                               {'\x00', '\x00', '\xBC', '\xFC'},
-                               {'\x22', '\x22', '\xBC', '\x1C'},
-                               {'\xB1', '\x11', '\x11', '\x1C'},
-                           },
-                           {{'\x00', '\xBE', '\xFC', '\x00'},
-                            {'\x00', '\xB1', '\x1C', '\x00'},
-                            {'\xB1', '\x11', '\x11', '\x1C'},
-                            {'\xB1', '\x11', '\x11', '\x1C'}}};
-
-const static uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
-                                         '^', '\\', '/', '[', ']', '-', '='};
-const static uint8_t player_styles[players_capacity + 1] = {
-    '\xF4', '\xF1', '\xF3', '\xF8', '\xF8', '\xF8'};
-const static uint8_t player_symbols[players_capacity + 1] = {'1', '2', '3',
-                                                             '4', '5', ' '};
 const static energy_t unit_movement_ranges[model_capacity] = {
     3, 2, 8, 6, 5, 5, 5, 6, 5, 6, 9, 7, 5, 6, 5};
 /*
