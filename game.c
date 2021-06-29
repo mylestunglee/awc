@@ -181,7 +181,7 @@ static void print_build_text(const struct game* const game) {
 
 void game_print_text(const struct game* const game, const bool attack_enabled,
                      const bool build_enabled) {
-
+    return;
     if (attack_enabled)
         print_attack_text(game);
     else if (build_enabled)

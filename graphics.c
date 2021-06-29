@@ -1,6 +1,8 @@
 #include "graphics.h"
 #include "console.h"
+#include <locale.h>
 #include <stdio.h>
+#include <wchar.h>
 
 #define tile_width 8
 #define tile_height 4
@@ -78,7 +80,7 @@ const static uint8_t
                             {'\xB1', '\x11', '\x11', '\x1C'},
                             {'\xB1', '\x11', '\x11', '\x1C'}}};
 
-static void render_pixel(uint8_t symbol, const uint8_t style,
+static void render_pixel(wchar_t symbol, const uint8_t style,
                          const uint8_t prev_style) {
     if (style != prev_style) {
         const uint8_t forecolour = style >> 4;
@@ -87,31 +89,31 @@ static void render_pixel(uint8_t symbol, const uint8_t style,
         const uint8_t prev_backcolour = prev_style & 15;
         bool carry = false;
 
-        printf("%c[", '\x1B');
+        wprintf(L"%c[", '\x1B');
         if (forecolour != prev_forecolour) {
             carry = true;
             if (forecolour < 8)
-                printf("%u", forecolour + 30);
+                wprintf(L"%u", forecolour + 30);
             else
-                printf("%u", forecolour + 82);
+                wprintf(L"%u", forecolour + 82);
         }
         if (backcolour != prev_backcolour) {
             if (carry)
-                printf(";");
+                wprintf(L";");
             if (backcolour < 8)
-                printf("%u", backcolour + 40);
+                wprintf(L"%u", backcolour + 40);
             else
-                printf("%u", backcolour + 92);
+                wprintf(L"%u", backcolour + 92);
         }
-        printf("m");
+        wprintf(L"m");
     }
-    printf("%c", symbol);
+    wprintf(L"%lc", symbol);
 }
 
 // Attempt to find symbol style pair from rendering coordinates
 static bool render_unit(const struct game* const game, const grid_t x,
                         const grid_t y, const grid_t tile_x,
-                        const grid_t tile_y, uint8_t* const symbol,
+                        const grid_t tile_y, wchar_t* const symbol,
                         uint8_t* const style) {
 
     // Out of bounds
@@ -153,40 +155,38 @@ static bool render_unit(const struct game* const game, const grid_t x,
 static bool render_selection(const struct game* const game, const grid_t x,
                              const grid_t y, const grid_t tile_x,
                              const grid_t tile_y, const bool attack_enabled,
-                             const bool build_enabled, uint8_t* const symbol,
+                             const bool build_enabled, wchar_t* const symbol,
                              uint8_t* const style) {
 
     if (game->x != x || game->y != y)
         return false;
 
-    // Construct ASCII box art in selected tile
-    uint8_t edges = 0;
+    const bool top = tile_y == 0;
+    const bool bottom = tile_y == tile_height - 1;
+    const bool left = tile_x == 0;
+    const bool right = tile_x == tile_width - 1;
 
-    if (tile_x == 0)
-        edges |= vertical_bit;
-    if (tile_x == tile_width - 1)
-        edges |= vertical_bit;
-    if (tile_y == 0)
-        edges |= horizontal_bit;
-    if (tile_y == tile_height - 1)
-        edges |= horizontal_bit;
-
-    switch (edges) {
-    case 0:
+    if (!(top || bottom || left || right))
         return false;
-    case vertical_bit: {
-        *symbol = '|';
-        break;
-    }
-    case horizontal_bit: {
-        *symbol = '-';
-        break;
-    }
-    case horizontal_bit | vertical_bit: {
-        *symbol = '+';
-        break;
-    }
-    }
+
+    if (top && left)
+        *symbol = 0x250c;
+    else if (top && right)
+        *symbol = 0x2510;
+    else if (bottom && left)
+        *symbol = 0x2514;
+    else if (bottom && right)
+        *symbol = 0x2518;
+    else if (top)
+        *symbol = 0x2500;
+    else if (bottom)
+        *symbol = 0x2500;
+    else if (left)
+        *symbol = 0x2502;
+    else if (right)
+        *symbol = 0x2502;
+    else
+        *symbol = '#';
 
     const tile_t tile = game->map[y][x];
 
@@ -210,13 +210,13 @@ static bool render_selection(const struct game* const game, const grid_t x,
 }
 
 static void render_bar(uint32_t progress, uint32_t completion,
-                       const grid_t tile_x, uint8_t* const symbol,
+                       const grid_t tile_x, wchar_t* const symbol,
                        uint8_t* const style) {
     // Set health bar colour
     const uint8_t styles[4] = {'\x90', '\x30', '\xB0', '\xA0'};
     *style = styles[(4 * progress) / completion];
 
-    const uint8_t symbols[5] = {' ', '[', '|', ']', '='};
+    const wchar_t symbols[5] = {' ', '[', '|', ']', '='};
     int8_t steps = ((4 * unit_width + 1) * progress) / completion -
                    4 * (tile_x - unit_left);
 
@@ -230,7 +230,7 @@ static void render_bar(uint32_t progress, uint32_t completion,
 
 static bool render_health_bar(const struct game* const game, const grid_t x,
                               const grid_t y, const grid_t tile_x,
-                              const grid_t tile_y, uint8_t* const symbol,
+                              const grid_t tile_y, wchar_t* const symbol,
                               uint8_t* const style) {
 
     // Display health bar on the bottom of unit
@@ -259,7 +259,7 @@ static bool render_capture_progress_bar(const struct game* const game,
                                         const grid_t x, const grid_t y,
                                         const grid_t tile_x,
                                         const grid_t tile_y,
-                                        uint8_t* const symbol,
+                                        wchar_t* const symbol,
                                         uint8_t* const style) {
 
     // Display health bar on the bottom of unit
@@ -287,7 +287,7 @@ static bool render_capture_progress_bar(const struct game* const game,
 
 static void render_highlight(const struct game* const game, const grid_t x,
                              const grid_t y, const bool attack_enabled,
-                             uint8_t* const symbol, uint8_t* const style) {
+                             wchar_t* const symbol, uint8_t* const style) {
 
     const uint8_t highlight =
         game->labels[y][x] & (accessible_bit | attackable_bit);
@@ -335,7 +335,7 @@ static void render_highlight(const struct game* const game, const grid_t x,
 
 static bool render_terrian(const struct game* const game, const grid_t x,
                            const grid_t y, const bool attack_enabled,
-                           uint8_t* const symbol, uint8_t* const style) {
+                           wchar_t* const symbol, uint8_t* const style) {
 
     const tile_t tile = game->map[y][x];
 
@@ -350,7 +350,7 @@ static bool render_terrian(const struct game* const game, const grid_t x,
 static bool render_capturable(const struct game* const game, const grid_t x,
                               const grid_t y, const grid_t tile_x,
                               const grid_t tile_y, const bool attack_enabled,
-                              uint8_t* const symbol, uint8_t* const style) {
+                              wchar_t* const symbol, uint8_t* const style) {
 
     const tile_t tile = game->map[y][x];
     uint8_t texture =
@@ -380,7 +380,7 @@ static bool render_capturable(const struct game* const game, const grid_t x,
 static bool render_tile(const struct game* const game, const grid_t x,
                         const grid_t y, const grid_t tile_x,
                         const grid_t tile_y, const bool attack_enabled,
-                        uint8_t* const symbol, uint8_t* const style) {
+                        wchar_t* const symbol, uint8_t* const style) {
 
     const tile_t tile = game->map[y][x];
 
@@ -392,8 +392,8 @@ static bool render_tile(const struct game* const game, const grid_t x,
 }
 
 static void reset_cursor() {
-    printf("\033[0;0H");
-    printf("\033[2J\033[1;1H");
+    wprintf(L"\033[0;0H");
+    wprintf(L"\033[2J\033[1;1H");
 }
 
 static void reset_black() { printf("%c[30;40m", '\x1B'); }
@@ -417,7 +417,7 @@ void render(const struct game* const game, const bool attack_enabled,
             uint8_t prev_style = '\x00';
             for (grid_t x = screen_left; x != screen_right; ++x) {
                 for (uint8_t tile_x = 0; tile_x < tile_width; ++tile_x) {
-                    uint8_t symbol;
+                    wchar_t symbol;
                     uint8_t style;
 
                     if (render_health_bar(game, x, y, tile_x, tile_y, &symbol,
@@ -431,7 +431,6 @@ void render(const struct game* const game, const bool attack_enabled,
                                     &style) ||
                         render_tile(game, x, y, tile_x, tile_y, attack_enabled,
                                     &symbol, &style)) {
-
                         render_pixel(symbol, style, prev_style);
                         prev_style = style;
                     } else {
@@ -440,9 +439,13 @@ void render(const struct game* const game, const bool attack_enabled,
                 }
             }
             reset_style();
-            printf("\n");
+            wprintf(L"\n");
         }
     }
 }
 
-void reset_style() { printf("%c[0m", '\x1B'); }
+#include <stdlib.h>
+
+void reset_style() { wprintf(L"%c[0m", '\x1B'); }
+
+void graphics_init() { setlocale(LC_CTYPE, ""); }

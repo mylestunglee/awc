@@ -4,6 +4,8 @@
 #include "parse.h"
 
 void controller_run(struct game* const game) {
+    graphics_init();
+
     do {
         const bool attack_enabled = game_attack_enabled(game);
         const bool build_enabled = game_build_enabled(game);
