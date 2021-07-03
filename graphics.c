@@ -111,7 +111,7 @@ static void render_pixel(wchar_t symbol, const uint8_t style,
 }
 
 // Attempt to find symbol style pair from rendering coordinates
-static bool render_unit(const struct game* const game, const grid_t x,
+bool render_unit(const struct game* const game, const grid_t x,
                         const grid_t y, const grid_t tile_x,
                         const grid_t tile_y, wchar_t* const symbol,
                         uint8_t* const style) {
@@ -206,15 +206,15 @@ static bool render_selection(const struct game* const game, const grid_t x,
 }
 
 static void render_block(uint32_t progress, uint32_t completion,
-                       const grid_t tile_x, wchar_t* const symbol,
-                       uint8_t* const style) {
+                         const grid_t tile_x, wchar_t* const symbol,
+                         uint8_t* const style) {
     const uint8_t styles[3] = {'\x90', '\xB0', '\xA0'};
     const uint8_t inverted_styles[3] = {'\x09', '\x0B', '\x0A'};
     const uint8_t style_index = (3 * progress) / completion;
 
     const wchar_t block_symbols[8] = {L'▏', L'▎', L'▍', L'▌', L'▋', L'▊', L'▉'};
     const int8_t steps = ((8 * unit_width + 1) * progress) / completion -
-                   8 * (tile_x - unit_left) - 1;
+                         8 * (tile_x - unit_left) - 1;
     if (steps < 0) {
         *style = styles[style_index];
         *symbol = ' ';
@@ -228,8 +228,7 @@ static void render_block(uint32_t progress, uint32_t completion,
 }
 
 static void render_percent(uint32_t progress, uint32_t completion,
-                       const grid_t tile_x, wchar_t* const symbol)
-{
+                           const grid_t tile_x, wchar_t* const symbol) {
     const uint8_t percent = (100 * progress) / completion;
     assert(percent > 0);
     assert(percent < 100);
@@ -245,7 +244,7 @@ static void render_percent(uint32_t progress, uint32_t completion,
             *symbol = left_digit;
         else if (tile_x == unit_left + unit_width - 1)
             *symbol = right_digit;
-    }   
+    }
 }
 
 // Set health bar colour
@@ -326,7 +325,7 @@ static void render_highlight(const struct game* const game, const grid_t x,
 
     // Clear foreground style
     *style &= '\x0f';
-    *symbol = 0x2591; // light shade
+    *symbol = L'░'; // light shade
 
     // Set foreground style
     switch (highlight) {
@@ -359,13 +358,13 @@ static bool render_terrian(const struct game* const game, const grid_t x,
         }
 
         if ((grid_t)(game->prev_x + 1) == game->x)
-            *symbol = 0x25ba; // right
+            *symbol = L'▶';
         else if ((grid_t)(game->prev_x - 1) == game->x)
-            *symbol = 0x25c0; // left
+            *symbol = L'◀';
         else if ((grid_t)(game->prev_y + 1) == game->y)
-            *symbol = 0x25bc; // down
+            *symbol = L'▼';
         else if ((grid_t)(game->prev_y - 1) == game->y)
-            *symbol = 0x25b2; // up
+            *symbol = L'▲';
         else
             // Previous position incorrectly set
             assert(false);
