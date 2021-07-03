@@ -212,7 +212,8 @@ static void render_bar(uint32_t progress, uint32_t completion,
     const uint8_t styles[3] = {'\x90', '\xB0', '\xA0'};
     *style = styles[(3 * progress) / completion];
 
-    const wchar_t symbols[9] = {' ', L'▏', L'▎', L'▍', L'▌', L'▋', L'▊', L'▉', L'█'};
+    const wchar_t symbols[9] = {' ',  L'▏', L'▎', L'▍', L'▌',
+                                L'▋', L'▊', L'▉', L'█'};
     int8_t steps = ((8 * unit_width + 1) * progress) / completion -
                    8 * (tile_x - unit_left);
 
@@ -282,8 +283,8 @@ static bool render_capture_progress_bar(const struct game* const game,
 }
 
 static void render_highlight(const struct game* const game, const grid_t x,
-                             const grid_t y, const bool attack_enabled,
-                             wchar_t* const symbol, uint8_t* const style) {
+                             const grid_t y, wchar_t* const symbol,
+                             uint8_t* const style) {
 
     const uint8_t highlight =
         game->labels[y][x] & (accessible_bit | attackable_bit);
@@ -294,26 +295,7 @@ static void render_highlight(const struct game* const game, const grid_t x,
 
     // Clear foreground style
     *style &= '\x0f';
-
-    // Show arrows highlighting position to attack unit
-    if (attack_enabled && x == game->prev_x && y == game->prev_y) {
-        if ((grid_t)(game->prev_x + 1) == game->x)
-            *symbol = '>';
-        else if ((grid_t)(game->prev_x - 1) == game->x)
-            *symbol = '<';
-        else if ((grid_t)(game->prev_y + 1) == game->y)
-            *symbol = 'v';
-        else if ((grid_t)(game->prev_y - 1) == game->y)
-            *symbol = '^';
-        else
-            // Previous position incorrectly set
-            assert(false);
-
-        *style |= attackable_style;
-        return;
-    }
-
-    *symbol = ':';
+    *symbol = 0x2591; // light shade
 
     // Set foreground style
     switch (highlight) {
@@ -330,23 +312,48 @@ static void render_highlight(const struct game* const game, const grid_t x,
 }
 
 static bool render_terrian(const struct game* const game, const grid_t x,
-                           const grid_t y, const bool attack_enabled,
-                           wchar_t* const symbol, uint8_t* const style) {
+                           const grid_t y, const grid_t tile_x,
+                           const bool attack_enabled, wchar_t* const symbol,
+                           uint8_t* const style) {
 
     const tile_t tile = game->map[y][x];
 
-    *symbol = tile_symbols[tile];
     *style = tile_styles[tile];
 
-    render_highlight(game, x, y, attack_enabled, symbol, style);
+    // Show arrows highlighting position to attack unit
+    if (attack_enabled && x == game->prev_x && y == game->prev_y) {
+        if (tile_x % 2 != 0) {
+            *symbol = ' ';
+            return true;
+        }
+
+        if ((grid_t)(game->prev_x + 1) == game->x)
+            *symbol = 0x25ba; // right
+        else if ((grid_t)(game->prev_x - 1) == game->x)
+            *symbol = 0x25c0; // left
+        else if ((grid_t)(game->prev_y + 1) == game->y)
+            *symbol = 0x25bc; // down
+        else if ((grid_t)(game->prev_y - 1) == game->y)
+            *symbol = 0x25b2; // up
+        else
+            // Previous position incorrectly set
+            assert(false);
+
+        // Set foreground colour to attackable style
+        *style = (*style & '\x0f') | attackable_style;
+        return true;
+    } else
+        *symbol = tile_symbols[tile];
+
+    render_highlight(game, x, y, symbol, style);
 
     return true;
 }
 
 static bool render_capturable(const struct game* const game, const grid_t x,
                               const grid_t y, const grid_t tile_x,
-                              const grid_t tile_y, const bool attack_enabled,
-                              wchar_t* const symbol, uint8_t* const style) {
+                              const grid_t tile_y, wchar_t* const symbol,
+                              uint8_t* const style) {
 
     const tile_t tile = game->map[y][x];
     uint8_t texture =
@@ -364,7 +371,7 @@ static bool render_capturable(const struct game* const game, const grid_t x,
 
     if (texture == 0) {
         *symbol = ' ';
-        render_highlight(game, x, y, attack_enabled, symbol, style);
+        render_highlight(game, x, y, symbol, style);
     } else if (texture == '\x0F') {
         *symbol = player_symbols[player];
     } else
@@ -381,10 +388,10 @@ static bool render_tile(const struct game* const game, const grid_t x,
     const tile_t tile = game->map[y][x];
 
     if (tile < terrian_capacity)
-        return render_terrian(game, x, y, attack_enabled, symbol, style);
+        return render_terrian(game, x, y, tile_x, attack_enabled, symbol,
+                              style);
     else
-        return render_capturable(game, x, y, tile_x, tile_y, attack_enabled,
-                                 symbol, style);
+        return render_capturable(game, x, y, tile_x, tile_y, symbol, style);
 }
 
 static void reset_cursor() {
@@ -395,17 +402,17 @@ static void reset_cursor() {
 static void reset_black() { wprintf(L"%c[30;40m", '\x1B'); }
 
 static void print_normal_text(const struct game* const game) {
-    wprintf(L"turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u\n",
-           game->turn, game->x, game->y,
-           tile_names[game->map[game->y][game->x]],
-           game->territory[game->y][game->x], game->labels[game->y][game->x],
-           game->golds[game->turn]);
+    wprintf(
+        L"turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u\n",
+        game->turn, game->x, game->y, tile_names[game->map[game->y][game->x]],
+        game->territory[game->y][game->x], game->labels[game->y][game->x],
+        game->golds[game->turn]);
 
     const struct unit* unit =
         units_const_get_at(&game->units, game->x, game->y);
     if (unit)
         wprintf(L"unit health=" health_format " model=%s capture_progress=%u",
-               unit->health, model_names[unit->model], unit->capture_progress);
+                unit->health, model_names[unit->model], unit->capture_progress);
 }
 
 static void print_attack_text(const struct game* const game) {
@@ -413,8 +420,8 @@ static void print_attack_text(const struct game* const game) {
     game_simulate_attack(game, &damage, &counter_damage);
     const health_wide_t percent = 100;
     wprintf(L"Damage: %u%% Counter-damage: %u%%\n",
-           (damage * percent) / health_max,
-           (counter_damage * percent) / health_max);
+            (damage * percent) / health_max,
+            (counter_damage * percent) / health_max);
 }
 
 static void print_build_text(const struct game* const game) {
@@ -431,7 +438,7 @@ static void print_build_text(const struct game* const game) {
 }
 
 static void print_text(const struct game* const game, const bool attack_enabled,
-                     const bool build_enabled) {
+                       const bool build_enabled) {
     if (attack_enabled)
         print_attack_text(game);
     else if (build_enabled)
