@@ -371,20 +371,18 @@ static bool render_tile(const struct game* const game, const grid_t x,
                         wchar_t* const symbol, uint8_t* const style) {
 
     const tile_t tile = game->map[y][x];
+    bool highlightable = true;
 
     if (tile < terrian_capacity) {
         *style = tile_styles[tile];
         *symbol = tile_symbols[tile];
-        render_highlight(game, x, y, symbol, style);
     } else {
-        const bool transparent = decode_texture(
+        highlightable = decode_texture(
             capturable_textures[tile - terrian_capacity][tile_y][tile_x / 2],
             tile_x % 2 == 0, game->territory[y][x], symbol, style);
 
-        if (transparent) {
+        if (highlightable)
             *symbol = ' ';
-            render_highlight(game, x, y, symbol, style);
-        }
     }
 
     // Show arrows highlighting position to attack unit
@@ -407,7 +405,8 @@ static bool render_tile(const struct game* const game, const grid_t x,
             // Set foreground colour to attackable style
             *style = (*style & '\x0f') | attackable_style;
         }
-    }
+    } else if (highlightable)
+        render_highlight(game, x, y, symbol, style);
 
     return true;
 }
