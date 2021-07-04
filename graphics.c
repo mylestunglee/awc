@@ -161,7 +161,7 @@ uint8_t calc_tile_style(const struct game* const game, const grid_t x,
         return player_styles[game->territory[y][x]];
 }
 
-uint8_t calc_label_style(const bool attack_enabled, const bool build_enabled) {
+uint8_t calc_action_style(const bool attack_enabled, const bool build_enabled) {
     if (attack_enabled)
         return attackable_style;
     else if (build_enabled)
@@ -174,7 +174,7 @@ uint8_t calc_selection_style(const struct game* const game, const grid_t x,
                              const grid_t y, const bool attack_enabled,
                              const bool build_enabled) {
     return (calc_tile_style(game, x, y) & '\x0f') |
-           calc_label_style(attack_enabled, build_enabled);
+           calc_action_style(attack_enabled, build_enabled);
 }
 
 bool calc_selection_symbol(const grid_t tile_x, const grid_t tile_y,

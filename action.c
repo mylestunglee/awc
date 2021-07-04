@@ -222,14 +222,11 @@ bool action_select(struct game* const game) {
 }
 
 bool action_highlight(struct game* const game) {
-    const struct unit* unit =
-        units_const_get_at(&game->units, game->x, game->y);
-    const bool selected = units_has_selection(&game->units);
+    const bool highlightable =
+        units_exists(&game->units, game->x, game->y) && !units_has_selection(&game->units);
 
-    if (!selected && unit && unit->enabled) {
+    if (highlightable)
         grid_explore(game, true);
-        return true;
-    }
 
-    return false;
+    return highlightable;
 }
