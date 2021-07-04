@@ -84,6 +84,7 @@ void action_attack(struct game* const game) {
     assert(game->dirty_labels);
     grid_clear_labels(game);
     attacker->enabled = false;
+    const health_t attacker_pre_move_health = attacker->health;
 
     // If unit is direct, move to attack
     const bool ranged = models_min_range[attacker->model];
@@ -92,9 +93,14 @@ void action_attack(struct game* const game) {
         attacker = units_get_selected(&game->units);
     }
 
+    const health_t attacker_post_move_health = attacker->health;
+    attacker->health = attacker_pre_move_health;
+
     // Compute damage
     health_t damage, counter_damage;
     game_simulate_attack(game, &damage, &counter_damage);
+
+    attacker->health = attacker_post_move_health;
 
     // Apply damage
     if (damage >= attackee->health) {
