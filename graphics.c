@@ -24,8 +24,6 @@ const static uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
                                          '^', '\\', '/', '[', ']', '-', '='};
 const static uint8_t player_styles[players_capacity + 1] = {
     '\xF4', '\xF1', '\xF3', '\xF8', '\xF8', '\xF8'};
-const static uint8_t player_symbols[players_capacity + 1] = {'1', '2', '3',
-                                                             '4', '5', ' '};
 
 const static uint8_t tile_styles[terrian_capacity] = {
     '\x80', '\xA2', '\x32', '\x13', '\x3B',
@@ -110,6 +108,29 @@ static void render_pixel(wchar_t symbol, const uint8_t style,
     wprintf(L"%lc", symbol);
 }
 
+// Returns true iff texture is transparent
+bool decode_texture(const uint8_t textures, const bool polarity,
+                    const player_t player, wchar_t* const symbol,
+                    uint8_t* const style) {
+
+    *style = player_styles[player];
+    // Extract 4-bits corresponding to texture coordinate
+    const uint8_t texture = polarity ? (textures >> 4) : (textures & '\x0f');
+
+    // Handle transparent pixel
+    if (texture == '\x00')
+        return true;
+    else if (texture == '\x0f') {
+        if (player == null_player)
+            *symbol = ' ';
+        else
+            *symbol = '1' + player;
+    } else
+        *symbol = unit_symbols[texture - 1];
+
+    return false;
+}
+
 // Attempt to find symbol style pair from rendering coordinates
 bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
                  const grid_t tile_x, const grid_t tile_y,
@@ -124,25 +145,14 @@ bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
     if (!unit)
         return false;
 
-    uint8_t texture =
+    const uint8_t textures =
         unit_textures[unit->model][tile_y - unit_top][(tile_x - unit_left) / 2];
 
-    // Extract 4-bits corresponding to texture coordinate
-    if ((tile_x - unit_left) % 2 == 0)
-        texture >>= 4;
-    else
-        texture &= '\x0F';
+    const bool transparent = decode_texture(
+        textures, (tile_x - unit_left) % 2 == 0, unit->player, symbol, style);
 
-    // Handle transparent pixel
-    if (texture == 0)
+    if (transparent)
         return false;
-
-    if (texture == '\x0F')
-        *symbol = player_symbols[unit->player];
-    else
-        *symbol = unit_symbols[texture - 1];
-
-    *style = player_styles[unit->player];
 
     // Dim forecolours if disabled
     if (!unit->enabled)
@@ -401,26 +411,16 @@ static bool render_capturable(const struct game* const game, const grid_t x,
 
     // TODO: render attack arrows on attack_enabled
     const tile_t tile = game->map[y][x];
-    uint8_t texture =
+    const uint8_t textures =
         capturable_textures[tile - terrian_capacity][tile_y][tile_x / 2];
 
-    // Select left or right 4-bit texture
-    if (tile_x % 2 == 0)
-        texture >>= 4;
-    else
-        texture &= '\x0F';
+    const bool transparent = decode_texture(
+        textures, tile_x % 2 == 0, game->territory[y][x], symbol, style);
 
-    const player_t player = game->territory[y][x];
-
-    *style = player_styles[player];
-
-    if (texture == 0) {
+    if (transparent) {
         *symbol = ' ';
         render_highlight(game, x, y, symbol, style);
-    } else if (texture == '\x0F') {
-        *symbol = player_symbols[player];
-    } else
-        *symbol = unit_symbols[texture - 1];
+    }
 
     return true;
 }
