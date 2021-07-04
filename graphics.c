@@ -145,11 +145,9 @@ bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
     if (!unit)
         return false;
 
-    const uint8_t textures =
-        unit_textures[unit->model][tile_y - unit_top][(tile_x - unit_left) / 2];
-
     const bool transparent = decode_texture(
-        textures, (tile_x - unit_left) % 2 == 0, unit->player, symbol, style);
+        unit_textures[unit->model][tile_y - unit_top][(tile_x - unit_left) / 2],
+        (tile_x - unit_left) % 2 == 0, unit->player, symbol, style);
 
     if (transparent)
         return false;
