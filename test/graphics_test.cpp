@@ -14,7 +14,7 @@ TEST_F(game_fixture, render_unit_ignores_no_unit) {
     uint8_t style = 0;
     ASSERT_FALSE(render_unit(game, 0, 0, 2, 1, &symbol, &style));
     ASSERT_EQ(symbol, 0);
-    ASSERT_EQ(style, 0);  
+    ASSERT_EQ(style, 0);
 }
 
 TEST_F(game_fixture, render_unit_ignores_transparent) {
@@ -34,7 +34,7 @@ TEST_F(game_fixture, render_unit_gives_unit_texture) {
 }
 
 TEST_F(game_fixture, render_unit_gives_player_icon) {
-    insert_unit({ .player = 2, .enabled = true});
+    insert_unit({.player = 2, .enabled = true});
     wchar_t symbol = 0;
     uint8_t style = 0;
     ASSERT_TRUE(render_unit(game, 0, 0, 3, 1, &symbol, &style));

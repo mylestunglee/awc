@@ -198,8 +198,3 @@ TEST_F(units_fixture, units_delete_player_deletes_all_player_units) {
     units_delete_player(units, 2);
     ASSERT_EQ(units->size, 0);
 }
-
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

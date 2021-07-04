@@ -339,14 +339,25 @@ TEST_F(game_fixture, explore_node_explores_adjacent_tiles) {
     ASSERT_FALSE(list_empty(&game->list));
 }
 
-TEST_F(game_fixture, grid_explore_explores_with_correct_residual_energies) {
+TEST_F(game_fixture, grid_explore_recursive_clears_energy) {
+    constexpr model_t infantry = 0;
+    insert_unit({.model = infantry, .player = 1, .x = 2, .y = 3});
+    game->x = 2;
+    game->y = 3;
+    game->map[3][3] = tile_plains;
+    game->energies[3][3] = 101;
+    grid_explore_recursive(game, false, 1);
+    ASSERT_EQ(game->energies[3][3], 3);
+}
+
+TEST_F(game_fixture,
+       grid_explore_recursive_explores_with_correct_residual_energies) {
     game->map[3][3] = tile_plains;
     game->map[3][4] = tile_plains;
     game->map[3][5] = tile_plains;
     game->map[3][6] = tile_plains;
     constexpr model_t infantry = 0;
-    struct unit unit = {.model = infantry, .player = 1, .x = 2, .y = 3};
-    units_insert(&game->units, &unit);
+    insert_unit({.model = infantry, .player = 1, .x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
     grid_explore_recursive(game, false, 1);
@@ -363,8 +374,7 @@ TEST_F(game_fixture, grid_explore_labels_accessible_tiles) {
     game->map[3][5] = tile_plains;
     game->map[3][6] = tile_plains;
     constexpr model_t infantry = 0;
-    struct unit unit = {.model = infantry, .player = 1, .x = 2, .y = 3};
-    units_insert(&game->units, &unit);
+    insert_unit({.model = infantry, .player = 1, .x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
     grid_explore(game, false);
@@ -377,10 +387,8 @@ TEST_F(game_fixture, grid_explore_labels_accessible_tiles) {
 
 TEST_F(game_fixture, grid_explore_labels_actionable_attack) {
     constexpr model_t infantry = 0;
-    struct unit alice = {.model = infantry, .player = 0, .x = 2, .y = 3};
-    units_insert(&game->units, &alice);
-    struct unit bob = {.model = infantry, .player = 1, .x = 3, .y = 3};
-    units_insert(&game->units, &bob);
+    insert_unit({.model = infantry, .player = 0, .x = 2, .y = 3});
+    insert_unit({.model = infantry, .player = 1, .x = 3, .y = 3});
     game->x = 2;
     game->y = 3;
     grid_explore(game, false);
@@ -473,10 +481,3 @@ TEST_F(game_fixture, grid_file_path_traces_path) {
     }
     ASSERT_EQ(size, 4);
 }
-
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-
-// TODO: test grid_explore clears energy

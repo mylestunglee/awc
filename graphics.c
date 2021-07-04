@@ -111,10 +111,9 @@ static void render_pixel(wchar_t symbol, const uint8_t style,
 }
 
 // Attempt to find symbol style pair from rendering coordinates
-bool render_unit(const struct game* const game, const grid_t x,
-                        const grid_t y, const grid_t tile_x,
-                        const grid_t tile_y, wchar_t* const symbol,
-                        uint8_t* const style) {
+bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
+                 const grid_t tile_x, const grid_t tile_y,
+                 wchar_t* const symbol, uint8_t* const style) {
 
     // Out of bounds
     if (unit_left > tile_x || tile_x >= unit_left + unit_width ||
