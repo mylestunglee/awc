@@ -365,66 +365,6 @@ static void render_highlight(const struct game* const game, const grid_t x,
     }
 }
 
-static bool render_terrian(const struct game* const game, const grid_t x,
-                           const grid_t y, const grid_t tile_x,
-                           const bool attack_enabled, wchar_t* const symbol,
-                           uint8_t* const style) {
-
-    const tile_t tile = game->map[y][x];
-
-    *style = tile_styles[tile];
-
-    // Show arrows highlighting position to attack unit
-    if (attack_enabled && x == game->prev_x && y == game->prev_y) {
-        if (tile_x % 2 != 0) {
-            *symbol = ' ';
-            return true;
-        }
-
-        if ((grid_t)(game->prev_x + 1) == game->x)
-            *symbol = L'▶';
-        else if ((grid_t)(game->prev_x - 1) == game->x)
-            *symbol = L'◀';
-        else if ((grid_t)(game->prev_y + 1) == game->y)
-            *symbol = L'▼';
-        else if ((grid_t)(game->prev_y - 1) == game->y)
-            *symbol = L'▲';
-        else
-            // Previous position incorrectly set
-            assert(false);
-
-        // Set foreground colour to attackable style
-        *style = (*style & '\x0f') | attackable_style;
-        return true;
-    } else
-        *symbol = tile_symbols[tile];
-
-    render_highlight(game, x, y, symbol, style);
-
-    return true;
-}
-
-static bool render_capturable(const struct game* const game, const grid_t x,
-                              const grid_t y, const grid_t tile_x,
-                              const grid_t tile_y, wchar_t* const symbol,
-                              uint8_t* const style) {
-
-    // TODO: render attack arrows on attack_enabled
-    const tile_t tile = game->map[y][x];
-    const uint8_t textures =
-        capturable_textures[tile - terrian_capacity][tile_y][tile_x / 2];
-
-    const bool transparent = decode_texture(
-        textures, tile_x % 2 == 0, game->territory[y][x], symbol, style);
-
-    if (transparent) {
-        *symbol = ' ';
-        render_highlight(game, x, y, symbol, style);
-    }
-
-    return true;
-}
-
 static bool render_tile(const struct game* const game, const grid_t x,
                         const grid_t y, const grid_t tile_x,
                         const grid_t tile_y, const bool attack_enabled,
@@ -432,11 +372,44 @@ static bool render_tile(const struct game* const game, const grid_t x,
 
     const tile_t tile = game->map[y][x];
 
-    if (tile < terrian_capacity)
-        return render_terrian(game, x, y, tile_x, attack_enabled, symbol,
-                              style);
-    else
-        return render_capturable(game, x, y, tile_x, tile_y, symbol, style);
+    if (tile < terrian_capacity) {
+        *style = tile_styles[tile];
+        *symbol = tile_symbols[tile];
+        render_highlight(game, x, y, symbol, style);
+    } else {
+        const bool transparent = decode_texture(
+            capturable_textures[tile - terrian_capacity][tile_y][tile_x / 2],
+            tile_x % 2 == 0, game->territory[y][x], symbol, style);
+
+        if (transparent) {
+            *symbol = ' ';
+            render_highlight(game, x, y, symbol, style);
+        }
+    }
+
+    // Show arrows highlighting position to attack unit
+    if (attack_enabled && x == game->prev_x && y == game->prev_y) {
+        if (tile_x % 2 != 0) {
+            *symbol = ' ';
+        } else {
+            if ((grid_t)(game->prev_x + 1) == game->x)
+                *symbol = L'▶';
+            else if ((grid_t)(game->prev_x - 1) == game->x)
+                *symbol = L'◀';
+            else if ((grid_t)(game->prev_y + 1) == game->y)
+                *symbol = L'▼';
+            else if ((grid_t)(game->prev_y - 1) == game->y)
+                *symbol = L'▲';
+            else
+                // Previous position incorrectly set
+                assert(false);
+
+            // Set foreground colour to attackable style
+            *style = (*style & '\x0f') | attackable_style;
+        }
+    }
+
+    return true;
 }
 
 static void reset_cursor() {
