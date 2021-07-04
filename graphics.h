@@ -15,6 +15,17 @@ void graphics_init(void);
 bool render_unit(const struct game* const, const grid_t, const grid_t,
                  const grid_t, const grid_t, wchar_t* const, uint8_t* const);
 
+uint8_t calc_tile_style(const struct game* const game, const grid_t,
+                        const grid_t);
+
+uint8_t calc_label_style(const bool, const bool);
+uint8_t calc_selection_style(const struct game* const, const grid_t,
+                             const grid_t, const bool, const bool);
+bool calc_selection_symbol(const grid_t, const grid_t, wchar_t* const);
+bool render_selection(const struct game* const, const grid_t, const grid_t,
+                      const grid_t, const grid_t, const bool, const bool,
+                      wchar_t* const, uint8_t* const);
+
 #endif
 
 #endif

@@ -1,6 +1,7 @@
 #define expose_graphics_internals
 #include "../graphics.h"
 #include "game_fixture.hpp"
+#include <gtest/gtest.h>
 
 TEST_F(game_fixture, render_unit_ignores_out_of_bounds) {
     insert_unit({});
@@ -49,4 +50,16 @@ TEST_F(game_fixture, render_unit_gives_shaded_unit_texture_when_disabled) {
     ASSERT_TRUE(render_unit(game, 0, 0, 2, 1, &symbol, &style));
     ASSERT_EQ(symbol, 'o');
     ASSERT_EQ(style, '\x04');
+}
+
+TEST_F(game_fixture, render_selection_sets_correct_style_on_tile) {
+    game->map[3][2] = tile_plains;
+    game->x = 2;
+    game->y = 3;
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_TRUE(
+        render_selection(game, 2, 3, 0, 0, false, false, &symbol, &style));
+    ASSERT_NE(symbol, 0);
+    ASSERT_EQ(style, '\xe2');
 }

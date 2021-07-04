@@ -133,7 +133,7 @@ bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
     else
         texture &= '\x0F';
 
-    // Transparent pixel
+    // Handle transparent pixel
     if (texture == 0)
         return false;
 
@@ -144,22 +144,41 @@ bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
 
     *style = player_styles[unit->player];
 
-    // Dim forecolours if disable
+    // Dim forecolours if disabled
     if (!unit->enabled)
         *style &= '\x0F';
 
     return true;
 }
 
-static bool render_selection(const struct game* const game, const grid_t x,
-                             const grid_t y, const grid_t tile_x,
-                             const grid_t tile_y, const bool attack_enabled,
-                             const bool build_enabled, wchar_t* const symbol,
-                             uint8_t* const style) {
+uint8_t calc_tile_style(const struct game* const game, const grid_t x,
+                        const grid_t y) {
+    const tile_t tile = game->map[y][x];
 
-    if (game->x != x || game->y != y)
-        return false;
+    if (tile < terrian_capacity)
+        return tile_styles[tile];
+    else
+        return player_styles[game->territory[y][x]];
+}
 
+uint8_t calc_label_style(const bool attack_enabled, const bool build_enabled) {
+    if (attack_enabled)
+        return attackable_style;
+    else if (build_enabled)
+        return buildable_style;
+    else
+        return accessible_style;
+}
+
+uint8_t calc_selection_style(const struct game* const game, const grid_t x,
+                             const grid_t y, const bool attack_enabled,
+                             const bool build_enabled) {
+    return (calc_tile_style(game, x, y) & '\x0f') |
+           calc_label_style(attack_enabled, build_enabled);
+}
+
+bool calc_selection_symbol(const grid_t tile_x, const grid_t tile_y,
+                           wchar_t* const symbol) {
     const bool top = tile_y == 0;
     const bool bottom = tile_y == tile_height - 1;
     const bool left = tile_x == 0;
@@ -180,28 +199,24 @@ static bool render_selection(const struct game* const game, const grid_t x,
         *symbol = L'─';
     else if (left || right)
         *symbol = L'│';
-    else
-        assert(false);
-
-    const tile_t tile = game->map[y][x];
-
-    // Handle terrian and capturable tiles
-    if (tile < terrian_capacity)
-        *style = tile_styles[tile];
-    else
-        *style = player_styles[game->territory[y][x]];
-
-    // Highlight box pre-attack
-    *style &= '\x0f';
-
-    if (attack_enabled)
-        *style |= attackable_style;
-    else if (build_enabled)
-        *style |= buildable_style;
-    else
-        *style |= accessible_style;
 
     return true;
+}
+
+bool render_selection(const struct game* const game, const grid_t x,
+                      const grid_t y, const grid_t tile_x, const grid_t tile_y,
+                      const bool attack_enabled, const bool build_enabled,
+                      wchar_t* const symbol, uint8_t* const style) {
+    if (game->x != x || game->y != y)
+        return false;
+
+    const bool selected = calc_selection_symbol(tile_x, tile_y, symbol);
+
+    if (selected)
+        *style =
+            calc_selection_style(game, x, y, attack_enabled, build_enabled);
+
+    return selected;
 }
 
 static void render_block(uint32_t progress, uint32_t completion,
@@ -384,6 +399,7 @@ static bool render_capturable(const struct game* const game, const grid_t x,
                               const grid_t tile_y, wchar_t* const symbol,
                               uint8_t* const style) {
 
+    // TODO: render attack arrows on attack_enabled
     const tile_t tile = game->map[y][x];
     uint8_t texture =
         capturable_textures[tile - terrian_capacity][tile_y][tile_x / 2];
