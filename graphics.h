@@ -17,8 +17,12 @@ void render_block(uint32_t, uint32_t, const grid_t, wchar_t* const,
 
 void render_percentage(uint32_t, uint32_t, const grid_t, wchar_t* const);
 
-void render_progress_bar(uint32_t, uint32_t, const grid_t, wchar_t* const,
+void render_bar(uint32_t, uint32_t, const grid_t, wchar_t* const,
                          uint8_t* const);
+
+bool render_unit_health_bar(const struct game* const, const grid_t,
+                            const grid_t, const grid_t, const grid_t,
+                            wchar_t* const, uint8_t* const);
 
 // ----
 

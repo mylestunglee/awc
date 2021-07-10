@@ -45,12 +45,34 @@ TEST(graphics_test, render_percentage_with_high_progress_is_left_aligned) {
     ASSERT_EQ(right_symbol, '7');
 }
 
-TEST(graphics_test, render_progress_bar_shows_percentage_overlaps_block) {
+TEST(graphics_test, render_bar_shows_percentage_overlaps_block) {
     wchar_t symbol = 0;
     uint8_t style = 0;
-    render_progress_bar(57, 100, 1, &symbol, &style);
+    render_bar(57, 100, 1, &symbol, &style);
     ASSERT_EQ(symbol, '5');
     ASSERT_EQ(style, '\x0B');
+}
+
+TEST_F(game_fixture, render_unit_health_bar_returns_false_when_no_unit_exists) {
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_FALSE(render_unit_health_bar(game, 0, 0, 1, 3, &symbol, &style));
+}
+
+TEST_F(game_fixture, render_unit_health_bar_returns_false_when_max_health) {
+    insert_unit({.health = health_max});
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_FALSE(render_unit_health_bar(game, 0, 0, 1, 3, &symbol, &style));
+}
+
+TEST_F(game_fixture, render_unit_health_bar_shows_unit_health) {
+    insert_unit({.health = health_max - 1});
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_TRUE(render_unit_health_bar(game, 0, 0, 1, 3, &symbol, &style));
+    ASSERT_NE(symbol, 0);
+    ASSERT_NE(style, 0);
 }
 
 // ------
