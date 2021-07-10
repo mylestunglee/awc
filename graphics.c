@@ -78,34 +78,112 @@ const static uint8_t
                             {'\xB1', '\x11', '\x11', '\x1C'},
                             {'\xB1', '\x11', '\x11', '\x1C'}}};
 
-static void render_pixel(wchar_t symbol, const uint8_t style,
-                         const uint8_t prev_style) {
-    if (style != prev_style) {
-        const uint8_t forecolour = style >> 4;
-        const uint8_t backcolour = style & 15;
-        const uint8_t prev_forecolour = prev_style >> 4;
-        const uint8_t prev_backcolour = prev_style & 15;
-        bool carry = false;
+static void render_block(uint32_t progress, uint32_t completion,
+                         const grid_t tile_x, wchar_t* const symbol,
+                         uint8_t* const style) {
+    const uint8_t styles[3] = {'\x90', '\xB0', '\xA0'};
+    const uint8_t inverted_styles[3] = {'\x09', '\x0B', '\x0A'};
+    const uint8_t style_index = (3 * progress) / completion;
 
-        wprintf(L"%c[", '\x1B');
-        if (forecolour != prev_forecolour) {
-            carry = true;
-            if (forecolour < 8)
-                wprintf(L"%u", forecolour + 30);
-            else
-                wprintf(L"%u", forecolour + 82);
-        }
-        if (backcolour != prev_backcolour) {
-            if (carry)
-                wprintf(L";");
-            if (backcolour < 8)
-                wprintf(L"%u", backcolour + 40);
-            else
-                wprintf(L"%u", backcolour + 92);
-        }
-        wprintf(L"m");
+    const wchar_t block_symbols[8] = {L'▏', L'▎', L'▍', L'▌', L'▋', L'▊', L'▉'};
+    const int8_t steps = ((8 * unit_width + 1) * progress) / completion -
+                         8 * (tile_x - unit_left) - 1;
+    if (steps < 0) {
+        *style = styles[style_index];
+        *symbol = ' ';
+    } else if (steps < 7) {
+        *style = styles[style_index];
+        *symbol = block_symbols[steps];
+    } else {
+        *style = inverted_styles[style_index];
+        *symbol = ' ';
     }
-    wprintf(L"%lc", symbol);
+}
+
+static void render_percent(uint32_t progress, uint32_t completion,
+                           const grid_t tile_x, wchar_t* const symbol) {
+    const uint8_t percent = (100 * progress) / completion;
+    assert(percent > 0);
+    assert(percent < 100);
+    const wchar_t left_digit = '0' + percent / 10;
+    const wchar_t right_digit = '0' + percent % 10;
+    if (percent >= 50) {
+        if (tile_x == unit_left)
+            *symbol = left_digit;
+        else if (tile_x == unit_left + 1)
+            *symbol = right_digit;
+    } else {
+        if (tile_x == unit_left + unit_width - 2)
+            *symbol = left_digit;
+        else if (tile_x == unit_left + unit_width - 1)
+            *symbol = right_digit;
+    }
+}
+
+// Set health bar colour
+static void render_bar(uint32_t progress, uint32_t completion,
+                       const grid_t tile_x, wchar_t* const symbol,
+                       uint8_t* const style) {
+    render_block(progress, completion, tile_x, symbol, style);
+    render_percent(progress, completion, tile_x, symbol);
+}
+
+static bool render_unit_health_bar(const struct game* const game,
+                                   const grid_t x, const grid_t y,
+                                   const grid_t tile_x, const grid_t tile_y,
+                                   wchar_t* const symbol,
+                                   uint8_t* const style) {
+
+    // Display health bar on the bottom of unit
+    if (tile_y != tile_height - 1)
+        return false;
+
+    if (tile_x < unit_left || tile_x >= unit_left + unit_width)
+        return false;
+
+    const struct unit* const unit = units_const_get_at(&game->units, x, y);
+    if (!unit)
+        return false;
+
+    const health_t health = unit->health;
+
+    // Hide health bar on full-health units
+    if (health == health_max)
+        return false;
+
+    render_bar(health, health_max, tile_x, symbol, style);
+
+    return true;
+}
+
+static bool render_capture_progress_bar(const struct game* const game,
+                                        const grid_t x, const grid_t y,
+                                        const grid_t tile_x,
+                                        const grid_t tile_y,
+                                        wchar_t* const symbol,
+                                        uint8_t* const style) {
+
+    // Display health bar on the bottom of unit
+    if (tile_y != 0)
+        return false;
+
+    if (tile_x < unit_left || tile_x >= unit_left + unit_width)
+        return false;
+
+    const struct unit* const unit =
+        units_const_get_at(&game->units, x, y - (grid_t)1);
+    if (!unit)
+        return false;
+
+    const health_wide_t capture_progress = unit->capture_progress;
+
+    // Hide health bar on full-health units
+    if (capture_progress == 0)
+        return false;
+
+    render_bar(capture_progress, capture_completion, tile_x, symbol, style);
+
+    return true;
 }
 
 // Returns true iff texture is transparent
@@ -225,113 +303,6 @@ bool render_selection(const struct game* const game, const grid_t x,
             calc_selection_style(game, x, y, attack_enabled, build_enabled);
 
     return selected;
-}
-
-static void render_block(uint32_t progress, uint32_t completion,
-                         const grid_t tile_x, wchar_t* const symbol,
-                         uint8_t* const style) {
-    const uint8_t styles[3] = {'\x90', '\xB0', '\xA0'};
-    const uint8_t inverted_styles[3] = {'\x09', '\x0B', '\x0A'};
-    const uint8_t style_index = (3 * progress) / completion;
-
-    const wchar_t block_symbols[8] = {L'▏', L'▎', L'▍', L'▌', L'▋', L'▊', L'▉'};
-    const int8_t steps = ((8 * unit_width + 1) * progress) / completion -
-                         8 * (tile_x - unit_left) - 1;
-    if (steps < 0) {
-        *style = styles[style_index];
-        *symbol = ' ';
-    } else if (steps < 7) {
-        *style = styles[style_index];
-        *symbol = block_symbols[steps];
-    } else {
-        *style = inverted_styles[style_index];
-        *symbol = ' ';
-    }
-}
-
-static void render_percent(uint32_t progress, uint32_t completion,
-                           const grid_t tile_x, wchar_t* const symbol) {
-    const uint8_t percent = (100 * progress) / completion;
-    assert(percent > 0);
-    assert(percent < 100);
-    const wchar_t left_digit = '0' + percent / 10;
-    const wchar_t right_digit = '0' + percent % 10;
-    if (percent >= 50) {
-        if (tile_x == unit_left)
-            *symbol = left_digit;
-        else if (tile_x == unit_left + 1)
-            *symbol = right_digit;
-    } else {
-        if (tile_x == unit_left + unit_width - 2)
-            *symbol = left_digit;
-        else if (tile_x == unit_left + unit_width - 1)
-            *symbol = right_digit;
-    }
-}
-
-// Set health bar colour
-static void render_bar(uint32_t progress, uint32_t completion,
-                       const grid_t tile_x, wchar_t* const symbol,
-                       uint8_t* const style) {
-    render_block(progress, completion, tile_x, symbol, style);
-    render_percent(progress, completion, tile_x, symbol);
-}
-
-static bool render_health_bar(const struct game* const game, const grid_t x,
-                              const grid_t y, const grid_t tile_x,
-                              const grid_t tile_y, wchar_t* const symbol,
-                              uint8_t* const style) {
-
-    // Display health bar on the bottom of unit
-    if (tile_y != tile_height - 1)
-        return false;
-
-    if (tile_x < unit_left || tile_x >= unit_left + unit_width)
-        return false;
-
-    const struct unit* const unit = units_const_get_at(&game->units, x, y);
-    if (!unit)
-        return false;
-
-    const health_t health = unit->health;
-
-    // Hide health bar on full-health units
-    if (health == health_max)
-        return false;
-
-    render_bar(health, health_max, tile_x, symbol, style);
-
-    return true;
-}
-
-static bool render_capture_progress_bar(const struct game* const game,
-                                        const grid_t x, const grid_t y,
-                                        const grid_t tile_x,
-                                        const grid_t tile_y,
-                                        wchar_t* const symbol,
-                                        uint8_t* const style) {
-
-    // Display health bar on the bottom of unit
-    if (tile_y != 0)
-        return false;
-
-    if (tile_x < unit_left || tile_x >= unit_left + unit_width)
-        return false;
-
-    const struct unit* const unit =
-        units_const_get_at(&game->units, x, y - (grid_t)1);
-    if (!unit)
-        return false;
-
-    const health_wide_t capture_progress = unit->capture_progress;
-
-    // Hide health bar on full-health units
-    if (capture_progress == 0)
-        return false;
-
-    render_bar(capture_progress, capture_completion, tile_x, symbol, style);
-
-    return true;
 }
 
 static void render_highlight(const struct game* const game, const grid_t x,
@@ -462,6 +433,36 @@ static void print_text(const struct game* const game, const bool attack_enabled,
         print_normal_text(game);
 }
 
+static void render_pixel(wchar_t symbol, const uint8_t style,
+                         const uint8_t prev_style) {
+    if (style != prev_style) {
+        const uint8_t forecolour = style >> 4;
+        const uint8_t backcolour = style & 15;
+        const uint8_t prev_forecolour = prev_style >> 4;
+        const uint8_t prev_backcolour = prev_style & 15;
+        bool carry = false;
+
+        wprintf(L"%c[", '\x1B');
+        if (forecolour != prev_forecolour) {
+            carry = true;
+            if (forecolour < 8)
+                wprintf(L"%u", forecolour + 30);
+            else
+                wprintf(L"%u", forecolour + 82);
+        }
+        if (backcolour != prev_backcolour) {
+            if (carry)
+                wprintf(L";");
+            if (backcolour < 8)
+                wprintf(L"%u", backcolour + 40);
+            else
+                wprintf(L"%u", backcolour + 92);
+        }
+        wprintf(L"m");
+    }
+    wprintf(L"%lc", symbol);
+}
+
 void render(const struct game* const game, const bool attack_enabled,
             const bool build_enabled) {
     reset_cursor();
@@ -484,8 +485,8 @@ void render(const struct game* const game, const bool attack_enabled,
                     wchar_t symbol;
                     uint8_t style;
 
-                    if (render_health_bar(game, x, y, tile_x, tile_y, &symbol,
-                                          &style) ||
+                    if (render_unit_health_bar(game, x, y, tile_x, tile_y,
+                                               &symbol, &style) ||
                         render_capture_progress_bar(game, x, y, tile_x, tile_y,
                                                     &symbol, &style) ||
                         render_selection(game, x, y, tile_x, tile_y,
