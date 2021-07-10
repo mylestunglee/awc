@@ -23,66 +23,66 @@ const static uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
                                          '^', '\\', '/', '[', ']', '-', '='};
 
 const static uint8_t player_styles[players_capacity + 1] = {
-    '\xF4', '\xF1', '\xF3', '\xF8', '\xF8', '\xF8'};
+    '\xf4', '\xf1', '\xf3', '\xf8', '\xf8', '\xf8'};
 
 const static uint8_t tile_styles[terrian_capacity] = {
-    '\x80', '\xA2', '\x32', '\x13', '\x3B',
-    '\xC4', '\xD4', '\x4C', '\x78', '\x78'};
+    '\x80', '\xa2', '\x32', '\x13', '\x3b',
+    '\xc4', '\xd4', '\x4c', '\x78', '\x78'};
 const static uint8_t
     unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
-        {{'\x03', '\xF3', '\x00'}, {'\x08', '\x88', '\x00'}},
-        {{'\x0E', '\xFE', '\x00'}, {'\x08', '\x88', '\x00'}},
-        {{'\x0A', '\xFD', '\x00'}, {'\x03', '\x33', '\x00'}},
-        {{'\xAB', '\xFC', '\xD0'}, {'\x3E', '\xEE', '\x30'}},
-        {{'\xB1', '\xFC', '\xE0'}, {'\x3E', '\xEE', '\x30'}},
-        {{'\x08', '\xF8', '\x00'}, {'\x03', '\xE3', '\x00'}},
-        {{'\x88', '\xF8', '\x80'}, {'\x33', '\x33', '\x30'}},
-        {{'\x0A', '\xFA', '\x00'}, {'\x03', '\xE3', '\x00'}},
-        {{'\xAA', '\xFA', '\xA0'}, {'\x33', '\x33', '\x30'}},
-        {{'\x0E', '\x4E', '\x10'}, {'\x0B', '\xFC', '\xE0'}},
-        {{'\x91', '\x11', '\x10'}, {'\x59', '\xFC', '\xE0'}},
-        {{'\x91', '\x11', '\x10'}, {'\x57', '\xF7', '\x60'}},
-        {{'\x22', '\x22', '\x20'}, {'\x92', '\xFC', '\xE0'}},
-        {{'\x2A', '\xFA', '\x20'}, {'\x92', '\x2C', '\xE0'}},
-        {{'\x88', '\xF8', '\x80'}, {'\x92', '\x22', '\xA0'}}};
+        {{'\x03', '\xf3', '\x00'}, {'\x08', '\x88', '\x00'}},
+        {{'\x0E', '\xfe', '\x00'}, {'\x08', '\x88', '\x00'}},
+        {{'\x0A', '\xfd', '\x00'}, {'\x03', '\x33', '\x00'}},
+        {{'\xab', '\xfc', '\xd0'}, {'\x3e', '\xee', '\x30'}},
+        {{'\xb1', '\xfc', '\xe0'}, {'\x3e', '\xee', '\x30'}},
+        {{'\x08', '\xf8', '\x00'}, {'\x03', '\xe3', '\x00'}},
+        {{'\x88', '\xf8', '\x80'}, {'\x33', '\x33', '\x30'}},
+        {{'\x0A', '\xfa', '\x00'}, {'\x03', '\xe3', '\x00'}},
+        {{'\xaa', '\xfa', '\xa0'}, {'\x33', '\x33', '\x30'}},
+        {{'\x0E', '\x4e', '\x10'}, {'\x0B', '\xfc', '\xe0'}},
+        {{'\x91', '\x11', '\x10'}, {'\x59', '\xfc', '\xe0'}},
+        {{'\x91', '\x11', '\x10'}, {'\x57', '\xf7', '\x60'}},
+        {{'\x22', '\x22', '\x20'}, {'\x92', '\xfc', '\xe0'}},
+        {{'\x2a', '\xfa', '\x20'}, {'\x92', '\x2c', '\xe0'}},
+        {{'\x88', '\xf8', '\x80'}, {'\x92', '\x22', '\xa0'}}};
 
 const static uint8_t
     capturable_textures[capturable_capacity][tile_height]
                        [(tile_width + 1) / 2] = {
                            {
-                               {'\x00', '\xB1', '\xFC', '\x00'},
-                               {'\x00', '\xB1', '\xB1', '\x1C'},
-                               {'\xB1', '\x1C', '\xB1', '\x1C'},
-                               {'\xB1', '\x1C', '\x00', '\x00'},
+                               {'\x00', '\xb1', '\xfc', '\x00'},
+                               {'\x00', '\xb1', '\xb1', '\x1c'},
+                               {'\xb1', '\x1c', '\xb1', '\x1c'},
+                               {'\xb1', '\x1c', '\x00', '\x00'},
                            },
                            {
                                {'\x00', '\x00', '\x00', '\x00'},
-                               {'\xB9', '\x2B', '\xF2', '\xAC'},
-                               {'\xB1', '\x11', '\x11', '\x1C'},
-                               {'\xB1', '\x11', '\x11', '\x1C'},
+                               {'\xb9', '\x2b', '\xf2', '\xac'},
+                               {'\xb1', '\x11', '\x11', '\x1c'},
+                               {'\xb1', '\x11', '\x11', '\x1c'},
                            },
                            {
-                               {'\x00', '\x00', '\x9F', '\xA0'},
-                               {'\x00', '\x00', '\xC1', '\xB0'},
-                               {'\x22', '\x22', '\xC1', '\xB2'},
-                               {'\xB1', '\x11', '\x11', '\x1C'},
+                               {'\x00', '\x00', '\x9f', '\xa0'},
+                               {'\x00', '\x00', '\xc1', '\xb0'},
+                               {'\x22', '\x22', '\xc1', '\xb2'},
+                               {'\xb1', '\x11', '\x11', '\x1c'},
                            },
                            {
                                {'\x00', '\x00', '\x00', '\x00'},
-                               {'\x00', '\x00', '\xBC', '\xFC'},
-                               {'\x22', '\x22', '\xBC', '\x1C'},
-                               {'\xB1', '\x11', '\x11', '\x1C'},
+                               {'\x00', '\x00', '\xbc', '\xfc'},
+                               {'\x22', '\x22', '\xbc', '\x1c'},
+                               {'\xb1', '\x11', '\x11', '\x1c'},
                            },
-                           {{'\x00', '\xBE', '\xFC', '\x00'},
-                            {'\x00', '\xB1', '\x1C', '\x00'},
-                            {'\xB1', '\x11', '\x11', '\x1C'},
-                            {'\xB1', '\x11', '\x11', '\x1C'}}};
+                           {{'\x00', '\xbe', '\xfc', '\x00'},
+                            {'\x00', '\xb1', '\x1c', '\x00'},
+                            {'\xb1', '\x11', '\x11', '\x1c'},
+                            {'\xb1', '\x11', '\x11', '\x1c'}}};
 
 void render_block(uint32_t progress, uint32_t completion, const grid_t tile_x,
                   wchar_t* const symbol, uint8_t* const style) {
     assert(progress < completion);
     assert(completion > 0);
-    const uint8_t styles[] = {'\x90', '\xB0', '\xA0'};
+    const uint8_t styles[] = {'\x90', '\xb0', '\xa0'};
     const uint8_t inverted_styles[] = {'\x09', '\x0B', '\x0A'};
     const uint8_t style_index = (3 * progress) / completion;
 
@@ -380,7 +380,7 @@ static void reset_cursor() {
     wprintf(L"\033[2J\033[1;1H");
 }
 
-static void reset_black() { wprintf(L"%c[30;40m", '\x1B'); }
+static void reset_black() { wprintf(L"%c[30;40m", '\x1b'); }
 
 static void print_normal_text(const struct game* const game) {
     wprintf(
@@ -437,7 +437,7 @@ static void render_pixel(wchar_t symbol, const uint8_t style,
         const uint8_t prev_backcolour = prev_style & 15;
         bool carry = false;
 
-        wprintf(L"%c[", '\x1B');
+        wprintf(L"%c[", '\x1b');
         if (forecolour != prev_forecolour) {
             carry = true;
             if (forecolour < 8)
@@ -508,6 +508,6 @@ void render(const struct game* const game, const bool attack_enabled,
 
 #include <stdlib.h>
 
-void reset_style() { wprintf(L"%c[0m", '\x1B'); }
+void reset_style() { wprintf(L"%c[0m", '\x1b'); }
 
 void graphics_init() { setlocale(LC_CTYPE, ""); }

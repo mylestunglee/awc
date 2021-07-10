@@ -24,7 +24,7 @@ TEST(graphics_test, render_block_with_half_completion_is_half_full) {
     uint8_t style = 0;
     render_block(128, 255, 3, &symbol, &style);
     ASSERT_EQ(symbol, L'▌');
-    ASSERT_EQ(style, '\xB0');
+    ASSERT_EQ(style, '\xb0');
 }
 
 TEST(graphics_test, render_percentage_with_low_progress_is_right_aligned) {
@@ -103,13 +103,13 @@ TEST_F(game_fixture, render_capture_progress_bar_shows_capture_progress) {
 
 TEST_F(game_fixture, calc_tile_style_gets_terrian_style) {
     game->map[3][2] = tile_plains;
-    ASSERT_EQ(calc_tile_style(game, 2, 3), '\xA2');
+    ASSERT_EQ(calc_tile_style(game, 2, 3), '\xa2');
 }
 
 TEST_F(game_fixture, calc_tile_style_gets_capturable_style) {
     game->map[3][2] = tile_city;
     game->territory[3][2] = 1;
-    ASSERT_EQ(calc_tile_style(game, 2, 3), '\xF1');
+    ASSERT_EQ(calc_tile_style(game, 2, 3), '\xf1');
 }
 
 TEST(graphics_test, calc_action_style_gets_attackable_style) {
@@ -154,7 +154,7 @@ TEST_F(game_fixture, render_unit_gives_unit_texture) {
     uint8_t style = 0;
     ASSERT_TRUE(render_unit(game, 0, 0, 2, 1, &symbol, &style));
     ASSERT_EQ(symbol, 'o');
-    ASSERT_EQ(style, '\xF4');
+    ASSERT_EQ(style, '\xf4');
 }
 
 TEST_F(game_fixture, render_unit_gives_player_icon) {
@@ -163,7 +163,7 @@ TEST_F(game_fixture, render_unit_gives_player_icon) {
     uint8_t style = 0;
     ASSERT_TRUE(render_unit(game, 0, 0, 3, 1, &symbol, &style));
     ASSERT_EQ(symbol, '3');
-    ASSERT_EQ(style, '\xF3');
+    ASSERT_EQ(style, '\xf3');
 }
 
 TEST_F(game_fixture, render_unit_gives_shaded_unit_texture_when_disabled) {
