@@ -24,6 +24,13 @@ bool render_unit_health_bar(const struct game* const, const grid_t,
                             const grid_t, const grid_t, const grid_t,
                             wchar_t* const, uint8_t* const);
 
+bool render_capture_progress_bar(const struct game* const,
+                                        const grid_t, const grid_t,
+                                        const grid_t,
+                                        const grid_t,
+                                        wchar_t* const,
+                                        uint8_t* const);
+
 // ----
 
 bool render_unit(const struct game* const, const grid_t, const grid_t,

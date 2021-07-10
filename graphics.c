@@ -156,14 +156,14 @@ bool render_unit_health_bar(const struct game* const game, const grid_t x,
     return true;
 }
 
-static bool render_capture_progress_bar(const struct game* const game,
+bool render_capture_progress_bar(const struct game* const game,
                                         const grid_t x, const grid_t y,
                                         const grid_t tile_x,
                                         const grid_t tile_y,
                                         wchar_t* const symbol,
                                         uint8_t* const style) {
 
-    // Display health bar on the bottom of unit
+    // Display health bar on the bottom of capturable
     if (tile_y != 0)
         return false;
 

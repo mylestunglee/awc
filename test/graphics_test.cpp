@@ -75,6 +75,28 @@ TEST_F(game_fixture, render_unit_health_bar_shows_unit_health) {
     ASSERT_NE(style, 0);
 }
 
+TEST_F(game_fixture, render_capture_progress_bar_returns_false_when_no_unit_exists) {
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_FALSE(render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
+}
+
+TEST_F(game_fixture, render_capture_progress_bar_returns_false_when_not_capturing) {
+    insert_unit({});
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_FALSE(render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
+}
+
+TEST_F(game_fixture, render_capture_progress_bar_shows_capture_progress) {
+    insert_unit({.capture_progress = 1});
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_TRUE(render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
+    ASSERT_NE(symbol, 0);
+    ASSERT_NE(style, 0);
+}
+
 // ------
 
 TEST_F(game_fixture, render_unit_ignores_out_of_bounds) {
