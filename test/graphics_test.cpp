@@ -45,7 +45,7 @@ TEST(graphics_test, render_percentage_with_high_progress_is_left_aligned) {
     ASSERT_EQ(right_symbol, '7');
 }
 
-TEST(graphics_test, render_bar_shows_percentage_overlaps_block) {
+TEST(graphics_test, render_bar_overlaps_percentage_over_block) {
     wchar_t symbol = 0;
     uint8_t style = 0;
     render_bar(57, 100, 1, &symbol, &style);
@@ -122,6 +122,40 @@ TEST(graphics_test, calc_action_style_gets_buildable_style) {
 
 TEST(graphics_test, calc_action_style_gets_accessible_style) {
     ASSERT_EQ(calc_action_style(false, false), '\xe0');
+}
+
+TEST_F(game_fixture, calc_selection_style_overlaps_action_style_over_tile) {
+    game->map[3][2] = tile_plains;
+    ASSERT_EQ(calc_selection_style(game, 2, 3, false, false), '\xe2');
+}
+
+TEST(graphics_test, calc_selection_symbol_returns_false_when_not_in_border) {
+    wchar_t symbol = 0;
+    ASSERT_FALSE(calc_selection_symbol(1, 1, &symbol));
+}
+
+TEST(graphics_test, calc_selection_symbol_shows_border_symbol) {
+    wchar_t symbol = 0;
+    ASSERT_TRUE(calc_selection_symbol(0, 0, &symbol));    
+    ASSERT_NE(symbol, 0);
+}
+
+TEST_F(game_fixture, render_selection_ignores_nonselected_tile) {
+    game->x = 2;
+    game->y = 3;
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_FALSE(render_selection(game, 3, 3, 0, 0, false, false, &symbol, &style));
+}
+
+TEST_F(game_fixture, render_selection_shows_selection) {
+    game->x = 2;
+    game->y = 3;
+    wchar_t symbol = 0;
+    uint8_t style = 0;
+    ASSERT_TRUE(render_selection(game, 2, 3, 0, 0, false, false, &symbol, &style));
+    ASSERT_NE(symbol, 0);
+    ASSERT_NE(style, 0);
 }
 
 // ------
