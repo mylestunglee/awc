@@ -1,7 +1,7 @@
 TARGET = test
 CXX = g++
 CXXFLAGS = -g -Wall -pedantic -funsigned-char -std=c++2a
-LIBRARIES = -lgtest_main  -lgtest -lglpk
+LIBRARIES = -lgtest_main -lgtest -lglpk
 
 .PHONY: default clean run
 

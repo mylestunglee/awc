@@ -1,6 +1,6 @@
 TARGET = awc
 CC = gcc
-CFLAGS = -g -Wall -pedantic
+CFLAGS = -g -Wall -pedantic -Wunused-macros
 LIBRARIES = -lglpk
 
 default: $(TARGET)
