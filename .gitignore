@@ -4,3 +4,5 @@ test/*_test
 !test/*_test.cpp
 *.o
 *.txt
+html
+latex
