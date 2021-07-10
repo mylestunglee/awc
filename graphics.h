@@ -18,18 +18,19 @@ void render_block(uint32_t, uint32_t, const grid_t, wchar_t* const,
 void render_percentage(uint32_t, uint32_t, const grid_t, wchar_t* const);
 
 void render_bar(uint32_t, uint32_t, const grid_t, wchar_t* const,
-                         uint8_t* const);
+                uint8_t* const);
 
 bool render_unit_health_bar(const struct game* const, const grid_t,
                             const grid_t, const grid_t, const grid_t,
                             wchar_t* const, uint8_t* const);
 
-bool render_capture_progress_bar(const struct game* const,
-                                        const grid_t, const grid_t,
-                                        const grid_t,
-                                        const grid_t,
-                                        wchar_t* const,
-                                        uint8_t* const);
+bool render_capture_progress_bar(const struct game* const, const grid_t,
+                                 const grid_t, const grid_t, const grid_t,
+                                 wchar_t* const, uint8_t* const);
+
+uint8_t calc_tile_style(const struct game* const, const grid_t, const grid_t);
+
+uint8_t calc_action_style(const bool, const bool);
 
 // ----
 

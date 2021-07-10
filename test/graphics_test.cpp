@@ -75,17 +75,21 @@ TEST_F(game_fixture, render_unit_health_bar_shows_unit_health) {
     ASSERT_NE(style, 0);
 }
 
-TEST_F(game_fixture, render_capture_progress_bar_returns_false_when_no_unit_exists) {
+TEST_F(game_fixture,
+       render_capture_progress_bar_returns_false_when_no_unit_exists) {
     wchar_t symbol = 0;
     uint8_t style = 0;
-    ASSERT_FALSE(render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
+    ASSERT_FALSE(
+        render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
 }
 
-TEST_F(game_fixture, render_capture_progress_bar_returns_false_when_not_capturing) {
+TEST_F(game_fixture,
+       render_capture_progress_bar_returns_false_when_not_capturing) {
     insert_unit({});
     wchar_t symbol = 0;
     uint8_t style = 0;
-    ASSERT_FALSE(render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
+    ASSERT_FALSE(
+        render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
 }
 
 TEST_F(game_fixture, render_capture_progress_bar_shows_capture_progress) {
@@ -95,6 +99,29 @@ TEST_F(game_fixture, render_capture_progress_bar_shows_capture_progress) {
     ASSERT_TRUE(render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
     ASSERT_NE(symbol, 0);
     ASSERT_NE(style, 0);
+}
+
+TEST_F(game_fixture, calc_tile_style_gets_terrian_style) {
+    game->map[3][2] = tile_plains;
+    ASSERT_EQ(calc_tile_style(game, 2, 3), '\xA2');
+}
+
+TEST_F(game_fixture, calc_tile_style_gets_capturable_style) {
+    game->map[3][2] = tile_city;
+    game->territory[3][2] = 1;
+    ASSERT_EQ(calc_tile_style(game, 2, 3), '\xF1');
+}
+
+TEST(graphics_test, calc_action_style_gets_attackable_style) {
+    ASSERT_EQ(calc_action_style(true, false), '\x90');
+}
+
+TEST(graphics_test, calc_action_style_gets_buildable_style) {
+    ASSERT_EQ(calc_action_style(false, true), '\xf0');
+}
+
+TEST(graphics_test, calc_action_style_gets_accessible_style) {
+    ASSERT_EQ(calc_action_style(false, false), '\xe0');
 }
 
 // ------

@@ -122,9 +122,8 @@ void render_percentage(uint32_t progress, uint32_t completion,
     }
 }
 
-void render_bar(uint32_t progress, uint32_t completion,
-                         const grid_t tile_x, wchar_t* const symbol,
-                         uint8_t* const style) {
+void render_bar(uint32_t progress, uint32_t completion, const grid_t tile_x,
+                wchar_t* const symbol, uint8_t* const style) {
     render_block(progress, completion, tile_x, symbol, style);
     render_percentage(progress, completion, tile_x, symbol);
 }
@@ -156,12 +155,10 @@ bool render_unit_health_bar(const struct game* const game, const grid_t x,
     return true;
 }
 
-bool render_capture_progress_bar(const struct game* const game,
-                                        const grid_t x, const grid_t y,
-                                        const grid_t tile_x,
-                                        const grid_t tile_y,
-                                        wchar_t* const symbol,
-                                        uint8_t* const style) {
+bool render_capture_progress_bar(const struct game* const game, const grid_t x,
+                                 const grid_t y, const grid_t tile_x,
+                                 const grid_t tile_y, wchar_t* const symbol,
+                                 uint8_t* const style) {
 
     // Display health bar on the bottom of capturable
     if (tile_y != 0)
@@ -181,59 +178,7 @@ bool render_capture_progress_bar(const struct game* const game,
     if (capture_progress == 0)
         return false;
 
-    render_bar(capture_progress, capture_completion, tile_x, symbol,
-                        style);
-
-    return true;
-}
-
-// Returns true iff texture is transparent
-bool decode_texture(const uint8_t textures, const bool polarity,
-                    const player_t player, wchar_t* const symbol,
-                    uint8_t* const style) {
-
-    *style = player_styles[player];
-    // Extract 4-bits corresponding to texture coordinate
-    const uint8_t texture = polarity ? (textures >> 4) : (textures & '\x0f');
-
-    // Handle transparent pixel
-    if (texture == '\x00')
-        return true;
-    else if (texture == '\x0f') {
-        if (player == null_player)
-            *symbol = ' ';
-        else
-            *symbol = '1' + player;
-    } else
-        *symbol = unit_symbols[texture - 1];
-
-    return false;
-}
-
-// Attempt to find symbol style pair from rendering coordinates
-bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
-                 const grid_t tile_x, const grid_t tile_y,
-                 wchar_t* const symbol, uint8_t* const style) {
-
-    // Out of bounds
-    if (unit_left > tile_x || tile_x > unit_right || unit_top > tile_y ||
-        tile_y > unit_bottom)
-        return false;
-
-    const struct unit* const unit = units_const_get_at(&game->units, x, y);
-    if (!unit)
-        return false;
-
-    const bool transparent = decode_texture(
-        unit_textures[unit->model][tile_y - unit_top][(tile_x - unit_left) / 2],
-        (tile_x - unit_left) % 2 == 0, unit->player, symbol, style);
-
-    if (transparent)
-        return false;
-
-    // Dim forecolours if disabled
-    if (!unit->enabled)
-        *style &= '\x0F';
+    render_bar(capture_progress, capture_completion, tile_x, symbol, style);
 
     return true;
 }
@@ -241,14 +186,12 @@ bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
 uint8_t calc_tile_style(const struct game* const game, const grid_t x,
                         const grid_t y) {
     const tile_t tile = game->map[y][x];
-
-    if (tile < terrian_capacity)
-        return tile_styles[tile];
-    else
-        return player_styles[game->territory[y][x]];
+    return tile < terrian_capacity ? tile_styles[tile]
+                                   : player_styles[game->territory[y][x]];
 }
 
 uint8_t calc_action_style(const bool attack_enabled, const bool build_enabled) {
+    assert(!(attack_enabled && build_enabled));
     if (attack_enabled)
         return attackable_style;
     else if (build_enabled)
@@ -304,6 +247,57 @@ bool render_selection(const struct game* const game, const grid_t x,
             calc_selection_style(game, x, y, attack_enabled, build_enabled);
 
     return selected;
+}
+
+// Returns true iff texture is transparent
+bool decode_texture(const uint8_t textures, const bool polarity,
+                    const player_t player, wchar_t* const symbol,
+                    uint8_t* const style) {
+
+    *style = player_styles[player];
+    // Extract 4-bits corresponding to texture coordinate
+    const uint8_t texture = polarity ? (textures >> 4) : (textures & '\x0f');
+
+    // Handle transparent pixel
+    if (texture == '\x00')
+        return true;
+    else if (texture == '\x0f') {
+        if (player == null_player)
+            *symbol = ' ';
+        else
+            *symbol = '1' + player;
+    } else
+        *symbol = unit_symbols[texture - 1];
+
+    return false;
+}
+
+// Attempt to find symbol style pair from rendering coordinates
+bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
+                 const grid_t tile_x, const grid_t tile_y,
+                 wchar_t* const symbol, uint8_t* const style) {
+
+    // Out of bounds
+    if (unit_left > tile_x || tile_x > unit_right || unit_top > tile_y ||
+        tile_y > unit_bottom)
+        return false;
+
+    const struct unit* const unit = units_const_get_at(&game->units, x, y);
+    if (!unit)
+        return false;
+
+    const bool transparent = decode_texture(
+        unit_textures[unit->model][tile_y - unit_top][(tile_x - unit_left) / 2],
+        (tile_x - unit_left) % 2 == 0, unit->player, symbol, style);
+
+    if (transparent)
+        return false;
+
+    // Dim forecolours if disabled
+    if (!unit->enabled)
+        *style &= '\x0F';
+
+    return true;
 }
 
 static void render_highlight(const struct game* const game, const grid_t x,
