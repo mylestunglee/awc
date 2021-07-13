@@ -254,20 +254,23 @@ bool decode_texture(const uint8_t textures, const bool polarity,
                     const player_t player, wchar_t* const symbol,
                     uint8_t* const style) {
 
-    *style = player_styles[player];
     // Extract 4-bits corresponding to texture coordinate
-    const uint8_t texture = polarity ? (textures >> 4) : (textures & '\x0f');
+    const uint8_t texture = polarity ? (textures & '\x0f') : (textures >> 4);
 
     // Handle transparent pixel
     if (texture == '\x00')
         return true;
-    else if (texture == '\x0f') {
-        if (player == null_player)
-            *symbol = ' ';
-        else
-            *symbol = '1' + player;
-    } else
-        *symbol = unit_symbols[texture - 1];
+    else {
+        if (texture == '\x0f') {
+            if (player == null_player)
+                *symbol = ' ';
+            else
+                *symbol = '1' + player;
+        } else
+            *symbol = unit_symbols[texture - 1];
+
+        *style = player_styles[player];
+    }
 
     return false;
 }
@@ -288,7 +291,7 @@ bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
 
     const bool transparent = decode_texture(
         unit_textures[unit->model][tile_y - unit_top][(tile_x - unit_left) / 2],
-        (tile_x - unit_left) % 2 == 0, unit->player, symbol, style);
+        (tile_x - unit_left) % 2 != 0, unit->player, symbol, style);
 
     if (transparent)
         return false;
@@ -343,7 +346,7 @@ static bool render_tile(const struct game* const game, const grid_t x,
     } else {
         highlightable = decode_texture(
             capturable_textures[tile - terrian_capacity][tile_y][tile_x / 2],
-            tile_x % 2 == 0, game->territory[y][x], symbol, style);
+            tile_x % 2 != 0, game->territory[y][x], symbol, style);
 
         if (highlightable)
             *symbol = ' ';
