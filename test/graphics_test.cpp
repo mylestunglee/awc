@@ -61,14 +61,14 @@ TEST_F(units_fixture,
 }
 
 TEST_F(units_fixture, render_unit_health_bar_returns_false_when_max_health) {
-    insert_unit({.health = health_max});
+    insert({.health = health_max});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     ASSERT_FALSE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
 }
 
 TEST_F(units_fixture, render_unit_health_bar_shows_unit_health) {
-    insert_unit({.health = health_max - 1});
+    insert({.health = health_max - 1});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     ASSERT_TRUE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
@@ -86,7 +86,7 @@ TEST_F(units_fixture,
 
 TEST_F(units_fixture,
        render_capture_progress_bar_returns_false_when_not_capturing) {
-    insert_unit({});
+    insert({});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     ASSERT_FALSE(
@@ -94,7 +94,7 @@ TEST_F(units_fixture,
 }
 
 TEST_F(units_fixture, render_capture_progress_bar_shows_capture_progress) {
-    insert_unit({.capture_progress = 1});
+    insert({.capture_progress = 1});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     ASSERT_TRUE(
@@ -228,4 +228,34 @@ TEST_F(units_fixture, render_unit_gives_shaded_unit_texture_when_disabled) {
     ASSERT_TRUE(render_unit(units, 0, 0, 2, 1, &symbol, &style));
     ASSERT_EQ(symbol, 'o');
     ASSERT_EQ(style, '\x04');
+}
+
+TEST(graphics_test, render_highlight_with_no_label_shows_no_highlight) {
+    wchar_t symbol = 0;
+    uint8_t style = '\x00';
+    render_highlight('\x00', &symbol, &style);
+    ASSERT_EQ(symbol, 0);
+    ASSERT_EQ(style, '\x00');
+}
+
+TEST(graphics_test, render_highlight_shows_overlapping_accessible_style) {
+    wchar_t symbol = 0;
+    uint8_t style = '\x23';
+    render_highlight(accessible_bit, &symbol, &style);
+    ASSERT_EQ(symbol, L'░');
+    ASSERT_EQ(style, '\xe3');
+}
+
+TEST(graphics_test, render_highlight_shows_attackable_style) {
+    wchar_t symbol = 0;
+    uint8_t style = '\x00';
+    render_highlight(attackable_bit, &symbol, &style);
+    ASSERT_EQ(style, '\x90');
+}
+
+TEST(graphics_test, render_highlight_shows_accessible_and_attackable_style) {
+    wchar_t symbol = 0;
+    uint8_t style = '\x00';
+    render_highlight(accessible_bit | attackable_bit, &symbol, &style);
+    ASSERT_EQ(style, '\xd0');
 }

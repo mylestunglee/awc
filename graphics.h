@@ -47,8 +47,7 @@ bool decode_texture(const uint8_t, const bool, const player_t, wchar_t* const,
 bool render_unit(const struct units* const, const grid_t, const grid_t,
                  const grid_t, const grid_t, wchar_t* const, uint8_t* const);
 
-void render_highlight(const uint8_t labels[grid_size][grid_size],
-                      const grid_t x, const grid_t y, wchar_t* const symbol,
+void render_highlight(const uint8_t label, wchar_t* const symbol,
                       uint8_t* const style);
 
 // ----

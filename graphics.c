@@ -302,14 +302,13 @@ bool render_unit(const struct units* const units, const grid_t x,
     return true;
 }
 
-void render_highlight(const uint8_t labels[grid_size][grid_size],
-                      const grid_t x, const grid_t y, wchar_t* const symbol,
+void render_highlight(const uint8_t label, wchar_t* const symbol,
                       uint8_t* const style) {
 
-    const uint8_t highlight = labels[y][x] & (accessible_bit | attackable_bit);
+    assert(!(label & ~(accessible_bit | attackable_bit)));
 
     // Apply label hightlighting
-    if (!highlight)
+    if (!label)
         return;
 
     // Clear foreground style
@@ -317,7 +316,7 @@ void render_highlight(const uint8_t labels[grid_size][grid_size],
     *symbol = L'░';
 
     // Set foreground style
-    switch (highlight) {
+    switch (label) {
     case accessible_bit:
         *style |= accessible_style;
         break;
@@ -371,7 +370,7 @@ static bool render_tile(const struct game* const game, const grid_t x,
             *style = (*style & '\x0f') | attackable_style;
         }
     } else if (highlightable)
-        render_highlight(game->labels, x, y, symbol, style);
+        render_highlight(game->labels[y][x], symbol, style);
 
     return true;
 }
