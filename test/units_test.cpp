@@ -1,13 +1,5 @@
 #define expose_units_internals
-#include "../units.h"
-#include <gtest/gtest.h>
-
-class units_fixture : public ::testing::Test {
-protected:
-    units_fixture() : units(new struct units) { units_initialise(units); }
-    ~units_fixture() { delete units; }
-    struct units* const units;
-};
+#include "units_fixture.hpp"
 
 TEST_F(units_fixture, units_initialise_sets_start) {
     units->start = 2;

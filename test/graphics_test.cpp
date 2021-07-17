@@ -1,7 +1,7 @@
 #define expose_graphics_internals
 #include "../graphics.h"
 #include "game_fixture.hpp"
-#include <gtest/gtest.h>
+#include "units_fixture.hpp"
 
 TEST(graphics_test, render_block_with_no_progress_is_empty) {
     wchar_t symbol = 0;
@@ -53,50 +53,52 @@ TEST(graphics_test, render_bar_overlaps_percentage_over_block) {
     ASSERT_EQ(style, '\x0B');
 }
 
-TEST_F(game_fixture, render_unit_health_bar_returns_false_when_no_unit_exists) {
+TEST_F(units_fixture,
+       render_unit_health_bar_returns_false_when_no_unit_exists) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_FALSE(render_unit_health_bar(game, 0, 0, 1, 3, &symbol, &style));
+    ASSERT_FALSE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
 }
 
-TEST_F(game_fixture, render_unit_health_bar_returns_false_when_max_health) {
+TEST_F(units_fixture, render_unit_health_bar_returns_false_when_max_health) {
     insert_unit({.health = health_max});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_FALSE(render_unit_health_bar(game, 0, 0, 1, 3, &symbol, &style));
+    ASSERT_FALSE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
 }
 
-TEST_F(game_fixture, render_unit_health_bar_shows_unit_health) {
+TEST_F(units_fixture, render_unit_health_bar_shows_unit_health) {
     insert_unit({.health = health_max - 1});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_TRUE(render_unit_health_bar(game, 0, 0, 1, 3, &symbol, &style));
+    ASSERT_TRUE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
     ASSERT_NE(symbol, 0);
     ASSERT_NE(style, '\x00');
 }
 
-TEST_F(game_fixture,
+TEST_F(units_fixture,
        render_capture_progress_bar_returns_false_when_no_unit_exists) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     ASSERT_FALSE(
-        render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
+        render_capture_progress_bar(units, 0, 1, 1, 0, &symbol, &style));
 }
 
-TEST_F(game_fixture,
+TEST_F(units_fixture,
        render_capture_progress_bar_returns_false_when_not_capturing) {
     insert_unit({});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     ASSERT_FALSE(
-        render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
+        render_capture_progress_bar(units, 0, 1, 1, 0, &symbol, &style));
 }
 
-TEST_F(game_fixture, render_capture_progress_bar_shows_capture_progress) {
+TEST_F(units_fixture, render_capture_progress_bar_shows_capture_progress) {
     insert_unit({.capture_progress = 1});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_TRUE(render_capture_progress_bar(game, 0, 1, 1, 0, &symbol, &style));
+    ASSERT_TRUE(
+        render_capture_progress_bar(units, 0, 1, 1, 0, &symbol, &style));
     ASSERT_NE(symbol, 0);
     ASSERT_NE(style, '\x00');
 }
@@ -188,42 +190,42 @@ TEST(graphics_test, decode_texture_fetches_texture) {
     ASSERT_EQ(symbol, '_');
 }
 
-TEST_F(game_fixture, render_unit_ignores_out_of_bounds) {
-    insert_unit({});
+TEST_F(units_fixture, render_unit_ignores_out_of_bounds) {
+    insert({});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_FALSE(render_unit(game, 0, 0, 0, 0, &symbol, &style));
+    ASSERT_FALSE(render_unit(units, 0, 0, 0, 0, &symbol, &style));
 }
 
-TEST_F(game_fixture, render_unit_ignores_no_unit) {
+TEST_F(units_fixture, render_unit_ignores_no_unit) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_FALSE(render_unit(game, 0, 0, 2, 1, &symbol, &style));
+    ASSERT_FALSE(render_unit(units, 0, 0, 2, 1, &symbol, &style));
     ASSERT_EQ(symbol, 0);
     ASSERT_EQ(style, 0);
 }
 
-TEST_F(game_fixture, render_unit_ignores_transparent) {
-    insert_unit({.enabled = true});
+TEST_F(units_fixture, render_unit_ignores_transparent) {
+    insert({.enabled = true});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_FALSE(render_unit(game, 0, 0, 1, 1, &symbol, &style));
+    ASSERT_FALSE(render_unit(units, 0, 0, 1, 1, &symbol, &style));
 }
 
-TEST_F(game_fixture, render_unit_gives_unit_texture) {
-    insert_unit({.enabled = true});
+TEST_F(units_fixture, render_unit_gives_unit_texture) {
+    insert({.enabled = true});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_TRUE(render_unit(game, 0, 0, 2, 1, &symbol, &style));
+    ASSERT_TRUE(render_unit(units, 0, 0, 2, 1, &symbol, &style));
     ASSERT_EQ(symbol, 'o');
     ASSERT_EQ(style, '\xf4');
 }
 
-TEST_F(game_fixture, render_unit_gives_shaded_unit_texture_when_disabled) {
-    insert_unit({});
+TEST_F(units_fixture, render_unit_gives_shaded_unit_texture_when_disabled) {
+    insert({});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_TRUE(render_unit(game, 0, 0, 2, 1, &symbol, &style));
+    ASSERT_TRUE(render_unit(units, 0, 0, 2, 1, &symbol, &style));
     ASSERT_EQ(symbol, 'o');
     ASSERT_EQ(style, '\x04');
 }

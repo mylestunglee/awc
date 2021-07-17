@@ -128,7 +128,7 @@ void render_bar(uint32_t progress, uint32_t completion, const grid_t tile_x,
     render_percentage(progress, completion, tile_x, symbol);
 }
 
-bool render_unit_health_bar(const struct game* const game, const grid_t x,
+bool render_unit_health_bar(const struct units* const units, const grid_t x,
                             const grid_t y, const grid_t tile_x,
                             const grid_t tile_y, wchar_t* const symbol,
                             uint8_t* const style) {
@@ -140,7 +140,7 @@ bool render_unit_health_bar(const struct game* const game, const grid_t x,
     if (tile_x < unit_left || tile_x > unit_right)
         return false;
 
-    const struct unit* const unit = units_const_get_at(&game->units, x, y);
+    const struct unit* const unit = units_const_get_at(units, x, y);
     if (!unit)
         return false;
 
@@ -155,10 +155,10 @@ bool render_unit_health_bar(const struct game* const game, const grid_t x,
     return true;
 }
 
-bool render_capture_progress_bar(const struct game* const game, const grid_t x,
-                                 const grid_t y, const grid_t tile_x,
-                                 const grid_t tile_y, wchar_t* const symbol,
-                                 uint8_t* const style) {
+bool render_capture_progress_bar(const struct units* const units,
+                                 const grid_t x, const grid_t y,
+                                 const grid_t tile_x, const grid_t tile_y,
+                                 wchar_t* const symbol, uint8_t* const style) {
 
     // Display health bar on the bottom of capturable
     if (tile_y != 0)
@@ -167,8 +167,7 @@ bool render_capture_progress_bar(const struct game* const game, const grid_t x,
     if (tile_x < unit_left || tile_x >= unit_left + unit_width)
         return false;
 
-    const struct unit* const unit =
-        units_const_get_at(&game->units, x, y - (grid_t)1);
+    const struct unit* const unit = units_const_get_at(units, x, y - (grid_t)1);
     if (!unit)
         return false;
 
@@ -276,8 +275,8 @@ bool decode_texture(const uint8_t textures, const bool polarity,
 }
 
 // Attempt to find symbol style pair from rendering coordinates
-bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
-                 const grid_t tile_x, const grid_t tile_y,
+bool render_unit(const struct units* const units, const grid_t x,
+                 const grid_t y, const grid_t tile_x, const grid_t tile_y,
                  wchar_t* const symbol, uint8_t* const style) {
 
     // Out of bounds
@@ -285,7 +284,7 @@ bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
         tile_y > unit_bottom)
         return false;
 
-    const struct unit* const unit = units_const_get_at(&game->units, x, y);
+    const struct unit* const unit = units_const_get_at(units, x, y);
     if (!unit)
         return false;
 
@@ -303,12 +302,11 @@ bool render_unit(const struct game* const game, const grid_t x, const grid_t y,
     return true;
 }
 
-static void render_highlight(const struct game* const game, const grid_t x,
-                             const grid_t y, wchar_t* const symbol,
-                             uint8_t* const style) {
+void render_highlight(const uint8_t labels[grid_size][grid_size],
+                      const grid_t x, const grid_t y, wchar_t* const symbol,
+                      uint8_t* const style) {
 
-    const uint8_t highlight =
-        game->labels[y][x] & (accessible_bit | attackable_bit);
+    const uint8_t highlight = labels[y][x] & (accessible_bit | attackable_bit);
 
     // Apply label hightlighting
     if (!highlight)
@@ -316,7 +314,7 @@ static void render_highlight(const struct game* const game, const grid_t x,
 
     // Clear foreground style
     *style &= '\x0f';
-    *symbol = L'░'; // light shade
+    *symbol = L'░';
 
     // Set foreground style
     switch (highlight) {
@@ -373,7 +371,7 @@ static bool render_tile(const struct game* const game, const grid_t x,
             *style = (*style & '\x0f') | attackable_style;
         }
     } else if (highlightable)
-        render_highlight(game, x, y, symbol, style);
+        render_highlight(game->labels, x, y, symbol, style);
 
     return true;
 }
@@ -483,14 +481,14 @@ void render(const struct game* const game, const bool attack_enabled,
                     wchar_t symbol;
                     uint8_t style;
 
-                    if (render_unit_health_bar(game, x, y, tile_x, tile_y,
-                                               &symbol, &style) ||
-                        render_capture_progress_bar(game, x, y, tile_x, tile_y,
-                                                    &symbol, &style) ||
+                    if (render_unit_health_bar(&game->units, x, y, tile_x,
+                                               tile_y, &symbol, &style) ||
+                        render_capture_progress_bar(&game->units, x, y, tile_x,
+                                                    tile_y, &symbol, &style) ||
                         render_selection(game, x, y, tile_x, tile_y,
                                          attack_enabled, build_enabled, &symbol,
                                          &style) ||
-                        render_unit(game, x, y, tile_x, tile_y, &symbol,
+                        render_unit(&game->units, x, y, tile_x, tile_y, &symbol,
                                     &style) ||
                         render_tile(game, x, y, tile_x, tile_y, attack_enabled,
                                     &symbol, &style)) {
