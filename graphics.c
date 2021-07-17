@@ -253,23 +253,21 @@ bool decode_texture(const uint8_t textures, const bool polarity,
                     const player_t player, wchar_t* const symbol,
                     uint8_t* const style) {
 
+    *style = player_styles[player];
+
     // Extract 4-bits corresponding to texture coordinate
     const uint8_t texture = polarity ? (textures & '\x0f') : (textures >> 4);
 
     // Handle transparent pixel
     if (texture == '\x00')
         return true;
-    else {
-        if (texture == '\x0f') {
+    else if (texture == '\x0f') {
             if (player == null_player)
                 *symbol = ' ';
             else
                 *symbol = '1' + player;
-        } else
-            *symbol = unit_symbols[texture - 1];
-
-        *style = player_styles[player];
-    }
+    } else
+        *symbol = unit_symbols[texture - 1];
 
     return false;
 }
