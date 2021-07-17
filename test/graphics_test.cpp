@@ -259,3 +259,31 @@ TEST(graphics_test, render_highlight_shows_accessible_and_attackable_style) {
     render_highlight(accessible_bit | attackable_bit, &symbol, &style);
     ASSERT_EQ(style, '\xd0');
 }
+
+TEST_F(game_fixture, render_attack_arrows_show_arrows_on_even_subtile) {
+    game->x = 5;
+    game->y = 3;
+    game->prev_x = 6;
+    game->prev_y = 3;
+    wchar_t symbol = 0;
+    uint8_t style = '\x12';
+    render_attack_arrows(game, 2, &symbol, &style);
+    ASSERT_NE(symbol, 0);
+    ASSERT_EQ(style, '\x92');
+}
+
+TEST_F(game_fixture, render_attack_arrows_pads_odd_subtile) {
+    wchar_t symbol = 0;
+    uint8_t style = '\x00';
+    render_attack_arrows(game, 3, &symbol, &style);
+    ASSERT_EQ(symbol, ' ');
+}
+
+TEST_F(game_fixture, render_tile_shows_tile) {
+    wchar_t symbol = 0;
+    uint8_t style = '\x00';
+    game->map[3][2] = tile_plains;
+    ASSERT_TRUE(render_tile(game, 2, 3, 0, 0, false, &symbol, &style));
+    ASSERT_EQ(symbol, '"');
+    ASSERT_EQ(style, '\xa2');
+}

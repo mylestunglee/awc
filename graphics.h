@@ -50,18 +50,12 @@ bool render_unit(const struct units* const, const grid_t, const grid_t,
 void render_highlight(const uint8_t label, wchar_t* const symbol,
                       uint8_t* const style);
 
-// ----
+void render_attack_arrows(const struct game* const, const grid_t,
+                          wchar_t* const, uint8_t* const);
 
-uint8_t calc_tile_style(const struct game* const game, const grid_t,
-                        const grid_t);
-
-uint8_t calc_label_style(const bool, const bool);
-uint8_t calc_selection_style(const struct game* const, const grid_t,
-                             const grid_t, const bool, const bool);
-bool calc_selection_symbol(const grid_t, const grid_t, wchar_t* const);
-bool render_selection(const struct game* const, const grid_t, const grid_t,
-                      const grid_t, const grid_t, const bool, const bool,
-                      wchar_t* const, uint8_t* const);
+bool render_tile(const struct game* const, const grid_t, const grid_t,
+                 const grid_t, const grid_t, const bool, wchar_t* const,
+                 uint8_t* const);
 
 #endif
 

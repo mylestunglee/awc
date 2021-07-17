@@ -332,22 +332,25 @@ void render_highlight(const uint8_t label, wchar_t* const symbol,
     }
 }
 
-static void render_attack_arrows(const struct game* const game,
-    const grid_t tile_x, wchar_t* const symbol,
-    uint8_t* const style) {
+void render_attack_arrows(const struct game* const game, const grid_t tile_x,
+                          wchar_t* const symbol, uint8_t* const style) {
 
     if (tile_x % 2 != 0) {
         *symbol = ' ';
     } else {
-        if ((grid_t)(game->prev_x + 1) == game->x)
+        if ((grid_t)(game->prev_x + 1) == game->x) {
+            assert(game->prev_y == game->y);
             *symbol = L'▶';
-        else if ((grid_t)(game->prev_x - 1) == game->x)
+        } else if ((grid_t)(game->prev_x - 1) == game->x) {
+            assert(game->prev_y == game->y);
             *symbol = L'◀';
-        else if ((grid_t)(game->prev_y + 1) == game->y)
+        } else if ((grid_t)(game->prev_y + 1) == game->y) {
+            assert(game->prev_x == game->x);
             *symbol = L'▼';
-        else if ((grid_t)(game->prev_y - 1) == game->y)
+        } else if ((grid_t)(game->prev_y - 1) == game->y) {
+            assert(game->prev_x == game->x);
             *symbol = L'▲';
-        else
+        } else
             // Previous position incorrectly set
             assert(false);
 
@@ -356,10 +359,10 @@ static void render_attack_arrows(const struct game* const game,
     }
 }
 
-static bool render_tile(const struct game* const game, const grid_t x,
-                        const grid_t y, const grid_t tile_x,
-                        const grid_t tile_y, const bool attack_enabled,
-                        wchar_t* const symbol, uint8_t* const style) {
+bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
+                 const grid_t tile_x, const grid_t tile_y,
+                 const bool attack_enabled, wchar_t* const symbol,
+                 uint8_t* const style) {
 
     const tile_t tile = game->map[y][x];
     bool highlightable = true;
@@ -379,7 +382,7 @@ static bool render_tile(const struct game* const game, const grid_t x,
     // Show arrows highlighting position to attack unit
     if (attack_enabled && x == game->prev_x && y == game->prev_y)
         render_attack_arrows(game, tile_x, symbol, style);
-    else if (*symbol == ' ')
+    else if (highlightable)
         render_highlight(game->labels[y][x], symbol, style);
 
     return true;
