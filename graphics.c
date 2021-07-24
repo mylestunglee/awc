@@ -389,11 +389,10 @@ bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
     return true;
 }
 
-static bool render_pixel(const struct game* const game, const grid_t x,
-                         const grid_t y, const grid_t tile_x,
-                         const grid_t tile_y, const bool attack_enabled,
-                         const bool build_enabled, wchar_t* const symbol,
-                         uint8_t* const style) {
+bool render_pixel(const struct game* const game, const grid_t x, const grid_t y,
+                  const grid_t tile_x, const grid_t tile_y,
+                  const bool attack_enabled, const bool build_enabled,
+                  wchar_t* const symbol, uint8_t* const style) {
     return render_unit_health_bar(&game->units, x, y, tile_x, tile_y, symbol,
                                   style) ||
            render_capture_progress_bar(&game->units, x, y, tile_x, tile_y,

@@ -55,6 +55,11 @@ bool render_tile(const struct game* const, const grid_t, const grid_t,
                  const grid_t, const grid_t, const bool, wchar_t* const,
                  uint8_t* const);
 
+bool render_pixel(const struct game* const game, const grid_t x, const grid_t y,
+                  const grid_t tile_x, const grid_t tile_y,
+                  const bool attack_enabled, const bool build_enabled,
+                  wchar_t* const symbol, uint8_t* const style);
+
 #endif
 
 #endif

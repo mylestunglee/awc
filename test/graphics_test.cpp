@@ -2,6 +2,7 @@
 #include "../graphics.h"
 #include "game_fixture.hpp"
 #include "units_fixture.hpp"
+#include <utility>
 
 TEST(graphics_test, render_block_with_no_progress_is_empty) {
     wchar_t symbol = 0;
@@ -284,6 +285,55 @@ TEST_F(game_fixture, render_tile_shows_tile) {
     uint8_t style = '\x00';
     game->map[3][2] = tile_plains;
     ASSERT_TRUE(render_tile(game, 2, 3, 0, 0, false, &symbol, &style));
+    ASSERT_EQ(symbol, '"');
+    ASSERT_EQ(style, '\xa2');
+}
+
+namespace {
+std::pair<wchar_t, uint8_t> render_pixel_helper(const struct game* const game,
+                                                const grid_t x, const grid_t y,
+                                                const grid_t tile_x,
+                                                const grid_t tile_y) {
+    wchar_t symbol = 0;
+    uint8_t style = '\x00';
+    auto rendered =
+        render_pixel(game, x, y, tile_x, tile_y, game_attack_enabled(game),
+                     game_build_enabled(game), &symbol, &style);
+    assert(rendered);
+    return {symbol, style};
+}
+} // namespace
+
+TEST_F(game_fixture, render_pixel_shows_unit_health_bar) {
+    insert_unit({.health = health_max - 1});
+    const auto [symbol, style] = render_pixel_helper(game, 0, 0, 1, 3);
+    ASSERT_EQ(symbol, '9');
+    ASSERT_EQ(style, '\x0a');
+}
+
+TEST_F(game_fixture, render_pixel_shows_capture_progress) {
+    insert_unit({.capture_progress = capture_completion - 1});
+    const auto [symbol, style] = render_pixel_helper(game, 0, 1, 1, 0);
+    ASSERT_EQ(symbol, '9');
+    ASSERT_EQ(style, '\x0a');
+}
+
+TEST_F(game_fixture, render_pixel_shows_selection) {
+    const auto [symbol, style] = render_pixel_helper(game, 0, 0, 0, 0);
+    ASSERT_EQ(symbol, L'┌');
+    ASSERT_EQ(style, '\xe0');
+}
+
+TEST_F(game_fixture, render_pixel_shows_unit) {
+    insert_unit({.enabled = true});
+    const auto [symbol, style] = render_pixel_helper(game, 0, 0, 2, 1);
+    ASSERT_EQ(symbol, 'o');
+    ASSERT_EQ(style, '\xf4');
+}
+
+TEST_F(game_fixture, render_pixel_shows_tile) {
+    game->map[3][2] = tile_plains;
+    const auto [symbol, style] = render_pixel_helper(game, 2, 3, 0, 0);
     ASSERT_EQ(symbol, '"');
     ASSERT_EQ(style, '\xa2');
 }
