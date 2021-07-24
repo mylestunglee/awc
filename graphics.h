@@ -6,8 +6,6 @@
 
 void render(const struct game* const, const bool, const bool);
 
-void reset_style(void);
-
 void graphics_init(void);
 
 #ifdef expose_graphics_internals

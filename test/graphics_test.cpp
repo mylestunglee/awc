@@ -260,7 +260,7 @@ TEST(graphics_test, render_highlight_shows_accessible_and_attackable_style) {
     ASSERT_EQ(style, '\xd0');
 }
 
-TEST_F(game_fixture, render_attack_arrows_show_arrows_on_even_subtile) {
+TEST_F(game_fixture, render_attack_arrows_show_arrows_on_even_pixel) {
     game->x = 5;
     game->y = 3;
     game->prev_x = 6;
@@ -272,7 +272,7 @@ TEST_F(game_fixture, render_attack_arrows_show_arrows_on_even_subtile) {
     ASSERT_EQ(style, '\x92');
 }
 
-TEST_F(game_fixture, render_attack_arrows_pads_odd_subtile) {
+TEST_F(game_fixture, render_attack_arrows_pads_odd_pixel) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     render_attack_arrows(game, 3, &symbol, &style);

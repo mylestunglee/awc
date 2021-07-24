@@ -371,6 +371,7 @@ bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
         *style = tile_styles[tile];
         *symbol = tile_symbols[tile];
     } else {
+        // If texture is transparent, texture is highlightable
         highlightable = decode_texture(
             capturable_textures[tile - terrian_capacity][tile_y][tile_x / 2],
             tile_x % 2 != 0, game->territory[y][x], symbol, style);
@@ -388,12 +389,74 @@ bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
     return true;
 }
 
+static bool render_pixel(const struct game* const game, const grid_t x,
+                         const grid_t y, const grid_t tile_x,
+                         const grid_t tile_y, const bool attack_enabled,
+                         const bool build_enabled, wchar_t* const symbol,
+                         uint8_t* const style) {
+    return render_unit_health_bar(&game->units, x, y, tile_x, tile_y, symbol,
+                                  style) ||
+           render_capture_progress_bar(&game->units, x, y, tile_x, tile_y,
+                                       symbol, style) ||
+           render_selection(game, x, y, tile_x, tile_y, attack_enabled,
+                            build_enabled, symbol, style) ||
+           render_unit(&game->units, x, y, tile_x, tile_y, symbol, style) ||
+           render_tile(game, x, y, tile_x, tile_y, attack_enabled, symbol,
+                       style);
+}
+
+static void apply_style(const uint8_t style, const uint8_t prev_style) {
+    if (style != prev_style) {
+        const uint8_t forecolour = style >> 4;
+        const uint8_t backcolour = style & 15;
+        const uint8_t prev_forecolour = prev_style >> 4;
+        const uint8_t prev_backcolour = prev_style & 15;
+        bool carry = false;
+
+        wprintf(L"%c[", '\x1b');
+        if (forecolour != prev_forecolour) {
+            carry = true;
+            if (forecolour < 8)
+                wprintf(L"%u", forecolour + 30);
+            else
+                wprintf(L"%u", forecolour + 82);
+        }
+        if (backcolour != prev_backcolour) {
+            if (carry)
+                wprintf(L";");
+            if (backcolour < 8)
+                wprintf(L"%u", backcolour + 40);
+            else
+                wprintf(L"%u", backcolour + 92);
+        }
+        wprintf(L"m");
+    }
+}
+
+// Returns previous style
+static uint8_t apply_pixel(const struct game* const game, const grid_t x,
+                           const grid_t y, const grid_t tile_x,
+                           const grid_t tile_y, const bool attack_enabled,
+                           const bool build_enabled, const uint8_t prev_style) {
+    wchar_t symbol;
+    uint8_t style;
+    const bool rendered =
+        render_pixel(game, x, y, tile_x, tile_y, attack_enabled, build_enabled,
+                     &symbol, &style);
+    assert(rendered);
+    apply_style(style, prev_style);
+    wprintf(L"%lc", symbol);
+    return style;
+}
+
 static void reset_cursor() {
     wprintf(L"\033[0;0H");
     wprintf(L"\033[2J\033[1;1H");
 }
 
 static void reset_black() { wprintf(L"%c[30;40m", '\x1b'); }
+
+static void reset_style() { wprintf(L"%c[0m", '\x1b'); }
 
 static void print_normal_text(const struct game* const game) {
     wprintf(
@@ -441,36 +504,6 @@ static void print_text(const struct game* const game, const bool attack_enabled,
         print_normal_text(game);
 }
 
-static void render_pixel(wchar_t symbol, const uint8_t style,
-                         const uint8_t prev_style) {
-    if (style != prev_style) {
-        const uint8_t forecolour = style >> 4;
-        const uint8_t backcolour = style & 15;
-        const uint8_t prev_forecolour = prev_style >> 4;
-        const uint8_t prev_backcolour = prev_style & 15;
-        bool carry = false;
-
-        wprintf(L"%c[", '\x1b');
-        if (forecolour != prev_forecolour) {
-            carry = true;
-            if (forecolour < 8)
-                wprintf(L"%u", forecolour + 30);
-            else
-                wprintf(L"%u", forecolour + 82);
-        }
-        if (backcolour != prev_backcolour) {
-            if (carry)
-                wprintf(L";");
-            if (backcolour < 8)
-                wprintf(L"%u", backcolour + 40);
-            else
-                wprintf(L"%u", backcolour + 92);
-        }
-        wprintf(L"m");
-    }
-    wprintf(L"%lc", symbol);
-}
-
 void render(const struct game* const game, const bool attack_enabled,
             const bool build_enabled) {
     reset_cursor();
@@ -489,27 +522,10 @@ void render(const struct game* const game, const bool attack_enabled,
             reset_black();
             uint8_t prev_style = '\x00';
             for (grid_t x = screen_left; x != screen_right; ++x) {
-                for (uint8_t tile_x = 0; tile_x < tile_width; ++tile_x) {
-                    wchar_t symbol;
-                    uint8_t style;
-
-                    if (render_unit_health_bar(&game->units, x, y, tile_x,
-                                               tile_y, &symbol, &style) ||
-                        render_capture_progress_bar(&game->units, x, y, tile_x,
-                                                    tile_y, &symbol, &style) ||
-                        render_selection(game, x, y, tile_x, tile_y,
-                                         attack_enabled, build_enabled, &symbol,
-                                         &style) ||
-                        render_unit(&game->units, x, y, tile_x, tile_y, &symbol,
-                                    &style) ||
-                        render_tile(game, x, y, tile_x, tile_y, attack_enabled,
-                                    &symbol, &style)) {
-                        render_pixel(symbol, style, prev_style);
-                        prev_style = style;
-                    } else {
-                        assert(false);
-                    }
-                }
+                for (uint8_t tile_x = 0; tile_x < tile_width; ++tile_x)
+                    prev_style =
+                        apply_pixel(game, x, y, tile_x, tile_y, attack_enabled,
+                                    build_enabled, prev_style);
             }
             reset_style();
             wprintf(L"\n");
@@ -520,7 +536,5 @@ void render(const struct game* const game, const bool attack_enabled,
 }
 
 #include <stdlib.h>
-
-void reset_style() { wprintf(L"%c[0m", '\x1b'); }
 
 void graphics_init() { setlocale(LC_CTYPE, ""); }
