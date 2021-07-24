@@ -2,6 +2,7 @@
 #include "console.h"
 #include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <wchar.h>
 
 #define tile_width 8
@@ -77,6 +78,8 @@ const static uint8_t
                             {'\x00', '\xb1', '\x1c', '\x00'},
                             {'\xb1', '\x11', '\x11', '\x1c'},
                             {'\xb1', '\x11', '\x11', '\x1c'}}};
+
+void graphics_init() { setlocale(LC_CTYPE, ""); }
 
 void render_block(uint32_t progress, uint32_t completion, const grid_t tile_x,
                   wchar_t* const symbol, uint8_t* const style) {
@@ -503,7 +506,7 @@ static void print_text(const struct game* const game, const bool attack_enabled,
         print_normal_text(game);
 }
 
-void render(const struct game* const game, const bool attack_enabled,
+void graphics_render(const struct game* const game, const bool attack_enabled,
             const bool build_enabled) {
     reset_cursor();
 
@@ -533,7 +536,3 @@ void render(const struct game* const game, const bool attack_enabled,
 
     print_text(game, attack_enabled, build_enabled);
 }
-
-#include <stdlib.h>
-
-void graphics_init() { setlocale(LC_CTYPE, ""); }

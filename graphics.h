@@ -4,9 +4,9 @@
 #include "game.h"
 #include <assert.h>
 
-void render(const struct game* const, const bool, const bool);
-
 void graphics_init(void);
+
+void graphics_render(const struct game* const, const bool, const bool);
 
 #ifdef expose_graphics_internals
 
