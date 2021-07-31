@@ -83,7 +83,6 @@ void action_attack(struct game* const game) {
     assert(game->labels[game->y][game->x] & attackable_bit);
     assert(game->dirty_labels);
     grid_clear_labels(game);
-    attacker->enabled = false;
     const health_t attacker_pre_move_health = attacker->health;
 
     // If unit is direct, move to attack
@@ -92,6 +91,7 @@ void action_attack(struct game* const game) {
         action_move_selected(game, game->prev_x, game->prev_y);
         attacker = units_get_selected(&game->units);
     }
+    attacker->enabled = false;
 
     const health_t attacker_post_move_health = attacker->health;
     attacker->health = attacker_pre_move_health;
