@@ -15,7 +15,8 @@ static void add_distribution_rows(glp_prob* const problem,
                                   int* const row_offset) {
     for (model_t model = 0; model < model_capacity; ++model) {
         char name[symbolic_name_length];
-        snprintf(name, symbolic_name_length, "u_" model_format, model + 1);
+        snprintf(name, symbolic_name_length, "u_" model_format,
+                 (model_t)(model + 1));
         glp_set_row_name(problem, *row_offset, name);
         glp_set_row_bnds(problem, *row_offset, GLP_DB, 0.0, 1.0);
         ++*row_offset;
@@ -30,7 +31,8 @@ add_allocation_rows(glp_prob* const problem,
     for (tile_t capturable = 0; capturable < capturable_capacity;
          ++capturable) {
         char name[symbolic_name_length];
-        snprintf(name, symbolic_name_length, "v_" tile_format, capturable + 1);
+        snprintf(name, symbolic_name_length, "v_" tile_format,
+                 (tile_t)(capturable + 1));
         glp_set_row_name(problem, *row_offset, name);
         glp_set_row_bnds(problem, *row_offset, GLP_UP, 0.0,
                          (double)capturables[capturable]);
@@ -48,7 +50,8 @@ static void add_cost_row(glp_prob* const problem, const gold_t budget,
 static void add_surplus_rows(glp_prob* const problem, int* const row_offset) {
     for (model_t model = 0; model < model_capacity; ++model) {
         char name[symbolic_name_length];
-        snprintf(name, symbolic_name_length, "s_" model_format, model + 1);
+        snprintf(name, symbolic_name_length, "s_" model_format,
+                 (model_t)(model + 1));
         glp_set_row_name(problem, *row_offset, name);
         glp_set_row_bnds(problem, *row_offset, GLP_LO, 0.0, 0.0);
         ++*row_offset;
@@ -78,7 +81,8 @@ static void add_distribution_columns(
         for (model_t n = 0; n < model_capacity; ++n) {
             char name[symbolic_name_length];
             snprintf(name, symbolic_name_length,
-                     "x_{" model_format "," model_format "}", m + 1, n + 1);
+                     "x_{" model_format "," model_format "}", (model_t)(m + 1),
+                     (model_t)(n + 1));
             glp_set_col_name(problem, *column_offset, name);
             glp_set_col_bnds(problem, *column_offset, GLP_DB, 0.0, 1.0);
             ++*column_offset;
@@ -96,7 +100,8 @@ static void add_allocation_columns(
         for (model_t n = 0; n < model_capacity; ++n) {
             char name[symbolic_name_length];
             snprintf(name, symbolic_name_length,
-                     "y_{" model_format "," model_format "}", m + 1, n + 1);
+                     "y_{" model_format "," model_format "}", (model_t)(m + 1),
+                     (model_t)(n + 1));
             glp_set_col_name(problem, *column_offset, name);
             glp_set_col_bnds(problem, *column_offset, GLP_LO, 0.0, 0.0);
             glp_set_col_kind(problem, *column_offset, GLP_IV);

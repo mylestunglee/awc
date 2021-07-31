@@ -507,7 +507,7 @@ static void print_text(const struct game* const game, const bool attack_enabled,
 }
 
 void graphics_render(const struct game* const game, const bool attack_enabled,
-            const bool build_enabled) {
+                     const bool build_enabled) {
     reset_cursor();
 
     int console_width, console_height;

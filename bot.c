@@ -269,22 +269,27 @@ static bool find_nearest_target(struct game* const game,
                                 grid_t* const nearest_x,
                                 grid_t* const nearest_y) {
 
-    grid_t attackee_target_x, attackee_target_y, capturable_x, capturable_y;
+    grid_t attackee_target_x, attackee_target_y;
     const energy_t attackee_target_energy = find_nearest_attackee_target(
         game, unit, &attackee_target_x, &attackee_target_y);
 
     energy_t capturable_energy = 0;
 
-    if (unit->model < unit_capturable_upper_bound)
+    if (unit->model < unit_capturable_upper_bound) {
+        grid_t capturable_x, capturable_y;
         capturable_energy =
             find_nearest_capturable(game, &capturable_x, &capturable_y);
 
-    if (attackee_target_energy > capturable_energy) {
+        if (attackee_target_energy > capturable_energy) {
+            *nearest_x = attackee_target_x;
+            *nearest_y = attackee_target_y;
+        } else {
+            *nearest_x = capturable_x;
+            *nearest_y = capturable_y;
+        }
+    } else {
         *nearest_x = attackee_target_x;
         *nearest_y = attackee_target_y;
-    } else {
-        *nearest_x = capturable_x;
-        *nearest_y = capturable_y;
     }
 
     return attackee_target_energy > 0 || capturable_energy > 0;

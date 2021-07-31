@@ -26,6 +26,9 @@ runtest:
 format:
 	clang-format -style=file -i *.c *.h test/*.cpp
 
+tidy:
+	clang-tidy -header-filter=.* -system-headers -checks=-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling *.c -fix --
+
 doc:
 	doxygen Doxyfile
 
