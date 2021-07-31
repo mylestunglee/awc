@@ -44,15 +44,11 @@ bool game_build_enabled(const struct game* const game) {
            !units_has_selection(&game->units);
 }
 
-static void game_postload(struct game* const game) {
-    grid_correct(game->territory, game->map);
-    grid_compute_incomes(game->territory, game->incomes);
-}
-
 bool game_load(struct game* const game, const char* const filename) {
     game_initialise(game);
     const bool error = file_load(game, filename);
-    game_postload(game);
+    grid_correct(game->territory, game->map);
+    grid_compute_incomes(game->territory, game->incomes);
     return error;
 }
 
@@ -81,7 +77,7 @@ bool game_attack_enabled(const struct game* const game) {
     // 3. Selected tile is attackable, which implies:
     //     a. Selected unit can attack with positive damage
     //     b. Attacker and attackee are in different teams
-    return game->units.selected != null_unit &&
+    return units_has_selection(&game->units) &&
            (models_min_range[units_const_get_by(&game->units,
                                                 game->units.selected)
                                  ->model] ||

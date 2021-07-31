@@ -83,6 +83,7 @@ const static energy_t unit_movement_ranges[model_capacity] = {
 #define tile_mountain 3
 #define tile_bridge 9
 #define tile_city 10
+#define tile_factory 11
 #define tile_hq 14
 
 const static movement_t unit_movement_types[model_capacity] = {
