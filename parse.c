@@ -115,11 +115,11 @@ bool parse_self_destruct_unit(struct game* const game, const char input) {
 }
 
 bool parse_space(struct game* const game, const char input,
-                 const bool attack_enabled) {
+                 const bool attackable) {
     if (input != ' ')
         return false;
 
-    if (attack_enabled) {
+    if (attackable) {
         action_attack(game);
         return true;
     }
@@ -127,8 +127,8 @@ bool parse_space(struct game* const game, const char input,
     return false;
 }
 
-bool parse_command(struct game* const game, const char input,
-                   bool attack_enabled, bool build_enabled) {
+bool parse_command(struct game* const game, const char input, bool attackable,
+                   bool build_enabled) {
 
     if (input == 'q')
         return true;
@@ -156,7 +156,7 @@ bool parse_command(struct game* const game, const char input,
     if (parse_file(game, input))
         return false;
 
-    if (parse_space(game, input, attack_enabled))
+    if (parse_space(game, input, attackable))
         return false;
 
     if (input == ' ' && action_select(game))

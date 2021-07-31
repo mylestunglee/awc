@@ -297,8 +297,8 @@ std::pair<wchar_t, uint8_t> render_pixel_helper(const struct game* const game,
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     auto rendered =
-        render_pixel(game, x, y, tile_x, tile_y, game_attack_enabled(game),
-                     game_build_enabled(game), &symbol, &style);
+        render_pixel(game, x, y, tile_x, tile_y, game_attackable(game),
+                     game_buildable(game), &symbol, &style);
     assert(rendered);
     return {symbol, style};
 }

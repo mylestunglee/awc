@@ -27,8 +27,8 @@ void game_initialise(struct game* const game) {
     game->dirty_labels = false;
 }
 
-bool game_build_enabled(const struct game* const game) {
-    // The state is build enabled iff:
+bool game_buildable(const struct game* const game) {
+    // The state is buildable iff:
     // 1. The player owns the selected capturable
     // 2. There is no unit on the tile
     // 3. The capturable has buildable units
@@ -70,8 +70,8 @@ bool game_select_next_unit(struct game* const game) {
     return true;
 }
 
-bool game_attack_enabled(const struct game* const game) {
-    // The state is attack enabled iff:
+bool game_attackable(const struct game* const game) {
+    // The state is attackable iff:
     // 1. A unit is selected
     // 2. Previous selected tile is accessible if direct attack
     // 3. Selected tile is attackable, which implies:
