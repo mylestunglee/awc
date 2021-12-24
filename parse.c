@@ -150,12 +150,14 @@ bool parse_command(struct game* const game, const char input, bool attackable,
     if (parse_surrender(game, input))
         return false;
 
+    // TOOD: inline build_enabled into parse_build
     if (build_enabled && parse_build(game, input))
         return false;
 
     if (parse_file(game, input))
         return false;
 
+    // TODO: rename to parse_attack
     if (parse_space(game, input, attackable))
         return false;
 
