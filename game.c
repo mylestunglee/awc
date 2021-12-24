@@ -52,14 +52,32 @@ bool game_load(struct game* const game, const char* const filename) {
     return error;
 }
 
-// Selects the next enabled unit of the current turn, returns true iff unit was
-// selected
-// TODO: implement when a hovering over a unit
+const struct unit* find_next_unit(const struct game* const game) {
+    const struct unit* const curr =
+        units_const_get_at(&game->units, game->x, game->y);
+
+    if (!curr || curr->player != game->turn) {
+        const struct unit* next = units_const_get_first(&game->units, game->turn);
+        while (next && !next->enabled)
+            next = units_const_get_next(&game->units, next);
+        return next;
+    } else {
+        assert(curr && curr->player == game->turn);
+        const struct unit* next = units_const_get_next_cyclic(&game->units, curr);
+        while (next != curr && !next->enabled)
+            next = units_const_get_next_cyclic(&game->units, next);
+
+        if (next == curr)
+            return NULL;
+        else
+            return next;
+    }
+}
+
+// Selects the next enabled unit, returns unit was selected
 bool game_select_next_unit(struct game* const game) {
-    const struct unit* const unit =
-        units_const_get_first(&game->units, game->turn);
-    if (!unit)
-        return false;
+    const struct unit* const unit = find_next_unit(game);
+    assert(unit->enabled);
 
     game->x = unit->x;
     game->y = unit->y;

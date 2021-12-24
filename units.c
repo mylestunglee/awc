@@ -225,6 +225,15 @@ const struct unit* units_const_get_next(const struct units* const units,
     return units_const_get_by_safe(units, units->nexts[index]);
 }
 
+const struct unit* units_const_get_next_cyclic(const struct units* const units,
+                                               const struct unit* const unit) {
+    const struct unit* const next = units_const_get_next(units, unit);
+    if (next == NULL)
+        return units_const_get_by(units, units->firsts[unit->player]);
+    else
+        return next;
+}
+
 struct unit* units_get_selected(struct units* const units) {
     return units_get_by(units, units->selected);
 }

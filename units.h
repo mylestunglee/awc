@@ -47,6 +47,8 @@ const struct unit* units_const_get_first(const struct units* const,
                                          const player_t);
 const struct unit* units_const_get_next(const struct units* const,
                                         const struct unit* const);
+const struct unit* units_const_get_next_cyclic(const struct units* const,
+                                               const struct unit* const);
 const struct unit* units_const_get_by(const struct units* const, const unit_t);
 struct unit* units_get_selected(struct units* const);
 const struct unit* units_const_get_selected(const struct units* const);
