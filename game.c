@@ -83,7 +83,7 @@ const struct unit* find_next_unit(const struct game* const game) {
 }
 
 // Hovers the next enabled unit, returns unit was selected
-bool hover_next_unit(struct game* const game) {
+bool game_hover_next_unit(struct game* const game) {
     const struct unit* const unit = find_next_unit(game);
     if (!unit)
         return false;
