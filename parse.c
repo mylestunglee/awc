@@ -96,7 +96,7 @@ bool parse_surrender(struct game* const game, const char input) {
 }
 
 bool parse_select_next_unit(struct game* const game, const char input) {
-    return input == 'm' && hover_next_unit(game) && action_deselect(game);
+    return input == 'm' && hover_next_unit(game);
 }
 
 bool parse_build(struct game* const game, const char input) {
@@ -170,8 +170,10 @@ bool parse_command(struct game* const game, const char input, bool attackable,
     if (input == ' ' && action_move(game))
         return false;
 
-    if (input == ' ' && action_deselect(game))
+    if (input == ' ') {
+        game_deselect(game);
         return false;
+    }
 
     return false;
 }

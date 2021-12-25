@@ -167,7 +167,7 @@ bool action_move(struct game* const game) {
         if (is_capture_progressable(game) &&
             units_update_capture_progress(&game->units, capture_progress))
             action_capture(game);
-        action_deselect(game);
+        game_deselect(game);
         return true;
     }
     return false;
@@ -179,7 +179,7 @@ bool action_self_destruct_selection(struct game* const game) {
 
     units_delete(&game->units, game->units.selected);
     assert(game->dirty_labels);
-    action_deselect(game);
+    game_deselect(game);
     return true;
 }
 
@@ -197,12 +197,6 @@ bool action_surrender(struct game* const game) {
 
     game_remove_player(game, game->turn);
     turn_next(game);
-    return true;
-}
-
-bool action_deselect(struct game* const game) {
-    units_clear_selection(&game->units);
-    grid_clear_labels(game);
     return true;
 }
 

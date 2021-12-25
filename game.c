@@ -52,6 +52,11 @@ bool game_load(struct game* const game, const char* const filename) {
     return error;
 }
 
+void game_deselect(struct game* const game) {
+    units_clear_selection(&game->units);
+    grid_clear_labels(game);
+}
+
 const struct unit* find_next_unit(const struct game* const game) {
     const struct unit* const curr =
         units_const_get_at(&game->units, game->x, game->y);
@@ -77,7 +82,7 @@ const struct unit* find_next_unit(const struct game* const game) {
     }
 }
 
-// Selects the next enabled unit, returns unit was selected
+// Hovers the next enabled unit, returns unit was selected
 bool hover_next_unit(struct game* const game) {
     const struct unit* const unit = find_next_unit(game);
     if (!unit)
@@ -87,6 +92,8 @@ bool hover_next_unit(struct game* const game) {
 
     game->x = unit->x;
     game->y = unit->y;
+
+    game_deselect(game);
 
     return true;
 }

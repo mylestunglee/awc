@@ -29,7 +29,7 @@ bool game_load(struct game* const, const char* const);
 
 void game_simulate_attack(const struct game* const, health_t* const,
                           health_t* const);
-
+void game_deselect(struct game* const game);
 bool hover_next_unit(struct game* const);
 void game_handle_unit_selection(struct game* const);
 bool game_attackable(const struct game* const);

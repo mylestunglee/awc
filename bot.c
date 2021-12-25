@@ -509,7 +509,7 @@ static void build_units(struct game* const game) {
 }
 
 void bot_play(struct game* const game) {
-    action_deselect(game);
+    game_deselect(game);
     interact_units(game);
     build_units(game);
 }
