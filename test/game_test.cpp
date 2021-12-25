@@ -60,12 +60,31 @@ TEST_F(game_fixture, find_next_unit_returns_null_when_no_units) {
     ASSERT_FALSE(find_next_unit(game));
 }
 
+TEST_F(game_fixture, game_hover_next_unit_returns_true_when_hovering) {
+    insert_unit({.x = 2, .enabled = true});
+    ASSERT_TRUE(game_hover_next_unit(game));
+    ASSERT_EQ(game->x, 2);
+}
+
+TEST_F(game_fixture, game_hover_next_unit_returns_false_when_not_hovering) {
+    ASSERT_FALSE(game_hover_next_unit(game));
+}
+
 TEST_F(game_fixture, game_attackable_returns_true_when_directly_attackable) {
     insert_unit({});
     units_select_at(&game->units, 0, 0);
     game->prev_x = 2;
     game->x = 3;
     game->labels[0][2] = accessible_bit;
+    game->labels[0][3] = attackable_bit;
+    ASSERT_TRUE(game_attackable(game));
+}
+
+TEST_F(game_fixture, game_attackable_returns_true_when_indirectly_attackable) {
+    constexpr model_t artillery = 5;
+    insert_unit({.model = artillery});
+    units_select_at(&game->units, 0, 0);
+    game->x = 3;
     game->labels[0][3] = attackable_bit;
     ASSERT_TRUE(game_attackable(game));
 }

@@ -103,20 +103,20 @@ bool game_attackable(const struct game* const game) {
     // 1. A unit is selected
     // 2. Previous selected tile is accessible if direct attack
     // 3. Selected tile is attackable, which implies:
-    //     a. Selected unit can attack with positive damage
+    //     a. Can attack with positive damage
     //     b. Attacker and attackee are in different teams
+    //     c. Attackee in attacker's range
     return units_has_selection(&game->units) &&
-           (models_min_range[units_const_get_by(&game->units,
-                                                game->units.selected)
+           (models_min_range[units_const_get_selected(&game->units)
                                  ->model] ||
             game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
            game->labels[game->y][game->x] & attackable_bit;
 }
 
 // Calculate damage when attacker attacks attackee
-static health_t calc_damage(const struct game* const game,
-                            const struct unit* const attacker,
-                            const struct unit* const attackee) {
+health_t calc_damage(const struct game* const game,
+                     const struct unit* const attacker,
+                     const struct unit* const attackee) {
 
     const tile_t tile = game->map[attackee->y][attackee->x];
     const uint8_t movement_type = unit_movement_types[attackee->model];
