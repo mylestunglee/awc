@@ -78,15 +78,15 @@ const struct unit* find_next_unit(const struct game* const game) {
 }
 
 // Selects the next enabled unit, returns unit was selected
-bool game_select_next_unit(struct game* const game) {
+bool hover_next_unit(struct game* const game) {
     const struct unit* const unit = find_next_unit(game);
+    if (!unit)
+        return false;
+
     assert(unit->enabled);
 
     game->x = unit->x;
     game->y = unit->y;
-
-    units_clear_selection(&game->units);
-    grid_clear_labels(game);
 
     return true;
 }

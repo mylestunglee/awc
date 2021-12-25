@@ -65,5 +65,5 @@ void turn_next(struct game* const game) {
         start_turn(game);
     } while (exists_alive_non_bot(game) && game_is_bot(game, game->turn));
 
-    game_select_next_unit(game);
+    hover_next_unit(game);
 }
