@@ -128,8 +128,7 @@ bool game_attackable(const struct game* const game) {
     //     b. Attacker and attackee are in different teams
     //     c. Attackee in attacker's range
     return units_has_selection(&game->units) &&
-           (models_min_range[units_const_get_selected(&game->units)
-                                 ->model] ||
+           (models_min_range[units_const_get_selected(&game->units)->model] ||
             game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
            game->labels[game->y][game->x] & attackable_bit;
 }

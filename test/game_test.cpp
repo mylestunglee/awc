@@ -85,6 +85,12 @@ TEST_F(game_fixture, game_buildable_returns_true_when_buildable) {
     ASSERT_TRUE(game_buildable(game));
 }
 
-TEST_F(game_fixture, game_buildable_returns_false_when_unbuildable) {
-    ASSERT_FALSE(game_buildable(game));
+TEST_F(game_fixture, calc_damage_between_two_infantry) {
+    constexpr model_t infantry = 0;
+    insert_unit({.health = health_max, .model = infantry, .x = 0});
+    insert_unit({.health = health_max, .model = infantry, .x = 1});
+    game->map[0][1] = tile_plains;
+    ASSERT_EQ(calc_damage(game, units_const_get_at(&game->units, 0, 0),
+                          units_const_get_at(&game->units, 1, 0)),
+              static_cast<health_t>(55.0 * 0.9 * 255.0 / 100.0));
 }

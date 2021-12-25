@@ -40,6 +40,8 @@ void game_remove_player(struct game* const, const player_t);
 #ifdef expose_game_internals
 
 const struct unit* find_next_unit(const struct game* const);
+health_t calc_damage(const struct game* const, const struct unit* const,
+                     const struct unit* const);
 
 #endif
 
