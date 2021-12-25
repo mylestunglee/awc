@@ -1,3 +1,4 @@
+#define expose_game_internals
 #include "../game.h"
 #include "game_fixture.hpp"
 #include <cstdio>
@@ -28,7 +29,36 @@ TEST_F(game_fixture, game_load_sets_map) {
     ASSERT_EQ(game->map[0][0], tile_plains);
 }
 
-// TODO: implement select next unit
+TEST_F(game_fixture, find_next_unit_returns_first_enabled_unit_while_hovering) {
+    insert_unit({.x = 2, .enabled = true});
+    insert_unit({.x = 3, .enabled = false});
+    insert_unit({.x = 5, .enabled = true});
+    game->x = 5;
+    auto unit = find_next_unit(game);
+    ASSERT_TRUE(unit);
+    ASSERT_EQ(unit->x, 2);
+}
+
+TEST_F(game_fixture, find_next_unit_returns_null_when_no_more_enabled_units) {
+    insert_unit({.x = 2, .enabled = false});
+    game->x = 2;
+    auto unit = find_next_unit(game);
+    ASSERT_FALSE(unit);
+}
+
+TEST_F(game_fixture,
+       find_next_unit_returns_first_enabled_unit_while_not_hovering) {
+    insert_unit({.x = 2, .enabled = false});
+    insert_unit({.x = 3, .enabled = true});
+    insert_unit({.x = 5, .enabled = false});
+    auto unit = find_next_unit(game);
+    ASSERT_TRUE(unit);
+    ASSERT_EQ(unit->x, 3);
+}
+
+TEST_F(game_fixture, find_next_unit_returns_null_when_no_units) {
+    ASSERT_FALSE(find_next_unit(game));
+}
 
 TEST_F(game_fixture, game_attackable_returns_true_when_directly_attackable) {
     insert_unit({});

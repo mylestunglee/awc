@@ -30,7 +30,6 @@ bool game_load(struct game* const, const char* const);
 void game_simulate_attack(const struct game* const, health_t* const,
                           health_t* const);
 
-const struct unit* find_next_unit(const struct game* const);
 bool game_select_next_unit(struct game* const);
 void game_handle_unit_selection(struct game* const);
 bool game_attackable(const struct game* const);
@@ -39,5 +38,11 @@ bool game_is_alive(const struct game* const, const player_t);
 bool game_is_bot(const struct game* const, const player_t);
 bool game_is_friendly(const struct game* const, const player_t);
 void game_remove_player(struct game* const, const player_t);
+
+#ifdef expose_game_internals
+
+const struct unit* find_next_unit(const struct game* const);
+
+#endif
 
 #endif

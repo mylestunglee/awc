@@ -55,22 +55,25 @@ bool game_load(struct game* const game, const char* const filename) {
 const struct unit* find_next_unit(const struct game* const game) {
     const struct unit* const curr =
         units_const_get_at(&game->units, game->x, game->y);
+    if (curr && curr->player == game->turn) {
+        const struct unit* next = curr;
 
-    if (!curr || curr->player != game->turn) {
-        const struct unit* next = units_const_get_first(&game->units, game->turn);
-        while (next && !next->enabled)
-            next = units_const_get_next(&game->units, next);
-        return next;
-    } else {
-        assert(curr && curr->player == game->turn);
-        const struct unit* next = units_const_get_next_cyclic(&game->units, curr);
-        while (next != curr && !next->enabled)
+        do {
             next = units_const_get_next_cyclic(&game->units, next);
 
-        if (next == curr)
-            return NULL;
-        else
-            return next;
+            if (!next || next == curr)
+                return NULL;
+        } while (!next->enabled);
+
+        return next;
+    } else {
+        const struct unit* next =
+            units_const_get_first(&game->units, game->turn);
+
+        while (next && !next->enabled)
+            next = units_const_get_next(&game->units, next);
+
+        return next;
     }
 }
 
