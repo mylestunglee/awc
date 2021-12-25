@@ -4,19 +4,6 @@
 #include <cstdio>
 #include <fstream>
 
-TEST_F(game_fixture, game_buildable_returns_true_when_buildable) {
-    game->x = 2;
-    game->y = 3;
-    game->turn = 5;
-    game->territory[3][2] = 5;
-    game->map[3][2] = tile_factory;
-    ASSERT_TRUE(game_buildable(game));
-}
-
-TEST_F(game_fixture, game_buildable_returns_false_when_unbuildable) {
-    ASSERT_FALSE(game_buildable(game));
-}
-
 TEST_F(game_fixture, game_load_sets_map) {
     using namespace std;
     auto filename = "test_state.txt";
@@ -87,4 +74,17 @@ TEST_F(game_fixture, game_attackable_returns_true_when_indirectly_attackable) {
     game->x = 3;
     game->labels[0][3] = attackable_bit;
     ASSERT_TRUE(game_attackable(game));
+}
+
+TEST_F(game_fixture, game_buildable_returns_true_when_buildable) {
+    game->x = 2;
+    game->y = 3;
+    game->turn = 5;
+    game->territory[3][2] = 5;
+    game->map[3][2] = tile_factory;
+    ASSERT_TRUE(game_buildable(game));
+}
+
+TEST_F(game_fixture, game_buildable_returns_false_when_unbuildable) {
+    ASSERT_FALSE(game_buildable(game));
 }

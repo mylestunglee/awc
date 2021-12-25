@@ -27,23 +27,6 @@ void game_initialise(struct game* const game) {
     game->dirty_labels = false;
 }
 
-bool game_buildable(const struct game* const game) {
-    // The state is buildable iff:
-    // 1. The player owns the selected capturable
-    // 2. There is no unit on the tile
-    // 3. The capturable has buildable units
-    // 4. No unit is selected
-
-    if (game->territory[game->y][game->x] != game->turn)
-        return false;
-
-    const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
-
-    return !units_const_get_at(&game->units, game->x, game->y) &&
-           buildable_models[capturable] < buildable_models[capturable + 1] &&
-           !units_has_selection(&game->units);
-}
-
 bool game_load(struct game* const game, const char* const filename) {
     game_initialise(game);
     const bool error = file_load(game, filename);
@@ -98,21 +81,6 @@ bool game_hover_next_unit(struct game* const game) {
     return true;
 }
 
-bool game_attackable(const struct game* const game) {
-    // The state is attackable iff:
-    // 1. A unit is selected
-    // 2. Previous selected tile is accessible if direct attack
-    // 3. Selected tile is attackable, which implies:
-    //     a. Can attack with positive damage
-    //     b. Attacker and attackee are in different teams
-    //     c. Attackee in attacker's range
-    return units_has_selection(&game->units) &&
-           (models_min_range[units_const_get_selected(&game->units)
-                                 ->model] ||
-            game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
-           game->labels[game->y][game->x] & attackable_bit;
-}
-
 // Calculate damage when attacker attacks attackee
 health_t calc_damage(const struct game* const game,
                      const struct unit* const attacker,
@@ -149,6 +117,38 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
         *counter_damage = 0;
     else
         *counter_damage = calc_damage(game, &attackee, attacker);
+}
+
+bool game_attackable(const struct game* const game) {
+    // The state is attackable iff:
+    // 1. A unit is selected
+    // 2. Previous selected tile is accessible if direct attack
+    // 3. Selected tile is attackable, which implies:
+    //     a. Can attack with positive damage
+    //     b. Attacker and attackee are in different teams
+    //     c. Attackee in attacker's range
+    return units_has_selection(&game->units) &&
+           (models_min_range[units_const_get_selected(&game->units)
+                                 ->model] ||
+            game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
+           game->labels[game->y][game->x] & attackable_bit;
+}
+
+bool game_buildable(const struct game* const game) {
+    // The state is buildable iff:
+    // 1. The player owns the selected capturable
+    // 2. There is no unit on the tile
+    // 3. The capturable has buildable units
+    // 4. No unit is selected
+
+    if (game->territory[game->y][game->x] != game->turn)
+        return false;
+
+    const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
+
+    return !units_const_get_at(&game->units, game->x, game->y) &&
+           buildable_models[capturable] < buildable_models[capturable + 1] &&
+           !units_has_selection(&game->units);
 }
 
 // A player is alive iff:
