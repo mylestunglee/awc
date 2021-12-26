@@ -155,7 +155,7 @@ bool game_buildable(const struct game* const game) {
 // 2. The player has a HQ, implied by a positive income
 //    This holds because when a player loses their HQ, income is nullified
 bool game_is_alive(const struct game* const game, const player_t player) {
-    return game->units.firsts[player] != null_unit || game->incomes[player] > 0;
+    return units_is_owner(&game->units, player) || game->incomes[player] > 0;
 }
 
 bool game_is_bot(const struct game* const game, const player_t player) {

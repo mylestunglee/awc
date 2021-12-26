@@ -45,6 +45,8 @@ struct unit* units_get_first(struct units* const, const player_t);
 struct unit* units_get_next(struct units* const, const struct unit* const);
 const struct unit* units_const_get_first(const struct units* const,
                                          const player_t);
+bool units_is_owner(const struct units* const,
+                                         const player_t);
 const struct unit* units_const_get_next(const struct units* const,
                                         const struct unit* const);
 const struct unit* units_const_get_next_cyclic(const struct units* const,

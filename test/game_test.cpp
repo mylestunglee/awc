@@ -156,3 +156,17 @@ TEST_F(game_fixture, game_buildable_returns_true_when_buildable) {
 TEST_F(game_fixture, game_buildable_returns_false_at_void_tile) {
     ASSERT_FALSE(game_buildable(game));
 }
+
+TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_unit) {
+    insert_unit({});
+    ASSERT_TRUE(game_is_alive(game, game->turn));
+}
+
+TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_income) {
+    ++game->incomes[game->turn];
+    ASSERT_TRUE(game_is_alive(game, game->turn));
+}
+
+TEST_F(game_fixture, game_is_alive_returns_false_when_player_has_nothing) {
+    ASSERT_FALSE(game_is_alive(game, game->turn));
+}
