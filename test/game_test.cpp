@@ -57,34 +57,6 @@ TEST_F(game_fixture, game_hover_next_unit_returns_false_when_not_hovering) {
     ASSERT_FALSE(game_hover_next_unit(game));
 }
 
-TEST_F(game_fixture, game_attackable_returns_true_when_directly_attackable) {
-    insert_unit({});
-    units_select_at(&game->units, 0, 0);
-    game->prev_x = 2;
-    game->x = 3;
-    game->labels[0][2] = accessible_bit;
-    game->labels[0][3] = attackable_bit;
-    ASSERT_TRUE(game_attackable(game));
-}
-
-TEST_F(game_fixture, game_attackable_returns_true_when_indirectly_attackable) {
-    constexpr model_t artillery = 5;
-    insert_unit({.model = artillery});
-    units_select_at(&game->units, 0, 0);
-    game->x = 3;
-    game->labels[0][3] = attackable_bit;
-    ASSERT_TRUE(game_attackable(game));
-}
-
-TEST_F(game_fixture, game_buildable_returns_true_when_buildable) {
-    game->x = 2;
-    game->y = 3;
-    game->turn = 5;
-    game->territory[3][2] = 5;
-    game->map[3][2] = tile_factory;
-    ASSERT_TRUE(game_buildable(game));
-}
-
 TEST_F(game_fixture, calc_damage_between_two_infantry) {
     constexpr model_t infantry = 0;
     insert_unit({.health = health_max, .model = infantry, .x = 0});
@@ -147,4 +119,40 @@ TEST_F(game_fixture, game_simulate_attack_when_counter_attacking) {
     ASSERT_EQ(damage, calc_damage(game, units_const_get_at(&game->units, 2, 3),
                                   units_const_get_at(&game->units, 5, 7)));
     ASSERT_EQ(counter_damage, (health_max - damage) * damage / health_max);
+}
+
+TEST_F(game_fixture, game_attackable_returns_true_when_directly_attackable) {
+    insert_unit({});
+    units_select_at(&game->units, 0, 0);
+    game->prev_x = 2;
+    game->x = 3;
+    game->labels[0][2] = accessible_bit;
+    game->labels[0][3] = attackable_bit;
+    ASSERT_TRUE(game_attackable(game));
+}
+
+TEST_F(game_fixture, game_attackable_returns_true_when_indirectly_attackable) {
+    constexpr model_t artillery = 5;
+    insert_unit({.model = artillery});
+    units_select_at(&game->units, 0, 0);
+    game->x = 3;
+    game->labels[0][3] = attackable_bit;
+    ASSERT_TRUE(game_attackable(game));
+}
+
+TEST_F(game_fixture, game_attackable_returns_false_when_none_selected) {
+    ASSERT_FALSE(game_attackable(game));
+}
+
+TEST_F(game_fixture, game_buildable_returns_true_when_buildable) {
+    game->x = 2;
+    game->y = 3;
+    game->turn = 5;
+    game->territory[3][2] = 5;
+    game->map[3][2] = tile_factory;
+    ASSERT_TRUE(game_buildable(game));
+}
+
+TEST_F(game_fixture, game_buildable_returns_false_at_void_tile) {
+    ASSERT_FALSE(game_buildable(game));
 }
