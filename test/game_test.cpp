@@ -1,4 +1,5 @@
 #define expose_game_internals
+#include "../bitarray.h"
 #include "../game.h"
 #include "game_fixture.hpp"
 #include <cstdio>
@@ -131,7 +132,8 @@ TEST_F(game_fixture, game_is_attackable_returns_true_when_directly_attackable) {
     ASSERT_TRUE(game_is_attackable(game));
 }
 
-TEST_F(game_fixture, game_is_attackable_returns_true_when_indirectly_attackable) {
+TEST_F(game_fixture,
+       game_is_attackable_returns_true_when_indirectly_attackable) {
     constexpr model_t artillery = 5;
     insert_unit({.model = artillery});
     units_select_at(&game->units, 0, 0);
@@ -169,4 +171,34 @@ TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_income) {
 
 TEST_F(game_fixture, game_is_alive_returns_false_when_player_has_nothing) {
     ASSERT_FALSE(game_is_alive(game, game->turn));
+}
+
+TEST_F(game_fixture, game_is_bot_returns_true_when_bot) {
+    bitarray_set(game->bots, game->turn);
+    ASSERT_TRUE(game_is_bot(game, game->turn));
+}
+
+TEST_F(game_fixture, game_is_bot_returns_false_when_not_bot) {
+    ASSERT_FALSE(game_is_bot(game, game->turn));
+}
+
+TEST_F(game_fixture, game_is_friendly_returns_true_when_itself) {
+    ASSERT_TRUE(game_is_friendly(game, 0));
+}
+
+TEST_F(game_fixture, game_is_friendly_returns_false_when_other) {
+    ASSERT_FALSE(game_is_friendly(game, 1));
+}
+
+TEST_F(game_fixture, game_remove_player_makes_player_unalive) {
+    game->turn = 2;
+    insert_unit({.player = game->turn});
+    game->territory[5][3] = game->turn;
+    ++game->incomes[game->turn];
+
+    game_remove_player(game, game->turn);
+
+    ASSERT_FALSE(units_is_owner(&game->units, game->turn));
+    ASSERT_EQ(game->territory[5][3], null_player);
+    ASSERT_EQ(game->incomes[game->turn], 0);
 }

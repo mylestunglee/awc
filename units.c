@@ -218,8 +218,7 @@ const struct unit* units_const_get_first(const struct units* const units,
     return units_const_get_by_safe(units, units->firsts[player]);
 }
 
-bool units_is_owner(const struct units* const units,
-                                         const player_t player) {
+bool units_is_owner(const struct units* const units, const player_t player) {
     return units->firsts[player] != null_unit;
 }
 
