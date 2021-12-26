@@ -113,7 +113,7 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
     attackee.health -= *damage;
 
     // Ranged units do not give counter-attacks
-    if (models_min_range[attackee.model])
+    if (models_min_range[attacker->model] || models_min_range[attackee.model])
         *counter_damage = 0;
     else
         *counter_damage = calc_damage(game, &attackee, attacker);

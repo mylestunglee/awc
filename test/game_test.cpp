@@ -94,3 +94,57 @@ TEST_F(game_fixture, calc_damage_between_two_infantry) {
                           units_const_get_at(&game->units, 1, 0)),
               static_cast<health_t>(55.0 * 0.9 * 255.0 / 100.0));
 }
+
+TEST_F(game_fixture, game_simulate_attack_kill_attackee) {
+    constexpr model_t infantry = 0;
+    insert_unit({.health = health_max, .model = infantry, .x = 2, .y = 3});
+    insert_unit({.health = 1, .model = infantry, .x = 5, .y = 7});
+    units_select_at(&game->units, 2, 3);
+    game->x = 5;
+    game->y = 7;
+    game->map[7][5] = tile_plains;
+
+    health_t damage = 0;
+    health_t counter_damage = 0;
+    game_simulate_attack(game, &damage, &counter_damage);
+
+    ASSERT_GT(damage, 0);
+    ASSERT_EQ(counter_damage, 0);
+}
+
+TEST_F(game_fixture, game_simulate_attack_ranged_units_do_not_counter_attack) {
+    constexpr model_t infantry = 0;
+    constexpr model_t artillery = 5;
+    insert_unit({.health = health_max, .model = artillery, .x = 2, .y = 3});
+    insert_unit({.health = health_max, .model = infantry, .x = 5, .y = 7});
+    units_select_at(&game->units, 2, 3);
+    game->x = 5;
+    game->y = 7;
+    game->map[7][5] = tile_plains;
+
+    health_t damage = 0;
+    health_t counter_damage = 0;
+    game_simulate_attack(game, &damage, &counter_damage);
+
+    ASSERT_GT(damage, 0);
+    ASSERT_EQ(counter_damage, 0);
+}
+
+TEST_F(game_fixture, game_simulate_attack_when_counter_attacking) {
+    constexpr model_t infantry = 0;
+    insert_unit({.health = health_max, .model = infantry, .x = 2, .y = 3});
+    insert_unit({.health = health_max, .model = infantry, .x = 5, .y = 7});
+    units_select_at(&game->units, 2, 3);
+    game->x = 5;
+    game->y = 7;
+    game->map[3][2] = tile_plains;
+    game->map[7][5] = tile_plains;
+
+    health_t damage = 0;
+    health_t counter_damage = 0;
+    game_simulate_attack(game, &damage, &counter_damage);
+
+    ASSERT_EQ(damage, calc_damage(game, units_const_get_at(&game->units, 2, 3),
+                                  units_const_get_at(&game->units, 5, 7)));
+    ASSERT_EQ(counter_damage, (health_max - damage) * damage / health_max);
+}
