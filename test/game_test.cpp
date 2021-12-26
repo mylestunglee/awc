@@ -121,40 +121,40 @@ TEST_F(game_fixture, game_simulate_attack_when_counter_attacking) {
     ASSERT_EQ(counter_damage, (health_max - damage) * damage / health_max);
 }
 
-TEST_F(game_fixture, game_attackable_returns_true_when_directly_attackable) {
+TEST_F(game_fixture, game_is_attackable_returns_true_when_directly_attackable) {
     insert_unit({});
     units_select_at(&game->units, 0, 0);
     game->prev_x = 2;
     game->x = 3;
     game->labels[0][2] = accessible_bit;
     game->labels[0][3] = attackable_bit;
-    ASSERT_TRUE(game_attackable(game));
+    ASSERT_TRUE(game_is_attackable(game));
 }
 
-TEST_F(game_fixture, game_attackable_returns_true_when_indirectly_attackable) {
+TEST_F(game_fixture, game_is_attackable_returns_true_when_indirectly_attackable) {
     constexpr model_t artillery = 5;
     insert_unit({.model = artillery});
     units_select_at(&game->units, 0, 0);
     game->x = 3;
     game->labels[0][3] = attackable_bit;
-    ASSERT_TRUE(game_attackable(game));
+    ASSERT_TRUE(game_is_attackable(game));
 }
 
-TEST_F(game_fixture, game_attackable_returns_false_when_none_selected) {
-    ASSERT_FALSE(game_attackable(game));
+TEST_F(game_fixture, game_is_attackable_returns_false_when_none_selected) {
+    ASSERT_FALSE(game_is_attackable(game));
 }
 
-TEST_F(game_fixture, game_buildable_returns_true_when_buildable) {
+TEST_F(game_fixture, game_is_buildable_returns_true_when_buildable) {
     game->x = 2;
     game->y = 3;
     game->turn = 5;
     game->territory[3][2] = 5;
     game->map[3][2] = tile_factory;
-    ASSERT_TRUE(game_buildable(game));
+    ASSERT_TRUE(game_is_buildable(game));
 }
 
-TEST_F(game_fixture, game_buildable_returns_false_at_void_tile) {
-    ASSERT_FALSE(game_buildable(game));
+TEST_F(game_fixture, game_is_buildable_returns_false_at_void_tile) {
+    ASSERT_FALSE(game_is_buildable(game));
 }
 
 TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_unit) {

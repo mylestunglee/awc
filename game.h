@@ -30,8 +30,8 @@ void game_deselect(struct game* const);
 bool game_hover_next_unit(struct game* const);
 void game_simulate_attack(const struct game* const, health_t* const,
                           health_t* const);
-bool game_attackable(const struct game* const);
-bool game_buildable(const struct game* const);
+bool game_is_attackable(const struct game* const);
+bool game_is_buildable(const struct game* const);
 bool game_is_alive(const struct game* const, const player_t);
 bool game_is_bot(const struct game* const, const player_t);
 bool game_is_friendly(const struct game* const, const player_t);

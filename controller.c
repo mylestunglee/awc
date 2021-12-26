@@ -7,8 +7,8 @@ void controller_run(struct game* const game) {
     graphics_init();
 
     do {
-        const bool attackable = game_attackable(game);
-        const bool buildable = game_buildable(game);
+        const bool attackable = game_is_attackable(game);
+        const bool buildable = game_is_buildable(game);
         assert(!(attackable && buildable));
 
         graphics_render(game, attackable, buildable);

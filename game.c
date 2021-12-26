@@ -119,7 +119,7 @@ void game_simulate_attack(const struct game* const game, health_t* const damage,
         *counter_damage = calc_damage(game, &attackee, attacker);
 }
 
-bool game_attackable(const struct game* const game) {
+bool game_is_attackable(const struct game* const game) {
     // The state is attackable iff:
     // 1. A unit is selected
     // 2. Previous selected tile is accessible if direct attack
@@ -133,7 +133,7 @@ bool game_attackable(const struct game* const game) {
            game->labels[game->y][game->x] & attackable_bit;
 }
 
-bool game_buildable(const struct game* const game) {
+bool game_is_buildable(const struct game* const game) {
     // The state is buildable iff:
     // 1. The player owns the selected capturable
     // 2. There is no unit on the tile
