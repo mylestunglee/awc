@@ -51,56 +51,64 @@ static health_t merge_health(const health_t source, const health_t target) {
     return merged_health;
 }
 
-// returns health after merge
+// returns actionable health after move
+// can modifies which unit is selected
+// does not modify enabled
 health_t action_move_selected(struct game* const game, const grid_t x,
                               const grid_t y) {
-    const struct unit* const source = units_get_selected(&game->units);
-    struct unit* const target = units_get_at(&game->units, x, y);
+    struct unit* const source = units_get_selected(&game->units);
+    assert(source->enabled);
+    const struct unit* const target = units_get_at(&game->units, x, y);
 
-    if (source == target)
-        return source->health;
-
-    if (!target) {
-        units_move_selection(&game->units, x, y);
-        return source->health;
+    health_t result = source->health;
+    if (source != target && target) {
+        assert(units_mergable(source, target));
+        source->health = merge_health(source->health, target->health);
+        if (target->enabled)
+            result = source->health;
+        units_delete_at(&game->units, x, y);
     }
+    units_move_selection(&game->units, x, y);
+    units_disable_selection(&game->units);
+    return result;
+}
 
-    // handle merge
-    assert(units_mergable(source, target));
-    const health_t merged_health = merge_health(source->health, target->health);
-    units_delete_selected(&game->units);
-    units_select_at(&game->units, x, y);
-    health_t gained_health = merged_health - target->health;
-    target->health = merged_health;
-    return gained_health;
+// simulate attack with attacker with artifically lower health
+static void simulate_restricted_attack(
+    struct game* const game,
+    const health_t attacker_health,
+    health_t* const damage,
+    health_t* const counter_damage) {
+
+    struct unit* const attacker = units_get_selected(&game->units);
+    const health_t health = attacker->health;
+    assert(attacker_health <= health);
+    attacker->health = attacker_health;
+    game_simulate_attack(game, damage, counter_damage);
+    attacker->health = health;
 }
 
 void action_attack(struct game* const game) {
-    struct unit* attacker = units_get_selected(&game->units);
+    struct unit* const attacker = units_get_selected(&game->units);
     struct unit* const attackee = units_get_at(&game->units, game->x, game->y);
     assert(attacker);
     assert(attacker->enabled);
     assert(game->labels[game->y][game->x] & attackable_bit);
     assert(game->dirty_labels);
     grid_clear_labels(game);
-    const health_t attacker_pre_move_health = attacker->health;
 
     // If unit is direct, move to attack
     const bool ranged = models_min_range[attacker->model];
-    if (!ranged) {
-        action_move_selected(game, game->prev_x, game->prev_y);
-        attacker = units_get_selected(&game->units);
+    health_t actionable_health = attacker->health;
+    if (ranged) {
+        units_delete_selected(&game->units);
+    } else {
+        actionable_health = action_move_selected(game, game->prev_x, game->prev_y);
     }
-    attacker->enabled = false;
-
-    const health_t attacker_post_move_health = attacker->health;
-    attacker->health = attacker_pre_move_health;
 
     // Compute damage
     health_t damage, counter_damage;
-    game_simulate_attack(game, &damage, &counter_damage);
-
-    attacker->health = attacker_post_move_health;
+    simulate_restricted_attack(game, actionable_health, &damage, &counter_damage);
 
     // Apply damage
     if (damage >= attackee->health) {
@@ -161,7 +169,6 @@ bool action_move(struct game* const game) {
     const bool selected = units_has_selection(&game->units);
     if (selected && game->labels[game->y][game->x] & accessible_bit) {
         assert(game->dirty_labels);
-        units_disable_selection(&game->units);
         const health_t capture_progress =
             action_move_selected(game, game->x, game->y);
         if (is_capture_progressable(game) &&
