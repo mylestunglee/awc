@@ -4,27 +4,12 @@
 #include "file.h"
 #include "grid.h"
 #include <assert.h>
-#include <stdio.h>
+#include <string.h>
 
 void game_initialise(struct game* const game) {
-    // TODO: fix order
-    game->x = 0;
-    game->y = 0;
-    grid_clear_uint8(game->map);
-    grid_clear_uint8(game->labels);
+    memset(game, 0, sizeof (struct game));
     grid_clear_territory(game->territory);
     units_initialise(&game->units);
-    list_initialise(&game->list);
-    game->turn = 0;
-
-    for (player_t player = 0; player < players_capacity; ++player) {
-        game->golds[player] = 0;
-        game->incomes[player] = 0;
-    }
-
-    bitarray_clear(game->bots, sizeof(game->bots));
-    bitarray_clear(game->alliances, sizeof(game->alliances));
-    game->dirty_labels = false;
 }
 
 bool game_load(struct game* const game, const char* const filename) {
