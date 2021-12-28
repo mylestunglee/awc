@@ -77,14 +77,14 @@ const static energy_t unit_movement_ranges[model_capacity] = {
 
 #define unit_capturable_upper_bound 2
 #define movement_type_ship 5
-#define tile_void 0
-#define tile_plains 1
-#define tile_forest 2
-#define tile_mountain 3
-#define tile_bridge 9
-#define tile_city 10
-#define tile_factory 11
-#define tile_hq 14
+#define tile_void (tile_t)0
+#define tile_plains (tile_t)1
+#define tile_forest (tile_t)2
+#define tile_mountain (tile_t)3
+#define tile_bridge (tile_t)9
+#define tile_city (tile_t)10
+#define tile_factory (tile_t)11
+#define tile_hq (tile_t)14
 
 const static movement_t unit_movement_types[model_capacity] = {
     0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
@@ -133,7 +133,7 @@ const static gold_t models_cost[model_capacity] = {1,  3, 4,  7,  16, 6,  15, 8,
 const static model_t buildable_models[capturable_capacity + 1] = {
     0, 0, 9, 12, model_capacity, model_capacity};
 
-#define gold_scale 1000
+#define gold_scale (gold_t)1000
 #define bitarray_size(bits) (bits + 7) / 8
 
 #endif

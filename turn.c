@@ -4,7 +4,7 @@
 #include "units.h"
 #include <assert.h>
 
-static void repair_units(struct game* const game) {
+void repair_units(struct game* const game) {
     struct unit* unit = units_get_first(&game->units, game->turn);
     while (unit) {
         if (game->territory[unit->y][unit->x] == game->turn &&
@@ -26,16 +26,16 @@ static void repair_units(struct game* const game) {
     }
 }
 
-static void end_turn(struct game* const game) {
-    units_clear_selection(&game->units);
-    grid_clear_labels(game);
-    units_set_enabled(&game->units, game->turn, false);
-}
-
 static void start_turn(struct game* const game) {
     units_set_enabled(&game->units, game->turn, true);
     game->golds[game->turn] += gold_scale * game->incomes[game->turn];
     repair_units(game);
+}
+
+static void end_turn(struct game* const game) {
+    units_clear_selection(&game->units);
+    grid_clear_labels(game);
+    units_set_enabled(&game->units, game->turn, false);
 }
 
 static void next_alive_turn(struct game* const game) {
