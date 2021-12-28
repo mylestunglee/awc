@@ -74,11 +74,10 @@ health_t action_move_selected(struct game* const game, const grid_t x,
 }
 
 // simulate attack with attacker with artifically lower health
-static void simulate_restricted_attack(
-    struct game* const game,
-    const health_t attacker_health,
-    health_t* const damage,
-    health_t* const counter_damage) {
+static void simulate_restricted_attack(struct game* const game,
+                                       const health_t attacker_health,
+                                       health_t* const damage,
+                                       health_t* const counter_damage) {
 
     struct unit* const attacker = units_get_selected(&game->units);
     const health_t health = attacker->health;
@@ -103,12 +102,14 @@ void action_attack(struct game* const game) {
     if (ranged) {
         units_delete_selected(&game->units);
     } else {
-        actionable_health = action_move_selected(game, game->prev_x, game->prev_y);
+        actionable_health =
+            action_move_selected(game, game->prev_x, game->prev_y);
     }
 
     // Compute damage
     health_t damage, counter_damage;
-    simulate_restricted_attack(game, actionable_health, &damage, &counter_damage);
+    simulate_restricted_attack(game, actionable_health, &damage,
+                               &counter_damage);
 
     // Apply damage
     if (damage >= attackee->health) {

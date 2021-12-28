@@ -7,7 +7,7 @@
 #include <string.h>
 
 void game_initialise(struct game* const game) {
-    memset(game, 0, sizeof (struct game));
+    memset(game, 0, sizeof(struct game));
     grid_clear_territory(game->territory);
     units_initialise(&game->units);
 }
