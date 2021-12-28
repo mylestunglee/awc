@@ -27,3 +27,12 @@ TEST_F(game_fixture, repair_units_caps_at_maximum_health) {
               health_max);
     ASSERT_EQ(game->golds[game->turn], -gold_scale / health_max);
 }
+
+TEST_F(game_fixture, start_turn) {
+    insert_unit({.x = 2, .y = 3});
+    game->territory[3][2] = game->turn;
+    ++game->incomes[game->turn];
+    start_turn(game);
+    ASSERT_TRUE(units_const_get_first(&game->units, game->turn)->enabled);
+    ASSERT_EQ(game->golds[game->turn], gold_scale - gold_scale * heal_rate / health_max);
+}

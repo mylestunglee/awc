@@ -26,7 +26,7 @@ void repair_units(struct game* const game) {
     }
 }
 
-static void start_turn(struct game* const game) {
+void start_turn(struct game* const game) {
     units_set_enabled(&game->units, game->turn, true);
     game->golds[game->turn] += gold_scale * game->incomes[game->turn];
     repair_units(game);

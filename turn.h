@@ -5,6 +5,7 @@
 
 #ifdef expose_turn_internals
 void repair_units(struct game* const);
+void start_turn(struct game* const);
 #endif
 void turn_next(struct game* const game);
 
