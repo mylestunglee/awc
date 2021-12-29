@@ -32,13 +32,13 @@ void start_turn(struct game* const game) {
     repair_units(game);
 }
 
-static void end_turn(struct game* const game) {
+void end_turn(struct game* const game) {
     units_clear_selection(&game->units);
     grid_clear_labels(game);
     units_set_enabled(&game->units, game->turn, false);
 }
 
-static void next_alive_turn(struct game* const game) {
+void next_alive_turn(struct game* const game) {
     for (player_t i = 0; i < players_capacity; ++i) {
         game->turn = (game->turn + 1) % players_capacity;
         if (game_is_alive(game, game->turn))
@@ -47,7 +47,7 @@ static void next_alive_turn(struct game* const game) {
     assert(false);
 }
 
-static bool exists_alive_non_bot(const struct game* const game) {
+bool exists_alive_non_bot(const struct game* const game) {
     for (player_t player = 0; player < players_capacity; ++player)
         if (game_is_alive(game, player) && !game_is_bot(game, player))
             return true;

@@ -1,4 +1,5 @@
 #define expose_turn_internals
+#include "../bitarray.h"
 #include "../turn.h"
 #include "game_fixture.hpp"
 #include <cstdio>
@@ -31,8 +32,47 @@ TEST_F(game_fixture, repair_units_caps_at_maximum_health) {
 TEST_F(game_fixture, start_turn) {
     insert_unit({.x = 2, .y = 3});
     game->territory[3][2] = game->turn;
-    ++game->incomes[game->turn];
+    game->incomes[game->turn] = 1;
     start_turn(game);
     ASSERT_TRUE(units_const_get_first(&game->units, game->turn)->enabled);
     ASSERT_EQ(game->golds[game->turn], gold_scale - gold_scale * heal_rate / health_max);
+}
+
+TEST_F(game_fixture, end_turn) {
+    insert_unit({.x = 2, .y = 3, .enabled = true});
+    units_select_at(&game->units, 2, 3);
+    game->dirty_labels = true;
+    end_turn(game);
+    ASSERT_FALSE(units_has_selection(&game->units));
+    ASSERT_FALSE(game->dirty_labels);
+    ASSERT_FALSE(units_const_get_first(&game->units, game->turn)->enabled);
+
+}
+
+TEST_F(game_fixture, next_alive_turn_increments_turn) {
+    game->turn = players_capacity - 1;
+    game->incomes[0] = 1;
+    next_alive_turn(game);
+    ASSERT_EQ(game->turn, 0);
+}
+
+TEST_F(game_fixture, next_alive_turn_skips_dead_player) {
+    game->incomes[2] = 1;
+    next_alive_turn(game);
+    ASSERT_EQ(game->turn, 2);
+}
+
+TEST_F(game_fixture, exists_alive_non_bot_returns_true_when_alive_player) {
+    game->incomes[game->turn] = 1;
+    ASSERT_TRUE(exists_alive_non_bot(game));
+}
+
+TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_alive_bot) {
+    game->incomes[game->turn] = 1;
+    bitarray_set(game->bots, game->turn);
+    ASSERT_FALSE(exists_alive_non_bot(game));
+}
+
+TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_dead_player) {
+    ASSERT_FALSE(exists_alive_non_bot(game));
 }
