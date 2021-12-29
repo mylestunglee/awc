@@ -35,7 +35,8 @@ TEST_F(game_fixture, start_turn) {
     game->incomes[game->turn] = 1;
     start_turn(game);
     ASSERT_TRUE(units_const_get_first(&game->units, game->turn)->enabled);
-    ASSERT_EQ(game->golds[game->turn], gold_scale - gold_scale * heal_rate / health_max);
+    ASSERT_EQ(game->golds[game->turn],
+              gold_scale - gold_scale * heal_rate / health_max);
 }
 
 TEST_F(game_fixture, end_turn) {
@@ -46,7 +47,6 @@ TEST_F(game_fixture, end_turn) {
     ASSERT_FALSE(units_has_selection(&game->units));
     ASSERT_FALSE(game->dirty_labels);
     ASSERT_FALSE(units_const_get_first(&game->units, game->turn)->enabled);
-
 }
 
 TEST_F(game_fixture, next_alive_turn_increments_turn) {
@@ -75,4 +75,27 @@ TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_alive_bot) {
 
 TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_dead_player) {
     ASSERT_FALSE(exists_alive_non_bot(game));
+}
+
+TEST_F(game_fixture, turn_next_sets_units_enabled) {
+    insert_unit({.player = 0, .x = 2, .enabled = true});
+    insert_unit({.player = 1, .x = 3, .enabled = false});
+    game->turn = 0;
+    turn_next(game);
+    ASSERT_FALSE(units_const_get_first(&game->units, 0)->enabled);
+    ASSERT_TRUE(units_const_get_first(&game->units, 1)->enabled);
+    ASSERT_EQ(game->turn, 1);
+    ASSERT_EQ(game->x, 3);
+}
+
+TEST_F(game_fixture, turn_next_plays_bot_turn) {
+    insert_unit({.player = 1, .x = 2, .enabled = true});
+    bitarray_set(game->bots, 1);
+    game->map[0][2] = tile_plains;
+    game->map[0][3] = tile_city;
+    game->territory[0][3] = 2;
+    game->incomes[2] = 1;
+    turn_next(game);
+    ASSERT_EQ(units_const_get_first(&game->units, 1)->x, 3);
+    ASSERT_EQ(game->turn, 2);
 }
