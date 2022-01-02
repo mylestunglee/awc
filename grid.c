@@ -9,6 +9,13 @@ void grid_clear_uint8(uint8_t grid[grid_size][grid_size]) {
     memset(grid, 0, grid_size * grid_size);
 }
 
+void grid_clear_labels(struct game* const game) {
+    if (game->dirty_labels) {
+        grid_clear_uint8(game->labels);
+        game->dirty_labels = false;
+    }
+}
+
 void grid_clear_territory(player_t territory[grid_size][grid_size]) {
     assert(sizeof(player_t) == 1);
     memset(territory, null_player, grid_size * grid_size);
@@ -32,8 +39,8 @@ void grid_clear_player_territory(tile_t map[grid_size][grid_size],
 }
 
 // Normalise invalid map territory state
-void grid_correct(player_t territory[grid_size][grid_size],
-                  tile_t map[grid_size][grid_size]) {
+void grid_correct_territory(player_t territory[grid_size][grid_size],
+                            tile_t map[grid_size][grid_size]) {
 
     grid_t y = 0;
     do {
@@ -60,13 +67,6 @@ void grid_compute_incomes(player_t territory[grid_size][grid_size],
                 ++incomes[player];
         } while (++x);
     } while (++y);
-}
-
-void grid_clear_labels(struct game* const game) {
-    if (game->dirty_labels) {
-        grid_clear_uint8(game->labels);
-        game->dirty_labels = false;
-    }
 }
 
 // Marks a tile as attackable if position relates to attackable unit
@@ -217,13 +217,13 @@ void explore_node(struct game* const game, const struct list_node* const node,
     explore_adjacent_tiles(game, node, model);
 }
 
+void clear_energies(energy_t energies[grid_size][grid_size]) {
+    memset(energies, 0, sizeof(energy_t) * grid_size * grid_size);
+}
+
 energy_t init_exploration_energy(const energy_t scalar, const model_t model) {
     const movement_t movement_type = unit_movement_types[model];
     return scalar * unit_movement_ranges[movement_type] + 1;
-}
-
-void clear_energies(energy_t energies[grid_size][grid_size]) {
-    memset(energies, 0, sizeof(energy_t) * grid_size * grid_size);
 }
 
 // Use scalar > 1 when looking ahead multiple turns

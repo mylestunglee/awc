@@ -44,25 +44,25 @@ TEST_F(grid_fixture, grid_clear_player_territory_sets_player_hqs_into_cities) {
     ASSERT_EQ(map[3][5], tile_city);
 }
 
-TEST_F(grid_fixture, grid_correct_santitises_invalid_players) {
+TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_players) {
     ASSERT_LT(players_capacity, 101);
     territory[2][3] = 101;
-    grid_correct(territory, map);
+    grid_correct_territory(territory, map);
     ASSERT_EQ(territory[2][3], null_player);
 }
 
-TEST_F(grid_fixture, grid_correct_santitises_invalid_tiles) {
+TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_tiles) {
     ASSERT_LT(tile_capacity, 101);
     map[2][3] = 101;
-    grid_correct(territory, map);
+    grid_correct_territory(territory, map);
     ASSERT_EQ(map[2][3], tile_void);
 }
 
-TEST_F(grid_fixture, grid_correct_santitises_invalid_hqs) {
+TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_hqs) {
     ASSERT_LT(players_capacity, 101);
     map[2][3] = tile_hq;
     territory[2][3] = 101;
-    grid_correct(territory, map);
+    grid_correct_territory(territory, map);
     ASSERT_EQ(map[2][3], tile_city);
     ASSERT_EQ(territory[2][3], null_player);
 }
@@ -331,6 +331,11 @@ TEST_F(game_fixture, explore_node_explores_adjacent_tiles) {
     game->map[7][6] = tile_plains;
     explore_node(game, &node, null_player, 0, false);
     ASSERT_FALSE(list_empty(&game->list));
+}
+
+TEST(game_test, init_exploration_energy_lookups_movement) {
+    constexpr model_t infantry = 0;
+    ASSERT_EQ(init_exploration_energy(2, infantry), 7);
 }
 
 TEST_F(game_fixture, grid_explore_recursive_clears_energy) {

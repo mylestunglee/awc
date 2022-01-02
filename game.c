@@ -15,7 +15,7 @@ void game_initialise(struct game* const game) {
 bool game_load(struct game* const game, const char* const filename) {
     game_initialise(game);
     const bool error = file_load(game, filename);
-    grid_correct(game->territory, game->map);
+    grid_correct_territory(game->territory, game->map);
     grid_compute_incomes(game->territory, game->incomes);
     return error;
 }
