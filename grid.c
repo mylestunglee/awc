@@ -10,13 +10,8 @@ void grid_clear_uint8(uint8_t grid[grid_size][grid_size]) {
 }
 
 void grid_clear_territory(player_t territory[grid_size][grid_size]) {
-    grid_t y = 0;
-    do {
-        grid_t x = 0;
-        do
-            territory[y][x] = null_player;
-        while (++x);
-    } while (++y);
+    assert(sizeof(player_t) == 1);
+    memset(territory, null_player, grid_size * grid_size);
 }
 
 void grid_clear_player_territory(tile_t map[grid_size][grid_size],
@@ -72,10 +67,6 @@ void grid_clear_labels(struct game* const game) {
         grid_clear_uint8(game->labels);
         game->dirty_labels = false;
     }
-}
-
-void grid_clear_energy(energy_t energies[grid_size][grid_size]) {
-    memset(energies, 0, sizeof(energy_t) * grid_size * grid_size);
 }
 
 // Marks a tile as attackable if position relates to attackable unit
@@ -231,11 +222,15 @@ energy_t init_exploration_energy(const energy_t scalar, const model_t model) {
     return scalar * unit_movement_ranges[movement_type] + 1;
 }
 
+void clear_energies(energy_t energies[grid_size][grid_size]) {
+    memset(energies, 0, sizeof(energy_t) * grid_size * grid_size);
+}
+
 // Use scalar > 1 when looking ahead multiple turns
 void grid_explore_recursive(struct game* const game,
                             const bool label_attackable_tiles,
                             const energy_t scalar) {
-    grid_clear_energy(game->energies);
+    clear_energies(game->energies);
     game->dirty_labels = true;
     struct list* const list = &game->list;
 

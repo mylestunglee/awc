@@ -7,7 +7,7 @@ class grid_fixture : public ::testing::Test {
 protected:
     grid_fixture() {
         grid_clear_uint8(map);
-        grid_clear_energy(energies);
+        clear_energies(energies);
         grid_clear_territory(territory);
     }
     tile_t map[grid_size][grid_size];
@@ -20,12 +20,6 @@ TEST_F(grid_fixture, grid_clear_uint8_t_clears_cell) {
     map[2][3] = 5;
     grid_clear_uint8(map);
     ASSERT_EQ(map[2][3], 0);
-}
-
-TEST_F(grid_fixture, grid_clear_energy_clears_cell) {
-    energies[2][3] = 5;
-    grid_clear_energy(energies);
-    ASSERT_EQ(energies[2][3], 0);
 }
 
 TEST_F(grid_fixture, grid_clear_territory_clears_cell) {
@@ -348,6 +342,12 @@ TEST_F(game_fixture, grid_explore_recursive_clears_energy) {
     game->energies[3][3] = 101;
     grid_explore_recursive(game, false, 1);
     ASSERT_EQ(game->energies[3][3], 3);
+}
+
+TEST_F(grid_fixture, clear_energies_clears_cell) {
+    energies[2][3] = 5;
+    clear_energies(energies);
+    ASSERT_EQ(energies[2][3], 0);
 }
 
 TEST_F(game_fixture,
