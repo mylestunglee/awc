@@ -20,30 +20,6 @@ static void action_capture(struct game* const game) {
     ++game->incomes[game->turn];
 }
 
-// refactor to if capturable
-bool is_capture_progressable(const struct game* const game) {
-    const struct unit* const unit = units_const_get_selected(&game->units);
-
-    assert(unit->player == game->turn);
-    assert(unit->x == game->x);
-    assert(unit->y == game->y);
-
-    // The moved unit can capture iff:
-    // 1. The unit is a infantry or a mech
-    // 2. The tile is capturable
-    // 3. The tile is owned by an enemy
-    if (unit->model >= unit_capturable_upper_bound)
-        return false;
-
-    if (game->map[game->y][game->x] < terrian_capacity)
-        return false;
-
-    if (game_is_friendly(game, game->territory[game->y][game->x]))
-        return false;
-
-    return true;
-}
-
 static health_t merge_health(const health_t source, const health_t target) {
     health_wide_t merged_health = (health_wide_t)source + (health_wide_t)target;
     if (merged_health > (health_wide_t)health_max)
@@ -166,13 +142,29 @@ bool action_build(struct game* const game, const model_t model) {
     return error;
 }
 
+bool can_selected_unit_capture(const struct game* const game) {
+    const struct unit* const unit = units_const_get_selected(&game->units);
+
+    assert(unit->player == game->turn);
+    assert(unit->x == game->x);
+    assert(unit->y == game->y);
+
+    // The moved unit can capture iff:
+    // 1. The unit is a infantry or a mech
+    // 2. The tile is capturable
+    // 3. The tile is owned by an enemy
+    return unit->model < unit_capturable_upper_bound
+        && game->map[game->y][game->x] >= terrian_capacity
+        && !game_is_friendly(game, game->territory[game->y][game->x]);
+}
+
 bool action_move(struct game* const game) {
     const bool selected = units_has_selection(&game->units);
     if (selected && game->labels[game->y][game->x] & accessible_bit) {
         assert(game->dirty_labels);
         const health_t capture_progress =
             action_move_selected(game, game->x, game->y);
-        if (is_capture_progressable(game) &&
+        if (can_selected_unit_capture(game) &&
             units_update_capture_progress(&game->units, capture_progress))
             action_capture(game);
         game_deselect(game);
