@@ -3,35 +3,17 @@
 #include "turn.h"
 #include <assert.h>
 
-// Occurs when unit captures enemy capturable
-static void action_capture(struct game* const game) {
-    const player_t loser = game->territory[game->y][game->x];
-
-    // Cannot recapture friendly capturable
-    assert(loser != game->turn);
-
-    // If the enemy loses their HQ
-    if (game->map[game->y][game->x] == tile_hq)
-        game_remove_player(game, loser);
-    else if (loser != null_player)
-        --game->incomes[loser];
-
-    game->territory[game->y][game->x] = game->turn;
-    ++game->incomes[game->turn];
-}
-
-static health_t merge_health(const health_t source, const health_t target) {
+health_t merge_health(const health_t source, const health_t target) {
     health_wide_t merged_health = (health_wide_t)source + (health_wide_t)target;
     if (merged_health > (health_wide_t)health_max)
-        merged_health = health_max;
-    return merged_health;
+        return health_max;
+    else
+        return merged_health;
 }
 
-// returns actionable health after move
-// can modifies which unit is selected
-// does not modify enabled
-health_t action_move_selected(struct game* const game, const grid_t x,
-                              const grid_t y) {
+// Returns actionable health after move considering possible merge
+health_t move_selected_unit(struct game* const game, const grid_t x,
+                            const grid_t y) {
     struct unit* const source = units_get_selected(&game->units);
     assert(source->enabled);
     const struct unit* const target = units_get_at(&game->units, x, y);
@@ -49,11 +31,11 @@ health_t action_move_selected(struct game* const game, const grid_t x,
     return result;
 }
 
-// simulate attack with attacker with artifically lower health
-static void simulate_restricted_attack(struct game* const game,
-                                       const health_t attacker_health,
-                                       health_t* const damage,
-                                       health_t* const counter_damage) {
+// Simulate attack with attacker with artifically lower health
+void simulate_restricted_attack(struct game* const game,
+                                const health_t attacker_health,
+                                health_t* const damage,
+                                health_t* const counter_damage) {
 
     struct unit* const attacker = units_get_selected(&game->units);
     const health_t health = attacker->health;
@@ -79,7 +61,7 @@ void action_attack(struct game* const game) {
         units_delete_selected(&game->units);
     } else {
         actionable_health =
-            action_move_selected(game, game->prev_x, game->prev_y);
+            move_selected_unit(game, game->prev_x, game->prev_y);
     }
 
     // Compute damage
@@ -95,12 +77,6 @@ void action_attack(struct game* const game) {
     }
 
     attackee->health -= damage;
-
-    // Ranged units do not receive counter-attacks
-    if (ranged) {
-        units_clear_selection(&game->units);
-        return;
-    }
 
     // Apply counter damage
     if (counter_damage >= attacker->health) {
@@ -153,9 +129,26 @@ bool can_selected_unit_capture(const struct game* const game) {
     // 1. The unit is a infantry or a mech
     // 2. The tile is capturable
     // 3. The tile is owned by an enemy
-    return unit->model < unit_capturable_upper_bound
-        && game->map[game->y][game->x] >= terrian_capacity
-        && !game_is_friendly(game, game->territory[game->y][game->x]);
+    return unit->model < unit_capturable_upper_bound &&
+           game->map[game->y][game->x] >= terrian_capacity &&
+           !game_is_friendly(game, game->territory[game->y][game->x]);
+}
+
+// Occurs when unit captures enemy capturable
+static void action_capture(struct game* const game) {
+    const player_t loser = game->territory[game->y][game->x];
+
+    // Cannot recapture friendly capturable
+    assert(loser != game->turn);
+
+    // If the enemy loses their HQ
+    if (game->map[game->y][game->x] == tile_hq)
+        game_remove_player(game, loser);
+    else if (loser != null_player)
+        --game->incomes[loser];
+
+    game->territory[game->y][game->x] = game->turn;
+    ++game->incomes[game->turn];
 }
 
 bool action_move(struct game* const game) {
@@ -163,7 +156,7 @@ bool action_move(struct game* const game) {
     if (selected && game->labels[game->y][game->x] & accessible_bit) {
         assert(game->dirty_labels);
         const health_t capture_progress =
-            action_move_selected(game, game->x, game->y);
+            move_selected_unit(game, game->x, game->y);
         if (can_selected_unit_capture(game) &&
             units_update_capture_progress(&game->units, capture_progress))
             action_capture(game);

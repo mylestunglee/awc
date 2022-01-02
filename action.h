@@ -3,6 +3,12 @@
 
 #include "game.h"
 
+#ifdef expose_action_internals
+health_t merge_health(const health_t, const health_t);
+health_t move_selected_unit(struct game* const, const grid_t, const grid_t);
+void simulate_restricted_attack(struct game* const, const health_t,
+                                health_t* const, health_t* const);
+#endif
 void action_attack(struct game* const);
 bool action_build(struct game* const, const model_t);
 #ifdef expose_action_internals
