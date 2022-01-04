@@ -55,11 +55,8 @@ void action_attack(struct game* const game) {
     grid_clear_labels(game);
 
     // If unit is direct, move to attack
-    const bool ranged = models_min_range[attacker->model];
     health_t actionable_health = attacker->health;
-    if (ranged) {
-        units_delete_selected(&game->units);
-    } else {
+    if (!models_min_range[attacker->model]) {
         actionable_health =
             move_selected_unit(game, game->prev_x, game->prev_y);
     }
