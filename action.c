@@ -56,10 +56,9 @@ void action_attack(struct game* const game) {
 
     // If unit is direct, move to attack
     health_t actionable_health = attacker->health;
-    if (!models_min_range[attacker->model]) {
+    if (!models_min_range[attacker->model])
         actionable_health =
             move_selected_unit(game, game->prev_x, game->prev_y);
-    }
 
     // Compute damage
     health_t damage, counter_damage;
@@ -70,6 +69,7 @@ void action_attack(struct game* const game) {
     if (damage >= attackee->health) {
         units_delete_at(&game->units, game->x, game->y);
         units_clear_selection(&game->units);
+        assert(counter_damage == 0);
         return;
     }
 
