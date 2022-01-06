@@ -13,7 +13,9 @@ TEST(action_test, merge_health_bounds_overflow) {
 TEST_F(game_fixture, move_selected_unit_when_no_merge) {
     insert_unit({.health = health_max, .x = 2, .y = 3, .enabled = true});
     units_select_at(&game->units, 2, 3);
+
     ASSERT_EQ(move_selected_unit(game, 5, 3), health_max);
+
     const struct unit* const unit = units_const_get_selected(&game->units);
     ASSERT_TRUE(unit);
     ASSERT_EQ(unit->x, 5);
@@ -24,7 +26,9 @@ TEST_F(game_fixture, move_selected_unit_when_merge_with_disabled_unit) {
     insert_unit({.health = 7, .x = 2, .y = 3, .enabled = true});
     insert_unit({.health = 11, .x = 5, .y = 3});
     units_select_at(&game->units, 2, 3);
+
     ASSERT_EQ(move_selected_unit(game, 5, 3), 7);
+
     ASSERT_EQ(game->units.size, 1);
 }
 
@@ -32,7 +36,9 @@ TEST_F(game_fixture, move_selected_unit_when_merge_with_enabled_unit) {
     insert_unit({.health = 7, .x = 2, .y = 3, .enabled = true});
     insert_unit({.health = 11, .x = 5, .y = 3, .enabled = true});
     units_select_at(&game->units, 2, 3);
+
     ASSERT_EQ(move_selected_unit(game, 5, 3), 18);
+
     ASSERT_EQ(game->units.size, 1);
 }
 
@@ -118,4 +124,46 @@ TEST_F(game_fixture, action_attack_where_counter_damage_kills) {
 
     ASSERT_FALSE(units_const_get_at(&game->units, 4, 7));
     ASSERT_FALSE(units_has_selection(&game->units));
+}
+
+TEST_F(game_fixture, action_build_returns_true_when_model_is_unbuildable) {
+    game->golds[game->turn] = gold_scale;
+    game->x = 2;
+    game->y = 3;
+    game->territory[3][2] = game->turn;
+    game->map[3][2] = tile_city;
+    constexpr model_t infantry = 0;
+
+    ASSERT_TRUE(action_build(game, infantry));
+}
+
+TEST_F(game_fixture, action_build_returns_true_when_model_is_unaffordable) {
+    game->x = 2;
+    game->y = 3;
+    game->territory[3][2] = game->turn;
+    game->map[3][2] = tile_factory;
+    constexpr model_t infantry = 0;
+
+    ASSERT_TRUE(action_build(game, infantry));
+}
+
+TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
+    game->golds[game->turn] = gold_scale;
+    game->x = 2;
+    game->y = 3;
+    game->territory[3][2] = game->turn;
+    game->map[3][2] = tile_factory;
+    constexpr model_t infantry = 0;
+
+    ASSERT_FALSE(action_build(game, infantry));
+
+    const struct unit* const unit = units_const_get_at(&game->units, 2, 3);
+    ASSERT_TRUE(unit);
+    ASSERT_EQ(unit->health, health_max);
+    ASSERT_EQ(unit->model, infantry);
+    ASSERT_EQ(unit->player, game->turn);
+    ASSERT_EQ(unit->x, 2);
+    ASSERT_EQ(unit->y, 3);
+    ASSERT_FALSE(unit->enabled);
+    ASSERT_EQ(unit->capture_progress, 0);
 }
