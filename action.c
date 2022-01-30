@@ -129,7 +129,7 @@ bool can_selected_unit_capture(const struct game* const game) {
 }
 
 // Occurs when unit captures enemy capturable
-static void action_capture(struct game* const game) {
+void action_capture(struct game* const game) {
     const player_t loser = game->territory[game->y][game->x];
 
     // Cannot recapture friendly capturable

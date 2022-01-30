@@ -167,3 +167,61 @@ TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
     ASSERT_FALSE(unit->enabled);
     ASSERT_EQ(unit->capture_progress, 0);
 }
+
+TEST_F(game_fixture, can_selected_unit_capture_returns_true_when_capturable) {
+    insert_unit({.x = 2, .y = 3});
+    units_select_at(&game->units, 2, 3);
+    game->x = 2;
+    game->y = 3;
+    game->map[3][2] = tile_city;
+    game->territory[3][2] = 1;
+
+    ASSERT_TRUE(can_selected_unit_capture(game));
+}
+
+TEST_F(game_fixture,
+       can_selected_unit_capture_returns_false_when_uncapturable) {
+    insert_unit({.x = 2, .y = 3});
+    units_select_at(&game->units, 2, 3);
+    game->x = 2;
+    game->y = 3;
+
+    ASSERT_FALSE(can_selected_unit_capture(game));
+}
+
+TEST_F(game_fixture, action_capture_when_capture_enemy_hq) {
+    game->x = 2;
+    game->y = 3;
+    game->territory[3][2] = 1;
+    game->map[3][2] = tile_hq;
+    game->incomes[game->turn] = 5;
+    game->incomes[1] = 5;
+
+    action_capture(game);
+
+    ASSERT_EQ(game->incomes[1], 0);
+    ASSERT_EQ(game->territory[3][2], game->turn);
+    ASSERT_EQ(game->incomes[game->turn], 6);
+}
+
+TEST_F(game_fixture, action_capture_when_capture_enemy_city_) {
+    game->x = 2;
+    game->y = 3;
+    game->territory[3][2] = 1;
+    game->incomes[1] = 5;
+
+    action_capture(game);
+
+    ASSERT_EQ(game->incomes[1], 4);
+}
+
+TEST_F(game_fixture, action_capture_when_capture_unoccupied_city) {
+    game->x = 2;
+    game->y = 3;
+    game->territory[3][2] = null_player;
+    game->incomes[game->turn] = 5;
+
+    action_capture(game);
+
+    ASSERT_EQ(game->incomes[game->turn], 6);
+}
