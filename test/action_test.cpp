@@ -327,3 +327,17 @@ TEST_F(game_fixture, action_select_returns_true_when_unit_selectable) {
 TEST_F(game_fixture, action_select_returns_false_when_unit_unselectable) {
     ASSERT_FALSE(action_select(game));
 }
+
+TEST_F(game_fixture, action_highlight_returns_true_when_unit_selectable) {
+    insert_unit({.x = 2, .y = 3});
+    game->x = 2;
+    game->y = 3;
+
+    ASSERT_TRUE(action_highlight(game));
+
+    ASSERT_EQ(game->labels[3][2], accessible_bit);
+}
+
+TEST_F(game_fixture, action_highlight_returns_false_when_unit_unselectable) {
+    ASSERT_FALSE(action_highlight(game));
+}
