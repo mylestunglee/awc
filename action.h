@@ -16,12 +16,12 @@ bool can_selected_unit_capture(const struct game* const);
 bool action_capture(struct game* const game);
 #endif
 bool action_move(struct game* const game);
-bool action_self_destruct_selection(struct game* const game);
-bool action_surrender(struct game* const game);
-bool action_select(struct game* const game);
-bool action_highlight(struct game* const game);
+bool action_self_destruct(struct game* const game);
 #ifdef expose_action_internals
 bool at_least_two_alive_players(const struct game* const game);
 #endif
+bool action_surrender(struct game* const game);
+bool action_select(struct game* const game);
+bool action_highlight(struct game* const game);
 
 #endif

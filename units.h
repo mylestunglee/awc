@@ -31,7 +31,6 @@ struct units {
 
 void units_initialise(struct units* const);
 bool units_insert(struct units* const, const struct unit* const);
-void units_delete(struct units* const, const unit_t);
 void units_delete_at(struct units* const, const grid_t, const grid_t);
 void units_delete_selected(struct units* const);
 void units_move_selection(struct units* const, const grid_t, const grid_t);
@@ -64,6 +63,7 @@ bool units_update_capture_progress(struct units* const, const health_t);
 
 #ifdef expose_units_internals
 
+void units_delete(struct units* const, const unit_t);
 void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
 unit_t insert_with_frees(struct units* const, const struct unit* const);
 unit_t insert_with_players(struct units* const, const struct unit* const);

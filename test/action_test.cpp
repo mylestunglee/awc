@@ -269,3 +269,61 @@ TEST_F(game_fixture, action_move_returns_true_when_finish_capturing) {
 TEST_F(game_fixture, action_move_turns_false_when_cannot_move) {
     ASSERT_FALSE(action_move(game));
 }
+
+TEST_F(game_fixture, action_self_destruct_returns_true_when_selected) {
+    insert_unit({.x = 2, .y = 3});
+    units_select_at(&game->units, 2, 3);
+    game->dirty_labels = true;
+
+    ASSERT_TRUE(action_self_destruct(game));
+
+    ASSERT_FALSE(game->dirty_labels);
+}
+
+TEST_F(game_fixture, action_self_destruct_returns_false) {
+    ASSERT_FALSE(action_self_destruct(game));
+}
+
+TEST_F(game_fixture, at_least_two_alive_players_returns_true) {
+    ++game->incomes[2];
+    ++game->incomes[3];
+
+    ASSERT_TRUE(at_least_two_alive_players(game));
+}
+
+TEST_F(game_fixture, at_least_two_alive_players_returns_false) {
+    ASSERT_FALSE(at_least_two_alive_players(game));
+}
+
+TEST_F(game_fixture, action_surrender_returns_true_when_two_players_alive) {
+    ++game->incomes[0];
+    ++game->incomes[1];
+
+    ASSERT_TRUE(action_surrender(game));
+
+    ASSERT_EQ(game->incomes[0], 0);
+    ASSERT_EQ(game->turn, 1);
+}
+
+TEST_F(game_fixture, action_surrender_returns_false_when_no_players_alive) {
+    ASSERT_FALSE(action_surrender(game));
+}
+
+TEST_F(game_fixture, action_select_returns_true_when_unit_selectable) {
+    insert_unit({.x = 2, .y = 3, .enabled = true});
+    game->x = 2;
+    game->y = 3;
+    game->labels[7][5] = accessible_bit;
+    game->dirty_labels = true;
+
+    ASSERT_TRUE(action_select(game));
+
+    ASSERT_EQ(game->labels[7][5], 0);
+    ASSERT_TRUE(game->dirty_labels);
+    const struct unit* const unit = units_const_get_at(&game->units, 2, 3);
+    ASSERT_TRUE(unit);
+}
+
+TEST_F(game_fixture, action_select_returns_false_when_unit_unselectable) {
+    ASSERT_FALSE(action_select(game));
+}

@@ -107,11 +107,11 @@ bool parse_build(struct game* const game, const char input) {
     return !action_build(game, model);
 }
 
-bool parse_self_destruct_unit(struct game* const game, const char input) {
+bool parse_self_destruct(struct game* const game, const char input) {
     if (input != 'k')
         return false;
 
-    return action_self_destruct_selection(game);
+    return action_self_destruct(game);
 }
 
 bool parse_space(struct game* const game, const char input,
@@ -144,7 +144,7 @@ bool parse_command(struct game* const game, const char input, bool attackable,
     if (parse_select_next_unit(game, input))
         return false;
 
-    if (parse_self_destruct_unit(game, input))
+    if (parse_self_destruct(game, input))
         return false;
 
     if (parse_surrender(game, input))

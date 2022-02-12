@@ -160,11 +160,11 @@ bool action_move(struct game* const game) {
     return false;
 }
 
-bool action_self_destruct_selection(struct game* const game) {
+bool action_self_destruct(struct game* const game) {
     if (!units_has_selection(&game->units))
         return false;
 
-    units_delete(&game->units, game->units.selected);
+    units_delete_selected(&game->units);
     assert(game->dirty_labels);
     game_deselect(game);
     return true;
