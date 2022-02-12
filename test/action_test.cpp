@@ -204,7 +204,7 @@ TEST_F(game_fixture, action_capture_when_capture_enemy_hq) {
     ASSERT_EQ(game->incomes[game->turn], 6);
 }
 
-TEST_F(game_fixture, action_capture_when_capture_enemy_city_) {
+TEST_F(game_fixture, action_capture_when_capture_enemy_city) {
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = 1;
@@ -224,4 +224,48 @@ TEST_F(game_fixture, action_capture_when_capture_unoccupied_city) {
     action_capture(game);
 
     ASSERT_EQ(game->incomes[game->turn], 6);
+}
+
+TEST_F(game_fixture, action_move_returns_true_when_start_capturing) {
+    insert_unit({.health = health_max, .x = 2, .y = 3, .enabled = true});
+    units_select_at(&game->units, 2, 3);
+    game->x = 5;
+    game->y = 7;
+    game->labels[7][5] = accessible_bit;
+    game->dirty_labels = true;
+    game->map[7][5] = tile_city;
+    game->territory[7][5] = null_player;
+
+    ASSERT_TRUE(action_move(game));
+
+    const struct unit* const unit = units_const_get_at(&game->units, 5, 7);
+    ASSERT_TRUE(unit);
+    ASSERT_EQ(game->territory[7][5], null_player);
+    ASSERT_FALSE(units_has_selection(&game->units));
+}
+
+TEST_F(game_fixture, action_move_returns_true_when_finish_capturing) {
+    insert_unit({.health = health_max,
+                 .x = 2,
+                 .y = 3,
+                 .enabled = true,
+                 .capture_progress = health_max});
+    units_select_at(&game->units, 2, 3);
+    game->x = 2;
+    game->y = 3;
+    game->labels[3][2] = accessible_bit;
+    game->dirty_labels = true;
+    game->map[3][2] = tile_city;
+    game->territory[3][2] = null_player;
+
+    ASSERT_TRUE(action_move(game));
+
+    const struct unit* const unit = units_const_get_at(&game->units, 2, 3);
+    ASSERT_TRUE(unit);
+    ASSERT_EQ(game->territory[3][2], unit->player);
+    ASSERT_FALSE(units_has_selection(&game->units));
+}
+
+TEST_F(game_fixture, action_move_turns_false_when_cannot_move) {
+    ASSERT_FALSE(action_move(game));
 }
