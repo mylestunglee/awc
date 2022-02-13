@@ -1,5 +1,5 @@
-#ifndef parse_h
-#define parse_h
+#ifndef PARSE_H
+#define PARSE_H
 
 #include "game.h"
 

@@ -12,7 +12,7 @@ void units_initialise(struct units* const units) {
     for (unit_t i = 0; i < units_capacity; ++i)
         units->frees[i] = (i + 1) % units_capacity;
 
-    for (player_t i = 0; i < players_capacity; ++i)
+    for (player_t i = 0; i < PLAYERS_CAPACITY; ++i)
         units->firsts[i] = null_unit;
 
     // Clear grid
@@ -65,7 +65,7 @@ unit_t insert_with_players(struct units* const units,
 
 bool units_insert(struct units* const units, const struct unit* const unit) {
     assert(units->grid[unit->y][unit->x] == null_unit);
-    assert(unit->player != null_player);
+    assert(unit->player != NULL_PLAYER);
 
     const unit_t index = insert_with_players(units, unit);
 
@@ -287,9 +287,9 @@ bool units_update_capture_progress(struct units* const units,
                                    const health_t progress) {
     struct unit* const selected = units_get_selected(units);
 
-    assert(selected->capture_progress < capture_completion);
+    assert(selected->capture_progress < CAPTURE_COMPLETION);
     selected->capture_progress += progress;
-    if (selected->capture_progress >= capture_completion) {
+    if (selected->capture_progress >= CAPTURE_COMPLETION) {
         selected->capture_progress = 0;
         return true;
     }

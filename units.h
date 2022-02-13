@@ -1,7 +1,7 @@
-#ifndef units_h
-#define units_h
+#ifndef UNITS_H
+#define UNITS_H
 
-#include "typedefs.h"
+#include "definitions.h"
 #include <stdbool.h>
 
 #define health_max (health_t)0xff
@@ -29,10 +29,10 @@ struct units {
     unit_t start;
     unit_t size;
     unit_t frees[units_capacity];
-    unit_t firsts[players_capacity];
+    unit_t firsts[PLAYERS_CAPACITY];
     unit_t prevs[units_capacity];
     unit_t nexts[units_capacity];
-    unit_t grid[grid_size][grid_size];
+    unit_t grid[GRID_SIZE][GRID_SIZE];
     unit_t selected;
 };
 

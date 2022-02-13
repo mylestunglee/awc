@@ -119,8 +119,8 @@ bool game_is_attackable(const struct game* const game) {
     //     c. Attackee in attacker's range
     return units_has_selection(&game->units) &&
            (models_min_range[units_const_get_selected(&game->units)->model] ||
-            game->labels[game->prev_y][game->prev_x] & accessible_bit) &&
-           game->labels[game->y][game->x] & attackable_bit;
+            game->labels[game->prev_y][game->prev_x] & ACCESSIBLE_BIT) &&
+           game->labels[game->y][game->x] & ATTACKABLE_BIT;
 }
 
 bool game_is_buildable(const struct game* const game) {
@@ -133,7 +133,7 @@ bool game_is_buildable(const struct game* const game) {
     if (game->territory[game->y][game->x] != game->turn)
         return false;
 
-    const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
+    const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
     return !units_const_get_at(&game->units, game->x, game->y) &&
            buildable_models[capturable] < buildable_models[capturable + 1] &&
@@ -157,7 +157,7 @@ bool game_is_friendly(const struct game* const game, const player_t player) {
 }
 
 void game_remove_player(struct game* const game, const player_t player) {
-    assert(player != null_player);
+    assert(player != NULL_PLAYER);
     units_delete_player(&game->units, player);
     grid_clear_player_territory(game->map, game->territory, player);
     game->incomes[player] = 0;

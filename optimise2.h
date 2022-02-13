@@ -1,15 +1,15 @@
-#ifndef optimise2_h
-#define optimise2_h
+#ifndef OPTIMISE2_H
+#define OPTIMISE2_H
 
 #include "game.h"
-#include "typedefs.h"
+#include "definitions.h"
 
 // bap: Build Allocation Problem
 
 struct bap_inputs {
-    health_wide_t friendly_distribution[model_capacity];
-    health_wide_t enemy_distribution[model_capacity];
-    grid_wide_t capturables[capturable_capacity];
+    health_wide_t friendly_distribution[MODEL_CAPACITY];
+    health_wide_t enemy_distribution[MODEL_CAPACITY];
+    grid_wide_t capturables[CAPTURABLE_CAPACITY];
     gold_t budget;
 };
 

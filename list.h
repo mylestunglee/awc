@@ -1,7 +1,7 @@
-#ifndef list_h
-#define list_h
+#ifndef LIST_H
+#define LIST_H
 
-#include "typedefs.h"
+#include "definitions.h"
 #include <stdbool.h>
 
 typedef uint16_t energy_t;
@@ -13,12 +13,12 @@ struct list_node {
 };
 
 typedef uint16_t list_t;
-#define list_capacity 0x10000
+#define LIST_CAPACITY 0x10000
 
 struct list {
     list_t start;
     list_t end;
-    struct list_node nodes[list_capacity];
+    struct list_node nodes[LIST_CAPACITY];
 };
 
 void list_initialise(struct list* const);

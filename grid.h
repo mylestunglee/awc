@@ -1,18 +1,18 @@
-#ifndef grid_h
-#define grid_h
+#ifndef GRID_H
+#define GRID_H
 
 #include "game.h"
 
-void grid_clear_uint8(uint8_t[grid_size][grid_size]);
+void grid_clear_uint8(uint8_t[GRID_SIZE][GRID_SIZE]);
 void grid_clear_labels(struct game* const);
-void grid_clear_territory(player_t[grid_size][grid_size]);
-void grid_clear_player_territory(tile_t[grid_size][grid_size],
-                                 player_t[grid_size][grid_size],
+void grid_clear_territory(player_t[GRID_SIZE][GRID_SIZE]);
+void grid_clear_player_territory(tile_t[GRID_SIZE][GRID_SIZE],
+                                 player_t[GRID_SIZE][GRID_SIZE],
                                  const player_t);
-void grid_correct_territory(player_t[grid_size][grid_size],
-                            tile_t[grid_size][grid_size]);
-void grid_compute_incomes(player_t[grid_size][grid_size],
-                          gold_t[players_capacity]);
+void grid_correct_territory(player_t[GRID_SIZE][GRID_SIZE],
+                            tile_t[GRID_SIZE][GRID_SIZE]);
+void grid_compute_incomes(player_t[GRID_SIZE][GRID_SIZE],
+                          gold_t[PLAYERS_CAPACITY]);
 #ifdef expose_grid_internals
 void grid_explore_mark_attackable_tile(struct game* const, const grid_t,
                                        const grid_t, const model_t,
@@ -34,7 +34,7 @@ void explore_node(struct game* const, const struct list_node* const,
 #endif
 void grid_explore(struct game* const, const bool);
 #ifdef expose_grid_internals
-void clear_energies(energy_t[grid_size][grid_size]);
+void clear_energies(energy_t[GRID_SIZE][GRID_SIZE]);
 energy_t init_exploration_energy(const energy_t, const model_t);
 #endif
 void grid_explore_recursive(struct game* const, const bool, const energy_t);

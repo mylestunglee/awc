@@ -9,15 +9,15 @@
 
 #define symbolic_name_length 16
 #define sparse_matrix_length                                                   \
-    (1 + model_capacity +                                                      \
-     (3 + capturable_capacity) * model_capacity * model_capacity)
+    (1 + MODEL_CAPACITY +                                                      \
+     (3 + CAPTURABLE_CAPACITY) * MODEL_CAPACITY * MODEL_CAPACITY)
 #define ranged_inefficiency 0.5
 
 static void add_distribution_rows(glp_prob* const problem,
                                   int* const row_offset) {
-    for (model_t model = 0; model < model_capacity; ++model) {
+    for (model_t model = 0; model < MODEL_CAPACITY; ++model) {
         char name[symbolic_name_length];
-        snprintf(name, symbolic_name_length, "u_" model_format,
+        snprintf(name, symbolic_name_length, "u_" MODEL_FORMAT,
                  (model_t)(model + 1));
         glp_set_row_name(problem, *row_offset, name);
         glp_set_row_bnds(problem, *row_offset, GLP_DB, 0.0, 1.0);
@@ -27,13 +27,13 @@ static void add_distribution_rows(glp_prob* const problem,
 
 static void
 add_allocation_rows(glp_prob* const problem,
-                    const grid_wide_t capturables[capturable_capacity],
+                    const grid_wide_t capturables[CAPTURABLE_CAPACITY],
                     int* const row_offset) {
 
-    for (tile_t capturable = 0; capturable < capturable_capacity;
+    for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY;
          ++capturable) {
         char name[symbolic_name_length];
-        snprintf(name, symbolic_name_length, "v_" tile_format,
+        snprintf(name, symbolic_name_length, "v_" TILE_FORMAT,
                  (tile_t)(capturable + 1));
         glp_set_row_name(problem, *row_offset, name);
         glp_set_row_bnds(problem, *row_offset, GLP_UP, 0.0,
@@ -50,9 +50,9 @@ static void add_cost_row(glp_prob* const problem, const gold_t budget,
 }
 
 static void add_surplus_rows(glp_prob* const problem, int* const row_offset) {
-    for (model_t model = 0; model < model_capacity; ++model) {
+    for (model_t model = 0; model < MODEL_CAPACITY; ++model) {
         char name[symbolic_name_length];
-        snprintf(name, symbolic_name_length, "s_" model_format,
+        snprintf(name, symbolic_name_length, "s_" MODEL_FORMAT,
                  (model_t)(model + 1));
         glp_set_row_name(problem, *row_offset, name);
         glp_set_row_bnds(problem, *row_offset, GLP_LO, 0.0, 0.0);
@@ -61,10 +61,10 @@ static void add_surplus_rows(glp_prob* const problem, int* const row_offset) {
 }
 
 static void add_rows(glp_prob* const problem,
-                     const grid_wide_t buildable_allocations[model_capacity],
+                     const grid_wide_t buildable_allocations[MODEL_CAPACITY],
                      const gold_t budget) {
 
-    glp_add_rows(problem, 1 + capturable_capacity + 2 * model_capacity);
+    glp_add_rows(problem, 1 + CAPTURABLE_CAPACITY + 2 * MODEL_CAPACITY);
 
     int row_offset = 1;
     add_distribution_rows(problem, &row_offset);
@@ -75,15 +75,15 @@ static void add_rows(glp_prob* const problem,
 
 static void add_distribution_columns(
     glp_prob* const problem,
-    const health_wide_t friendly_distribution[model_capacity],
-    const health_wide_t enemy_distribution[model_capacity],
+    const health_wide_t friendly_distribution[MODEL_CAPACITY],
+    const health_wide_t enemy_distribution[MODEL_CAPACITY],
     int* const column_offset) {
 
-    for (model_t m = 0; m < model_capacity; ++m) {
-        for (model_t n = 0; n < model_capacity; ++n) {
+    for (model_t m = 0; m < MODEL_CAPACITY; ++m) {
+        for (model_t n = 0; n < MODEL_CAPACITY; ++n) {
             char name[symbolic_name_length];
             snprintf(name, symbolic_name_length,
-                     "x_{" model_format "," model_format "}", (model_t)(m + 1),
+                     "x_{" MODEL_FORMAT "," MODEL_FORMAT "}", (model_t)(m + 1),
                      (model_t)(n + 1));
             glp_set_col_name(problem, *column_offset, name);
             glp_set_col_bnds(problem, *column_offset, GLP_DB, 0.0, 1.0);
@@ -94,15 +94,15 @@ static void add_distribution_columns(
 
 static void add_allocation_columns(
     glp_prob* const problem,
-    const health_wide_t friendly_distribution[model_capacity],
-    const health_wide_t enemy_distribution[model_capacity],
+    const health_wide_t friendly_distribution[MODEL_CAPACITY],
+    const health_wide_t enemy_distribution[MODEL_CAPACITY],
     int* const column_offset) {
 
-    for (model_t m = 0; m < model_capacity; ++m) {
-        for (model_t n = 0; n < model_capacity; ++n) {
+    for (model_t m = 0; m < MODEL_CAPACITY; ++m) {
+        for (model_t n = 0; n < MODEL_CAPACITY; ++n) {
             char name[symbolic_name_length];
             snprintf(name, symbolic_name_length,
-                     "y_{" model_format "," model_format "}", (model_t)(m + 1),
+                     "y_{" MODEL_FORMAT "," MODEL_FORMAT "}", (model_t)(m + 1),
                      (model_t)(n + 1));
             glp_set_col_name(problem, *column_offset, name);
             glp_set_col_bnds(problem, *column_offset, GLP_LO, 0.0, 0.0);
@@ -122,10 +122,10 @@ static void add_ratio_column(glp_prob* const problem,
 
 static void
 add_columns(glp_prob* const problem,
-            const health_wide_t friendly_distribution[model_capacity],
-            const health_wide_t enemy_distribution[model_capacity]) {
+            const health_wide_t friendly_distribution[MODEL_CAPACITY],
+            const health_wide_t enemy_distribution[MODEL_CAPACITY]) {
 
-    glp_add_cols(problem, 1 + 2 * model_capacity * model_capacity);
+    glp_add_cols(problem, 1 + 2 * MODEL_CAPACITY * MODEL_CAPACITY);
 
     int column_offset = 1;
     add_distribution_columns(problem, friendly_distribution, enemy_distribution,
@@ -155,10 +155,10 @@ static void set_sum_coefficients(struct sparse_matrix* const coefficients,
                                  const int row_offset,
                                  const int column_offset) {
 
-    for (model_t m = 0; m < model_capacity; ++m)
-        for (model_t n = 0; n < model_capacity; ++n) {
+    for (model_t m = 0; m < MODEL_CAPACITY; ++m)
+        for (model_t n = 0; n < MODEL_CAPACITY; ++n) {
             const int i = row_offset + m;
-            const int j = column_offset + m * model_capacity + n;
+            const int j = column_offset + m * MODEL_CAPACITY + n;
             sparse_matrix_set(coefficients, i, j, 1.0);
         }
 }
@@ -167,12 +167,12 @@ static void
 set_capturable_coefficients(struct sparse_matrix* const coefficients,
                             const int row_offset, const int column_offset) {
 
-    for (tile_t capturable = 0; capturable < capturable_capacity; ++capturable)
+    for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY; ++capturable)
         for (model_t m = buildable_models[capturable];
              m < buildable_models[capturable + 1]; ++m)
-            for (model_t n = 0; n < model_capacity; ++n) {
+            for (model_t n = 0; n < MODEL_CAPACITY; ++n) {
                 const int i = row_offset + capturable;
-                const int j = column_offset + m * model_capacity + n;
+                const int j = column_offset + m * MODEL_CAPACITY + n;
                 sparse_matrix_set(coefficients, i, j, 1.0);
             }
 }
@@ -181,9 +181,9 @@ static void set_cost_coefficients(struct sparse_matrix* const coefficients,
                                   const int row_offset,
                                   const int column_offset) {
 
-    for (model_t m = 0; m < model_capacity; ++m)
-        for (model_t n = 0; n < model_capacity; ++n) {
-            const int j = column_offset + m * model_capacity + n;
+    for (model_t m = 0; m < MODEL_CAPACITY; ++m)
+        for (model_t n = 0; n < MODEL_CAPACITY; ++n) {
+            const int j = column_offset + m * MODEL_CAPACITY + n;
             sparse_matrix_set(coefficients, row_offset, j, models_cost[m]);
         }
 }
@@ -191,16 +191,16 @@ static void set_cost_coefficients(struct sparse_matrix* const coefficients,
 static void set_surplus_distribution_coefficients(
     struct sparse_matrix* const coefficients,
     const health_wide_t* const friendly_distribution,
-    const health_wide_t enemy_distribution[model_capacity],
+    const health_wide_t enemy_distribution[MODEL_CAPACITY],
     const int row_offset, const int column_offset) {
 
-    for (model_t m = 0; m < model_capacity; ++m) {
+    for (model_t m = 0; m < MODEL_CAPACITY; ++m) {
         if (enemy_distribution[m] == 0)
             continue;
 
-        for (model_t n = 0; n < model_capacity; ++n) {
+        for (model_t n = 0; n < MODEL_CAPACITY; ++n) {
             const int i = row_offset + m;
-            const int j = column_offset + n * model_capacity + m;
+            const int j = column_offset + n * MODEL_CAPACITY + m;
             const double value =
                 (double)units_damage[n][m] *
                 (models_min_range[n] ? ranged_inefficiency : 1.0) *
@@ -214,10 +214,10 @@ static void set_surplus_distribution_coefficients(
 
 static void set_surplus_ratio_coefficients(
     struct sparse_matrix* const coefficients,
-    const health_wide_t enemy_distribution[model_capacity],
+    const health_wide_t enemy_distribution[MODEL_CAPACITY],
     const int row_offset, const int column_offset) {
 
-    for (model_t model = 0; model < model_capacity; ++model) {
+    for (model_t model = 0; model < MODEL_CAPACITY; ++model) {
         if (enemy_distribution[model] == 0)
             continue;
 
@@ -228,26 +228,26 @@ static void set_surplus_ratio_coefficients(
 
 static void
 populate_coefficients(glp_prob* const problem,
-                      const health_wide_t friendly_distribution[model_capacity],
-                      const health_wide_t enemy_distribution[model_capacity],
+                      const health_wide_t friendly_distribution[MODEL_CAPACITY],
+                      const health_wide_t enemy_distribution[MODEL_CAPACITY],
                       struct sparse_matrix* const coefficients) {
 
     // Reuse game queue as a workspace for storing the coefficient matrix
     assert(sizeof(struct sparse_matrix) <
-           sizeof(struct list_node) * list_capacity);
+           sizeof(struct list_node) * LIST_CAPACITY);
     coefficients->entries = 0;
 
     int row_offset = 0;
 
     set_sum_coefficients(coefficients, row_offset, 0);
-    row_offset += model_capacity;
+    row_offset += MODEL_CAPACITY;
 
     set_capturable_coefficients(coefficients, row_offset,
-                                model_capacity * model_capacity);
-    row_offset += capturable_capacity;
+                                MODEL_CAPACITY * MODEL_CAPACITY);
+    row_offset += CAPTURABLE_CAPACITY;
 
     set_cost_coefficients(coefficients, row_offset,
-                          model_capacity * model_capacity);
+                          MODEL_CAPACITY * MODEL_CAPACITY);
     ++row_offset;
 
     set_surplus_distribution_coefficients(coefficients, friendly_distribution,
@@ -255,10 +255,10 @@ populate_coefficients(glp_prob* const problem,
 
     set_surplus_distribution_coefficients(coefficients, NULL,
                                           enemy_distribution, row_offset,
-                                          model_capacity * model_capacity);
+                                          MODEL_CAPACITY * MODEL_CAPACITY);
 
     set_surplus_ratio_coefficients(coefficients, enemy_distribution, row_offset,
-                                   2 * model_capacity * model_capacity);
+                                   2 * MODEL_CAPACITY * MODEL_CAPACITY);
 
     glp_load_matrix(problem, coefficients->entries, coefficients->is,
                     coefficients->js, coefficients->values);
@@ -266,13 +266,13 @@ populate_coefficients(glp_prob* const problem,
 
 static void
 populate_build_allocations(glp_prob* const problem,
-                           grid_wide_t build_allocation[model_capacity]) {
+                           grid_wide_t build_allocation[MODEL_CAPACITY]) {
 
-    for (model_t m = 0; m < model_capacity; ++m)
-        for (model_t n = 0; n < model_capacity; ++n)
+    for (model_t m = 0; m < MODEL_CAPACITY; ++m)
+        for (model_t n = 0; n < MODEL_CAPACITY; ++n)
             build_allocation[m] +=
-                glp_mip_col_val(problem, 1 + n + m * model_capacity +
-                                             model_capacity * model_capacity);
+                glp_mip_col_val(problem, 1 + n + m * MODEL_CAPACITY +
+                                             MODEL_CAPACITY * MODEL_CAPACITY);
 }
 
 static int solve(glp_prob* const problem) {
@@ -284,10 +284,10 @@ static int solve(glp_prob* const problem) {
 }
 
 void optimise_build_allocations(
-    const health_wide_t friendly_distribution[model_capacity],
-    const health_wide_t enemy_distribution[model_capacity],
-    const grid_wide_t capturables[capturable_capacity], const gold_t budget,
-    grid_wide_t build_allocations[model_capacity], void* const workspace) {
+    const health_wide_t friendly_distribution[MODEL_CAPACITY],
+    const health_wide_t enemy_distribution[MODEL_CAPACITY],
+    const grid_wide_t capturables[CAPTURABLE_CAPACITY], const gold_t budget,
+    grid_wide_t build_allocations[MODEL_CAPACITY], void* const workspace) {
 
     glp_prob* const problem = glp_create_prob();
     glp_set_prob_name(problem, "build_allocations");

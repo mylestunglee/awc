@@ -25,12 +25,12 @@ static player_wide_t bitmatrix_cascade(const player_t p, const player_t q) {
     // Bit-matrix relation is reflexive and symmetric
     assert(p > q);
 
-    return (player_wide_t)p + (player_wide_t)q * players_capacity -
+    return (player_wide_t)p + (player_wide_t)q * PLAYERS_CAPACITY -
            (((player_wide_t)q + 1) * ((player_wide_t)q + 2)) / 2;
 }
 
 void bitmatrix_set(uint8_t* const data, const player_t p, const player_t q) {
-    if (p == null_player || q == null_player)
+    if (p == NULL_PLAYER || q == NULL_PLAYER)
         return;
 
     if (p == q)
@@ -43,7 +43,7 @@ void bitmatrix_set(uint8_t* const data, const player_t p, const player_t q) {
 }
 
 void bitmatrix_unset(uint8_t* const data, const player_t p, const player_t q) {
-    if (p == null_player || q == null_player)
+    if (p == NULL_PLAYER || q == NULL_PLAYER)
         return;
 
     if (p == q)
@@ -58,7 +58,7 @@ void bitmatrix_unset(uint8_t* const data, const player_t p, const player_t q) {
 bool bitmatrix_get(const uint8_t* const data, const player_t p,
                    const player_t q) {
     // Cannot be allied with null player
-    if (p == null_player || q == null_player)
+    if (p == NULL_PLAYER || q == NULL_PLAYER)
         return false;
 
     // Friendly untis are allied
@@ -73,8 +73,8 @@ bool bitmatrix_get(const uint8_t* const data, const player_t p,
 }
 
 void bitmatrix_print(const uint8_t* const data) {
-    for (player_t q = 0; q < players_capacity; ++q) {
-        for (player_t p = 0; p < players_capacity; ++p)
+    for (player_t q = 0; q < PLAYERS_CAPACITY; ++q) {
+        for (player_t p = 0; p < PLAYERS_CAPACITY; ++p)
             printf("%u ", bitmatrix_get(data, p, q));
         printf("\n");
     }

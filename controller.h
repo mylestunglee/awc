@@ -1,5 +1,5 @@
-#ifndef controller_h
-#define controller_h
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 
 #include "game.h"
 

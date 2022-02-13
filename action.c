@@ -52,7 +52,7 @@ void action_attack(struct game* const game) {
     struct unit* const attackee = units_get_at(&game->units, game->x, game->y);
     assert(attacker);
     assert(attacker->enabled);
-    assert(game->labels[game->y][game->x] & attackable_bit);
+    assert(game->labels[game->y][game->x] & ATTACKABLE_BIT);
     assert(game->dirty_labels);
     grid_clear_labels(game);
 
@@ -91,8 +91,8 @@ bool action_build(struct game* const game, const model_t model) {
     const gold_t cost = models_cost[model];
 
     assert(game->territory[game->y][game->x] == game->turn);
-    assert(game->map[game->y][game->x] >= terrian_capacity);
-    const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
+    assert(game->map[game->y][game->x] >= TERRIAN_CAPACITY);
+    const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
     if (model < buildable_models[capturable] ||
         model >= buildable_models[capturable + 1] ||
@@ -125,8 +125,8 @@ bool can_selected_unit_capture(const struct game* const game) {
     // 1. The unit is a infantry or a mech
     // 2. The tile is capturable
     // 3. The tile is owned by an enemy
-    return unit->model < unit_capturable_upper_bound &&
-           game->map[game->y][game->x] >= terrian_capacity &&
+    return unit->model < UNIT_CAPTURABLE_UPPER_BOUND &&
+           game->map[game->y][game->x] >= TERRIAN_CAPACITY &&
            !game_is_friendly(game, game->territory[game->y][game->x]);
 }
 
@@ -138,18 +138,18 @@ void action_capture(struct game* const game) {
     assert(loser != game->turn);
 
     // If the enemy loses their HQ
-    if (game->map[game->y][game->x] == tile_hq)
+    if (game->map[game->y][game->x] == TILE_HQ)
         game_remove_player(game, loser);
-    else if (loser != null_player)
-        game->incomes[loser] -= gold_scale;
+    else if (loser != NULL_PLAYER)
+        game->incomes[loser] -= GOLD_SCALE;
 
     game->territory[game->y][game->x] = game->turn;
-    game->incomes[game->turn] += gold_scale;
+    game->incomes[game->turn] += GOLD_SCALE;
 }
 
 bool action_move(struct game* const game) {
     const bool selected = units_has_selection(&game->units);
-    if (selected && game->labels[game->y][game->x] & accessible_bit) {
+    if (selected && game->labels[game->y][game->x] & ACCESSIBLE_BIT) {
         assert(game->dirty_labels);
         const health_t capture_progress =
             move_selected_unit(game, game->x, game->y);
@@ -174,7 +174,7 @@ bool action_self_destruct(struct game* const game) {
 
 bool at_least_two_alive_players(const struct game* const game) {
     player_t alive_players = 0;
-    for (player_t player = 0; player < players_capacity; ++player)
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
         if (game_is_alive(game, player))
             ++alive_players;
     return alive_players >= 2;

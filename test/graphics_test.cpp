@@ -114,7 +114,7 @@ TEST_F(game_fixture, calc_tile_style_gets_terrian_style) {
 }
 
 TEST_F(game_fixture, calc_tile_style_gets_capturable_style) {
-    game->map[3][2] = tile_city;
+    game->map[3][2] = TILE_CITY;
     game->territory[3][2] = 1;
     ASSERT_EQ(calc_tile_style(game, 2, 3), '\xf1');
 }
@@ -173,10 +173,10 @@ TEST(graphics_test, decode_texture_returns_true_on_transparent_texture) {
     ASSERT_TRUE(decode_texture('\x00', false, 0, &symbol, &style));
 }
 
-TEST(graphics_test, decode_texture_fetches_null_player_symbol) {
+TEST(graphics_test, decode_texture_fetches_NULL_PLAYER_symbol) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    ASSERT_FALSE(decode_texture('\xf0', false, null_player, &symbol, &style));
+    ASSERT_FALSE(decode_texture('\xf0', false, NULL_PLAYER, &symbol, &style));
     ASSERT_EQ(symbol, ' ');
 }
 
@@ -246,7 +246,7 @@ TEST(graphics_test, render_highlight_with_no_label_shows_no_highlight) {
 TEST(graphics_test, render_highlight_shows_overlapping_accessible_style) {
     wchar_t symbol = 0;
     uint8_t style = '\x23';
-    render_highlight(accessible_bit, &symbol, &style);
+    render_highlight(ACCESSIBLE_BIT, &symbol, &style);
     ASSERT_EQ(symbol, L'░');
     ASSERT_EQ(style, '\xe3');
 }
@@ -254,14 +254,14 @@ TEST(graphics_test, render_highlight_shows_overlapping_accessible_style) {
 TEST(graphics_test, render_highlight_shows_attackable_style) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_highlight(attackable_bit, &symbol, &style);
+    render_highlight(ATTACKABLE_BIT, &symbol, &style);
     ASSERT_EQ(style, '\x90');
 }
 
 TEST(graphics_test, render_highlight_shows_accessible_and_attackable_style) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_highlight(accessible_bit | attackable_bit, &symbol, &style);
+    render_highlight(ACCESSIBLE_BIT | ATTACKABLE_BIT, &symbol, &style);
     ASSERT_EQ(style, '\xd0');
 }
 
@@ -316,7 +316,7 @@ TEST_F(game_fixture, render_pixel_shows_unit_health_bar) {
 }
 
 TEST_F(game_fixture, render_pixel_shows_capture_progress) {
-    insert_unit({.capture_progress = capture_completion - 1});
+    insert_unit({.capture_progress = CAPTURE_COMPLETION - 1});
     const auto [symbol, style] = render_pixel_helper(game, 0, 1, 1, 0);
     ASSERT_EQ(symbol, '9');
     ASSERT_EQ(style, '\x0a');

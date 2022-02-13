@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <string.h>
 
-static void file_load_map(tile_t map[grid_size][grid_size],
+static void file_load_map(tile_t map[GRID_SIZE][GRID_SIZE],
                           const char* const tokens, const grid_t y) {
-    char map_str[grid_size] = {0};
-    if (sscanf(tokens, row_format, map_str) != 1)
+    char map_str[GRID_SIZE] = {0};
+    if (sscanf(tokens, ROW_FORMAT, map_str) != 1)
         return;
 
     grid_t x = 0;
@@ -18,7 +18,7 @@ static void file_load_map(tile_t map[grid_size][grid_size],
     // Read symbols left to right
     while (map_str[x] != '\0') {
         // Find tile index for symbol
-        for (tile_t tile = 0; tile < tile_capacity; ++tile) {
+        for (tile_t tile = 0; tile < TILE_CAPACITY; ++tile) {
             if (map_str[x] == tile_symbols[tile]) {
                 map[y][x] = tile;
                 break;
@@ -28,25 +28,25 @@ static void file_load_map(tile_t map[grid_size][grid_size],
     }
 }
 
-static void file_load_territory(player_t territory[grid_size][grid_size],
+static void file_load_territory(player_t territory[GRID_SIZE][GRID_SIZE],
                                 const char* const tokens) {
     grid_t x, y;
     player_t player;
 
-    if (sscanf(tokens, player_format grid_format grid_format, &player, &x,
+    if (sscanf(tokens, PLAYER_FORMAT GRID_FORMAT GRID_FORMAT, &player, &x,
                &y) != 3)
         return;
 
-    if (player < players_capacity)
+    if (player < PLAYERS_CAPACITY)
         territory[y][x] = player;
 }
 
 static void file_load_bot(uint8_t* const bots, const char* const tokens) {
     player_t player;
-    if (sscanf(tokens, player_format, &player) != 1)
+    if (sscanf(tokens, PLAYER_FORMAT, &player) != 1)
         return;
 
-    if (player < players_capacity)
+    if (player < PLAYERS_CAPACITY)
         bitarray_set(bots, player);
 }
 
@@ -58,11 +58,11 @@ static void file_load_unit(struct units* const units, const char* const tokens,
     char enabled[8];
     if (sscanf(
             tokens,
-            player_format grid_format grid_format health_format enabled_format,
+            PLAYER_FORMAT GRID_FORMAT GRID_FORMAT HEALTH_FORMAT ENABLED_FORMAT,
             &player, &x, &y, &health, enabled) != 5)
         return;
 
-    if (player < players_capacity) {
+    if (player < PLAYERS_CAPACITY) {
         const struct unit unit = {.health = health,
                                   .model = model,
                                   .player = player,
@@ -73,20 +73,20 @@ static void file_load_unit(struct units* const units, const char* const tokens,
     }
 }
 
-static void file_load_gold(gold_t golds[players_capacity],
+static void file_load_gold(gold_t golds[PLAYERS_CAPACITY],
                            const char* const tokens) {
     player_t player;
     gold_t gold;
 
-    if (sscanf(tokens, player_format gold_format, &player, &gold) != 2)
+    if (sscanf(tokens, PLAYER_FORMAT GOLD_FORMAT, &player, &gold) != 2)
         return;
 
-    if (player < players_capacity)
+    if (player < PLAYERS_CAPACITY)
         golds[player] = gold;
 }
 
 static void file_load_team(uint8_t* const alliances, char* tokens) {
-    player_t team[players_capacity];
+    player_t team[PLAYERS_CAPACITY];
     player_t size = 0;
 
     const char* const delim = " ";
@@ -94,7 +94,7 @@ static void file_load_team(uint8_t* const alliances, char* tokens) {
     // Parse tokens into integer array
     char* token = __strtok_r(NULL, delim, &tokens);
     while (token) {
-        if (sscanf(token, player_format, &team[size]) != 1)
+        if (sscanf(token, PLAYER_FORMAT, &team[size]) != 1)
             continue;
 
         ++size;
@@ -130,7 +130,7 @@ bool file_load(struct game* const game, const char* const filename) {
         if (key == NULL)
             continue;
         else if (!strcmp(key, "turn"))
-            sscanf(tokens, turn_format, &game->turn);
+            sscanf(tokens, TURN_FORMAT, &game->turn);
         else if (!strcmp(key, "map")) {
             file_load_map(game->map, tokens, y);
             ++y;
@@ -143,7 +143,7 @@ bool file_load(struct game* const game, const char* const filename) {
         else if (!strcmp(key, "team"))
             file_load_team(game->alliances, tokens);
         else
-            for (model_t model = 0; model < model_capacity; ++model)
+            for (model_t model = 0; model < MODEL_CAPACITY; ++model)
                 if (!strcmp(key, model_names[model])) {
                     file_load_unit(&game->units, tokens, model);
                     break;
@@ -155,7 +155,7 @@ bool file_load(struct game* const game, const char* const filename) {
 
 static grid_wide_t file_row_length(const struct game* const game,
                                    const grid_t y) {
-    for (grid_wide_t x = grid_size - 1; x >= 0; --x) {
+    for (grid_wide_t x = GRID_SIZE - 1; x >= 0; --x) {
         if (game->map[y][x]) {
             return x;
         }
@@ -181,12 +181,12 @@ static void file_save_map(const struct game* const game, FILE* const file) {
 }
 
 static void file_save_units(const struct units* const units, FILE* const file) {
-    for (player_t player = 0; player < players_capacity; ++player) {
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player) {
         const struct unit* unit = units_const_get_first(units, player);
         while (unit) {
             fprintf(file,
-                    model_name_format " " player_format " " grid_format
-                                      " " grid_format " " health_format " %s\n",
+                    MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
+                                      " " GRID_FORMAT " " HEALTH_FORMAT " %s\n",
                     model_names[unit->model], unit->player, unit->x, unit->y,
                     unit->health, unit->enabled ? "enabled" : "disabled");
             unit = units_const_get_next(units, unit);
@@ -194,33 +194,33 @@ static void file_save_units(const struct units* const units, FILE* const file) {
     }
 }
 
-static void file_save_territory(const player_t territory[grid_size][grid_size],
+static void file_save_territory(const player_t territory[GRID_SIZE][GRID_SIZE],
                                 FILE* const file) {
     grid_t y = 0;
     do {
         grid_t x = 0;
         do {
-            if (territory[y][x] != null_player)
+            if (territory[y][x] != NULL_PLAYER)
                 fprintf(file,
-                        "territory " player_format " " grid_format
-                        " " grid_format "\n",
+                        "territory " PLAYER_FORMAT " " GRID_FORMAT
+                        " " GRID_FORMAT "\n",
                         territory[y][x], x, y);
         } while (++x);
     } while (++y);
 }
 
-static void file_save_golds(const gold_t golds[players_capacity],
+static void file_save_golds(const gold_t golds[PLAYERS_CAPACITY],
                             FILE* const file) {
-    for (player_t player = 0; player < players_capacity; ++player)
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
         if (golds[player])
-            fprintf(file, "gold " player_format " " gold_format "\n", player,
+            fprintf(file, "gold " PLAYER_FORMAT " " GOLD_FORMAT "\n", player,
                     golds[player]);
 }
 
 static void file_save_bots(const uint8_t* const bots, FILE* const file) {
-    for (player_t player = 0; player < players_capacity; ++player)
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
         if (bitarray_get(bots, player))
-            fprintf(file, "bot " player_format "\n", player);
+            fprintf(file, "bot " PLAYER_FORMAT "\n", player);
 }
 
 static void file_save_teams(const uint8_t* const alliances, FILE* const file) {
@@ -228,15 +228,15 @@ static void file_save_teams(const uint8_t* const alliances, FILE* const file) {
     memcpy(copy, alliances, sizeof(copy));
 
     // For each possible member and following members
-    for (player_t p = 0; p < players_capacity; ++p)
-        for (player_t s = 0; s < players_capacity; ++s) {
+    for (player_t p = 0; p < PLAYERS_CAPACITY; ++p)
+        for (player_t s = 0; s < PLAYERS_CAPACITY; ++s) {
             // Only initalise first team member
-            player_t team[players_capacity];
+            player_t team[PLAYERS_CAPACITY];
             team[0] = p;
             player_t size = 1;
 
             // Attempt to grow team for any player expect p
-            for (player_t q = 0; q < players_capacity; ++q) {
+            for (player_t q = 0; q < PLAYERS_CAPACITY; ++q) {
                 if (p == q)
                     continue;
 
@@ -268,7 +268,7 @@ static void file_save_teams(const uint8_t* const alliances, FILE* const file) {
             // Print team
             fprintf(file, "team");
             for (player_t r = 0; r < size; ++r)
-                fprintf(file, " " player_format, team[r]);
+                fprintf(file, " " PLAYER_FORMAT, team[r]);
             fprintf(file, "\n");
         }
 }
@@ -279,7 +279,7 @@ bool file_save(const struct game* const game, const char* const filename) {
     if (!file)
         return true;
 
-    fprintf(file, "turn " turn_format "\n", game->turn);
+    fprintf(file, "turn " TURN_FORMAT "\n", game->turn);
     file_save_map(game, file);
     file_save_units(&game->units, file);
     file_save_territory(game->territory, file);

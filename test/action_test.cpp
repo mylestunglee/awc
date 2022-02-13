@@ -75,7 +75,7 @@ TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
     game->y = 7;
     game->map[7][4] = tile_plains;
     game->map[7][5] = tile_plains;
-    game->labels[7][5] = attackable_bit;
+    game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
     action_attack(game);
@@ -101,7 +101,7 @@ TEST_F(game_fixture, action_attack_where_ranged_unit_kills) {
     game->x = 5;
     game->y = 7;
     game->map[7][5] = tile_plains;
-    game->labels[7][5] = attackable_bit;
+    game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
     action_attack(game);
@@ -120,7 +120,7 @@ TEST_F(game_fixture, action_attack_where_counter_damage_kills) {
     game->y = 7;
     game->map[7][4] = tile_plains;
     game->map[7][5] = tile_plains;
-    game->labels[7][5] = attackable_bit;
+    game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
     action_attack(game);
@@ -130,11 +130,11 @@ TEST_F(game_fixture, action_attack_where_counter_damage_kills) {
 }
 
 TEST_F(game_fixture, action_build_returns_true_when_model_is_unbuildable) {
-    game->golds[game->turn] = gold_scale;
+    game->golds[game->turn] = GOLD_SCALE;
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = game->turn;
-    game->map[3][2] = tile_city;
+    game->map[3][2] = TILE_CITY;
     constexpr model_t infantry = 0;
 
     ASSERT_TRUE(action_build(game, infantry));
@@ -144,18 +144,18 @@ TEST_F(game_fixture, action_build_returns_true_when_model_is_unaffordable) {
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = game->turn;
-    game->map[3][2] = tile_factory;
+    game->map[3][2] = TILE_FACTORY;
     constexpr model_t infantry = 0;
 
     ASSERT_TRUE(action_build(game, infantry));
 }
 
 TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
-    game->golds[game->turn] = gold_scale;
+    game->golds[game->turn] = GOLD_SCALE;
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = game->turn;
-    game->map[3][2] = tile_factory;
+    game->map[3][2] = TILE_FACTORY;
     constexpr model_t infantry = 0;
 
     ASSERT_FALSE(action_build(game, infantry));
@@ -176,7 +176,7 @@ TEST_F(game_fixture, can_selected_unit_capture_returns_true_when_capturable) {
     units_select_at(&game->units, 2, 3);
     game->x = 2;
     game->y = 3;
-    game->map[3][2] = tile_city;
+    game->map[3][2] = TILE_CITY;
     game->territory[3][2] = 1;
 
     ASSERT_TRUE(can_selected_unit_capture(game));
@@ -196,7 +196,7 @@ TEST_F(game_fixture, action_capture_when_capture_enemy_hq) {
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = 1;
-    game->map[3][2] = tile_hq;
+    game->map[3][2] = TILE_HQ;
     game->incomes[game->turn] = 5000;
     game->incomes[1] = 5000;
 
@@ -221,7 +221,7 @@ TEST_F(game_fixture, action_capture_when_capture_enemy_city) {
 TEST_F(game_fixture, action_capture_when_capture_unoccupied_city) {
     game->x = 2;
     game->y = 3;
-    game->territory[3][2] = null_player;
+    game->territory[3][2] = NULL_PLAYER;
     game->incomes[game->turn] = 5000;
 
     action_capture(game);
@@ -234,16 +234,16 @@ TEST_F(game_fixture, action_move_returns_true_when_start_capturing) {
     units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;
-    game->labels[7][5] = accessible_bit;
+    game->labels[7][5] = ACCESSIBLE_BIT;
     game->dirty_labels = true;
-    game->map[7][5] = tile_city;
-    game->territory[7][5] = null_player;
+    game->map[7][5] = TILE_CITY;
+    game->territory[7][5] = NULL_PLAYER;
 
     ASSERT_TRUE(action_move(game));
 
     const struct unit* const unit = units_const_get_at(&game->units, 5, 7);
     ASSERT_TRUE(unit);
-    ASSERT_EQ(game->territory[7][5], null_player);
+    ASSERT_EQ(game->territory[7][5], NULL_PLAYER);
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 
@@ -256,10 +256,10 @@ TEST_F(game_fixture, action_move_returns_true_when_finish_capturing) {
     units_select_at(&game->units, 2, 3);
     game->x = 2;
     game->y = 3;
-    game->labels[3][2] = accessible_bit;
+    game->labels[3][2] = ACCESSIBLE_BIT;
     game->dirty_labels = true;
-    game->map[3][2] = tile_city;
-    game->territory[3][2] = null_player;
+    game->map[3][2] = TILE_CITY;
+    game->territory[3][2] = NULL_PLAYER;
 
     ASSERT_TRUE(action_move(game));
 
@@ -316,7 +316,7 @@ TEST_F(game_fixture, action_select_returns_true_when_unit_selectable) {
     insert_unit({.x = 2, .y = 3, .enabled = true});
     game->x = 2;
     game->y = 3;
-    game->labels[7][5] = accessible_bit;
+    game->labels[7][5] = ACCESSIBLE_BIT;
     game->dirty_labels = true;
 
     ASSERT_TRUE(action_select(game));
@@ -338,7 +338,7 @@ TEST_F(game_fixture, action_highlight_returns_true_when_unit_selectable) {
 
     ASSERT_TRUE(action_highlight(game));
 
-    ASSERT_EQ(game->labels[3][2], accessible_bit);
+    ASSERT_EQ(game->labels[3][2], ACCESSIBLE_BIT);
 }
 
 TEST_F(game_fixture, action_highlight_returns_false_when_unit_unselectable) {

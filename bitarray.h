@@ -1,7 +1,7 @@
-#ifndef bitarray_h
-#define bitarray_h
+#ifndef BITARRAY_H
+#define BITARRAY_H
 
-#include "typedefs.h"
+#include "definitions.h"
 #include <stdbool.h>
 
 typedef uint16_t player_wide_t;

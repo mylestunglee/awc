@@ -1,5 +1,5 @@
-#ifndef file_h
-#define file_h
+#ifndef FILE_H
+#define FILE_H
 
 #include "game.h"
 #include <stdbool.h>

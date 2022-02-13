@@ -1,19 +1,19 @@
-#ifndef constants_h
-#define constants_h
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
-#include "typedefs.h"
+#include "definitions.h"
 
-#define null_player players_capacity
+#define NULL_PLAYER PLAYERS_CAPACITY
 
-#define accessible_bit 1
-#define attackable_bit 2
+#define ACCESSIBLE_BIT 1
+#define ATTACKABLE_BIT 2
 
-#define tile_void (tile_t)0
-#define tile_bridge (tile_t)9
-#define tile_city (tile_t)10
-#define tile_factory (tile_t)11
-#define tile_hq (tile_t)14
+#define TILE_VOID (tile_t)0
+#define TILE_BRIDGE (tile_t)9
+#define TILE_CITY (tile_t)10
+#define TILE_FACTORY (tile_t)11
+#define TILE_HQ (tile_t)14
 
-#define gold_scale 1000
+#define GOLD_SCALE 1000
 
 #endif

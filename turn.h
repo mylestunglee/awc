@@ -1,9 +1,8 @@
-#ifndef turn_h
-#define turn_h
+#ifndef TURN_H
+#define TURN_H
 
 #include "game.h"
-#define heal_rate (health_t)51
-#define null_unit units_capacity
+#define HEAL_RATE (health_t)51
 
 #ifdef expose_turn_internals
 void repair_units(struct game* const);

@@ -13,8 +13,8 @@ TEST_F(game_fixture, repair_units_increases_unit_health) {
     game->territory[3][2] = game->turn;
     repair_units(game);
     ASSERT_EQ(units_const_get_first(&game->units, game->turn)->health,
-              heal_rate);
-    ASSERT_EQ(game->golds[game->turn], -gold_scale * heal_rate / health_max);
+              HEAL_RATE);
+    ASSERT_EQ(game->golds[game->turn], -GOLD_SCALE * HEAL_RATE / health_max);
 }
 
 TEST_F(game_fixture, repair_units_ignores_unit_not_on_territory) {
@@ -29,7 +29,7 @@ TEST_F(game_fixture, repair_units_caps_at_maximum_health) {
     repair_units(game);
     ASSERT_EQ(units_const_get_first(&game->units, game->turn)->health,
               health_max);
-    ASSERT_EQ(game->golds[game->turn], -gold_scale / health_max);
+    ASSERT_EQ(game->golds[game->turn], -GOLD_SCALE / health_max);
 }
 
 TEST_F(game_fixture, start_turn) {
@@ -39,7 +39,7 @@ TEST_F(game_fixture, start_turn) {
     start_turn(game);
     ASSERT_TRUE(units_const_get_first(&game->units, game->turn)->enabled);
     ASSERT_EQ(game->golds[game->turn],
-              gold_scale - gold_scale * heal_rate / health_max);
+              GOLD_SCALE - GOLD_SCALE * HEAL_RATE / health_max);
 }
 
 TEST_F(game_fixture, end_turn) {
@@ -53,7 +53,7 @@ TEST_F(game_fixture, end_turn) {
 }
 
 TEST_F(game_fixture, next_alive_turn_increments_turn) {
-    game->turn = players_capacity - 1;
+    game->turn = PLAYERS_CAPACITY - 1;
     game->incomes[0] = 1000;
     next_alive_turn(game);
     ASSERT_EQ(game->turn, 0);
@@ -95,7 +95,7 @@ TEST_F(game_fixture, turn_next_plays_bot_turn) {
     insert_unit({.player = 1, .x = 2, .enabled = true});
     bitarray_set(game->bots, 1);
     game->map[0][2] = tile_plains;
-    game->map[0][3] = tile_city;
+    game->map[0][3] = TILE_CITY;
     game->territory[0][3] = 2;
     game->incomes[2] = 1000;
     turn_next(game);

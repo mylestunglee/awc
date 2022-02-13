@@ -26,14 +26,14 @@
 const static uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
                                          '^', '\\', '/', '[', ']', '-', '='};
 
-const static uint8_t player_styles[players_capacity + 1] = {
+const static uint8_t player_styles[PLAYERS_CAPACITY + 1] = {
     '\xf4', '\xf1', '\xf3', '\xf8', '\xf8', '\xf8'};
 
-const static uint8_t tile_styles[terrian_capacity] = {
+const static uint8_t tile_styles[TERRIAN_CAPACITY] = {
     '\x80', '\xa2', '\x32', '\x13', '\x3b',
     '\xc4', '\xd4', '\x4c', '\x78', '\x78'};
 const static uint8_t
-    unit_textures[model_capacity][unit_height][(unit_width + 1) / 2] = {
+    unit_textures[MODEL_CAPACITY][unit_height][(unit_width + 1) / 2] = {
         {{'\x03', '\xf3', '\x00'}, {'\x08', '\x88', '\x00'}},
         {{'\x0E', '\xfe', '\x00'}, {'\x08', '\x88', '\x00'}},
         {{'\x0A', '\xfd', '\x00'}, {'\x03', '\x33', '\x00'}},
@@ -51,7 +51,7 @@ const static uint8_t
         {{'\x88', '\xf8', '\x80'}, {'\x92', '\x22', '\xa0'}}};
 
 const static uint8_t
-    capturable_textures[capturable_capacity][tile_height]
+    capturable_textures[CAPTURABLE_CAPACITY][tile_height]
                        [(tile_width + 1) / 2] = {
                            {
                                {'\x00', '\xb1', '\xfc', '\x00'},
@@ -188,7 +188,7 @@ bool render_capture_progress_bar(const struct units* const units,
     if (capture_progress == 0)
         return false;
 
-    render_bar(capture_progress, capture_completion, tile_x, symbol, style);
+    render_bar(capture_progress, CAPTURE_COMPLETION, tile_x, symbol, style);
 
     return true;
 }
@@ -196,7 +196,7 @@ bool render_capture_progress_bar(const struct units* const units,
 uint8_t calc_tile_style(const struct game* const game, const grid_t x,
                         const grid_t y) {
     const tile_t tile = game->map[y][x];
-    return tile < terrian_capacity ? tile_styles[tile]
+    return tile < TERRIAN_CAPACITY ? tile_styles[tile]
                                    : player_styles[game->territory[y][x]];
 }
 
@@ -273,7 +273,7 @@ bool decode_texture(const uint8_t textures, const bool polarity,
     if (texture == '\x00')
         return true;
     else if (texture == '\x0f') {
-        if (player == null_player)
+        if (player == NULL_PLAYER)
             *symbol = ' ';
         else
             *symbol = '1' + player;
@@ -314,7 +314,7 @@ bool render_unit(const struct units* const units, const grid_t x,
 void render_highlight(const uint8_t label, wchar_t* const symbol,
                       uint8_t* const style) {
 
-    assert(!(label & ~(accessible_bit | attackable_bit)));
+    assert(!(label & ~(ACCESSIBLE_BIT | ATTACKABLE_BIT)));
 
     // Apply label hightlighting
     if (!label)
@@ -326,13 +326,13 @@ void render_highlight(const uint8_t label, wchar_t* const symbol,
 
     // Set foreground style
     switch (label) {
-    case accessible_bit:
+    case ACCESSIBLE_BIT:
         *style |= accessible_style;
         break;
-    case attackable_bit:
+    case ATTACKABLE_BIT:
         *style |= attackable_style;
         break;
-    case accessible_bit | attackable_bit:
+    case ACCESSIBLE_BIT | ATTACKABLE_BIT:
         *style |= accessible_attackable_style;
         break;
     }
@@ -373,13 +373,13 @@ bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
     const tile_t tile = game->map[y][x];
     bool highlightable = true;
 
-    if (tile < terrian_capacity) {
+    if (tile < TERRIAN_CAPACITY) {
         *style = tile_styles[tile];
         *symbol = tile_symbols[tile];
     } else {
         // If texture is transparent, texture is highlightable
         highlightable = decode_texture(
-            capturable_textures[tile - terrian_capacity][tile_y][tile_x / 2],
+            capturable_textures[tile - TERRIAN_CAPACITY][tile_y][tile_x / 2],
             tile_x % 2 != 0, game->territory[y][x], symbol, style);
 
         if (highlightable)
@@ -473,7 +473,7 @@ static void print_normal_text(const struct game* const game) {
     const struct unit* unit =
         units_const_get_at(&game->units, game->x, game->y);
     if (unit)
-        wprintf(L"unit health=" health_format " model=%s capture_progress=%u",
+        wprintf(L"unit health=" HEALTH_FORMAT " model=%s capture_progress=%u",
                 unit->health, model_names[unit->model], unit->capture_progress);
 }
 
@@ -489,13 +489,13 @@ static void print_attack_text(const struct game* const game) {
 
 static void print_build_text(const struct game* const game) {
     const tile_t tile = game->map[game->y][game->x];
-    assert(tile >= terrian_capacity);
-    const tile_t capturable = tile - terrian_capacity;
+    assert(tile >= TERRIAN_CAPACITY);
+    const tile_t capturable = tile - TERRIAN_CAPACITY;
 
     wprintf(L"in build mode:");
     for (model_t model = buildable_models[capturable];
          model < buildable_models[capturable + 1]; ++model) {
-        wprintf(L"(" model_format ") %s ", model + 1, model_names[model]);
+        wprintf(L"(" MODEL_FORMAT ") %s ", model + 1, model_names[model]);
     }
     wprintf(L"\n");
 }

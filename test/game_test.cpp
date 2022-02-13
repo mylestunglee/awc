@@ -130,8 +130,8 @@ TEST_F(game_fixture, game_is_attackable_returns_true_when_directly_attackable) {
     units_select_at(&game->units, 0, 0);
     game->prev_x = 2;
     game->x = 3;
-    game->labels[0][2] = accessible_bit;
-    game->labels[0][3] = attackable_bit;
+    game->labels[0][2] = ACCESSIBLE_BIT;
+    game->labels[0][3] = ATTACKABLE_BIT;
     ASSERT_TRUE(game_is_attackable(game));
 }
 
@@ -141,7 +141,7 @@ TEST_F(game_fixture,
     insert_unit({.model = artillery});
     units_select_at(&game->units, 0, 0);
     game->x = 3;
-    game->labels[0][3] = attackable_bit;
+    game->labels[0][3] = ATTACKABLE_BIT;
     ASSERT_TRUE(game_is_attackable(game));
 }
 
@@ -154,7 +154,7 @@ TEST_F(game_fixture, game_is_buildable_returns_true_when_buildable) {
     game->y = 3;
     game->turn = 5;
     game->territory[3][2] = 5;
-    game->map[3][2] = tile_factory;
+    game->map[3][2] = TILE_FACTORY;
     ASSERT_TRUE(game_is_buildable(game));
 }
 
@@ -202,6 +202,6 @@ TEST_F(game_fixture, game_remove_player_makes_player_dead) {
     game_remove_player(game, game->turn);
 
     ASSERT_FALSE(units_is_owner(&game->units, game->turn));
-    ASSERT_EQ(game->territory[5][3], null_player);
+    ASSERT_EQ(game->territory[5][3], NULL_PLAYER);
     ASSERT_EQ(game->incomes[game->turn], 0);
 }

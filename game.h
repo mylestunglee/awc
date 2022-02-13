@@ -1,30 +1,30 @@
-#ifndef game_h
-#define game_h
+#ifndef GAME_H
+#define GAME_H
 
 #include "list.h"
 #include "units.h"
 
-#define bitarray_size(bits) (bits + 7) / 8
+#define BITARRAY_SIZE(bits) (bits + 7) / 8
 
 typedef int32_t gold_t;
 
 struct game {
-    tile_t map[grid_size][grid_size];
+    tile_t map[GRID_SIZE][GRID_SIZE];
     struct units units;
     grid_t x;
     grid_t y;
-    uint8_t labels[grid_size][grid_size];
-    energy_t energies[grid_size][grid_size];
+    uint8_t labels[GRID_SIZE][GRID_SIZE];
+    energy_t energies[GRID_SIZE][GRID_SIZE];
     struct list list;
     grid_t prev_x;
     grid_t prev_y;
     player_t turn;
-    player_t territory[grid_size][grid_size];
-    gold_t golds[players_capacity];
-    gold_t incomes[players_capacity];
-    uint8_t bots[bitarray_size(players_capacity)];
-    uint8_t alliances[bitarray_size(
-        (players_capacity * (players_capacity - 1)) / 2)];
+    player_t territory[GRID_SIZE][GRID_SIZE];
+    gold_t golds[PLAYERS_CAPACITY];
+    gold_t incomes[PLAYERS_CAPACITY];
+    uint8_t bots[BITARRAY_SIZE(PLAYERS_CAPACITY)];
+    uint8_t alliances[BITARRAY_SIZE(
+        (PLAYERS_CAPACITY * (PLAYERS_CAPACITY - 1)) / 2)];
     bool dirty_labels;
 };
 

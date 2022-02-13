@@ -1,5 +1,5 @@
-#ifndef graphics_h
-#define graphics_h
+#ifndef GRAPHICS_H
+#define GRAPHICS_H
 
 #include "game.h"
 #include <assert.h>

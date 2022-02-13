@@ -102,7 +102,7 @@ bool parse_select_next_unit(struct game* const game, const char input) {
 }
 
 bool parse_build(struct game* const game, const char input) {
-    const tile_t capturable = game->map[game->y][game->x] - terrian_capacity;
+    const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
     const model_t value = input - '1';
     const model_t model = value + buildable_models[capturable];
 

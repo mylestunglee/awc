@@ -12,7 +12,7 @@ void repair_units(struct game* const game) {
         if (game->territory[unit->y][unit->x] == game->turn &&
             unit->health < health_max) {
 
-            health_t heal = heal_rate;
+            health_t heal = HEAL_RATE;
 
             // Cap heal at maximum health
             if (unit->health >= health_max - heal)
@@ -40,8 +40,8 @@ void end_turn(struct game* const game) {
 }
 
 void next_alive_turn(struct game* const game) {
-    for (player_t i = 0; i < players_capacity; ++i) {
-        game->turn = (game->turn + 1) % players_capacity;
+    for (player_t i = 0; i < PLAYERS_CAPACITY; ++i) {
+        game->turn = (game->turn + 1) % PLAYERS_CAPACITY;
         if (game_is_alive(game, game->turn))
             return;
     }
@@ -49,7 +49,7 @@ void next_alive_turn(struct game* const game) {
 }
 
 bool exists_alive_non_bot(const struct game* const game) {
-    for (player_t player = 0; player < players_capacity; ++player)
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
         if (game_is_alive(game, player) && !game_is_bot(game, player))
             return true;
 

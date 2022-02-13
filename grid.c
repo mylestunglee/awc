@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void grid_clear_uint8(uint8_t grid[grid_size][grid_size]) {
-    memset(grid, 0, grid_size * grid_size);
+void grid_clear_uint8(uint8_t grid[GRID_SIZE][GRID_SIZE]) {
+    memset(grid, 0, GRID_SIZE * GRID_SIZE);
 }
 
 void grid_clear_labels(struct game* const game) {
@@ -17,13 +17,13 @@ void grid_clear_labels(struct game* const game) {
     }
 }
 
-void grid_clear_territory(player_t territory[grid_size][grid_size]) {
+void grid_clear_territory(player_t territory[GRID_SIZE][GRID_SIZE]) {
     assert(sizeof(player_t) == 1);
-    memset(territory, null_player, grid_size * grid_size);
+    memset(territory, NULL_PLAYER, GRID_SIZE * GRID_SIZE);
 }
 
-void grid_clear_player_territory(tile_t map[grid_size][grid_size],
-                                 player_t territory[grid_size][grid_size],
+void grid_clear_player_territory(tile_t map[GRID_SIZE][GRID_SIZE],
+                                 player_t territory[GRID_SIZE][GRID_SIZE],
                                  const player_t player) {
 
     grid_t y = 0;
@@ -31,40 +31,40 @@ void grid_clear_player_territory(tile_t map[grid_size][grid_size],
         grid_t x = 0;
         do
             if (territory[y][x] == player) {
-                territory[y][x] = null_player;
-                if (map[y][x] == tile_hq)
-                    map[y][x] = tile_city;
+                territory[y][x] = NULL_PLAYER;
+                if (map[y][x] == TILE_HQ)
+                    map[y][x] = TILE_CITY;
             }
         while (++x);
     } while (++y);
 }
 
 // Normalise invalid map territory state
-void grid_correct_territory(player_t territory[grid_size][grid_size],
-                            tile_t map[grid_size][grid_size]) {
+void grid_correct_territory(player_t territory[GRID_SIZE][GRID_SIZE],
+                            tile_t map[GRID_SIZE][GRID_SIZE]) {
 
     grid_t y = 0;
     do {
         grid_t x = 0;
         do {
-            if (territory[y][x] > players_capacity)
-                territory[y][x] = null_player;
-            if (map[y][x] > tile_capacity)
-                map[y][x] = tile_void;
+            if (territory[y][x] > PLAYERS_CAPACITY)
+                territory[y][x] = NULL_PLAYER;
+            if (map[y][x] > TILE_CAPACITY)
+                map[y][x] = TILE_VOID;
         } while (++x);
     } while (++y);
 
-    grid_clear_player_territory(map, territory, null_player);
+    grid_clear_player_territory(map, territory, NULL_PLAYER);
 }
 
-void grid_compute_incomes(player_t territory[grid_size][grid_size],
-                          gold_t incomes[players_capacity]) {
+void grid_compute_incomes(player_t territory[GRID_SIZE][GRID_SIZE],
+                          gold_t incomes[PLAYERS_CAPACITY]) {
     grid_t y = 0;
     do {
         grid_t x = 0;
         do {
             const player_t player = territory[y][x];
-            if (player != null_player)
+            if (player != NULL_PLAYER)
                 ++incomes[player];
         } while (++x);
     } while (++y);
@@ -87,7 +87,7 @@ void grid_explore_mark_attackable_tile(struct game* const game, const grid_t x,
             return;
     }
 
-    game->labels[y][x] |= attackable_bit;
+    game->labels[y][x] |= ATTACKABLE_BIT;
 }
 
 void grid_explore_mark_attackable_direct(struct game* const game,
@@ -164,8 +164,8 @@ bool is_node_accessible(const struct game* const game,
     const bool init_tile = source == target;
     const tile_t tile = game->map[node->y][node->x];
     const bool ship_on_bridge =
-        tile == tile_bridge &&
-        unit_movement_types[source->model] == movement_type_ship;
+        tile == TILE_BRIDGE &&
+        unit_movement_types[source->model] == MOVEMENT_TYPE_SHIP;
     return init_tile ||
            ((unoccupied || units_mergable(source, target)) && !ship_on_bridge);
 }
@@ -210,7 +210,7 @@ void explore_node(struct game* const game, const struct list_node* const node,
     game->energies[node->y][node->x] = node->energy;
 
     if (is_node_accessible(game, node)) {
-        game->labels[node->y][node->x] |= accessible_bit;
+        game->labels[node->y][node->x] |= ACCESSIBLE_BIT;
         grid_explore_mark_attackable_direct(game, node->x, node->y, model,
                                             player, label_attackable_tiles);
     }
@@ -218,8 +218,8 @@ void explore_node(struct game* const game, const struct list_node* const node,
     explore_adjacent_tiles(game, node, model);
 }
 
-void clear_energies(energy_t energies[grid_size][grid_size]) {
-    memset(energies, 0, sizeof(energy_t) * grid_size * grid_size);
+void clear_energies(energy_t energies[GRID_SIZE][GRID_SIZE]) {
+    memset(energies, 0, sizeof(energy_t) * GRID_SIZE * GRID_SIZE);
 }
 
 energy_t init_exploration_energy(const energy_t scalar, const model_t model) {

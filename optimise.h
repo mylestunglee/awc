@@ -1,14 +1,14 @@
-#ifndef optimise_h
-#define optimise_h
+#ifndef OPTIMISE_H
+#define OPTIMISE_H
 
 #include "game.h"
-#include "typedefs.h"
+#include "definitions.h"
 #include "units.h"
 
-void optimise_build_allocations(const health_wide_t[model_capacity],
-                                const health_wide_t[model_capacity],
-                                const grid_wide_t[capturable_capacity],
-                                const gold_t, grid_wide_t[model_capacity],
+void optimise_build_allocations(const health_wide_t[MODEL_CAPACITY],
+                                const health_wide_t[MODEL_CAPACITY],
+                                const grid_wide_t[CAPTURABLE_CAPACITY],
+                                const gold_t, grid_wide_t[MODEL_CAPACITY],
                                 void* const);
 
 #endif

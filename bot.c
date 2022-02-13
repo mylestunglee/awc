@@ -18,7 +18,7 @@ static const struct unit* find_attackee(struct game* const game,
         grid_t x = 0;
         do {
             // Attackee is at an attack-labelled tile
-            if (!(game->labels[y][x] & attackable_bit))
+            if (!(game->labels[y][x] & ATTACKABLE_BIT))
                 continue;
 
             health_t damage, counter_damage;
@@ -74,7 +74,7 @@ static void handle_direct_attack(struct game* const game,
         const grid_t i_x = adjacent_x[i];
         const grid_t i_y = adjacent_y[i];
 
-        if (!(game->labels[i_y][i_x] & accessible_bit))
+        if (!(game->labels[i_y][i_x] & ACCESSIBLE_BIT))
             continue;
 
         const model_t model = attacker->model;
@@ -123,7 +123,7 @@ static void update_max_energy(const struct game* const game, grid_t x, grid_t y,
     if (energy <= *max_energy)
         return;
 
-    if (!(game->labels[y][x] & accessible_bit))
+    if (!(game->labels[y][x] & ACCESSIBLE_BIT))
         return;
 
     *max_energy = energy;
@@ -141,7 +141,7 @@ static energy_t find_nearest_capturable(struct game* const game,
         grid_t x = 0;
         do {
             // Tile is capturable
-            if (game->map[y][x] < terrian_capacity)
+            if (game->map[y][x] < TERRIAN_CAPACITY)
                 continue;
 
             if (game_is_friendly(game, game->territory[y][x]))
@@ -159,7 +159,7 @@ static void handle_capture(struct game* const game, struct unit* const unit) {
     assert(unit->enabled);
 
     // Unit can capture
-    if (unit->model >= unit_capturable_upper_bound)
+    if (unit->model >= UNIT_CAPTURABLE_UPPER_BOUND)
         return;
 
     grid_t x, y;
@@ -239,7 +239,7 @@ static energy_t find_nearest_attackee_target(struct game* const game,
     // Maximise remaining energy to find nearest
     energy_t max_energy = 0;
 
-    for (player_t player = 0; player < players_capacity; ++player) {
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player) {
 
         if (game_is_friendly(game, player))
             continue;
@@ -277,7 +277,7 @@ static bool find_nearest_target(struct game* const game,
 
     energy_t capturable_energy = 0;
 
-    if (unit->model < unit_capturable_upper_bound) {
+    if (unit->model < UNIT_CAPTURABLE_UPPER_BOUND) {
         grid_t capturable_x, capturable_y;
         capturable_energy =
             find_nearest_capturable(game, &capturable_x, &capturable_y);
@@ -313,13 +313,13 @@ static void move_towards_target(struct game* const game,
     while (!list_empty(list) &&
            list_back_peek(list).energy >= accessible_energy) {
         const struct list_node node = list_back_pop(list);
-        if (accessible_bit & game->labels[node.y][node.x]) {
+        if (ACCESSIBLE_BIT & game->labels[node.y][node.x]) {
             game->x = node.x;
             game->y = node.y;
         }
     }
 
-    assert(accessible_bit & game->labels[game->y][game->x]);
+    assert(ACCESSIBLE_BIT & game->labels[game->y][game->x]);
 
     const bool success = action_move(game);
     assert(success);
@@ -375,7 +375,7 @@ static void interact_units(struct game* const game) {
 
 static void
 accumulate_distribution(const struct game* const game, const player_t player,
-                        health_wide_t distribution[model_capacity]) {
+                        health_wide_t distribution[MODEL_CAPACITY]) {
 
     const struct units* const units = &game->units;
     const struct unit* unit = units_const_get_first(units, player);
@@ -387,10 +387,10 @@ accumulate_distribution(const struct game* const game, const player_t player,
 
 static void
 populate_distributions(const struct game* const game,
-                       health_wide_t friendly_distribution[model_capacity],
-                       health_wide_t enemy_distribution[model_capacity]) {
+                       health_wide_t friendly_distribution[MODEL_CAPACITY],
+                       health_wide_t enemy_distribution[MODEL_CAPACITY]) {
 
-    for (player_t player = 0; player < players_capacity; ++player) {
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player) {
         if (game_is_friendly(game, player))
             accumulate_distribution(game, player, friendly_distribution);
         else
@@ -399,8 +399,8 @@ populate_distributions(const struct game* const game,
 }
 
 static bool
-is_nonzero_distribution(const health_wide_t distribution[model_capacity]) {
-    for (model_t model = 0; model < model_capacity; ++model)
+is_nonzero_distribution(const health_wide_t distribution[MODEL_CAPACITY]) {
+    for (model_t model = 0; model < MODEL_CAPACITY; ++model)
         if (distribution[model])
             return true;
 
@@ -408,7 +408,7 @@ is_nonzero_distribution(const health_wide_t distribution[model_capacity]) {
 }
 
 static void populate_capturables(const struct game* const game,
-                                 grid_wide_t capturables[capturable_capacity]) {
+                                 grid_wide_t capturables[CAPTURABLE_CAPACITY]) {
 
     grid_t y = 0;
     do {
@@ -417,7 +417,7 @@ static void populate_capturables(const struct game* const game,
             if (game->territory[y][x] != game->turn)
                 continue;
 
-            const tile_t capturable = game->map[y][x] - terrian_capacity;
+            const tile_t capturable = game->map[y][x] - TERRIAN_CAPACITY;
             ++capturables[capturable];
         } while (++x);
     } while (++y);
@@ -425,18 +425,18 @@ static void populate_capturables(const struct game* const game,
 
 // Maximise infantry build allocations
 static void
-default_build_allocations(const grid_wide_t capturables[capturable_capacity],
+default_build_allocations(const grid_wide_t capturables[CAPTURABLE_CAPACITY],
                           const gold_t budget,
-                          grid_wide_t build_allocations[model_capacity]) {
+                          grid_wide_t build_allocations[MODEL_CAPACITY]) {
 
     // Find infantry-buildable capturable
     tile_t capturable = 0;
-    while (capturable < capturable_capacity &&
+    while (capturable < CAPTURABLE_CAPACITY &&
            buildable_models[capturable + 1] == 0) {
 
         ++capturable;
     }
-    assert(capturable < capturable_capacity);
+    assert(capturable < CAPTURABLE_CAPACITY);
 
     // Populate build_allocations
     const grid_wide_t budget_allocatable = budget / models_cost[0];
@@ -450,7 +450,7 @@ default_build_allocations(const grid_wide_t capturables[capturable_capacity],
 
 static void
 realise_build_allocations(struct game* const game,
-                          grid_wide_t build_allocations[model_capacity]) {
+                          grid_wide_t build_allocations[MODEL_CAPACITY]) {
 
     grid_t y = 0;
     do {
@@ -462,7 +462,7 @@ realise_build_allocations(struct game* const game,
             if (units_const_get_at(&game->units, x, y))
                 continue;
 
-            const tile_t capturable = game->map[y][x] - terrian_capacity;
+            const tile_t capturable = game->map[y][x] - TERRIAN_CAPACITY;
 
             for (model_t model = buildable_models[capturable];
                  model < buildable_models[capturable + 1]; ++model) {
@@ -484,16 +484,16 @@ realise_build_allocations(struct game* const game,
 }
 
 static void build_units(struct game* const game) {
-    if (capturable_capacity == 0)
+    if (CAPTURABLE_CAPACITY == 0)
         return;
 
     // Prepare build allocation decision structures
-    health_wide_t friendly_distribution[model_capacity] = {0};
-    health_wide_t enemy_distribution[model_capacity] = {0};
+    health_wide_t friendly_distribution[MODEL_CAPACITY] = {0};
+    health_wide_t enemy_distribution[MODEL_CAPACITY] = {0};
     populate_distributions(game, friendly_distribution, enemy_distribution);
-    grid_wide_t capturables[capturable_capacity] = {0};
+    grid_wide_t capturables[CAPTURABLE_CAPACITY] = {0};
     populate_capturables(game, capturables);
-    grid_wide_t build_allocations[model_capacity] = {0};
+    grid_wide_t build_allocations[MODEL_CAPACITY] = {0};
 
     // Perform build allocation decision
     if (is_nonzero_distribution(enemy_distribution))
