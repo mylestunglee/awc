@@ -1,9 +1,12 @@
 #define expose_game_internals
 #include "../bitarray.h"
+#include "../constants.h"
 #include "../game.h"
 #include "game_fixture.hpp"
 #include <cstdio>
 #include <fstream>
+
+constexpr tile_t tile_plains = 1;
 
 TEST_F(game_fixture, game_load_sets_map) {
     using namespace std;

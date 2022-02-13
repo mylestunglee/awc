@@ -14,4 +14,6 @@
 #define tile_factory (tile_t)11
 #define tile_hq (tile_t)14
 
+#define gold_scale 1000
+
 #endif

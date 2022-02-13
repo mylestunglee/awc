@@ -1,8 +1,12 @@
 #define expose_graphics_internals
+#include "../constants.h"
 #include "../graphics.h"
+#include "../unit_constants.h"
 #include "game_fixture.hpp"
 #include "units_fixture.hpp"
 #include <utility>
+
+constexpr tile_t tile_plains = 1;
 
 TEST(graphics_test, render_block_with_no_progress_is_empty) {
     wchar_t symbol = 0;

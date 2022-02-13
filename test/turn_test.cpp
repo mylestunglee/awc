@@ -1,9 +1,12 @@
 #define expose_turn_internals
 #include "../bitarray.h"
+#include "../constants.h"
 #include "../turn.h"
 #include "game_fixture.hpp"
 #include <cstdio>
 #include <fstream>
+
+constexpr tile_t tile_plains = 1;
 
 TEST_F(game_fixture, repair_units_increases_unit_health) {
     insert_unit({.x = 2, .y = 3});

@@ -6,9 +6,6 @@
 #include "units.h"
 #include <assert.h>
 
-#define heal_rate (health_t)51
-#define income_scale (gold_t)1000
-
 void repair_units(struct game* const game) {
     struct unit* unit = units_get_first(&game->units, game->turn);
     while (unit) {
@@ -23,8 +20,7 @@ void repair_units(struct game* const game) {
 
             unit->health += heal;
             game->golds[game->turn] -=
-                (models_cost[unit->model] * (gold_t)heal) /
-                (gold_t)health_max;
+                (models_cost[unit->model] * (gold_t)heal) / (gold_t)health_max;
         }
 
         unit = units_get_next(&game->units, unit);
@@ -33,7 +29,7 @@ void repair_units(struct game* const game) {
 
 void start_turn(struct game* const game) {
     units_set_enabled(&game->units, game->turn, true);
-    game->golds[game->turn] += income_scale * game->incomes[game->turn];
+    game->golds[game->turn] += game->incomes[game->turn];
     repair_units(game);
 }
 

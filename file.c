@@ -1,7 +1,7 @@
 #include "file.h"
 #include "bitarray.h"
-#include "format_constants.h"
 #include "constants.h"
+#include "format_constants.h"
 #include "units.h"
 #include <stdbool.h>
 #include <stdio.h>

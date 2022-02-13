@@ -1,6 +1,8 @@
 #define expose_grid_internals
 #include "../bitarray.h"
+#include "../constants.h"
 #include "../grid.h"
+#include "../unit_constants.h"
 #include "game_fixture.hpp"
 
 class grid_fixture : public ::testing::Test {
@@ -14,6 +16,8 @@ protected:
     energy_t energies[grid_size][grid_size];
     player_t territory[grid_size][grid_size];
 };
+
+constexpr tile_t tile_plains = 1;
 
 TEST_F(grid_fixture, grid_clear_uint8_t_clears_cell) {
     ASSERT_EQ(typeid(tile_t), typeid(uint8_t));

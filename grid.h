@@ -28,7 +28,7 @@ bool is_node_unexplorable(const struct game* const,
 bool is_node_accessible(const struct game* const,
                         const struct list_node* const);
 void explore_adjacent_tiles(struct game* const, const struct list_node* const,
-                            const movement_t);
+                            const model_t);
 void explore_node(struct game* const, const struct list_node* const,
                   const player_t, const model_t, const bool);
 #endif

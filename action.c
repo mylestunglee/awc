@@ -141,10 +141,10 @@ void action_capture(struct game* const game) {
     if (game->map[game->y][game->x] == tile_hq)
         game_remove_player(game, loser);
     else if (loser != null_player)
-        --game->incomes[loser];
+        game->incomes[loser] -= gold_scale;
 
     game->territory[game->y][game->x] = game->turn;
-    ++game->incomes[game->turn];
+    game->incomes[game->turn] += gold_scale;
 }
 
 bool action_move(struct game* const game) {

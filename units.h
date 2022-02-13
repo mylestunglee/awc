@@ -6,6 +6,7 @@
 
 #define health_max (health_t)0xff
 #define units_capacity (unit_t)0xff
+#define null_unit units_capacity
 
 typedef uint8_t unit_t;
 typedef uint8_t health_t;

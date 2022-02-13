@@ -3,6 +3,8 @@
 #include "../constants.h"
 #include "game_fixture.hpp"
 
+constexpr tile_t tile_plains = 1;
+
 TEST(action_test, merge_health_returns_added_health) {
     ASSERT_EQ(merge_health(2, 3), 5);
 }
