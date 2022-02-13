@@ -185,7 +185,7 @@ static void set_cost_coefficients(struct sparse_matrix* const coefficients,
         for (model_t n = 0; n < model_capacity; ++n) {
             const int j = column_offset + m * model_capacity + n;
             sparse_matrix_set(coefficients, row_offset, j,
-                              gold_scale * models_cost[m]);
+                              models_cost[m]);
         }
 }
 

@@ -1,7 +1,6 @@
 #ifndef constants_h
 #define constants_h
 
-#include "list.h"
 #include "typedefs.h"
 
 #define unit_format "%02X"
@@ -42,7 +41,5 @@ const static char* const tile_names[tile_capacity] = {
 #define tile_city (tile_t)10
 #define tile_factory (tile_t)11
 #define tile_hq (tile_t)14
-
-#define gold_scale (gold_t)1000
 
 #endif

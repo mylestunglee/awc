@@ -88,7 +88,7 @@ void action_attack(struct game* const game) {
 
 // Build unit at (game->x, game->y), returns true iff build is successful
 bool action_build(struct game* const game, const model_t model) {
-    const gold_t cost = gold_scale * models_cost[model];
+    const gold_t cost = models_cost[model];
 
     assert(game->territory[game->y][game->x] == game->turn);
     assert(game->map[game->y][game->x] >= terrian_capacity);

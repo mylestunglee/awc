@@ -40,8 +40,9 @@ const static movement_t unit_movement_types[model_capacity] = {
 const static uint8_t unit_pass_type[model_capacity] = {0, 0, 0, 0, 0, 0, 0, 0,
                                                        0, 1, 1, 1, 2, 2, 2};
 
-const static gold_t models_cost[model_capacity] = {1,  3, 4,  7,  16, 6,  15, 8,
-                                                   12, 9, 22, 20, 20, 18, 28};
+const static gold_t models_cost[model_capacity] = {
+    1000,  3000, 4000,  7000,  16000, 6000,  15000, 8000,
+    12000, 9000, 22000, 20000, 20000, 18000, 28000};
 
 const static energy_t unit_movement_ranges[model_capacity] = {
     3, 2, 8, 6, 5, 5, 5, 6, 5, 6, 9, 7, 5, 6, 5};
