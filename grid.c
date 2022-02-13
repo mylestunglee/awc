@@ -1,6 +1,6 @@
 #include "grid.h"
 #include "bitarray.h"
-#include "definitions.h"
+#include "constants.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>

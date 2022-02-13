@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include "constants.h"
 #include "console.h"
 #include <locale.h>
 #include <stdio.h>

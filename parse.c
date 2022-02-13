@@ -1,4 +1,5 @@
 #include "parse.h"
+#include "constants.h"
 #include "action.h"
 #include "file.h"
 #include "turn.h"

@@ -1,4 +1,5 @@
 #include "game.h"
+#include "constants.h"
 #include "action.h"
 #include "bitarray.h"
 #include "file.h"

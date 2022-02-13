@@ -1,7 +1,7 @@
 #ifndef optimise2_h
 #define optimise2_h
 
-#include "definitions.h"
+#include "typedefs.h"
 
 // bap: Build Allocation Problem
 

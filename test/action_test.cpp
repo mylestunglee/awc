@@ -1,5 +1,6 @@
 #define expose_action_internals
 #include "../action.h"
+#include "../constants.h"
 #include "game_fixture.hpp"
 
 TEST(action_test, merge_health_returns_added_health) {

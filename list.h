@@ -1,7 +1,7 @@
 #ifndef list_h
 #define list_h
 
-#include "definitions.h"
+#include "typedefs.h"
 #include <stdbool.h>
 
 struct list_node {
@@ -9,6 +9,9 @@ struct list_node {
     grid_t y;
     energy_t energy;
 };
+
+typedef uint16_t list_t;
+#define list_capacity 0x10000
 
 struct list {
     list_t start;

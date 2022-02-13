@@ -1,7 +1,7 @@
 #ifndef bitarray_h
 #define bitarray_h
 
-#include "definitions.h"
+#include "typedefs.h"
 #include <stdbool.h>
 
 void bitarray_clear(uint8_t* const, const player_wide_t);

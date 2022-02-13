@@ -2,6 +2,7 @@
 #include <glpk.h>
 #include <stdio.h>
 
+#include "constants.h"
 #include "list.h"
 #include "optimise.h"
 
