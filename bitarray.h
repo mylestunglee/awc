@@ -4,6 +4,8 @@
 #include "typedefs.h"
 #include <stdbool.h>
 
+typedef uint16_t player_wide_t;
+
 void bitarray_clear(uint8_t* const, const player_wide_t);
 void bitarray_set(uint8_t* const, const player_wide_t);
 void bitarray_unset(uint8_t* const, const player_wide_t);

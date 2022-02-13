@@ -1,6 +1,6 @@
 #include "file.h"
 #include "bitarray.h"
-#include "constants.h"
+#include "format_constants.h"
 #include "units.h"
 #include <stdbool.h>
 #include <stdio.h>

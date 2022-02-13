@@ -62,5 +62,6 @@ const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 3, 6, 0,
                                                         5, 0, 0, 0, 0, 0, 7};
 
 #define unit_capturable_upper_bound (model_t)2
+#define movement_type_ship 5
 
 #endif

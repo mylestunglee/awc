@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include "console.h"
 #include "constants.h"
+#include "format_constants.h"
 #include "unit_constants.h"
 #include <locale.h>
 #include <stdio.h>
