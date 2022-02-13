@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <stddef.h>
 
+#define null_unit units_capacity
+
 void units_initialise(struct units* const units) {
     // Set counters
     units->start = 0;

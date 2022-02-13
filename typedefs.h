@@ -23,8 +23,6 @@ typedef uint8_t movement_t;
 #define terrian_capacity 10
 #define capturable_capacity 5
 #define tile_capacity (terrian_capacity + capturable_capacity)
-#define units_capacity (unit_t)0xff
-#define null_unit units_capacity
 #define players_capacity 5
 #define null_player players_capacity
 #define heal_rate (health_t)51

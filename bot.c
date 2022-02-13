@@ -362,7 +362,7 @@ static void interact_unit(struct game* const game, struct unit* const unit) {
 }
 
 static void interact_units(struct game* const game) {
-    assert(game->units.selected == null_unit);
+    assert(!units_const_get_selected(&game->units));
 
     struct units* const units = &game->units;
     struct unit* unit = units_get_first(units, game->turn);

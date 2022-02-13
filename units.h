@@ -6,6 +6,7 @@
 
 typedef uint8_t unit_t;
 #define capture_completion (health_wide_t)0x1fe // double health_max
+#define units_capacity (unit_t)0xff
 
 struct unit {
     health_t health;
