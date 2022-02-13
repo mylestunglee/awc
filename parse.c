@@ -1,10 +1,10 @@
 #include "parse.h"
-#include "constants.h"
 #include "action.h"
+#include "constants.h"
 #include "file.h"
 #include "turn.h"
-#include <stdio.h>
 #include "unit_constants.h"
+#include <stdio.h>
 
 bool parse_file(struct game* const game, const char input) {
     bool error;

@@ -1,7 +1,7 @@
 #ifndef unit_constants_h
 #define unit_constants_h
 
-#include "units.h"
+#include "game.h"
 
 const static health_t tile_defense[movement_types_capacity][tile_capacity] = {
     {0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
@@ -32,5 +32,15 @@ const static model_t buildable_models[capturable_capacity + 1] = {
     0, 0, 9, 12, model_capacity, model_capacity};
 
 #define capture_completion (capture_progress_t)0x1fe // double health_max
+
+typedef uint8_t movement_t;
+
+const static movement_t unit_movement_types[model_capacity] = {
+    0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
+const static uint8_t unit_pass_type[model_capacity] = {0, 0, 0, 0, 0, 0, 0, 0,
+                                                       0, 1, 1, 1, 2, 2, 2};
+
+const static gold_t models_cost[model_capacity] = {1,  3, 4,  7,  16, 6,  15, 8,
+                                                   12, 9, 22, 20, 20, 18, 28};
 
 #endif

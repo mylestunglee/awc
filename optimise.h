@@ -1,6 +1,7 @@
 #ifndef optimise_h
 #define optimise_h
 
+#include "game.h"
 #include "typedefs.h"
 #include "units.h"
 

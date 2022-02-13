@@ -1,8 +1,8 @@
 #ifndef constants_h
 #define constants_h
 
-#include "typedefs.h"
 #include "list.h"
+#include "typedefs.h"
 
 #define unit_format "%02X"
 #define grid_format "%3hhu"
@@ -55,10 +55,6 @@ const static energy_t unit_movement_ranges[model_capacity] = {
 #define tile_factory (tile_t)11
 #define tile_hq (tile_t)14
 
-const static movement_t unit_movement_types[model_capacity] = {
-    0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
-const static uint8_t unit_pass_type[model_capacity] = {0, 0, 0, 0, 0, 0, 0, 0,
-                                                       0, 1, 1, 1, 2, 2, 2};
 const static energy_t
     movement_type_cost[movement_types_capacity][tile_capacity] = {
         {0, 1, 1, 2, 1, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1},
@@ -68,14 +64,10 @@ const static energy_t
         {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         {0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0}};
 
-
-
 const static grid_t models_min_range[model_capacity] = {0, 0, 0, 0, 0, 2, 3, 0,
                                                         2, 0, 0, 0, 0, 0, 2};
 const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 3, 6, 0,
                                                         5, 0, 0, 0, 0, 0, 7};
-const static gold_t models_cost[model_capacity] = {1,  3, 4,  7,  16, 6,  15, 8,
-                                                   12, 9, 22, 20, 20, 18, 28};
 
 #define gold_scale (gold_t)1000
 

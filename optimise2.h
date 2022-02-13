@@ -1,8 +1,8 @@
 #ifndef optimise2_h
 #define optimise2_h
 
+#include "game.h"
 #include "typedefs.h"
-#include "units.h"
 
 // bap: Build Allocation Problem
 

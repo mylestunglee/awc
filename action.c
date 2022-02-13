@@ -1,8 +1,8 @@
 #include "action.h"
 #include "constants.h"
-#include "unit_constants.h"
 #include "grid.h"
 #include "turn.h"
+#include "unit_constants.h"
 #include <assert.h>
 
 health_t merge_health(const health_t source, const health_t target) {

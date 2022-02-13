@@ -1,12 +1,12 @@
 #include "game.h"
-#include "constants.h"
 #include "action.h"
 #include "bitarray.h"
+#include "constants.h"
 #include "file.h"
 #include "grid.h"
+#include "unit_constants.h"
 #include <assert.h>
 #include <string.h>
-#include "unit_constants.h"
 
 void game_initialise(struct game* const game) {
     memset(game, 0, sizeof(struct game));

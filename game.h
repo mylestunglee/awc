@@ -6,6 +6,8 @@
 
 #define bitarray_size(bits) (bits + 7) / 8
 
+typedef int32_t gold_t;
+
 struct game {
     tile_t map[grid_size][grid_size];
     struct units units;

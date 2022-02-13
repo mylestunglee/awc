@@ -8,8 +8,6 @@ typedef int16_t grid_wide_t;
 typedef uint8_t tile_t;
 typedef uint8_t player_t;
 typedef uint16_t player_wide_t;
-typedef int32_t gold_t;
-typedef uint8_t movement_t;
 
 #define grid_size (grid_wide_t)256
 #define model_capacity 15

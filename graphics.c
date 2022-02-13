@@ -1,11 +1,11 @@
 #include "graphics.h"
-#include "constants.h"
 #include "console.h"
+#include "constants.h"
+#include "unit_constants.h"
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
-#include "unit_constants.h"
 
 #define tile_width 8
 #define tile_height 4
