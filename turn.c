@@ -5,6 +5,8 @@
 #include "units.h"
 #include <assert.h>
 
+#define heal_rate (health_t)51
+
 void repair_units(struct game* const game) {
     struct unit* unit = units_get_first(&game->units, game->turn);
     while (unit) {

@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "list.h"
 #include "optimise.h"
+#include "unit_constants.h"
 
 #define symbolic_name_length 16
 #define sparse_matrix_length                                                   \

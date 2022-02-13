@@ -6,6 +6,10 @@
 #include "grid.h"
 #include <assert.h>
 #include <string.h>
+#include "unit_constants.h"
+
+#define defense_max (health_wide_t)10
+#define attack_max (health_wide_t)100
 
 void game_initialise(struct game* const game) {
     memset(game, 0, sizeof(struct game));

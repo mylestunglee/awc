@@ -1,5 +1,6 @@
 #include "action.h"
 #include "constants.h"
+#include "unit_constants.h"
 #include "grid.h"
 #include "turn.h"
 #include <assert.h>

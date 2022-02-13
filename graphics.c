@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "unit_constants.h"
 
 #define tile_width 8
 #define tile_height 4

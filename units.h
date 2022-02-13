@@ -4,9 +4,13 @@
 #include "typedefs.h"
 #include <stdbool.h>
 
-typedef uint8_t unit_t;
-#define capture_completion (health_wide_t)0x1fe // double health_max
+#define health_max (health_t)0xff
 #define units_capacity (unit_t)0xff
+
+typedef uint8_t unit_t;
+typedef uint8_t health_t;
+typedef uint8_t model_t;
+typedef uint16_t capture_progress_t;
 
 struct unit {
     health_t health;
@@ -15,7 +19,7 @@ struct unit {
     grid_t x;
     grid_t y;
     bool enabled;
-    health_wide_t capture_progress;
+    capture_progress_t capture_progress;
 };
 
 struct units {

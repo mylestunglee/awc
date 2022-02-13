@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "unit_constants.h"
 
 void grid_clear_uint8(uint8_t grid[grid_size][grid_size]) {
     memset(grid, 0, grid_size * grid_size);
