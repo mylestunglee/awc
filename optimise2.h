@@ -2,6 +2,7 @@
 #define optimise2_h
 
 #include "typedefs.h"
+#include "units.h"
 
 // bap: Build Allocation Problem
 

@@ -181,7 +181,7 @@ bool render_capture_progress_bar(const struct units* const units,
     if (!unit)
         return false;
 
-    const health_wide_t capture_progress = unit->capture_progress;
+    const capture_progress_t capture_progress = unit->capture_progress;
 
     // Hide health bar on full-health units
     if (capture_progress == 0)

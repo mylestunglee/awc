@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-typedef uint32_t health_wide_t;
 typedef uint8_t grid_t;
 typedef int16_t grid_wide_t;
 typedef uint16_t energy_t;

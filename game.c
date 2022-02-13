@@ -8,9 +8,6 @@
 #include <string.h>
 #include "unit_constants.h"
 
-#define defense_max (health_wide_t)10
-#define attack_max (health_wide_t)100
-
 void game_initialise(struct game* const game) {
     memset(game, 0, sizeof(struct game));
     grid_clear_territory(game->territory);
@@ -75,12 +72,15 @@ bool game_hover_next_unit(struct game* const game) {
 health_t calc_damage(const struct game* const game,
                      const struct unit* const attacker,
                      const struct unit* const attackee) {
+    typedef uint32_t damage_t;
+    const damage_t defense_max = 10;
+    const damage_t attack_max = 100;
 
     const tile_t tile = game->map[attackee->y][attackee->x];
-    const uint8_t movement_type = unit_movement_types[attackee->model];
-    return ((health_wide_t)units_damage[attacker->model][attackee->model] *
-            (health_wide_t)attacker->health *
-            (health_wide_t)(defense_max - tile_defense[movement_type][tile])) /
+    const movement_t movement_type = unit_movement_types[attackee->model];
+    return ((damage_t)units_damage[attacker->model][attackee->model] *
+            (damage_t)attacker->health *
+            (damage_t)(defense_max - tile_defense[movement_type][tile])) /
            (attack_max * defense_max);
 }
 
