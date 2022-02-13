@@ -27,7 +27,7 @@ static void add_distribution_rows(glp_prob* const problem,
 
 static void
 add_allocation_rows(glp_prob* const problem,
-                    const tile_wide_t capturables[capturable_capacity],
+                    const grid_wide_t capturables[capturable_capacity],
                     int* const row_offset) {
 
     for (tile_t capturable = 0; capturable < capturable_capacity;
@@ -61,7 +61,7 @@ static void add_surplus_rows(glp_prob* const problem, int* const row_offset) {
 }
 
 static void add_rows(glp_prob* const problem,
-                     const tile_wide_t buildable_allocations[model_capacity],
+                     const grid_wide_t buildable_allocations[model_capacity],
                      const gold_t budget) {
 
     glp_add_rows(problem, 1 + capturable_capacity + 2 * model_capacity);
@@ -267,7 +267,7 @@ populate_coefficients(glp_prob* const problem,
 
 static void
 populate_build_allocations(glp_prob* const problem,
-                           tile_wide_t build_allocation[model_capacity]) {
+                           grid_wide_t build_allocation[model_capacity]) {
 
     for (model_t m = 0; m < model_capacity; ++m)
         for (model_t n = 0; n < model_capacity; ++n)
@@ -287,8 +287,8 @@ static int solve(glp_prob* const problem) {
 void optimise_build_allocations(
     const health_wide_t friendly_distribution[model_capacity],
     const health_wide_t enemy_distribution[model_capacity],
-    const tile_wide_t capturables[capturable_capacity], const gold_t budget,
-    tile_wide_t build_allocations[model_capacity], void* const workspace) {
+    const grid_wide_t capturables[capturable_capacity], const gold_t budget,
+    grid_wide_t build_allocations[model_capacity], void* const workspace) {
 
     glp_prob* const problem = glp_create_prob();
     glp_set_prob_name(problem, "build_allocations");

@@ -4,6 +4,8 @@
 #include "typedefs.h"
 #include <stdbool.h>
 
+typedef uint16_t energy_t;
+
 struct list_node {
     grid_t x;
     grid_t y;

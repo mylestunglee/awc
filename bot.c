@@ -411,7 +411,7 @@ is_nonzero_distribution(const health_wide_t distribution[model_capacity]) {
 }
 
 static void populate_capturables(const struct game* const game,
-                                 tile_wide_t capturables[capturable_capacity]) {
+                                 grid_wide_t capturables[capturable_capacity]) {
 
     grid_t y = 0;
     do {
@@ -428,9 +428,9 @@ static void populate_capturables(const struct game* const game,
 
 // Maximise infantry build allocations
 static void
-default_build_allocations(const tile_wide_t capturables[capturable_capacity],
+default_build_allocations(const grid_wide_t capturables[capturable_capacity],
                           const gold_t budget,
-                          tile_wide_t build_allocations[model_capacity]) {
+                          grid_wide_t build_allocations[model_capacity]) {
 
     // Find infantry-buildable capturable
     tile_t capturable = 0;
@@ -442,8 +442,8 @@ default_build_allocations(const tile_wide_t capturables[capturable_capacity],
     assert(capturable < capturable_capacity);
 
     // Populate build_allocations
-    const tile_wide_t budget_allocatable = budget / models_cost[0];
-    const tile_wide_t capturable_allocatable = capturables[capturable];
+    const grid_wide_t budget_allocatable = budget / models_cost[0];
+    const grid_wide_t capturable_allocatable = capturables[capturable];
 
     if (budget_allocatable < capturable_allocatable)
         build_allocations[0] = budget_allocatable;
@@ -453,7 +453,7 @@ default_build_allocations(const tile_wide_t capturables[capturable_capacity],
 
 static void
 realise_build_allocations(struct game* const game,
-                          tile_wide_t build_allocations[model_capacity]) {
+                          grid_wide_t build_allocations[model_capacity]) {
 
     grid_t y = 0;
     do {
@@ -494,9 +494,9 @@ static void build_units(struct game* const game) {
     health_wide_t friendly_distribution[model_capacity] = {0};
     health_wide_t enemy_distribution[model_capacity] = {0};
     populate_distributions(game, friendly_distribution, enemy_distribution);
-    tile_wide_t capturables[capturable_capacity] = {0};
+    grid_wide_t capturables[capturable_capacity] = {0};
     populate_capturables(game, capturables);
-    tile_wide_t build_allocations[model_capacity] = {0};
+    grid_wide_t build_allocations[model_capacity] = {0};
 
     // Perform build allocation decision
     if (is_nonzero_distribution(enemy_distribution))

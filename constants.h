@@ -2,6 +2,7 @@
 #define constants_h
 
 #include "typedefs.h"
+#include "list.h"
 
 #define unit_format "%02X"
 #define grid_format "%3hhu"
