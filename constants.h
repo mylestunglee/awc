@@ -33,18 +33,6 @@ const static char* const tile_names[tile_capacity] = {
     "sea",  "reef",    "river",   "road",      "bridge",
     "city", "factory", "airport", "habour",    "HQ"};
 
-const static energy_t unit_movement_ranges[model_capacity] = {
-    3, 2, 8, 6, 5, 5, 5, 6, 5, 6, 9, 7, 5, 6, 5};
-/*
-0 int
-1 mech
-2 tires
-3 tread
-4 air
-5 ships
-*/
-
-#define unit_capturable_upper_bound 2
 #define movement_type_ship 5
 #define tile_void (tile_t)0
 #define tile_plains (tile_t)1
@@ -54,20 +42,6 @@ const static energy_t unit_movement_ranges[model_capacity] = {
 #define tile_city (tile_t)10
 #define tile_factory (tile_t)11
 #define tile_hq (tile_t)14
-
-const static energy_t
-    movement_type_cost[movement_types_capacity][tile_capacity] = {
-        {0, 1, 1, 2, 1, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1},
-        {0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
-        {0, 2, 3, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
-        {0, 1, 2, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
-        {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0}};
-
-const static grid_t models_min_range[model_capacity] = {0, 0, 0, 0, 0, 2, 3, 0,
-                                                        2, 0, 0, 0, 0, 0, 2};
-const static grid_t models_max_range[model_capacity] = {0, 0, 0, 0, 0, 3, 6, 0,
-                                                        5, 0, 0, 0, 0, 0, 7};
 
 #define gold_scale (gold_t)1000
 
