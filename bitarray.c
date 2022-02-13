@@ -1,4 +1,5 @@
 #include "bitarray.h"
+#include "constants.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>

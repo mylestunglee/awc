@@ -3,6 +3,8 @@
 
 #include "typedefs.h"
 
+#define null_player players_capacity
+
 #define accessible_bit 1
 #define attackable_bit 2
 
