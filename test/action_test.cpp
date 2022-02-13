@@ -2,8 +2,7 @@
 #include "../action.h"
 #include "../constants.h"
 #include "game_fixture.hpp"
-
-constexpr tile_t tile_plains = 1;
+#include "test_constants.hpp"
 
 TEST(action_test, merge_health_returns_added_health) {
     ASSERT_EQ(merge_health(2, 3), 5);
@@ -73,8 +72,8 @@ TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
     game->prev_y = 7;
     game->x = 5;
     game->y = 7;
-    game->map[7][4] = tile_plains;
-    game->map[7][5] = tile_plains;
+    game->map[7][4] = TILE_PLAINS;
+    game->map[7][5] = TILE_PLAINS;
     game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
@@ -90,9 +89,8 @@ TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
 }
 
 TEST_F(game_fixture, action_attack_where_ranged_unit_kills) {
-    constexpr model_t artillery = 5;
     insert_unit({.health = health_max,
-                 .model = artillery,
+                 .model = MODEL_ARTILLERY,
                  .x = 2,
                  .y = 3,
                  .enabled = true});
@@ -100,7 +98,7 @@ TEST_F(game_fixture, action_attack_where_ranged_unit_kills) {
     units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;
-    game->map[7][5] = tile_plains;
+    game->map[7][5] = TILE_PLAINS;
     game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
@@ -118,8 +116,8 @@ TEST_F(game_fixture, action_attack_where_counter_damage_kills) {
     game->prev_y = 7;
     game->x = 5;
     game->y = 7;
-    game->map[7][4] = tile_plains;
-    game->map[7][5] = tile_plains;
+    game->map[7][4] = TILE_PLAINS;
+    game->map[7][5] = TILE_PLAINS;
     game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
@@ -135,9 +133,8 @@ TEST_F(game_fixture, action_build_returns_true_when_model_is_unbuildable) {
     game->y = 3;
     game->territory[3][2] = game->turn;
     game->map[3][2] = TILE_CITY;
-    constexpr model_t infantry = 0;
 
-    ASSERT_TRUE(action_build(game, infantry));
+    ASSERT_TRUE(action_build(game, MODEL_INFANTRY));
 }
 
 TEST_F(game_fixture, action_build_returns_true_when_model_is_unaffordable) {
@@ -145,9 +142,8 @@ TEST_F(game_fixture, action_build_returns_true_when_model_is_unaffordable) {
     game->y = 3;
     game->territory[3][2] = game->turn;
     game->map[3][2] = TILE_FACTORY;
-    constexpr model_t infantry = 0;
 
-    ASSERT_TRUE(action_build(game, infantry));
+    ASSERT_TRUE(action_build(game, MODEL_INFANTRY));
 }
 
 TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
@@ -156,14 +152,13 @@ TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
     game->y = 3;
     game->territory[3][2] = game->turn;
     game->map[3][2] = TILE_FACTORY;
-    constexpr model_t infantry = 0;
 
-    ASSERT_FALSE(action_build(game, infantry));
+    ASSERT_FALSE(action_build(game, MODEL_INFANTRY));
 
     const struct unit* const unit = units_const_get_at(&game->units, 2, 3);
     ASSERT_TRUE(unit);
     ASSERT_EQ(unit->health, health_max);
-    ASSERT_EQ(unit->model, infantry);
+    ASSERT_EQ(unit->model, MODEL_INFANTRY);
     ASSERT_EQ(unit->player, game->turn);
     ASSERT_EQ(unit->x, 2);
     ASSERT_EQ(unit->y, 3);

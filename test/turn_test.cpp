@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <fstream>
 
-constexpr tile_t tile_plains = 1;
+constexpr tile_t TILE_PLAINS = 1;
 
 TEST_F(game_fixture, repair_units_increases_unit_health) {
     insert_unit({.x = 2, .y = 3});
@@ -94,7 +94,7 @@ TEST_F(game_fixture, turn_next_sets_units_enabled) {
 TEST_F(game_fixture, turn_next_plays_bot_turn) {
     insert_unit({.player = 1, .x = 2, .enabled = true});
     bitarray_set(game->bots, 1);
-    game->map[0][2] = tile_plains;
+    game->map[0][2] = TILE_PLAINS;
     game->map[0][3] = TILE_CITY;
     game->territory[0][3] = 2;
     game->incomes[2] = 1000;

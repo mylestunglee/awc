@@ -5,8 +5,7 @@
 #include "game_fixture.hpp"
 #include <cstdio>
 #include <fstream>
-
-constexpr tile_t tile_plains = 1;
+#include "test_constants.hpp"
 
 TEST_F(game_fixture, game_load_sets_map) {
     using namespace std;
@@ -17,7 +16,7 @@ TEST_F(game_fixture, game_load_sets_map) {
     }
     game_load(game, filename);
     remove(filename);
-    ASSERT_EQ(game->map[0][0], tile_plains);
+    ASSERT_EQ(game->map[0][0], TILE_PLAINS);
 }
 
 TEST_F(game_fixture, find_next_unit_returns_first_enabled_unit_while_hovering) {
@@ -62,23 +61,21 @@ TEST_F(game_fixture, game_hover_next_unit_returns_false_when_not_hovering) {
 }
 
 TEST_F(game_fixture, calc_damage_between_two_infantry) {
-    constexpr model_t infantry = 0;
-    insert_unit({.health = health_max, .model = infantry, .x = 0});
-    insert_unit({.health = health_max, .model = infantry, .x = 1});
-    game->map[0][1] = tile_plains;
+    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 0});
+    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 1});
+    game->map[0][1] = TILE_PLAINS;
     ASSERT_EQ(calc_damage(game, units_const_get_at(&game->units, 0, 0),
                           units_const_get_at(&game->units, 1, 0)),
               static_cast<health_t>(55.0 * 0.9 * 255.0 / 100.0));
 }
 
 TEST_F(game_fixture, game_simulate_attack_kill_attackee) {
-    constexpr model_t infantry = 0;
-    insert_unit({.health = health_max, .model = infantry, .x = 2, .y = 3});
-    insert_unit({.health = 1, .model = infantry, .x = 5, .y = 7});
+    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+    insert_unit({.health = 1, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;
-    game->map[7][5] = tile_plains;
+    game->map[7][5] = TILE_PLAINS;
 
     health_t damage = 0;
     health_t counter_damage = 0;
@@ -89,14 +86,12 @@ TEST_F(game_fixture, game_simulate_attack_kill_attackee) {
 }
 
 TEST_F(game_fixture, game_simulate_attack_ranged_units_do_not_counter_attack) {
-    constexpr model_t infantry = 0;
-    constexpr model_t artillery = 5;
-    insert_unit({.health = health_max, .model = artillery, .x = 2, .y = 3});
-    insert_unit({.health = health_max, .model = infantry, .x = 5, .y = 7});
+    insert_unit({.health = health_max, .model = MODEL_ARTILLERY, .x = 2, .y = 3});
+    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;
-    game->map[7][5] = tile_plains;
+    game->map[7][5] = TILE_PLAINS;
 
     health_t damage = 0;
     health_t counter_damage = 0;
@@ -107,14 +102,13 @@ TEST_F(game_fixture, game_simulate_attack_ranged_units_do_not_counter_attack) {
 }
 
 TEST_F(game_fixture, game_simulate_attack_when_counter_attacking) {
-    constexpr model_t infantry = 0;
-    insert_unit({.health = health_max, .model = infantry, .x = 2, .y = 3});
-    insert_unit({.health = health_max, .model = infantry, .x = 5, .y = 7});
+    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;
-    game->map[3][2] = tile_plains;
-    game->map[7][5] = tile_plains;
+    game->map[3][2] = TILE_PLAINS;
+    game->map[7][5] = TILE_PLAINS;
 
     health_t damage = 0;
     health_t counter_damage = 0;
@@ -137,8 +131,7 @@ TEST_F(game_fixture, game_is_attackable_returns_true_when_directly_attackable) {
 
 TEST_F(game_fixture,
        game_is_attackable_returns_true_when_indirectly_attackable) {
-    constexpr model_t artillery = 5;
-    insert_unit({.model = artillery});
+    insert_unit({.model = MODEL_ARTILLERY});
     units_select_at(&game->units, 0, 0);
     game->x = 3;
     game->labels[0][3] = ATTACKABLE_BIT;

@@ -5,8 +5,7 @@
 #include "game_fixture.hpp"
 #include "units_fixture.hpp"
 #include <utility>
-
-constexpr tile_t tile_plains = 1;
+#include "test_constants.hpp"
 
 TEST(graphics_test, render_block_with_no_progress_is_empty) {
     wchar_t symbol = 0;
@@ -109,7 +108,7 @@ TEST_F(units_fixture, render_capture_progress_bar_shows_capture_progress) {
 }
 
 TEST_F(game_fixture, calc_tile_style_gets_terrian_style) {
-    game->map[3][2] = tile_plains;
+    game->map[3][2] = TILE_PLAINS;
     ASSERT_EQ(calc_tile_style(game, 2, 3), '\xa2');
 }
 
@@ -132,7 +131,7 @@ TEST(graphics_test, calc_action_style_gets_accessible_style) {
 }
 
 TEST_F(game_fixture, calc_selection_style_overlaps_action_style_over_tile) {
-    game->map[3][2] = tile_plains;
+    game->map[3][2] = TILE_PLAINS;
     ASSERT_EQ(calc_selection_style(game, 2, 3, false, false), '\xe2');
 }
 
@@ -287,7 +286,7 @@ TEST_F(game_fixture, render_attack_arrows_pads_odd_pixel) {
 TEST_F(game_fixture, render_tile_shows_tile) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    game->map[3][2] = tile_plains;
+    game->map[3][2] = TILE_PLAINS;
     ASSERT_TRUE(render_tile(game, 2, 3, 0, 0, false, &symbol, &style));
     ASSERT_EQ(symbol, '"');
     ASSERT_EQ(style, '\xa2');
@@ -336,7 +335,7 @@ TEST_F(game_fixture, render_pixel_shows_unit) {
 }
 
 TEST_F(game_fixture, render_pixel_shows_tile) {
-    game->map[3][2] = tile_plains;
+    game->map[3][2] = TILE_PLAINS;
     const auto [symbol, style] = render_pixel_helper(game, 2, 3, 0, 0);
     ASSERT_EQ(symbol, '"');
     ASSERT_EQ(style, '\xa2');

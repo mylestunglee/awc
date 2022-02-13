@@ -4,6 +4,7 @@
 #include "../grid.h"
 #include "../unit_constants.h"
 #include "game_fixture.hpp"
+#include "test_constants.hpp"
 
 class grid_fixture : public ::testing::Test {
 protected:
@@ -16,8 +17,6 @@ protected:
     energy_t energies[GRID_SIZE][GRID_SIZE];
     player_t territory[GRID_SIZE][GRID_SIZE];
 };
-
-constexpr tile_t tile_plains = 1;
 
 TEST_F(grid_fixture, grid_clear_uint8_t_clears_cell) {
     ASSERT_EQ(typeid(tile_t), typeid(uint8_t));
@@ -91,32 +90,28 @@ TEST_F(
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_marks_when_damagable_enemy_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    constexpr model_t infantry = 0;
-    ASSERT_NE(units_damage[infantry][infantry], 0);
+    ASSERT_NE(units_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
     insert_unit({.player = 1, .x = 2, .y = 3});
-    grid_explore_mark_attackable_tile(game, 2, 3, infantry, 0, false);
+    grid_explore_mark_attackable_tile(game, 2, 3, MODEL_INFANTRY, 0, false);
     ASSERT_EQ(game->labels[3][2], ATTACKABLE_BIT);
 }
 
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_undamagable_enemy_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    constexpr model_t infantry = 0;
-    constexpr model_t missles = 8;
-    ASSERT_EQ(units_damage[missles][infantry], 0);
+    ASSERT_EQ(units_damage[MODEL_MISSLES][MODEL_INFANTRY], 0);
     insert_unit({.player = 1, .x = 2, .y = 3});
-    grid_explore_mark_attackable_tile(game, 2, 3, missles, 0, false);
+    grid_explore_mark_attackable_tile(game, 2, 3, MODEL_MISSLES, 0, false);
     ASSERT_EQ(game->labels[3][2], 0);
 }
 
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_friendly_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    constexpr model_t infantry = 0;
-    ASSERT_NE(units_damage[infantry][infantry], 0);
+    ASSERT_NE(units_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
     insert_unit({.player = 1, .x = 2, .y = 3});
     bitmatrix_set(game->alliances, 0, 1);
-    grid_explore_mark_attackable_tile(game, 2, 3, infantry, 0, false);
+    grid_explore_mark_attackable_tile(game, 2, 3, MODEL_INFANTRY, 0, false);
     ASSERT_EQ(game->labels[3][2], 0);
 }
 
@@ -129,9 +124,8 @@ TEST_F(
     game_fixture,
     grid_explore_mark_attackable_direct_marks_adjacent_tiles_with_direct_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    constexpr model_t infantry = 0;
-    ASSERT_EQ(models_min_range[infantry], 0);
-    grid_explore_mark_attackable_direct(game, 2, 3, infantry, 7, true);
+    ASSERT_EQ(models_min_range[MODEL_INFANTRY], 0);
+    grid_explore_mark_attackable_direct(game, 2, 3, MODEL_INFANTRY, 7, true);
     ASSERT_EQ(game->labels[3][3], ATTACKABLE_BIT);
     ASSERT_EQ(game->labels[3][1], ATTACKABLE_BIT);
     ASSERT_EQ(game->labels[4][2], ATTACKABLE_BIT);
@@ -141,17 +135,15 @@ TEST_F(
 TEST_F(game_fixture,
        grid_explore_mark_attackable_direct_unmarked_with_indirect_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    constexpr model_t artillery = 5;
-    ASSERT_GT(models_min_range[artillery], 0);
-    grid_explore_mark_attackable_direct(game, 2, 3, artillery, 7, true);
+    ASSERT_GT(models_min_range[MODEL_ARTILLERY], 0);
+    grid_explore_mark_attackable_direct(game, 2, 3, MODEL_ARTILLERY, 7, true);
     ASSERT_EQ(game->labels[3][3], 0);
 }
 
 TEST_F(game_fixture,
        grid_explore_mark_attackable_ranged_marks_with_correct_range) {
-    constexpr model_t artillery = 5;
-    ASSERT_GT(models_min_range[artillery], 0);
-    grid_explore_mark_attackable_ranged(game, 2, 10, artillery, 5, true);
+    ASSERT_GT(models_min_range[MODEL_ARTILLERY], 0);
+    grid_explore_mark_attackable_ranged(game, 2, 10, MODEL_ARTILLERY, 5, true);
     ASSERT_EQ(game->labels[10][2], 0);
     ASSERT_EQ(game->labels[11][2], 0);
     ASSERT_EQ(game->labels[12][2], ATTACKABLE_BIT);
@@ -161,9 +153,8 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        grid_explore_mark_attackable_ranged_unmarked_with_direct_unit) {
-    constexpr model_t infantry = 0;
-    ASSERT_EQ(models_min_range[infantry], 0);
-    grid_explore_mark_attackable_ranged(game, 2, 3, infantry, 5, true);
+    ASSERT_EQ(models_min_range[MODEL_INFANTRY], 0);
+    grid_explore_mark_attackable_ranged(game, 2, 3, MODEL_INFANTRY, 5, true);
     for (auto x = 0; x < GRID_SIZE; ++x)
         for (auto y = 0; y < GRID_SIZE; ++y)
             ASSERT_EQ(game->labels[y][x], 0);
@@ -180,10 +171,8 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        is_node_unexplorable_returns_false_when_blocked_by_passable_unit) {
-    constexpr model_t infantry = 0;
-    constexpr model_t helicopter = 9;
-    insert_unit({.model = infantry, .x = 0, .y = 0});
-    insert_unit({.model = helicopter, .player = 1, .x = 2, .y = 3});
+    insert_unit({.model = MODEL_INFANTRY, .x = 0, .y = 0});
+    insert_unit({.model = MODEL_HELICOPTER, .player = 1, .x = 2, .y = 3});
     struct list_node node = {.x = 2, .y = 3};
     auto unexplorable = is_node_unexplorable(game, &node, 0);
     ASSERT_FALSE(unexplorable);
@@ -199,7 +188,7 @@ TEST_F(game_fixture, is_node_unexplorable_returns_true_when_visited) {
 
 TEST_F(game_fixture, is_node_unexplorable_returns_false_when_explorable) {
     insert_unit({.x = 0, .y = 0});
-    game->map[3][2] = tile_plains;
+    game->map[3][2] = TILE_PLAINS;
     struct list_node node = {.x = 2, .y = 3};
     auto unexplorable = is_node_unexplorable(game, &node, 0);
     ASSERT_FALSE(unexplorable);
@@ -234,27 +223,26 @@ TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
 
 TEST_F(game_fixture, is_node_accessible_returns_false_when_ship_on_bridge) {
     ASSERT_NE(MOVEMENT_TYPE_SHIP, 0);
-    constexpr model_t submarine = 12;
-    ASSERT_EQ(unit_movement_types[submarine], MOVEMENT_TYPE_SHIP);
+    ASSERT_EQ(unit_movement_types[MODEL_SUBMARINE], MOVEMENT_TYPE_SHIP);
     game->map[3][2] = TILE_BRIDGE;
-    insert_unit({.model = submarine, .x = 0, .y = 0});
+    insert_unit({.model = MODEL_SUBMARINE, .x = 0, .y = 0});
     struct list_node node = {.x = 2, .y = 3};
     auto accessible = is_node_accessible(game, &node);
     ASSERT_FALSE(accessible);
 }
 
 TEST_F(game_fixture, explore_adjacent_tiles_explores_adjacent_tiles) {
-    ASSERT_EQ(movement_type_cost[0][tile_plains], 1);
+    ASSERT_EQ(movement_type_cost[0][TILE_PLAINS], 1);
 
     bool north_explored = false;
     bool east_explored = false;
     bool south_explored = false;
     bool west_explored = false;
 
-    game->map[2][2] = tile_plains;
-    game->map[3][3] = tile_plains;
-    game->map[4][2] = tile_plains;
-    game->map[3][1] = tile_plains;
+    game->map[2][2] = TILE_PLAINS;
+    game->map[3][3] = TILE_PLAINS;
+    game->map[4][2] = TILE_PLAINS;
+    game->map[3][1] = TILE_PLAINS;
 
     struct list_node node = {.x = 2, .y = 3, .energy = 5};
     explore_adjacent_tiles(game, &node, 0);
@@ -288,12 +276,12 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        explore_adjacent_tiles_does_not_explore_tiles_with_depleted_energy) {
-    ASSERT_EQ(movement_type_cost[0][tile_plains], 1);
+    ASSERT_EQ(movement_type_cost[0][TILE_PLAINS], 1);
 
-    game->map[2][2] = tile_plains;
-    game->map[3][3] = tile_plains;
-    game->map[4][2] = tile_plains;
-    game->map[3][1] = tile_plains;
+    game->map[2][2] = TILE_PLAINS;
+    game->map[3][3] = TILE_PLAINS;
+    game->map[4][2] = TILE_PLAINS;
+    game->map[3][1] = TILE_PLAINS;
 
     struct list_node node = {.x = 2, .y = 3, .energy = 1};
     explore_adjacent_tiles(game, &node, 0);
@@ -321,7 +309,7 @@ TEST_F(game_fixture, explore_node_sets_attackable_label_if_accessible) {
     game->x = 2;
     game->y = 3;
     insert_unit({.x = 2, .y = 3});
-    game->map[7][5] = tile_plains;
+    game->map[7][5] = TILE_PLAINS;
     struct list_node node = {.x = 5, .y = 7, .energy = 11};
     explore_node(game, &node, NULL_PLAYER, 0, true);
     ASSERT_EQ(game->labels[7][6], ATTACKABLE_BIT);
@@ -332,22 +320,20 @@ TEST_F(game_fixture, explore_node_explores_adjacent_tiles) {
     game->y = 3;
     insert_unit({.x = 2, .y = 3});
     struct list_node node = {.x = 5, .y = 7, .energy = 11};
-    game->map[7][6] = tile_plains;
+    game->map[7][6] = TILE_PLAINS;
     explore_node(game, &node, NULL_PLAYER, 0, false);
     ASSERT_FALSE(list_empty(&game->list));
 }
 
 TEST(game_test, init_exploration_energy_lookups_movement) {
-    constexpr model_t infantry = 0;
-    ASSERT_EQ(init_exploration_energy(2, infantry), 7);
+    ASSERT_EQ(init_exploration_energy(2, MODEL_INFANTRY), 7);
 }
 
 TEST_F(game_fixture, grid_explore_recursive_clears_energy) {
-    constexpr model_t infantry = 0;
-    insert_unit({.model = infantry, .player = 1, .x = 2, .y = 3});
+    insert_unit({.model = MODEL_INFANTRY, .player = 1, .x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
-    game->map[3][3] = tile_plains;
+    game->map[3][3] = TILE_PLAINS;
     game->energies[3][3] = 101;
     grid_explore_recursive(game, false, 1);
     ASSERT_EQ(game->energies[3][3], 3);
@@ -361,12 +347,11 @@ TEST_F(grid_fixture, clear_energies_clears_cell) {
 
 TEST_F(game_fixture,
        grid_explore_recursive_explores_with_correct_residual_energies) {
-    game->map[3][3] = tile_plains;
-    game->map[3][4] = tile_plains;
-    game->map[3][5] = tile_plains;
-    game->map[3][6] = tile_plains;
-    constexpr model_t infantry = 0;
-    insert_unit({.model = infantry, .player = 1, .x = 2, .y = 3});
+    game->map[3][3] = TILE_PLAINS;
+    game->map[3][4] = TILE_PLAINS;
+    game->map[3][5] = TILE_PLAINS;
+    game->map[3][6] = TILE_PLAINS;
+    insert_unit({.model = MODEL_INFANTRY, .player = 1, .x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
     grid_explore_recursive(game, false, 1);
@@ -378,12 +363,11 @@ TEST_F(game_fixture,
 }
 
 TEST_F(game_fixture, grid_explore_labels_accessible_tiles) {
-    game->map[3][3] = tile_plains;
-    game->map[3][4] = tile_plains;
-    game->map[3][5] = tile_plains;
-    game->map[3][6] = tile_plains;
-    constexpr model_t infantry = 0;
-    insert_unit({.model = infantry, .player = 1, .x = 2, .y = 3});
+    game->map[3][3] = TILE_PLAINS;
+    game->map[3][4] = TILE_PLAINS;
+    game->map[3][5] = TILE_PLAINS;
+    game->map[3][6] = TILE_PLAINS;
+    insert_unit({.model = MODEL_INFANTRY, .player = 1, .x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
     grid_explore(game, false);
@@ -395,9 +379,8 @@ TEST_F(game_fixture, grid_explore_labels_accessible_tiles) {
 }
 
 TEST_F(game_fixture, grid_explore_labels_actionable_attack) {
-    constexpr model_t infantry = 0;
-    insert_unit({.model = infantry, .player = 0, .x = 2, .y = 3});
-    insert_unit({.model = infantry, .player = 1, .x = 3, .y = 3});
+    insert_unit({.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3});
+    insert_unit({.model = MODEL_INFANTRY, .player = 1, .x = 3, .y = 3});
     game->x = 2;
     game->y = 3;
     grid_explore(game, false);
@@ -405,8 +388,7 @@ TEST_F(game_fixture, grid_explore_labels_actionable_attack) {
 }
 
 TEST_F(game_fixture, grid_explore_labels_potential_attack) {
-    constexpr model_t infantry = 0;
-    struct unit unit = {.model = infantry, .player = 0, .x = 2, .y = 3};
+    struct unit unit = {.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
@@ -415,12 +397,11 @@ TEST_F(game_fixture, grid_explore_labels_potential_attack) {
 }
 
 TEST_F(game_fixture, grid_explore_is_blocked_by_units) {
-    game->map[3][3] = tile_plains;
-    game->map[3][4] = tile_plains;
-    constexpr model_t infantry = 0;
-    struct unit alice = {.model = infantry, .player = 0, .x = 2, .y = 3};
+    game->map[3][3] = TILE_PLAINS;
+    game->map[3][4] = TILE_PLAINS;
+    struct unit alice = {.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3};
     units_insert(&game->units, &alice);
-    struct unit bob = {.model = infantry, .player = 1, .x = 3, .y = 3};
+    struct unit bob = {.model = MODEL_INFANTRY, .player = 1, .x = 3, .y = 3};
     units_insert(&game->units, &bob);
     game->x = 2;
     game->y = 3;
@@ -431,8 +412,7 @@ TEST_F(game_fixture, grid_explore_is_blocked_by_units) {
 TEST_F(
     game_fixture,
     grid_explore_starting_tile_is_accessible_when_all_adjacent_tiles_are_blocked) {
-    constexpr model_t infantry = 0;
-    struct unit unit = {.model = infantry, .player = 0, .x = 2, .y = 3};
+    struct unit unit = {.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
@@ -441,9 +421,8 @@ TEST_F(
 }
 
 TEST_F(game_fixture, grid_explore_merges_labels) {
-    game->map[3][3] = tile_plains;
-    constexpr model_t infantry = 0;
-    struct unit unit = {.model = infantry, .player = 1, .x = 2, .y = 3};
+    game->map[3][3] = TILE_PLAINS;
+    struct unit unit = {.model = MODEL_INFANTRY, .player = 1, .x = 2, .y = 3};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
@@ -452,8 +431,7 @@ TEST_F(game_fixture, grid_explore_merges_labels) {
 }
 
 TEST_F(game_fixture, grid_explore_recursive_initial_energy_scales) {
-    constexpr model_t infantry = 0;
-    struct unit unit = {.model = infantry, .player = 0, .x = 2, .y = 3};
+    struct unit unit = {.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
