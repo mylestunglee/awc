@@ -197,36 +197,36 @@ TEST_F(game_fixture, action_capture_when_capture_enemy_hq) {
     game->y = 3;
     game->territory[3][2] = 1;
     game->map[3][2] = tile_hq;
-    game->incomes[game->turn] = 5;
-    game->incomes[1] = 5;
+    game->incomes[game->turn] = 5000;
+    game->incomes[1] = 5000;
 
     action_capture(game);
 
     ASSERT_EQ(game->incomes[1], 0);
     ASSERT_EQ(game->territory[3][2], game->turn);
-    ASSERT_EQ(game->incomes[game->turn], 6);
+    ASSERT_EQ(game->incomes[game->turn], 6000);
 }
 
 TEST_F(game_fixture, action_capture_when_capture_enemy_city) {
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = 1;
-    game->incomes[1] = 5;
+    game->incomes[1] = 5000;
 
     action_capture(game);
 
-    ASSERT_EQ(game->incomes[1], 4);
+    ASSERT_EQ(game->incomes[1], 4000);
 }
 
 TEST_F(game_fixture, action_capture_when_capture_unoccupied_city) {
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = null_player;
-    game->incomes[game->turn] = 5;
+    game->incomes[game->turn] = 5000;
 
     action_capture(game);
 
-    ASSERT_EQ(game->incomes[game->turn], 6);
+    ASSERT_EQ(game->incomes[game->turn], 6000);
 }
 
 TEST_F(game_fixture, action_move_returns_true_when_start_capturing) {

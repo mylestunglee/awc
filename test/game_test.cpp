@@ -168,7 +168,7 @@ TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_unit) {
 }
 
 TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_income) {
-    game->incomes[game->turn] = 1;
+    game->incomes[game->turn] = 1000;
     ASSERT_TRUE(game_is_alive(game, game->turn));
 }
 
@@ -197,7 +197,7 @@ TEST_F(game_fixture, game_remove_player_makes_player_dead) {
     game->turn = 2;
     insert_unit({.player = game->turn});
     game->territory[5][3] = game->turn;
-    game->incomes[game->turn] = 1;
+    game->incomes[game->turn] = 1000;
 
     game_remove_player(game, game->turn);
 

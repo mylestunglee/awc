@@ -35,7 +35,7 @@ TEST_F(game_fixture, repair_units_caps_at_maximum_health) {
 TEST_F(game_fixture, start_turn) {
     insert_unit({.x = 2, .y = 3});
     game->territory[3][2] = game->turn;
-    game->incomes[game->turn] = 1;
+    game->incomes[game->turn] = 1000;
     start_turn(game);
     ASSERT_TRUE(units_const_get_first(&game->units, game->turn)->enabled);
     ASSERT_EQ(game->golds[game->turn],
@@ -54,24 +54,24 @@ TEST_F(game_fixture, end_turn) {
 
 TEST_F(game_fixture, next_alive_turn_increments_turn) {
     game->turn = players_capacity - 1;
-    game->incomes[0] = 1;
+    game->incomes[0] = 1000;
     next_alive_turn(game);
     ASSERT_EQ(game->turn, 0);
 }
 
 TEST_F(game_fixture, next_alive_turn_skips_dead_player) {
-    game->incomes[2] = 1;
+    game->incomes[2] = 1000;
     next_alive_turn(game);
     ASSERT_EQ(game->turn, 2);
 }
 
 TEST_F(game_fixture, exists_alive_non_bot_returns_true_when_alive_player) {
-    game->incomes[game->turn] = 1;
+    game->incomes[game->turn] = 1000;
     ASSERT_TRUE(exists_alive_non_bot(game));
 }
 
 TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_alive_bot) {
-    game->incomes[game->turn] = 1;
+    game->incomes[game->turn] = 1000;
     bitarray_set(game->bots, game->turn);
     ASSERT_FALSE(exists_alive_non_bot(game));
 }
@@ -97,7 +97,7 @@ TEST_F(game_fixture, turn_next_plays_bot_turn) {
     game->map[0][2] = tile_plains;
     game->map[0][3] = tile_city;
     game->territory[0][3] = 2;
-    game->incomes[2] = 1;
+    game->incomes[2] = 1000;
     turn_next(game);
     ASSERT_EQ(units_const_get_first(&game->units, 1)->x, 3);
     ASSERT_EQ(game->turn, 2);
