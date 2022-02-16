@@ -3,9 +3,9 @@
 #include "../graphics.h"
 #include "../unit_constants.h"
 #include "game_fixture.hpp"
+#include "test_constants.hpp"
 #include "units_fixture.hpp"
 #include <utility>
-#include "test_constants.hpp"
 
 TEST(graphics_test, render_block_with_no_progress_is_empty) {
     wchar_t symbol = 0;

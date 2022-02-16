@@ -3,9 +3,9 @@
 #include "../constants.h"
 #include "../game.h"
 #include "game_fixture.hpp"
+#include "test_constants.hpp"
 #include <cstdio>
 #include <fstream>
-#include "test_constants.hpp"
 
 TEST_F(game_fixture, game_load_sets_map) {
     using namespace std;
@@ -70,7 +70,8 @@ TEST_F(game_fixture, calc_damage_between_two_infantry) {
 }
 
 TEST_F(game_fixture, game_simulate_attack_kill_attackee) {
-    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+    insert_unit(
+        {.health = health_max, .model = MODEL_INFANTRY, .x = 2, .y = 3});
     insert_unit({.health = 1, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     units_select_at(&game->units, 2, 3);
     game->x = 5;
@@ -86,8 +87,10 @@ TEST_F(game_fixture, game_simulate_attack_kill_attackee) {
 }
 
 TEST_F(game_fixture, game_simulate_attack_ranged_units_do_not_counter_attack) {
-    insert_unit({.health = health_max, .model = MODEL_ARTILLERY, .x = 2, .y = 3});
-    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 5, .y = 7});
+    insert_unit(
+        {.health = health_max, .model = MODEL_ARTILLERY, .x = 2, .y = 3});
+    insert_unit(
+        {.health = health_max, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;
@@ -102,8 +105,10 @@ TEST_F(game_fixture, game_simulate_attack_ranged_units_do_not_counter_attack) {
 }
 
 TEST_F(game_fixture, game_simulate_attack_when_counter_attacking) {
-    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 2, .y = 3});
-    insert_unit({.health = health_max, .model = MODEL_INFANTRY, .x = 5, .y = 7});
+    insert_unit(
+        {.health = health_max, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+    insert_unit(
+        {.health = health_max, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;

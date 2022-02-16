@@ -1,8 +1,8 @@
 #ifndef OPTIMISE_H
 #define OPTIMISE_H
 
-#include "game.h"
 #include "definitions.h"
+#include "game.h"
 #include "units.h"
 
 void optimise_build_allocations(const health_wide_t[MODEL_CAPACITY],
