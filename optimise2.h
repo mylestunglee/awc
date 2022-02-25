@@ -47,7 +47,7 @@ void set_next_matrix_column(struct bap_temps* const, const char, const index_t,
                             const index_t, const int, const double, const int);
 void set_a_columns(const struct bap_inputs* const, struct bap_temps* const);
 void set_b_columns(const struct bap_inputs* const, struct bap_temps* const);
-void set_next_objective_column(struct bap_temps* const);
+void set_z_column(struct bap_temps* const);
 void set_columns(const struct bap_inputs* const, struct bap_temps* const);
 void create_columns(const struct bap_inputs* const, struct bap_temps* const);
 
@@ -67,7 +67,10 @@ void set_matrix(const struct bap_inputs* const, struct bap_temps* const);
 
 #endif
 
-#define SPARSE_MATRIX_LENGTH (MODEL_CAPACITY * MODEL_CAPACITY * MODEL_CAPACITY)
+#define SPARSE_MATRIX_LENGTH                                                   \
+    (MODEL_CAPACITY +                                                          \
+     (CAPTURABLE_CAPACITY + 1) * MODEL_CAPACITY * MODEL_CAPACITY +             \
+     3 * MODEL_CAPACITY * MODEL_CAPACITY * MODEL_CAPACITY)
 
 struct bap_temps {
     glp_prob* const problem;
@@ -75,12 +78,10 @@ struct bap_temps {
     index_t a_column_start_index;
     index_t a_column_end_index;
     index_t b_column_start_index;
-    index_t b_column_end_index;
     index_t z_column_index;
     index_t distribution_row_start_index;
     index_t distribution_row_end_index;
     index_t allocation_row_start_index; // start/end remove?
-    index_t allocation_row_end_index;
     index_t budget_row_index;
     index_t surplus_row_start_index;
     index_t surplus_row_end_index;

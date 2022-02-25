@@ -122,7 +122,6 @@ void set_allocation_rows(const struct bap_inputs* const inputs,
         if (allocation_exists(inputs, capturable))
             set_next_row(temps, 'a', capturable, GLP_UP, 0.0,
                          (double)inputs->capturables[capturable]);
-    temps->allocation_row_end_index = temps->curr_index;
 }
 
 void set_budget_row(const struct bap_inputs* const inputs,
@@ -217,10 +216,9 @@ void set_b_columns(const struct bap_inputs* const inputs,
     FOR(j)
     if (b_i_j_exists(inputs, i, j))
         set_next_matrix_column(temps, 'B', i, j, GLP_LO, 0.0, GLP_IV);
-    temps->b_column_end_index = temps->curr_index;
 }
 
-void set_next_objective_column(struct bap_temps* const temps) {
+void set_z_column(struct bap_temps* const temps) {
     temps->z_column_index = temps->curr_index;
     glp_set_col_name(temps->problem, temps->curr_index, "z");
     glp_set_obj_coef(temps->problem, temps->curr_index, 1.0);
@@ -233,7 +231,7 @@ void set_columns(const struct bap_inputs* const inputs,
     temps->curr_index = 0;
     set_a_columns(inputs, temps);
     set_b_columns(inputs, temps);
-    set_next_objective_column(temps);
+    set_z_column(temps);
 }
 
 void create_columns(const struct bap_inputs* const inputs,
