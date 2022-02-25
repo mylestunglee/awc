@@ -2,6 +2,31 @@
 #include "unit_constants.h"
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
+
+#define SYMBOLIC_NAME_LENGTH 16
+#define SPARSE_MATRIX_LENGTH                                                   \
+    (MODEL_CAPACITY +                                                          \
+     (CAPTURABLE_CAPACITY + 1) * MODEL_CAPACITY * MODEL_CAPACITY +             \
+     3 * MODEL_CAPACITY * MODEL_CAPACITY * MODEL_CAPACITY)
+
+struct bap_temps {
+    glp_prob* problem;
+    index_t curr_index;
+    index_t a_column_start_index;
+    index_t a_column_end_index;
+    index_t b_column_start_index;
+    index_t z_column_index;
+    index_t distribution_row_start_index;
+    index_t distribution_row_end_index;
+    index_t allocation_row_start_index; // start/end remove?
+    index_t budget_row_index;
+    index_t surplus_row_start_index;
+    index_t surplus_row_end_index;
+    int matrix_rows[SPARSE_MATRIX_LENGTH];
+    int matrix_columns[SPARSE_MATRIX_LENGTH];
+    double matrix_values[SPARSE_MATRIX_LENGTH];
+};
 
 #define FOR(variable)                                                          \
     for (index_t variable = 0; variable < MODEL_CAPACITY; ++variable)
@@ -52,7 +77,7 @@ bool surplus_j_exists(const struct bap_inputs* const inputs, const index_t j) {
     return a_j_exists(inputs, j) || b_j_exists(inputs, j);
 }
 
-bool problem_exists(const struct bap_inputs* const inputs) {
+bool glpk_solvable_bap(const struct bap_inputs* const inputs) {
     FOR(i) if (!b_i_exists(inputs, i)) return false;
 
     return true;
@@ -88,8 +113,6 @@ index_t count_rows(const struct bap_inputs* const inputs) {
     return count_distribution_rows(inputs) + count_allocation_rows(inputs) +
            count_budget_row(inputs) + count_surplus_rows(inputs);
 }
-
-#define SYMBOLIC_NAME_LENGTH 16
 
 void set_next_row(struct bap_temps* const temps, const char variable_name,
                   const index_t variable_index, const int bounds_type,
@@ -289,7 +312,8 @@ void set_budget_submatrix(const struct bap_inputs* const inputs,
 
 double calc_surplus_submatrix_value(const struct bap_inputs* const inputs,
                                     const index_t i, const index_t j) {
-    return (double)units_damage[i][j] * (models_min_range[i] ? 0.5 : 1.0) /
+    return -1.0 * (double)units_damage[i][j] *
+           (models_min_range[i] ? 0.5 : 1.0) /
            (double)inputs->enemy_distribution[j];
 }
 
@@ -318,7 +342,7 @@ void set_surplus_submatrix(const struct bap_inputs* const inputs,
 
     for (index_t row = temps->surplus_row_start_index;
          row < temps->surplus_row_end_index; ++row)
-        sparse_matrix_set(temps, row, temps->z_column_index, -1.0);
+        sparse_matrix_set(temps, row, temps->z_column_index, 1.0);
 }
 
 void set_matrix(const struct bap_inputs* const inputs,
@@ -327,4 +351,47 @@ void set_matrix(const struct bap_inputs* const inputs,
     set_allocation_submatrix(inputs, temps);
     set_budget_submatrix(inputs, temps);
     set_surplus_submatrix(inputs, temps);
+}
+
+void initialise_bap(const struct bap_inputs* const inputs,
+                    struct bap_temps* const temps) {
+    create_rows(inputs, temps);
+    create_columns(inputs, temps);
+    set_matrix(inputs, temps);
+}
+
+void glpk_solve(struct bap_temps* const temps) {
+    glp_iocp parameters;
+    glp_init_iocp(&parameters);
+    parameters.presolve = GLP_ON;
+    parameters.msg_lev = GLP_MSG_ERR;
+    const int error = glp_intopt(temps->problem, &parameters);
+    assert(!error);
+}
+
+void parse_results(const struct bap_inputs* const inputs,
+                   const struct bap_temps* const temps,
+                   grid_wide_t outputs[MODEL_CAPACITY]) {
+    memset(outputs, 0, sizeof(grid_wide_t) * MODEL_CAPACITY);
+    index_t column = temps->a_column_start_index;
+
+    FOR(i)
+    FOR(j)
+    if (b_i_j_exists(inputs, i, j)) {
+        outputs[i] += glp_mip_col_val(temps->problem, column);
+        ++column;
+    }
+}
+
+void glpk_solve_bap(const struct bap_inputs* const inputs,
+                    grid_wide_t outputs[MODEL_CAPACITY],
+                    void* const workspace) {
+    struct bap_temps* const temps = workspace;
+    temps->problem = glp_create_prob();
+
+    initialise_bap(inputs, temps);
+    glpk_solve(temps);
+    parse_results(inputs, temps, outputs);
+
+    glp_delete_prob(temps->problem);
 }
