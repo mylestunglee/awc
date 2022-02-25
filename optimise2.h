@@ -25,18 +25,45 @@ bool allocation_exists(const struct bap_inputs* const, const index_t);
 bool surplus_j_exists(const struct bap_inputs* const, const index_t);
 bool problem_exists(const struct bap_inputs* const);
 
-void create_row(struct bap_temps* const, const char variable, const index_t,
-                const int, const double, const double upper_bound);
-void create_distribution_rows(const struct bap_inputs* const,
-                              struct bap_temps* const);
-void create_allocation_rows(const struct bap_inputs* const,
-                            struct bap_temps* const);
-void create_budget_row(const struct bap_inputs* const, struct bap_temps* const);
-void create_surplus_rows(const struct bap_inputs* const,
+index_t count_distribution_rows(const struct bap_inputs* const);
+index_t count_allocation_rows(const struct bap_inputs* const);
+index_t count_budget_row(const struct bap_inputs* const);
+index_t count_rows(const struct bap_inputs* const);
+void set_next_row(struct bap_temps* const, const char variable, const index_t,
+                  const int, const double, const double upper_bound);
+void set_distribution_rows(const struct bap_inputs* const,
+                           struct bap_temps* const);
+void set_allocation_rows(const struct bap_inputs* const,
                          struct bap_temps* const);
+void set_budget_row(const struct bap_inputs* const, struct bap_temps* const);
+void set_surplus_rows(const struct bap_inputs* const, struct bap_temps* const);
+void create_rows(const struct bap_inputs* const, struct bap_temps* const);
 
-void sparse_matrix_set(struct bap_temps* const temps, const int row,
-                       const int column, const double value);
+index_t count_a_columns(const struct bap_inputs* const);
+index_t count_b_columns(const struct bap_inputs* const);
+index_t count_objective_column(const struct bap_inputs* const);
+index_t count_columns(const struct bap_inputs* const);
+void set_next_matrix_column(struct bap_temps* const, const char, const index_t,
+                            const index_t, const int, const double, const int);
+void set_a_columns(const struct bap_inputs* const, struct bap_temps* const);
+void set_b_columns(const struct bap_inputs* const, struct bap_temps* const);
+void set_next_objective_column(struct bap_temps* const);
+void set_columns(const struct bap_inputs* const, struct bap_temps* const);
+void create_columns(const struct bap_inputs* const, struct bap_temps* const);
+
+void sparse_matrix_set(struct bap_temps* const, const int, const int,
+                       const double);
+void set_distribution_submatrix(const struct bap_inputs* const,
+                                struct bap_temps* const);
+void set_allocation_submatrix(const struct bap_inputs* const,
+                              struct bap_temps* const);
+void set_budget_submatrix(const struct bap_inputs* const,
+                          struct bap_temps* const);
+double calc_surplus_submatrix_value(const struct bap_inputs* const,
+                                    const index_t, const index_t);
+void set_surplus_submatrix(const struct bap_inputs* const,
+                           struct bap_temps* const);
+void set_matrix(const struct bap_inputs* const, struct bap_temps* const);
 
 #endif
 
