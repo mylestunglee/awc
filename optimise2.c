@@ -386,7 +386,7 @@ void parse_results(const struct bap_inputs* const inputs,
 void glpk_solve_bap(const struct bap_inputs* const inputs,
                     grid_wide_t outputs[MODEL_CAPACITY],
                     void* const workspace) {
-    struct bap_temps* const temps = workspace;
+    struct bap_temps* const temps = (struct bap_temps*)workspace;
     temps->problem = glp_create_prob();
 
     initialise_bap(inputs, temps);

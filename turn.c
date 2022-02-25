@@ -10,17 +10,17 @@ void repair_units(struct game* const game) {
     struct unit* unit = units_get_first(&game->units, game->turn);
     while (unit) {
         if (game->territory[unit->y][unit->x] == game->turn &&
-            unit->health < health_max) {
+            unit->health < HEALTH_MAX) {
 
             health_t heal = HEAL_RATE;
 
             // Cap heal at maximum health
-            if (unit->health >= health_max - heal)
-                heal = health_max - unit->health;
+            if (unit->health >= HEALTH_MAX - heal)
+                heal = HEALTH_MAX - unit->health;
 
             unit->health += heal;
             game->golds[game->turn] -=
-                (models_cost[unit->model] * (gold_t)heal) / (gold_t)health_max;
+                (models_cost[unit->model] * (gold_t)heal) / (gold_t)HEALTH_MAX;
         }
 
         unit = units_get_next(&game->units, unit);

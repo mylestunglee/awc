@@ -14,7 +14,7 @@ struct bap_inputs {
 
 typedef int16_t index_t;
 
-#ifdef expose_optimise_internals
+#ifdef EXPOSE_OPTIMISE_INTERNALS
 bool a_i_j_exists(const struct bap_inputs* const, const index_t, const index_t);
 bool a_i_exists(const struct bap_inputs* const, const index_t);
 bool a_j_exists(const struct bap_inputs* const, const index_t);
@@ -26,7 +26,7 @@ bool surplus_j_exists(const struct bap_inputs* const, const index_t);
 #endif
 bool glpk_solvable_bap(const struct bap_inputs* const);
 
-#ifdef expose_optimise_internals
+#ifdef EXPOSE_OPTIMISE_INTERNALS
 index_t count_distribution_rows(const struct bap_inputs* const);
 index_t count_allocation_rows(const struct bap_inputs* const);
 index_t count_budget_row(const struct bap_inputs* const);

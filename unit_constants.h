@@ -31,7 +31,7 @@ const static health_t units_damage[MODEL_CAPACITY][MODEL_CAPACITY] = {
 const static model_t buildable_models[CAPTURABLE_CAPACITY + 1] = {
     0, 0, 9, 12, MODEL_CAPACITY, MODEL_CAPACITY};
 
-#define CAPTURE_COMPLETION (capture_progress_t)0x1fe // double health_max
+#define CAPTURE_COMPLETION (capture_progress_t)0x1fe // double HEALTH_MAX
 
 typedef uint8_t movement_t;
 

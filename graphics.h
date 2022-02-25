@@ -8,7 +8,7 @@ void graphics_init(void);
 
 void graphics_render(const struct game* const, const bool, const bool);
 
-#ifdef expose_graphics_internals
+#ifdef EXPOSE_GRAPHICS_INTERNALS
 
 void render_block(uint32_t, uint32_t, const grid_t, wchar_t* const,
                   uint8_t* const);

@@ -158,10 +158,10 @@ bool render_unit_health_bar(const struct units* const units, const grid_t x,
     const health_t health = unit->health;
 
     // Hide health bar on full-health units
-    if (health == health_max)
+    if (health == HEALTH_MAX)
         return false;
 
-    render_bar(health, health_max, tile_x, symbol, style);
+    render_bar(health, HEALTH_MAX, tile_x, symbol, style);
 
     return true;
 }
@@ -483,8 +483,8 @@ static void print_attack_text(const struct game* const game) {
     game_simulate_attack(game, &damage, &counter_damage);
     const health_wide_t percent = 100;
     wprintf(L"Damage: %u%% Counter-damage: %u%%\n",
-            (damage * percent) / health_max,
-            (counter_damage * percent) / health_max);
+            (damage * percent) / HEALTH_MAX,
+            (counter_damage * percent) / HEALTH_MAX);
 }
 
 static void print_build_text(const struct game* const game) {

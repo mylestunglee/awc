@@ -4,9 +4,9 @@
 #include "definitions.h"
 #include <stdbool.h>
 
-#define health_max (health_t)0xff
-#define units_capacity (unit_t)0xff
-#define null_unit units_capacity
+#define HEALTH_MAX (health_t)0xff
+#define UNITS_CAPACITY (unit_t)0xff
+#define NULL_UNIT UNITS_CAPACITY
 
 typedef uint8_t unit_t;
 typedef uint8_t health_t;
@@ -25,13 +25,13 @@ struct unit {
 };
 
 struct units {
-    struct unit data[units_capacity];
+    struct unit data[UNITS_CAPACITY];
     unit_t start;
     unit_t size;
-    unit_t frees[units_capacity];
+    unit_t frees[UNITS_CAPACITY];
     unit_t firsts[PLAYERS_CAPACITY];
-    unit_t prevs[units_capacity];
-    unit_t nexts[units_capacity];
+    unit_t prevs[UNITS_CAPACITY];
+    unit_t nexts[UNITS_CAPACITY];
     unit_t grid[GRID_SIZE][GRID_SIZE];
     unit_t selected;
 };
@@ -68,7 +68,7 @@ bool units_exists(const struct units* const, const grid_t, const grid_t);
 bool units_ranged(const model_t);
 bool units_update_capture_progress(struct units* const, const health_t);
 
-#ifdef expose_units_internals
+#ifdef EXPOSE_UNITS_INTERNALS
 
 void units_delete(struct units* const, const unit_t);
 void units_move(struct units* const, const unit_t, const grid_t, const grid_t);

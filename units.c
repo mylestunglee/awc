@@ -9,34 +9,34 @@ void units_initialise(struct units* const units) {
     units->start = 0;
     units->size = 0;
     // Setup indices
-    for (unit_t i = 0; i < units_capacity; ++i)
-        units->frees[i] = (i + 1) % units_capacity;
+    for (unit_t i = 0; i < UNITS_CAPACITY; ++i)
+        units->frees[i] = (i + 1) % UNITS_CAPACITY;
 
     for (player_t i = 0; i < PLAYERS_CAPACITY; ++i)
-        units->firsts[i] = null_unit;
+        units->firsts[i] = NULL_UNIT;
 
     // Clear grid
     grid_t y = 0;
     do {
         grid_t x = 0;
         do {
-            units->grid[y][x] = null_unit;
+            units->grid[y][x] = NULL_UNIT;
         } while (++x);
     } while (++y);
 
-    units->selected = null_unit;
+    units->selected = NULL_UNIT;
 }
 
 unit_t insert_with_frees(struct units* const units,
                          const struct unit* const unit) {
-    assert(units->size <= units_capacity);
+    assert(units->size <= UNITS_CAPACITY);
     // Check space to insert unit
-    if (units->size == units_capacity)
-        return null_unit;
+    if (units->size == UNITS_CAPACITY)
+        return NULL_UNIT;
 
     const unit_t index = units->start;
     units->start = units->frees[units->start];
-    units->frees[index] = null_unit;
+    units->frees[index] = NULL_UNIT;
     ++units->size;
     units->data[index] = *unit;
     return index;
@@ -46,17 +46,17 @@ unit_t insert_with_players(struct units* const units,
                            const struct unit* const unit) {
     unit_t index = insert_with_frees(units, unit);
     // Propagate failure
-    if (index == null_unit)
-        return null_unit;
+    if (index == NULL_UNIT)
+        return NULL_UNIT;
 
     const player_t player = unit->player;
 
     // Link new node at front
     units->nexts[index] = units->firsts[player];
-    units->prevs[index] = null_unit;
+    units->prevs[index] = NULL_UNIT;
 
     // If not first unit of the player
-    if (units->firsts[player] != null_unit)
+    if (units->firsts[player] != NULL_UNIT)
         units->prevs[units->firsts[player]] = index;
 
     units->firsts[player] = index;
@@ -64,13 +64,13 @@ unit_t insert_with_players(struct units* const units,
 }
 
 bool units_insert(struct units* const units, const struct unit* const unit) {
-    assert(units->grid[unit->y][unit->x] == null_unit);
+    assert(units->grid[unit->y][unit->x] == NULL_UNIT);
     assert(unit->player != NULL_PLAYER);
 
     const unit_t index = insert_with_players(units, unit);
 
     // insert_with_players may fail when units data structure is at capacity
-    if (index == null_unit)
+    if (index == NULL_UNIT)
         return true;
 
     units->grid[unit->y][unit->x] = index;
@@ -79,7 +79,7 @@ bool units_insert(struct units* const units, const struct unit* const unit) {
 
 void delete_with_frees(struct units* const units, const unit_t index) {
     assert(units->size > 0);
-    assert(units->frees[index] == null_unit);
+    assert(units->frees[index] == NULL_UNIT);
 
     units->frees[index] = units->start;
     units->start = index;
@@ -97,7 +97,7 @@ void delete_with_players(struct units* const units, const unit_t index) {
     }
 
     // Link next's prev to skip over index
-    if (units->nexts[index] != null_unit) {
+    if (units->nexts[index] != NULL_UNIT) {
         units->prevs[units->nexts[index]] = units->prevs[index];
     }
 
@@ -105,15 +105,15 @@ void delete_with_players(struct units* const units, const unit_t index) {
 }
 
 void units_delete(struct units* const units, const unit_t unit_index) {
-    assert(unit_index != null_unit);
+    assert(unit_index != NULL_UNIT);
     delete_with_players(units, unit_index);
     const struct unit* const unit = &units->data[unit_index];
-    units->grid[unit->y][unit->x] = null_unit;
+    units->grid[unit->y][unit->x] = NULL_UNIT;
 }
 
 void units_delete_at(struct units* const units, const grid_t x,
                      const grid_t y) {
-    assert(units->grid[y][x] != null_unit);
+    assert(units->grid[y][x] != NULL_UNIT);
     units_delete(units, units->grid[y][x]);
 }
 
@@ -131,12 +131,12 @@ void units_move(struct units* const units, const unit_t unit, const grid_t x,
     if (old_x == x && old_y == y)
         return;
 
-    assert(unit != null_unit);
-    assert(units->grid[y][x] == null_unit);
+    assert(unit != NULL_UNIT);
+    assert(units->grid[y][x] == NULL_UNIT);
     units->data[unit].x = x;
     units->data[unit].y = y;
     units->data[unit].capture_progress = 0;
-    units->grid[old_y][old_x] = null_unit;
+    units->grid[old_y][old_x] = NULL_UNIT;
     units->grid[y][x] = unit;
 }
 
@@ -150,7 +150,7 @@ void units_set_enabled(struct units* const units, const player_t player,
                        const bool enabled) {
     unit_t curr = units->firsts[player];
 
-    while (curr != null_unit) {
+    while (curr != NULL_UNIT) {
         units->data[curr].enabled = enabled;
         curr = units->nexts[curr];
     }
@@ -158,12 +158,12 @@ void units_set_enabled(struct units* const units, const player_t player,
 
 // Clears all units of a player
 void units_delete_player(struct units* const units, const player_t player) {
-    while (units->firsts[player] != null_unit)
+    while (units->firsts[player] != NULL_UNIT)
         units_delete(units, units->firsts[player]);
 }
 
 struct unit* units_get_by_safe(struct units* const units, const unit_t unit) {
-    if (unit == null_unit)
+    if (unit == NULL_UNIT)
         return NULL;
 
     return units_get_by(units, unit);
@@ -176,13 +176,13 @@ struct unit* units_get_at(struct units* const units, const grid_t x,
 
 const struct unit* units_const_get_by(const struct units* const units,
                                       const unit_t unit) {
-    assert(unit != null_unit);
+    assert(unit != NULL_UNIT);
     return &units->data[unit];
 }
 
 const struct unit* units_const_get_by_safe(const struct units* const units,
                                            const unit_t unit) {
-    if (unit == null_unit)
+    if (unit == NULL_UNIT)
         return NULL;
 
     return units_const_get_by(units, unit);
@@ -194,7 +194,7 @@ const struct unit* units_const_get_at(const struct units* const units,
 }
 
 struct unit* units_get_by(struct units* const units, const unit_t unit) {
-    assert(unit != null_unit);
+    assert(unit != NULL_UNIT);
     return &units->data[unit];
 }
 
@@ -204,7 +204,7 @@ struct unit* units_get_first(struct units* const units, const player_t player) {
 
 unit_t index_by_pointer(const struct units* const units,
                         const struct unit* const unit) {
-    assert(unit - (struct unit*)&units->data != null_unit);
+    assert(unit - (struct unit*)&units->data != NULL_UNIT);
     return unit - (struct unit*)&units->data;
 }
 
@@ -221,7 +221,7 @@ const struct unit* units_const_get_first(const struct units* const units,
 }
 
 bool units_is_owner(const struct units* const units, const player_t player) {
-    return units->firsts[player] != null_unit;
+    return units->firsts[player] != NULL_UNIT;
 }
 
 const struct unit* units_const_get_next(const struct units* const units,
@@ -250,17 +250,17 @@ const struct unit* units_const_get_selected(const struct units* const units) {
 
 void units_select_at(struct units* const units, const grid_t x,
                      const grid_t y) {
-    assert(units->selected == null_unit);
-    assert(units->grid[y][x] != null_unit);
+    assert(units->selected == NULL_UNIT);
+    assert(units->grid[y][x] != NULL_UNIT);
     units->selected = units->grid[y][x];
 }
 
 void units_clear_selection(struct units* const units) {
-    units->selected = null_unit;
+    units->selected = NULL_UNIT;
 }
 
 bool units_has_selection(const struct units* const units) {
-    return units->selected != null_unit;
+    return units->selected != NULL_UNIT;
 }
 
 void units_disable_selection(struct units* const units) {
@@ -272,13 +272,13 @@ bool units_mergable(const struct unit* const source,
     assert(source);
     assert(target);
     return source->player == target->player &&
-           !(source->health == health_max && target->health == health_max) &&
+           !(source->health == HEALTH_MAX && target->health == HEALTH_MAX) &&
            source->model == target->model;
 }
 
 bool units_exists(const struct units* const units, const grid_t x,
                   const grid_t y) {
-    return units->grid[y][x] != null_unit;
+    return units->grid[y][x] != NULL_UNIT;
 }
 
 bool units_ranged(const model_t model) { return models_min_range[model] > 0; }

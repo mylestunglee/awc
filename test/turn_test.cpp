@@ -1,4 +1,4 @@
-#define expose_turn_internals
+#define EXPOSE_TURN_INTERNALS
 #include "../bitarray.h"
 #include "../constants.h"
 #include "../turn.h"
@@ -14,7 +14,7 @@ TEST_F(game_fixture, repair_units_increases_unit_health) {
     repair_units(game);
     ASSERT_EQ(units_const_get_first(&game->units, game->turn)->health,
               HEAL_RATE);
-    ASSERT_EQ(game->golds[game->turn], -GOLD_SCALE * HEAL_RATE / health_max);
+    ASSERT_EQ(game->golds[game->turn], -GOLD_SCALE * HEAL_RATE / HEALTH_MAX);
 }
 
 TEST_F(game_fixture, repair_units_ignores_unit_not_on_territory) {
@@ -24,12 +24,12 @@ TEST_F(game_fixture, repair_units_ignores_unit_not_on_territory) {
 }
 
 TEST_F(game_fixture, repair_units_caps_at_maximum_health) {
-    insert_unit({.health = health_max - 1, .x = 2, .y = 3});
+    insert_unit({.health = HEALTH_MAX - 1, .x = 2, .y = 3});
     game->territory[3][2] = game->turn;
     repair_units(game);
     ASSERT_EQ(units_const_get_first(&game->units, game->turn)->health,
-              health_max);
-    ASSERT_EQ(game->golds[game->turn], -GOLD_SCALE / health_max);
+              HEALTH_MAX);
+    ASSERT_EQ(game->golds[game->turn], -GOLD_SCALE / HEALTH_MAX);
 }
 
 TEST_F(game_fixture, start_turn) {
@@ -39,7 +39,7 @@ TEST_F(game_fixture, start_turn) {
     start_turn(game);
     ASSERT_TRUE(units_const_get_first(&game->units, game->turn)->enabled);
     ASSERT_EQ(game->golds[game->turn],
-              GOLD_SCALE - GOLD_SCALE * HEAL_RATE / health_max);
+              GOLD_SCALE - GOLD_SCALE * HEAL_RATE / HEALTH_MAX);
 }
 
 TEST_F(game_fixture, end_turn) {

@@ -7,8 +7,8 @@
 
 health_t merge_health(const health_t source, const health_t target) {
     health_wide_t merged_health = (health_wide_t)source + (health_wide_t)target;
-    if (merged_health > (health_wide_t)health_max)
-        return health_max;
+    if (merged_health > (health_wide_t)HEALTH_MAX)
+        return HEALTH_MAX;
     else
         return merged_health;
 }
@@ -102,7 +102,7 @@ bool action_build(struct game* const game, const model_t model) {
     game->golds[game->turn] -= cost;
 
     // Error may occur when units is full
-    const struct unit unit = {.health = health_max,
+    const struct unit unit = {.health = HEALTH_MAX,
                               .model = model,
                               .player = game->turn,
                               .x = game->x,

@@ -4,7 +4,7 @@
 #include "game.h"
 #define HEAL_RATE (health_t)51
 
-#ifdef expose_turn_internals
+#ifdef EXPOSE_TURN_INTERNALS
 void repair_units(struct game* const);
 void start_turn(struct game* const);
 void end_turn(struct game* const);

@@ -1,4 +1,4 @@
-#define expose_units_internals
+#define EXPOSE_UNITS_INTERNALS
 #include "units_fixture.hpp"
 
 TEST_F(units_fixture, units_initialise_sets_start) {
@@ -22,13 +22,13 @@ TEST_F(units_fixture, units_initialise_sets_frees) {
 TEST_F(units_fixture, units_initialise_sets_firsts) {
     units->firsts[2] = 3;
     units_initialise(units);
-    ASSERT_EQ(units->firsts[2], null_unit);
+    ASSERT_EQ(units->firsts[2], NULL_UNIT);
 }
 
 TEST_F(units_fixture, units_initialise_clears_grid) {
     units->grid[2][3] = 5;
     units_initialise(units);
-    ASSERT_EQ(units->grid[2][3], null_unit);
+    ASSERT_EQ(units->grid[2][3], NULL_UNIT);
 }
 
 TEST_F(units_fixture, insert_with_frees_sets_next_start) {
@@ -36,7 +36,7 @@ TEST_F(units_fixture, insert_with_frees_sets_next_start) {
     struct unit unit;
     insert_with_frees(units, &unit);
     ASSERT_EQ(units->start, 3);
-    ASSERT_EQ(units->frees[2], null_unit);
+    ASSERT_EQ(units->frees[2], NULL_UNIT);
 }
 
 TEST_F(units_fixture, insert_with_frees_inserts_unit) {
@@ -44,16 +44,16 @@ TEST_F(units_fixture, insert_with_frees_inserts_unit) {
         .x = 2, .y = 3
     };
     auto index = insert_with_frees(units, &unit);
-    ASSERT_NE(index, null_unit);
+    ASSERT_NE(index, NULL_UNIT);
     ASSERT_EQ(units->data[index].x, 2);
     ASSERT_EQ(units->data[index].y, 3);
 }
 
 TEST_F(units_fixture, insert_with_frees_fails_when_full) {
     struct unit unit;
-    units->size = units_capacity;
+    units->size = UNITS_CAPACITY;
     auto index = insert_with_frees(units, &unit);
-    ASSERT_EQ(index, null_unit);
+    ASSERT_EQ(index, NULL_UNIT);
 }
 
 TEST_F(units_fixture, insert_with_players_sets_links_on_first_unit) {
@@ -63,8 +63,8 @@ TEST_F(units_fixture, insert_with_players_sets_links_on_first_unit) {
     };
     auto index = insert_with_players(units, &unit);
     ASSERT_EQ(index, 2);
-    ASSERT_EQ(units->nexts[index], null_unit);
-    ASSERT_EQ(units->prevs[index], null_unit);
+    ASSERT_EQ(units->nexts[index], NULL_UNIT);
+    ASSERT_EQ(units->prevs[index], NULL_UNIT);
     ASSERT_EQ(units->firsts[3], 2);
 }
 
@@ -80,18 +80,18 @@ TEST_F(units_fixture, insert_with_players_set_links_second_unit) {
     auto second_index = insert_with_players(units, &second_unit);
     ASSERT_EQ(first_index, 3);
     ASSERT_EQ(second_index, 4);
-    ASSERT_EQ(units->nexts[first_index], null_unit);
+    ASSERT_EQ(units->nexts[first_index], NULL_UNIT);
     ASSERT_EQ(units->nexts[second_index], 3);
     ASSERT_EQ(units->prevs[first_index], 4);
-    ASSERT_EQ(units->prevs[second_index], null_unit);
+    ASSERT_EQ(units->prevs[second_index], NULL_UNIT);
     ASSERT_EQ(units->firsts[2], 4);
 }
 
 TEST_F(units_fixture, insert_with_players_propogates_failure) {
     struct unit unit;
-    units->size = units_capacity;
+    units->size = UNITS_CAPACITY;
     auto index = insert_with_players(units, &unit);
-    ASSERT_EQ(index, null_unit);
+    ASSERT_EQ(index, NULL_UNIT);
 }
 
 TEST_F(units_fixture, units_insert_sets_grid) {
@@ -101,7 +101,7 @@ TEST_F(units_fixture, units_insert_sets_grid) {
     auto error = units_insert(units, &unit);
     ASSERT_FALSE(error);
     auto index = units->grid[3][2];
-    ASSERT_NE(index, null_unit);
+    ASSERT_NE(index, NULL_UNIT);
     auto& unit_ref = units->data[index];
     ASSERT_EQ(unit_ref.x, 2);
     ASSERT_EQ(unit_ref.y, 3);
@@ -109,7 +109,7 @@ TEST_F(units_fixture, units_insert_sets_grid) {
 
 TEST_F(units_fixture, units_insert_propogates_failure) {
     struct unit unit;
-    units->size = units_capacity;
+    units->size = UNITS_CAPACITY;
     auto error = units_insert(units, &unit);
     ASSERT_TRUE(error);
 }
@@ -117,7 +117,7 @@ TEST_F(units_fixture, units_insert_propogates_failure) {
 TEST_F(units_fixture, delete_with_frees_links_free_index) {
     units->size = 2;
     units->start = 3;
-    units->frees[5] = null_unit;
+    units->frees[5] = NULL_UNIT;
     delete_with_frees(units, 5);
     ASSERT_EQ(units->frees[5], 3);
     ASSERT_EQ(units->start, 5);
@@ -154,7 +154,7 @@ TEST_F(units_fixture, units_delete_unsets_grid) {
     };
     units_insert(units, &unit);
     units_delete(units, units->grid[3][2]);
-    ASSERT_EQ(units->grid[3][2], null_unit);
+    ASSERT_EQ(units->grid[3][2], NULL_UNIT);
 }
 
 TEST_F(units_fixture, units_move_relocates_unit) {
@@ -164,7 +164,7 @@ TEST_F(units_fixture, units_move_relocates_unit) {
     units_insert(units, &unit);
     auto index = units->grid[3][2];
     units_move(units, index, 5, 7);
-    ASSERT_EQ(units->grid[3][2], null_unit);
+    ASSERT_EQ(units->grid[3][2], NULL_UNIT);
     ASSERT_EQ(units->grid[7][5], index);
 }
 

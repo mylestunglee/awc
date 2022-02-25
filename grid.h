@@ -13,7 +13,7 @@ void grid_correct_territory(player_t[GRID_SIZE][GRID_SIZE],
                             tile_t[GRID_SIZE][GRID_SIZE]);
 void grid_compute_incomes(player_t[GRID_SIZE][GRID_SIZE],
                           gold_t[PLAYERS_CAPACITY]);
-#ifdef expose_grid_internals
+#ifdef EXPOSE_GRID_INTERNALS
 void grid_explore_mark_attackable_tile(struct game* const, const grid_t,
                                        const grid_t, const model_t,
                                        const player_t, const bool);
@@ -33,7 +33,7 @@ void explore_node(struct game* const, const struct list_node* const,
                   const player_t, const model_t, const bool);
 #endif
 void grid_explore(struct game* const, const bool);
-#ifdef expose_grid_internals
+#ifdef EXPOSE_GRID_INTERNALS
 void clear_energies(energy_t[GRID_SIZE][GRID_SIZE]);
 energy_t init_exploration_energy(const energy_t, const model_t);
 #endif

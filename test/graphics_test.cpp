@@ -1,4 +1,4 @@
-#define expose_graphics_internals
+#define EXPOSE_GRAPHICS_INTERNALS
 #include "../constants.h"
 #include "../graphics.h"
 #include "../unit_constants.h"
@@ -65,14 +65,14 @@ TEST_F(units_fixture,
 }
 
 TEST_F(units_fixture, render_unit_health_bar_returns_false_when_max_health) {
-    insert({.health = health_max});
+    insert({.health = HEALTH_MAX});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     ASSERT_FALSE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
 }
 
 TEST_F(units_fixture, render_unit_health_bar_shows_unit_health) {
-    insert({.health = health_max - 1});
+    insert({.health = HEALTH_MAX - 1});
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     ASSERT_TRUE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
@@ -308,7 +308,7 @@ std::pair<wchar_t, uint8_t> render_pixel_helper(const struct game* const game,
 } // namespace
 
 TEST_F(game_fixture, render_pixel_shows_unit_health_bar) {
-    insert_unit({.health = health_max - 1});
+    insert_unit({.health = HEALTH_MAX - 1});
     const auto [symbol, style] = render_pixel_helper(game, 0, 0, 1, 3);
     ASSERT_EQ(symbol, '9');
     ASSERT_EQ(style, '\x0a');

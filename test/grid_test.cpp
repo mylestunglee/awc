@@ -1,4 +1,4 @@
-#define expose_grid_internals
+#define EXPOSE_GRID_INTERNALS
 #include "../bitarray.h"
 #include "../constants.h"
 #include "../grid.h"
@@ -214,8 +214,8 @@ TEST_F(game_fixture, is_node_accessible_returns_true_when_mergable) {
 }
 
 TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
-    insert_unit({.health = health_max, .x = 2, .y = 3});
-    insert_unit({.health = health_max, .x = 0, .y = 0});
+    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
+    insert_unit({.health = HEALTH_MAX, .x = 0, .y = 0});
     struct list_node node = {.x = 2, .y = 3};
     auto accessible = is_node_accessible(game, &node);
     ASSERT_FALSE(accessible);
