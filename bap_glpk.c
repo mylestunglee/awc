@@ -1,6 +1,7 @@
-#include "optimise2.h"
+#include "bap_glpk.h"
 #include "unit_constants.h"
 #include <assert.h>
+#include <glpk.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -19,7 +20,7 @@ struct bap_temps {
     index_t z_column_index;
     index_t distribution_row_start_index;
     index_t distribution_row_end_index;
-    index_t allocation_row_start_index; // start/end remove?
+    index_t allocation_row_start_index;
     index_t budget_row_index;
     index_t surplus_row_start_index;
     index_t surplus_row_end_index;
@@ -77,7 +78,7 @@ bool surplus_j_exists(const struct bap_inputs* const inputs, const index_t j) {
     return a_j_exists(inputs, j) || b_j_exists(inputs, j);
 }
 
-bool glpk_solvable_bap(const struct bap_inputs* const inputs) {
+bool bap_glpk_solvable(const struct bap_inputs* const inputs) {
     FOR(i) if (!b_i_exists(inputs, i)) return false;
 
     return true;
@@ -383,7 +384,7 @@ void parse_results(const struct bap_inputs* const inputs,
     }
 }
 
-void glpk_solve_bap(const struct bap_inputs* const inputs,
+void bap_glpk_solve(const struct bap_inputs* const inputs,
                     grid_wide_t outputs[MODEL_CAPACITY],
                     void* const workspace) {
     struct bap_temps* const temps = (struct bap_temps*)workspace;

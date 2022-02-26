@@ -1,17 +1,7 @@
-#ifndef OPTIMISE2_H
-#define OPTIMISE2_H
+#ifndef BAP_GLPK_H
+#define BAP_GLPK_H
 
-#include "definitions.h"
-#include "game.h"
-#include <glpk.h>
-
-struct bap_inputs {
-    health_wide_t friendly_distribution[MODEL_CAPACITY];
-    health_wide_t enemy_distribution[MODEL_CAPACITY];
-    grid_wide_t capturables[CAPTURABLE_CAPACITY];
-    gold_t budget;
-};
-
+#include "bap.h"
 typedef int16_t index_t;
 
 #ifdef EXPOSE_OPTIMISE_INTERNALS
@@ -24,7 +14,7 @@ bool b_j_exists(const struct bap_inputs* const, const index_t);
 bool allocation_exists(const struct bap_inputs* const, const index_t);
 bool surplus_j_exists(const struct bap_inputs* const, const index_t);
 #endif
-bool glpk_solvable_bap(const struct bap_inputs* const);
+bool bap_glpk_solvable(const struct bap_inputs* const);
 
 #ifdef EXPOSE_OPTIMISE_INTERNALS
 index_t count_distribution_rows(const struct bap_inputs* const);
@@ -78,9 +68,8 @@ void initialise_bap(const struct bap_inputs* const, struct bap_temps* const);
 void glpk_solve(struct bap_temps* const);
 void parse_results(const struct bap_inputs* const,
                    const struct bap_temps* const, grid_wide_t[MODEL_CAPACITY]);
-void glpk_solve_bap(const struct bap_inputs* const, grid_wide_t[MODEL_CAPACITY],
-                    void* const);
-
 #endif
+void bap_glpk_solve(const struct bap_inputs* const, grid_wide_t[MODEL_CAPACITY],
+                    void* const);
 
 #endif

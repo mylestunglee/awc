@@ -3,7 +3,6 @@
 #include "constants.h"
 #include "game.h"
 #include "grid.h"
-#include "optimise.h"
 #include "unit_constants.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -496,11 +495,11 @@ static void build_units(struct game* const game) {
     grid_wide_t build_allocations[MODEL_CAPACITY] = {0};
 
     // Perform build allocation decision
-    if (is_nonzero_distribution(enemy_distribution))
-        optimise_build_allocations(friendly_distribution, enemy_distribution,
+    if (is_nonzero_distribution(enemy_distribution)) {
+        /*optimise_build_allocations(friendly_distribution, enemy_distribution,
                                    capturables, game->golds[game->turn],
-                                   build_allocations, &game->list.nodes);
-    else
+                                   build_allocations, &game->list.nodes);*/
+    } else
         default_build_allocations(capturables, game->golds[game->turn],
                                   build_allocations);
 
