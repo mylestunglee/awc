@@ -1,4 +1,4 @@
-#include "bap_glpk.h"
+#include "bap_glpk_solver.h"
 #include "unit_constants.h"
 #include <assert.h>
 #include <glpk.h>

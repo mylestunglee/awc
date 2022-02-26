@@ -1,5 +1,5 @@
-#ifndef BAP_GLPK_H
-#define BAP_GLPK_H
+#ifndef BAP_GLPK_SOLVER_H
+#define BAP_GLPK_SOLVER_H
 
 #include "bap.h"
 typedef int16_t index_t;
