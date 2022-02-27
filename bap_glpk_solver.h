@@ -16,7 +16,7 @@ struct bap_temps {
     index_t curr_index;
     index_t a_column_start_index;
     index_t a_column_end_index;
-    index_t b_column_start_index;
+    index_t b_column_index;
     index_t z_column_index;
     index_t distribution_row_start_index;
     index_t distribution_row_end_index;

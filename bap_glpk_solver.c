@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FOR(variable)                                                          \
+#define FOR_MODEL(variable)                                                          \
     for (index_t variable = 0; variable < MODEL_CAPACITY; ++variable)
+#define FOR_CAPTURABLE for (tile_t k = 0; k < CAPTURABLE_CAPACITY; ++k)
 #define SYMBOLIC_NAME_LENGTH 16
 
 
@@ -17,13 +18,13 @@ bool a_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
 }
 
 bool a_i_exists(const struct bap_inputs* const inputs, const index_t i) {
-    FOR(j) if (a_i_j_exists(inputs, i, j)) return true;
+    FOR_MODEL(j) if (a_i_j_exists(inputs, i, j)) return true;
 
     return false;
 }
 
 bool a_j_exists(const struct bap_inputs* const inputs, const index_t j) {
-    FOR(i) if (!a_i_j_exists(inputs, i, j)) return true;
+    FOR_MODEL(i) if (!a_i_j_exists(inputs, i, j)) return true;
 
     return false;
 }
@@ -35,21 +36,21 @@ bool allocation_exists(const struct bap_inputs* const inputs,
 
 bool b_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
                   const index_t j) {
-    for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY; ++capturable)
-        if (buildable_models[capturable] <= i && i < buildable_models[capturable])
-            return allocation_exists(inputs, capturable);
+    FOR_CAPTURABLE
+        if (buildable_models[k] <= i && i < buildable_models[k])
+            return allocation_exists(inputs, k);
 
     return false;
 }
 
 bool b_i_exists(const struct bap_inputs* const inputs, const index_t i) {
-    FOR(j) if (b_i_j_exists(inputs, i, j)) return true;
+    FOR_MODEL(j) if (b_i_j_exists(inputs, i, j)) return true;
 
     return false;
 }
 
 bool b_j_exists(const struct bap_inputs* const inputs, const index_t j) {
-    FOR(i) if (b_i_j_exists(inputs, i, j)) return true;
+    FOR_MODEL(i) if (b_i_j_exists(inputs, i, j)) return true;
 
     return false;
 }
@@ -59,14 +60,14 @@ bool surplus_j_exists(const struct bap_inputs* const inputs, const index_t j) {
 }
 
 bool bap_glpk_solvable(const struct bap_inputs* const inputs) {
-    FOR(i) if (b_i_exists(inputs, i)) return true;
+    FOR_MODEL(i) if (b_i_exists(inputs, i)) return true;
 
     return false;
 }
 
 index_t count_distribution_rows(const struct bap_inputs* const inputs) {
     index_t count = 0;
-    FOR(i)
+    FOR_MODEL(i)
     if (a_i_exists(inputs, i))
         ++count;
     return count;
@@ -74,8 +75,8 @@ index_t count_distribution_rows(const struct bap_inputs* const inputs) {
 
 index_t count_allocation_rows(const struct bap_inputs* const inputs) {
     index_t count = 0;
-    for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY; ++capturable)
-        if (allocation_exists(inputs, capturable))
+    FOR_CAPTURABLE
+        if (allocation_exists(inputs, k))
             ++count;
     return count;
 }
@@ -84,7 +85,7 @@ index_t count_budget_row(const struct bap_inputs* const inputs) { return 1; }
 
 index_t count_surplus_rows(const struct bap_inputs* const inputs) {
     index_t count = 0;
-    FOR(j)
+    FOR_MODEL(j)
     if (surplus_j_exists(inputs, j))
         ++count;
     return count;
@@ -112,7 +113,7 @@ void set_next_row(struct bap_temps* const temps, const char variable_name,
 void set_distribution_rows(const struct bap_inputs* const inputs,
                            struct bap_temps* const temps) {
     temps->distribution_row_start_index = temps->curr_index;
-    FOR(i)
+    FOR_MODEL(i)
     if (a_i_exists(inputs, i))
         set_next_row(temps, 'd', i, GLP_FX, inputs->friendly_distribution[i],
                      inputs->friendly_distribution[i]);
@@ -122,10 +123,10 @@ void set_distribution_rows(const struct bap_inputs* const inputs,
 void set_allocation_rows(const struct bap_inputs* const inputs,
                          struct bap_temps* const temps) {
     temps->allocation_row_index = temps->curr_index;
-    for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY; ++capturable)
-        if (allocation_exists(inputs, capturable))
-            set_next_row(temps, 'a', capturable, GLP_UP, 0.0,
-                         (double)inputs->capturables[capturable]);
+    FOR_CAPTURABLE
+        if (allocation_exists(inputs, k))
+            set_next_row(temps, 'a', k, GLP_UP, 0.0,
+                         (double)inputs->capturables[k]);
 }
 
 void set_budget_row(const struct bap_inputs* const inputs,
@@ -137,7 +138,7 @@ void set_budget_row(const struct bap_inputs* const inputs,
 void set_surplus_rows(const struct bap_inputs* const inputs,
                       struct bap_temps* const temps) {
     temps->surplus_row_start_index = temps->curr_index;
-    FOR(j)
+    FOR_MODEL(j)
     if (surplus_j_exists(inputs, j))
         set_next_row(temps, 's', j, GLP_LO, 0.0, 0.0);
     temps->surplus_row_end_index = temps->curr_index;
@@ -160,8 +161,8 @@ void create_rows(const struct bap_inputs* const inputs,
 
 index_t count_a_columns(const struct bap_inputs* const inputs) {
     index_t count = 0;
-    FOR(i)
-    FOR(j)
+    FOR_MODEL(i)
+    FOR_MODEL(j)
     if (a_i_j_exists(inputs, i, j))
         ++count;
     return count;
@@ -169,8 +170,8 @@ index_t count_a_columns(const struct bap_inputs* const inputs) {
 
 index_t count_b_columns(const struct bap_inputs* const inputs) {
     index_t count = 0;
-    FOR(i)
-    FOR(j)
+    FOR_MODEL(i)
+    FOR_MODEL(j)
     if (b_i_j_exists(inputs, i, j))
         ++count;
     return count;
@@ -204,8 +205,8 @@ void set_next_matrix_column(struct bap_temps* const temps,
 void set_a_columns(const struct bap_inputs* const inputs,
                    struct bap_temps* const temps) {
     temps->a_column_start_index = temps->curr_index;
-    FOR(i)
-    FOR(j)
+    FOR_MODEL(i)
+    FOR_MODEL(j)
     if (a_i_j_exists(inputs, i, j))
         set_next_matrix_column(temps, 'A', i, j, GLP_DB,
                                (double)inputs->friendly_distribution[i],
@@ -215,9 +216,9 @@ void set_a_columns(const struct bap_inputs* const inputs,
 
 void set_b_columns(const struct bap_inputs* const inputs,
                    struct bap_temps* const temps) {
-    temps->b_column_start_index = temps->curr_index;
-    FOR(i)
-    FOR(j)
+    temps->b_column_index = temps->curr_index;
+    FOR_MODEL(i)
+    FOR_MODEL(j)
     if (b_i_j_exists(inputs, i, j))
         set_next_matrix_column(temps, 'B', i, j, GLP_LO, 0.0, GLP_IV);
 }
@@ -266,11 +267,11 @@ void set_distribution_submatrix(const struct bap_inputs* const inputs,
 void set_allocation_submatrix(const struct bap_inputs* const inputs,
                               struct bap_temps* const temps) {
     index_t row = temps->allocation_row_index;
-    for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY; ++capturable)
-        if (allocation_exists(inputs, capturable)) {
-            index_t column = temps->b_column_start_index;
-            for (index_t i = buildable_models[capturable]; i < buildable_models[capturable + 1]; ++i)
-            FOR(j)
+    FOR_CAPTURABLE
+        if (allocation_exists(inputs, k)) {
+            index_t column = temps->b_column_index;
+            for (index_t i = buildable_models[k]; i < buildable_models[k + 1]; ++i)
+            FOR_MODEL(j)
             if (b_i_j_exists(inputs, i, j)) {
                 sparse_matrix_set(temps, row, column, 1.0);
                 ++column;
@@ -281,9 +282,9 @@ void set_allocation_submatrix(const struct bap_inputs* const inputs,
 
 void set_budget_submatrix(const struct bap_inputs* const inputs,
                           struct bap_temps* const temps) {
-    index_t column = temps->b_column_start_index;
-    FOR(i)
-    FOR(j)
+    index_t column = temps->b_column_index;
+    FOR_MODEL(i)
+    FOR_MODEL(j)
     if (b_i_j_exists(inputs, i, j)) {
         sparse_matrix_set(temps, temps->budget_row_index, column,
                           models_cost[i]);
@@ -301,10 +302,10 @@ double calc_surplus_submatrix_value(const struct bap_inputs* const inputs,
 void set_surplus_submatrix(const struct bap_inputs* const inputs,
                            struct bap_temps* const temps) {
     index_t a_column = temps->a_column_start_index;
-    index_t b_column = temps->b_column_start_index;
-    FOR(i) {
+    index_t b_column = temps->b_column_index;
+    FOR_MODEL(i) {
         index_t row = temps->surplus_row_start_index;
-        FOR(j) {
+        FOR_MODEL(j) {
             if (a_i_j_exists(inputs, i, j)) {
                 sparse_matrix_set(temps, row, a_column,
                                   calc_surplus_submatrix_value(inputs, i, j));
@@ -357,8 +358,8 @@ void parse_results(const struct bap_inputs* const inputs,
     memset(outputs, 0, sizeof(grid_wide_t) * MODEL_CAPACITY);
     index_t column = temps->a_column_start_index;
 
-    FOR(i)
-    FOR(j)
+    FOR_MODEL(i)
+    FOR_MODEL(j)
     if (b_i_j_exists(inputs, i, j)) {
         outputs[i] += glp_mip_col_val(temps->problem, column);
         ++column;
