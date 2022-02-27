@@ -5,32 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SYMBOLIC_NAME_LENGTH 16
-#define SPARSE_MATRIX_LENGTH                                                   \
-    (MODEL_CAPACITY +                                                          \
-     (CAPTURABLE_CAPACITY + 1) * MODEL_CAPACITY * MODEL_CAPACITY +             \
-     3 * MODEL_CAPACITY * MODEL_CAPACITY * MODEL_CAPACITY)
-
-struct bap_temps {
-    glp_prob* problem;
-    index_t curr_index;
-    index_t a_column_start_index;
-    index_t a_column_end_index;
-    index_t b_column_start_index;
-    index_t z_column_index;
-    index_t distribution_row_start_index;
-    index_t distribution_row_end_index;
-    index_t allocation_row_start_index;
-    index_t budget_row_index;
-    index_t surplus_row_start_index;
-    index_t surplus_row_end_index;
-    int matrix_rows[SPARSE_MATRIX_LENGTH];
-    int matrix_columns[SPARSE_MATRIX_LENGTH];
-    double matrix_values[SPARSE_MATRIX_LENGTH];
-};
-
 #define FOR(variable)                                                          \
     for (index_t variable = 0; variable < MODEL_CAPACITY; ++variable)
+#define SYMBOLIC_NAME_LENGTH 16
+
 
 bool a_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
                   const index_t j) {
@@ -39,34 +17,15 @@ bool a_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
 }
 
 bool a_i_exists(const struct bap_inputs* const inputs, const index_t i) {
-    FOR(j) if (!a_i_j_exists(inputs, i, j)) return false;
+    FOR(j) if (a_i_j_exists(inputs, i, j)) return true;
 
-    return true;
+    return false;
 }
 
 bool a_j_exists(const struct bap_inputs* const inputs, const index_t j) {
-    FOR(i) if (!a_i_j_exists(inputs, i, j)) return false;
+    FOR(i) if (!a_i_j_exists(inputs, i, j)) return true;
 
-    return true;
-}
-
-bool b_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
-                  const index_t j) {
-    FOR(i) if (!a_i_j_exists(inputs, i, j)) return false;
-
-    return true;
-}
-
-bool b_i_exists(const struct bap_inputs* const inputs, const index_t i) {
-    FOR(j) if (!b_i_j_exists(inputs, i, j)) return false;
-
-    return true;
-}
-
-bool b_j_exists(const struct bap_inputs* const inputs, const index_t j) {
-    FOR(i) if (!b_i_j_exists(inputs, i, j)) return false;
-
-    return true;
+    return false;
 }
 
 bool allocation_exists(const struct bap_inputs* const inputs,
@@ -74,14 +33,35 @@ bool allocation_exists(const struct bap_inputs* const inputs,
     return inputs->capturables[capturable] > 0;
 }
 
+bool b_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
+                  const index_t j) {
+    for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY; ++capturable)
+        if (buildable_models[capturable] <= i && i < buildable_models[capturable])
+            return allocation_exists(inputs, capturable);
+
+    return false;
+}
+
+bool b_i_exists(const struct bap_inputs* const inputs, const index_t i) {
+    FOR(j) if (b_i_j_exists(inputs, i, j)) return true;
+
+    return false;
+}
+
+bool b_j_exists(const struct bap_inputs* const inputs, const index_t j) {
+    FOR(i) if (b_i_j_exists(inputs, i, j)) return true;
+
+    return false;
+}
+
 bool surplus_j_exists(const struct bap_inputs* const inputs, const index_t j) {
     return a_j_exists(inputs, j) || b_j_exists(inputs, j);
 }
 
 bool bap_glpk_solvable(const struct bap_inputs* const inputs) {
-    FOR(i) if (!b_i_exists(inputs, i)) return false;
+    FOR(i) if (b_i_exists(inputs, i)) return true;
 
-    return true;
+    return false;
 }
 
 index_t count_distribution_rows(const struct bap_inputs* const inputs) {
@@ -123,8 +103,8 @@ void set_next_row(struct bap_temps* const temps, const char variable_name,
 
     char name[SYMBOLIC_NAME_LENGTH];
     snprintf(name, sizeof name, "%c_%hu", variable_name, variable_index);
-    glp_set_row_name(temps->problem, temps->curr_index, name);
-    glp_set_row_bnds(temps->problem, temps->curr_index, bounds_type,
+    glp_set_row_name(temps->problem, temps->curr_index + 1, name);
+    glp_set_row_bnds(temps->problem, temps->curr_index + 1, bounds_type,
                      lower_bound, upper_bound);
     ++temps->curr_index;
 }
@@ -141,7 +121,7 @@ void set_distribution_rows(const struct bap_inputs* const inputs,
 
 void set_allocation_rows(const struct bap_inputs* const inputs,
                          struct bap_temps* const temps) {
-    temps->allocation_row_start_index = temps->curr_index;
+    temps->allocation_row_index = temps->curr_index;
     for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY; ++capturable)
         if (allocation_exists(inputs, capturable))
             set_next_row(temps, 'a', capturable, GLP_UP, 0.0,
@@ -174,7 +154,7 @@ void set_rows(const struct bap_inputs* const inputs,
 
 void create_rows(const struct bap_inputs* const inputs,
                  struct bap_temps* const temps) {
-    glp_add_cols(temps->problem, count_rows(inputs));
+    glp_add_rows(temps->problem, count_rows(inputs));
     set_rows(inputs, temps);
 }
 
@@ -214,10 +194,10 @@ void set_next_matrix_column(struct bap_temps* const temps,
 
     char name[SYMBOLIC_NAME_LENGTH];
     snprintf(name, sizeof name, "%c_%hu_%hu", variable_name, i, j);
-    glp_set_col_name(temps->problem, temps->curr_index, name);
-    glp_set_col_bnds(temps->problem, temps->curr_index, bounds_type, 0.0,
+    glp_set_col_name(temps->problem, temps->curr_index + 1, name);
+    glp_set_col_bnds(temps->problem, temps->curr_index + 1, bounds_type, 0.0,
                      upper_bound);
-    glp_set_col_kind(temps->problem, temps->curr_index, variable_type);
+    glp_set_col_kind(temps->problem, temps->curr_index + 1, variable_type);
     ++temps->curr_index;
 }
 
@@ -244,9 +224,9 @@ void set_b_columns(const struct bap_inputs* const inputs,
 
 void set_z_column(struct bap_temps* const temps) {
     temps->z_column_index = temps->curr_index;
-    glp_set_col_name(temps->problem, temps->curr_index, "z");
-    glp_set_obj_coef(temps->problem, temps->curr_index, 1.0);
-    glp_set_col_bnds(temps->problem, temps->curr_index, GLP_FR, 0.0, 0.0);
+    glp_set_col_name(temps->problem, temps->curr_index + 1, "z");
+    glp_set_obj_coef(temps->problem, temps->curr_index + 1, -1.0);
+    glp_set_col_bnds(temps->problem, temps->curr_index + 1, GLP_FR, 0.0, 0.0);
     ++temps->curr_index;
 }
 
@@ -285,17 +265,17 @@ void set_distribution_submatrix(const struct bap_inputs* const inputs,
 
 void set_allocation_submatrix(const struct bap_inputs* const inputs,
                               struct bap_temps* const temps) {
+    index_t row = temps->allocation_row_index;
     for (tile_t capturable = 0; capturable < CAPTURABLE_CAPACITY; ++capturable)
         if (allocation_exists(inputs, capturable)) {
-            index_t row = temps->allocation_row_start_index;
-            FOR(i)
-            if (buildable_models[capturable] <= i &&
-                i < buildable_models[capturable + 1] && b_i_exists(inputs, i)) {
-                for (index_t column = temps->b_column_start_index;
-                     column < temps->a_column_end_index; ++column)
-                    sparse_matrix_set(temps, row, column, 1.0);
-                ++row;
+            index_t column = temps->b_column_start_index;
+            for (index_t i = buildable_models[capturable]; i < buildable_models[capturable + 1]; ++i)
+            FOR(j)
+            if (b_i_j_exists(inputs, i, j)) {
+                sparse_matrix_set(temps, row, column, 1.0);
+                ++column;
             }
+            ++row;
         }
 }
 
@@ -313,7 +293,7 @@ void set_budget_submatrix(const struct bap_inputs* const inputs,
 
 double calc_surplus_submatrix_value(const struct bap_inputs* const inputs,
                                     const index_t i, const index_t j) {
-    return -1.0 * (double)units_damage[i][j] *
+    return (double)units_damage[i][j] *
            (models_min_range[i] ? 0.5 : 1.0) /
            (double)inputs->enemy_distribution[j];
 }
@@ -343,15 +323,17 @@ void set_surplus_submatrix(const struct bap_inputs* const inputs,
 
     for (index_t row = temps->surplus_row_start_index;
          row < temps->surplus_row_end_index; ++row)
-        sparse_matrix_set(temps, row, temps->z_column_index, 1.0);
+        sparse_matrix_set(temps, row, temps->z_column_index, -1.0);
 }
 
 void set_matrix(const struct bap_inputs* const inputs,
                 struct bap_temps* const temps) {
+    temps->curr_index = 0;
     set_distribution_submatrix(inputs, temps);
     set_allocation_submatrix(inputs, temps);
     set_budget_submatrix(inputs, temps);
     set_surplus_submatrix(inputs, temps);
+    glp_load_matrix(temps->problem, temps->curr_index, temps->matrix_rows, temps->matrix_columns, temps->matrix_values);
 }
 
 void initialise_bap(const struct bap_inputs* const inputs,
@@ -361,13 +343,12 @@ void initialise_bap(const struct bap_inputs* const inputs,
     set_matrix(inputs, temps);
 }
 
-void glpk_solve(struct bap_temps* const temps) {
+int glpk_solve(struct bap_temps* const temps) {
     glp_iocp parameters;
     glp_init_iocp(&parameters);
     parameters.presolve = GLP_ON;
     parameters.msg_lev = GLP_MSG_ERR;
-    const int error = glp_intopt(temps->problem, &parameters);
-    assert(!error);
+    return glp_intopt(temps->problem, &parameters);
 }
 
 void parse_results(const struct bap_inputs* const inputs,
@@ -384,15 +365,18 @@ void parse_results(const struct bap_inputs* const inputs,
     }
 }
 
-void bap_glpk_solve(const struct bap_inputs* const inputs,
+int bap_glpk_solve(const struct bap_inputs* const inputs,
                     grid_wide_t outputs[MODEL_CAPACITY],
                     void* const workspace) {
+    assert(sizeof(struct bap_temps) <= sizeof(struct list));
     struct bap_temps* const temps = (struct bap_temps*)workspace;
     temps->problem = glp_create_prob();
-
     initialise_bap(inputs, temps);
-    glpk_solve(temps);
-    parse_results(inputs, temps, outputs);
+    const int error = glpk_solve(temps);
+    if (!error)
+        parse_results(inputs, temps, outputs);
 
     glp_delete_prob(temps->problem);
+
+    return error;
 }

@@ -1,3 +1,6 @@
+#ifndef UNITS_FIXTURE_H
+#define UNITS_FIXTURE_H
+
 #include "../units.h"
 #include <gtest/gtest.h>
 
@@ -8,3 +11,5 @@ protected:
     void insert(const struct unit& unit);
     struct units* const units;
 };
+
+#endif

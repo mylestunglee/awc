@@ -2,21 +2,46 @@
 #define BAP_GLPK_SOLVER_H
 
 #include "bap.h"
+
 typedef int16_t index_t;
 
-#ifdef EXPOSE_OPTIMISE_INTERNALS
+#define SPARSE_MATRIX_LENGTH                                                   \
+    (MODEL_CAPACITY +                                                          \
+     (CAPTURABLE_CAPACITY + 1) * MODEL_CAPACITY * MODEL_CAPACITY +             \
+     3 * MODEL_CAPACITY * MODEL_CAPACITY * MODEL_CAPACITY)
+
+struct glp_prob;
+struct bap_temps {
+    glp_prob* problem;
+    index_t curr_index;
+    index_t a_column_start_index;
+    index_t a_column_end_index;
+    index_t b_column_start_index;
+    index_t z_column_index;
+    index_t distribution_row_start_index;
+    index_t distribution_row_end_index;
+    index_t allocation_row_index;
+    index_t budget_row_index;
+    index_t surplus_row_start_index;
+    index_t surplus_row_end_index;
+    int matrix_rows[SPARSE_MATRIX_LENGTH];
+    int matrix_columns[SPARSE_MATRIX_LENGTH];
+    double matrix_values[SPARSE_MATRIX_LENGTH];
+};
+
+#ifdef EXPOSE_BAP_GLPK_SOLVER_INTERNALS
 bool a_i_j_exists(const struct bap_inputs* const, const index_t, const index_t);
 bool a_i_exists(const struct bap_inputs* const, const index_t);
 bool a_j_exists(const struct bap_inputs* const, const index_t);
+bool allocation_exists(const struct bap_inputs* const, const index_t);
 bool b_i_j_exists(const struct bap_inputs* const, const index_t, const index_t);
 bool b_i_exists(const struct bap_inputs* const, const index_t);
 bool b_j_exists(const struct bap_inputs* const, const index_t);
-bool allocation_exists(const struct bap_inputs* const, const index_t);
 bool surplus_j_exists(const struct bap_inputs* const, const index_t);
 #endif
 bool bap_glpk_solvable(const struct bap_inputs* const);
 
-#ifdef EXPOSE_OPTIMISE_INTERNALS
+#ifdef EXPOSE_BAP_GLPK_SOLVER_INTERNALS
 index_t count_distribution_rows(const struct bap_inputs* const);
 index_t count_allocation_rows(const struct bap_inputs* const);
 index_t count_budget_row(const struct bap_inputs* const);
@@ -65,11 +90,11 @@ void set_surplus_submatrix(const struct bap_inputs* const,
 void set_matrix(const struct bap_inputs* const, struct bap_glpk_temps* const);
 
 void initialise_bap(const struct bap_inputs* const, struct bap_temps* const);
-void glpk_solve(struct bap_temps* const);
+int glpk_solve(struct bap_temps* const);
 void parse_results(const struct bap_inputs* const,
                    const struct bap_temps* const, grid_wide_t[MODEL_CAPACITY]);
 #endif
-void bap_glpk_solve(const struct bap_inputs* const, grid_wide_t[MODEL_CAPACITY],
+int bap_glpk_solve(const struct bap_inputs* const, grid_wide_t[MODEL_CAPACITY],
                     void* const);
 
 #endif

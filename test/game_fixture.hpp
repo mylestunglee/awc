@@ -1,5 +1,5 @@
-#ifndef game_fixture_h
-#define game_fixture_h
+#ifndef GAME_FIXTURE_HPP
+#define GAME_FIXTURE_HPP
 
 #include <gtest/gtest.h>
 #include "../game.h"
