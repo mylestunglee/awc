@@ -11,7 +11,7 @@ protected:
     bap_glpk_solver_fixture();
     int solve();
 
-    std::unique_ptr<struct bap_inputs> inputs;
+    struct bap_inputs inputs;
     grid_wide_t outputs[MODEL_CAPACITY];
 
 private:
