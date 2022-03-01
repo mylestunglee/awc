@@ -95,7 +95,7 @@ index_t count_rows(const struct bap_inputs* const inputs) {
            count_budget_row(inputs) + count_surplus_rows(inputs);
 }
 
-void set_next_row(struct bap_temps* const temps, const char variable_name,
+void set_next_row(struct bap_glpk_temps* const temps, const char variable_name,
                   const index_t variable_index, const int bounds_type,
                   const double lower_bound, const double upper_bound) {
     assert('a' <= variable_name && variable_name < 'z');
@@ -110,7 +110,7 @@ void set_next_row(struct bap_temps* const temps, const char variable_name,
 }
 
 void set_distribution_rows(const struct bap_inputs* const inputs,
-                           struct bap_temps* const temps) {
+                           struct bap_glpk_temps* const temps) {
     temps->distribution_row_start_index = temps->curr_index;
     FOR_MODEL(i)
     if (a_i_exists(inputs, i)) {
@@ -122,7 +122,7 @@ void set_distribution_rows(const struct bap_inputs* const inputs,
 }
 
 void set_allocation_rows(const struct bap_inputs* const inputs,
-                         struct bap_temps* const temps) {
+                         struct bap_glpk_temps* const temps) {
     temps->allocation_row_index = temps->curr_index;
     FOR_CAPTURABLE
     if (allocation_exists(inputs, k))
@@ -131,13 +131,13 @@ void set_allocation_rows(const struct bap_inputs* const inputs,
 }
 
 void set_budget_row(const struct bap_inputs* const inputs,
-                    struct bap_temps* const temps) {
+                    struct bap_glpk_temps* const temps) {
     temps->budget_row_index = temps->curr_index;
     set_next_row(temps, 'b', 0, GLP_UP, 0.0, inputs->budget);
 }
 
 void set_surplus_rows(const struct bap_inputs* const inputs,
-                      struct bap_temps* const temps) {
+                      struct bap_glpk_temps* const temps) {
     temps->surplus_row_start_index = temps->curr_index;
     FOR_MODEL(j)
     if (surplus_j_exists(inputs, j))
@@ -146,7 +146,7 @@ void set_surplus_rows(const struct bap_inputs* const inputs,
 }
 
 void set_rows(const struct bap_inputs* const inputs,
-              struct bap_temps* const temps) {
+              struct bap_glpk_temps* const temps) {
     temps->curr_index = 1;
     set_distribution_rows(inputs, temps);
     set_allocation_rows(inputs, temps);
@@ -155,7 +155,7 @@ void set_rows(const struct bap_inputs* const inputs,
 }
 
 void create_rows(const struct bap_inputs* const inputs,
-                 struct bap_temps* const temps) {
+                 struct bap_glpk_temps* const temps) {
     glp_add_rows(temps->problem, count_rows(inputs));
     set_rows(inputs, temps);
 }
@@ -187,7 +187,7 @@ index_t count_columns(const struct bap_inputs* const inputs) {
            count_objective_column(inputs);
 }
 
-void set_next_matrix_column(struct bap_temps* const temps,
+void set_next_matrix_column(struct bap_glpk_temps* const temps,
                             const char variable_name, const index_t i,
                             const index_t j, const int bounds_type,
                             const double upper_bound, const int variable_type) {
@@ -204,7 +204,7 @@ void set_next_matrix_column(struct bap_temps* const temps,
 }
 
 void set_a_columns(const struct bap_inputs* const inputs,
-                   struct bap_temps* const temps) {
+                   struct bap_glpk_temps* const temps) {
     temps->a_column_start_index = temps->curr_index;
     FOR_MODEL(i)
     FOR_MODEL(j)
@@ -217,7 +217,7 @@ void set_a_columns(const struct bap_inputs* const inputs,
 }
 
 void set_b_columns(const struct bap_inputs* const inputs,
-                   struct bap_temps* const temps) {
+                   struct bap_glpk_temps* const temps) {
     temps->b_column_index = temps->curr_index;
     FOR_MODEL(i)
     FOR_MODEL(j)
@@ -225,7 +225,7 @@ void set_b_columns(const struct bap_inputs* const inputs,
         set_next_matrix_column(temps, 'B', i, j, GLP_LO, 0.0, GLP_IV);
 }
 
-void set_z_column(struct bap_temps* const temps) {
+void set_z_column(struct bap_glpk_temps* const temps) {
     temps->z_column_index = temps->curr_index;
     glp_set_col_name(temps->problem, temps->curr_index, "z");
     glp_set_obj_coef(temps->problem, temps->curr_index, -1.0);
@@ -234,7 +234,7 @@ void set_z_column(struct bap_temps* const temps) {
 }
 
 void set_columns(const struct bap_inputs* const inputs,
-                 struct bap_temps* const temps) {
+                 struct bap_glpk_temps* const temps) {
     temps->curr_index = 1;
     set_a_columns(inputs, temps);
     set_b_columns(inputs, temps);
@@ -242,12 +242,12 @@ void set_columns(const struct bap_inputs* const inputs,
 }
 
 void create_columns(const struct bap_inputs* const inputs,
-                    struct bap_temps* const temps) {
+                    struct bap_glpk_temps* const temps) {
     glp_add_cols(temps->problem, count_columns(inputs));
     set_columns(inputs, temps);
 }
 
-void sparse_matrix_set(struct bap_temps* const temps, const int row,
+void sparse_matrix_set(struct bap_glpk_temps* const temps, const int row,
                        const int column, const double value) {
     assert(temps->curr_index < SPARSE_MATRIX_LENGTH);
     ++temps->curr_index;
@@ -257,7 +257,7 @@ void sparse_matrix_set(struct bap_temps* const temps, const int row,
 }
 
 void set_distribution_submatrix(const struct bap_inputs* const inputs,
-                                struct bap_temps* const temps) {
+                                struct bap_glpk_temps* const temps) {
     for (index_t row = temps->distribution_row_start_index;
          row < temps->distribution_row_end_index; ++row)
         for (index_t column = temps->a_column_start_index;
@@ -267,7 +267,7 @@ void set_distribution_submatrix(const struct bap_inputs* const inputs,
 }
 
 void set_allocation_submatrix(const struct bap_inputs* const inputs,
-                              struct bap_temps* const temps) {
+                              struct bap_glpk_temps* const temps) {
     index_t row = temps->allocation_row_index;
     FOR_CAPTURABLE
     if (allocation_exists(inputs, k)) {
@@ -283,7 +283,7 @@ void set_allocation_submatrix(const struct bap_inputs* const inputs,
 }
 
 void set_budget_submatrix(const struct bap_inputs* const inputs,
-                          struct bap_temps* const temps) {
+                          struct bap_glpk_temps* const temps) {
     index_t column = temps->b_column_index;
     FOR_MODEL(i)
     FOR_MODEL(j)
@@ -301,7 +301,7 @@ double calc_surplus_submatrix_value(const struct bap_inputs* const inputs,
 }
 
 void set_surplus_submatrix(const struct bap_inputs* const inputs,
-                           struct bap_temps* const temps) {
+                           struct bap_glpk_temps* const temps) {
     index_t a_column = temps->a_column_start_index;
     index_t b_column = temps->b_column_index;
     FOR_MODEL(i) {
@@ -329,7 +329,7 @@ void set_surplus_submatrix(const struct bap_inputs* const inputs,
 }
 
 void set_matrix(const struct bap_inputs* const inputs,
-                struct bap_temps* const temps) {
+                struct bap_glpk_temps* const temps) {
     temps->curr_index = 0;
     set_distribution_submatrix(inputs, temps);
     set_allocation_submatrix(inputs, temps);
@@ -340,13 +340,13 @@ void set_matrix(const struct bap_inputs* const inputs,
 }
 
 void initialise_bap(const struct bap_inputs* const inputs,
-                    struct bap_temps* const temps) {
+                    struct bap_glpk_temps* const temps) {
     create_rows(inputs, temps);
     create_columns(inputs, temps);
     set_matrix(inputs, temps);
 }
 
-int glpk_solve(struct bap_temps* const temps) {
+int glpk_solve(struct bap_glpk_temps* const temps) {
     glp_iocp parameters;
     glp_init_iocp(&parameters);
     parameters.presolve = GLP_ON;
@@ -355,7 +355,7 @@ int glpk_solve(struct bap_temps* const temps) {
 }
 
 void parse_results(const struct bap_inputs* const inputs,
-                   const struct bap_temps* const temps,
+                   const struct bap_glpk_temps* const temps,
                    grid_wide_t outputs[MODEL_CAPACITY]) {
     memset(outputs, 0, sizeof(grid_wide_t) * MODEL_CAPACITY);
     index_t column = temps->a_column_start_index;
@@ -370,8 +370,8 @@ void parse_results(const struct bap_inputs* const inputs,
 
 int bap_glpk_solve(const struct bap_inputs* const inputs,
                    grid_wide_t outputs[MODEL_CAPACITY], void* const workspace) {
-    assert(sizeof(struct bap_temps) <= sizeof(struct list));
-    struct bap_temps* const temps = (struct bap_temps*)workspace;
+    assert(sizeof(struct bap_glpk_temps) <= sizeof(struct list));
+    struct bap_glpk_temps* const temps = (struct bap_glpk_temps*)workspace;
     temps->problem = glp_create_prob();
     initialise_bap(inputs, temps);
     const int error = glpk_solve(temps);

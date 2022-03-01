@@ -4,9 +4,6 @@
 #include "bap_glpk_solver_fixture.hpp"
 #include "test_constants.hpp"
 
-constexpr auto CAPTURABLE_FACTORY = 1;
-constexpr auto CAPTURABLE_AIRPORT = 2;
-
 TEST_F(bap_glpk_solver_fixture, constant_functions_when_null_case) {
     ASSERT_FALSE(a_i_j_exists(&inputs, MODEL_INFANTRY, MODEL_INFANTRY));
     ASSERT_FALSE(a_i_exists(&inputs, MODEL_INFANTRY));

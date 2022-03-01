@@ -11,11 +11,12 @@ protected:
 
 private:
     std::unique_ptr<struct bap_inputs> managed_inputs;
-    std::unique_ptr<struct bap_temps> managed_temps;
+    std::unique_ptr<struct bap_glpk_temps> managed_temps;
 
 protected:
     struct bap_inputs* inputs;
-    struct bap_temps* temps;
+    struct bap_glpk_temps* temps;
+    glp_prob* problem;
 };
 
 #endif

@@ -11,7 +11,7 @@ typedef int16_t index_t;
      (CAPTURABLE_CAPACITY + 1) * MODEL_CAPACITY * MODEL_CAPACITY +             \
      3 * MODEL_CAPACITY * MODEL_CAPACITY * MODEL_CAPACITY)
 
-struct bap_temps {
+struct bap_glpk_temps {
     glp_prob* problem;
     index_t curr_index;
     index_t a_column_start_index;
@@ -58,6 +58,7 @@ void set_budget_row(const struct bap_inputs* const,
                     struct bap_glpk_temps* const);
 void set_surplus_rows(const struct bap_inputs* const,
                       struct bap_glpk_temps* const);
+void set_rows(const struct bap_inputs* const, struct bap_glpk_temps* const);
 void create_rows(const struct bap_inputs* const, struct bap_glpk_temps* const);
 
 index_t count_a_columns(const struct bap_inputs* const);
@@ -90,10 +91,12 @@ void set_surplus_submatrix(const struct bap_inputs* const,
                            struct bap_glpk_temps* const);
 void set_matrix(const struct bap_inputs* const, struct bap_glpk_temps* const);
 
-void initialise_bap(const struct bap_inputs* const, struct bap_temps* const);
-int glpk_solve(struct bap_temps* const);
+void initialise_bap(const struct bap_inputs* const,
+                    struct bap_glpk_temps* const);
+int glpk_solve(struct bap_glpk_temps* const);
 void parse_results(const struct bap_inputs* const,
-                   const struct bap_temps* const, grid_wide_t[MODEL_CAPACITY]);
+                   const struct bap_glpk_temps* const,
+                   grid_wide_t[MODEL_CAPACITY]);
 #endif
 int bap_glpk_solve(const struct bap_inputs* const, grid_wide_t[MODEL_CAPACITY],
                    void* const);
