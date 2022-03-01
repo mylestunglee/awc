@@ -1,4 +1,3 @@
-#include "bap_solver.h"
 #include "bap_default_solver.h"
 #include "bap_glpk_solver.h"
 #include <assert.h>
