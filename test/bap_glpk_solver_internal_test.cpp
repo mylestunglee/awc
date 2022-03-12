@@ -1,7 +1,7 @@
 #define EXPOSE_BAP_GLPK_SOLVER_INTERNALS
+#include "../unit_constants.h"
 #include "bap_glpk_solver_internal_fixture.hpp"
 #include "test_constants.hpp"
-#include <glpk.h>
 
 TEST_F(bap_glpk_solver_internal_fixture, set_next_row) {
     glp_add_rows(problem, 1);
@@ -170,4 +170,104 @@ TEST_F(bap_glpk_solver_internal_fixture, create_columns) {
 
     ASSERT_EQ(glp_get_num_cols(problem), 2);
     ASSERT_EQ(temps->curr_index, 3);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, sparse_matrix_set) {
+    sparse_matrix_set(temps, 3, 5, 7.0);
+
+    ASSERT_EQ(temps->matrix_rows[1], 3);
+    ASSERT_EQ(temps->matrix_columns[1], 5);
+    ASSERT_EQ(temps->matrix_values[1], 7.0);
+    ASSERT_EQ(temps->curr_index, 2);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, set_distribution_submatrix) {
+    temps->distribution_row_start_index = 2;
+    temps->distribution_row_end_index = 3;
+    temps->a_column_start_index = 5;
+    temps->a_column_end_index = 6;
+
+    set_distribution_submatrix(inputs, temps);
+
+    ASSERT_EQ(temps->matrix_values[1], 1.0);
+    ASSERT_EQ(temps->curr_index, 2);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, set_allocation_submatrix) {
+    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->enemy_distribution[MODEL_INFANTRY] = 1;
+
+    set_allocation_submatrix(inputs, temps);
+
+    ASSERT_EQ(temps->matrix_values[1], 1.0);
+    ASSERT_EQ(temps->curr_index, 9);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, set_budget_submatrix) {
+    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->enemy_distribution[MODEL_INFANTRY] = 1;
+
+    set_budget_submatrix(inputs, temps);
+
+    ASSERT_EQ(temps->matrix_values[1], models_cost[MODEL_INFANTRY]);
+    ASSERT_EQ(temps->curr_index, 9);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, calc_surplus_submatrix_value) {
+    inputs->enemy_distribution[MODEL_INFANTRY] = 5;
+    ASSERT_EQ(
+        calc_surplus_submatrix_value(inputs, MODEL_ARTILLERY, MODEL_INFANTRY),
+        90.0 * 0.5 / 5.0);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, set_surplus_submatrix) {
+    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->friendly_distribution[MODEL_INFANTRY] = 1;
+    inputs->enemy_distribution[MODEL_INFANTRY] = 1;
+    temps->surplus_row_start_index = 2;
+    temps->surplus_row_end_index = 3;
+
+    set_surplus_submatrix(inputs, temps);
+
+    ASSERT_EQ(temps->matrix_values[1], 55.0);
+    ASSERT_EQ(temps->matrix_values[2], 55.0);
+    ASSERT_EQ(temps->matrix_values[10], -1.0);
+    ASSERT_EQ(temps->curr_index, 11);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, set_matrix) {
+    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->friendly_distribution[MODEL_INFANTRY] = 1;
+    inputs->enemy_distribution[MODEL_INFANTRY] = 1;
+
+    create_rows(inputs, temps);
+    create_columns(inputs, temps);
+
+    set_matrix(inputs, temps);
+
+    ASSERT_EQ(temps->curr_index, 28);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, bap_glpk_temps_preinitialise) {
+    temps->problem = nullptr;
+    temps->matrix_rows[0] = 2;
+    temps->matrix_columns[0] = 3;
+    temps->matrix_values[0] = 5.0;
+
+    bap_glpk_temps_preinitialise(temps);
+
+    ASSERT_NE(temps->problem, nullptr);
+    ASSERT_EQ(temps->matrix_rows[0], 0);
+    ASSERT_EQ(temps->matrix_columns[0], 0);
+    ASSERT_EQ(temps->matrix_values[0], 0.0);
+}
+
+TEST_F(bap_glpk_solver_internal_fixture, bap_glpk_temps_initialise) {
+    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->friendly_distribution[MODEL_INFANTRY] = 1;
+    inputs->enemy_distribution[MODEL_INFANTRY] = 1;
+
+    bap_glpk_temps_initialise(inputs, temps);
+
+    ASSERT_EQ(temps->curr_index, 28);
 }

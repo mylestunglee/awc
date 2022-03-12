@@ -250,10 +250,10 @@ void create_columns(const struct bap_inputs* const inputs,
 void sparse_matrix_set(struct bap_glpk_temps* const temps, const int row,
                        const int column, const double value) {
     assert(temps->curr_index < SPARSE_MATRIX_LENGTH);
-    ++temps->curr_index;
     temps->matrix_rows[temps->curr_index] = row;
     temps->matrix_columns[temps->curr_index] = column;
     temps->matrix_values[temps->curr_index] = value;
+    ++temps->curr_index;
 }
 
 void set_distribution_submatrix(const struct bap_inputs* const inputs,
@@ -330,17 +330,24 @@ void set_surplus_submatrix(const struct bap_inputs* const inputs,
 
 void set_matrix(const struct bap_inputs* const inputs,
                 struct bap_glpk_temps* const temps) {
-    temps->curr_index = 0;
+    temps->curr_index = 1;
     set_distribution_submatrix(inputs, temps);
     set_allocation_submatrix(inputs, temps);
     set_budget_submatrix(inputs, temps);
     set_surplus_submatrix(inputs, temps);
-    glp_load_matrix(temps->problem, temps->curr_index, temps->matrix_rows,
+    glp_load_matrix(temps->problem, temps->curr_index - 1, temps->matrix_rows,
                     temps->matrix_columns, temps->matrix_values);
 }
 
-void initialise_bap(const struct bap_inputs* const inputs,
-                    struct bap_glpk_temps* const temps) {
+void bap_glpk_temps_preinitialise(struct bap_glpk_temps* const temps) {
+    temps->problem = glp_create_prob();
+    temps->matrix_rows[0] = 0;
+    temps->matrix_columns[0] = 0;
+    temps->matrix_values[0] = 0.0;
+}
+
+void bap_glpk_temps_initialise(const struct bap_inputs* const inputs,
+                               struct bap_glpk_temps* const temps) {
     create_rows(inputs, temps);
     create_columns(inputs, temps);
     set_matrix(inputs, temps);
@@ -372,8 +379,8 @@ int bap_glpk_solve(const struct bap_inputs* const inputs,
                    grid_wide_t outputs[MODEL_CAPACITY], void* const workspace) {
     assert(sizeof(struct bap_glpk_temps) <= sizeof(struct list));
     struct bap_glpk_temps* const temps = (struct bap_glpk_temps*)workspace;
-    temps->problem = glp_create_prob();
-    initialise_bap(inputs, temps);
+    bap_glpk_temps_preinitialise(temps);
+    bap_glpk_temps_initialise(inputs, temps);
     const int error = glpk_solve(temps);
     if (!error)
         parse_results(inputs, temps, outputs);

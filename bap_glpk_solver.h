@@ -7,7 +7,7 @@
 typedef int16_t index_t;
 
 #define SPARSE_MATRIX_LENGTH                                                   \
-    (MODEL_CAPACITY +                                                          \
+    (1 + MODEL_CAPACITY +                                                      \
      (CAPTURABLE_CAPACITY + 1) * MODEL_CAPACITY * MODEL_CAPACITY +             \
      3 * MODEL_CAPACITY * MODEL_CAPACITY * MODEL_CAPACITY)
 
@@ -90,9 +90,9 @@ double calc_surplus_submatrix_value(const struct bap_inputs* const,
 void set_surplus_submatrix(const struct bap_inputs* const,
                            struct bap_glpk_temps* const);
 void set_matrix(const struct bap_inputs* const, struct bap_glpk_temps* const);
-
-void initialise_bap(const struct bap_inputs* const,
-                    struct bap_glpk_temps* const);
+void bap_glpk_temps_preinitialise(struct bap_glpk_temps* const);
+void bap_glpk_temps_initialise(const struct bap_inputs* const,
+                               struct bap_glpk_temps* const);
 int glpk_solve(struct bap_glpk_temps* const);
 void parse_results(const struct bap_inputs* const,
                    const struct bap_glpk_temps* const,

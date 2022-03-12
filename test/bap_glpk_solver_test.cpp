@@ -45,7 +45,7 @@ TEST_F(bap_glpk_solver_fixture, constant_functions_when_single_distribution) {
     ASSERT_EQ(count_columns(&inputs), 2);
 }
 
-TEST_F(bap_glpk_solver_fixture, constant_functions_when_) {
+TEST_F(bap_glpk_solver_fixture, constant_functions_when_single_allocation) {
     inputs.capturables[CAPTURABLE_FACTORY] = 1;
     inputs.enemy_distribution[MODEL_INFANTRY] = 1;
 
