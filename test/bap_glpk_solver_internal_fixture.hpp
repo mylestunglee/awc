@@ -16,7 +16,7 @@ private:
 protected:
     struct bap_inputs* inputs;
     struct bap_glpk_temps* temps;
-    glp_prob* problem;
+    glp_prob*& problem;
 };
 
 #endif
