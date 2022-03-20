@@ -2,17 +2,15 @@
 #include "../bap_glpk_solver.h"
 #include "../constants.h"
 #include "../unit_constants.h"
-#include "bap_solver_fixture.hpp"
+#include "bap_base_solver_fixture.hpp"
 #include "test_constants.hpp"
 
-class bap_glpk_solver_fixture : public bap_solver_fixture {
+class bap_glpk_solver_fixture : public bap_base_solver_fixture {
 public:
-    bap_glpk_solver_fixture() : workspace(std::make_unique<struct list>()) {}
-
     int solve() { return bap_glpk_solve(&inputs, outputs, workspace.get()); }
 
 private:
-    std::unique_ptr<struct list> workspace;
+    std::unique_ptr<struct list> workspace = std::make_unique<struct list>();
 };
 
 TEST_F(bap_glpk_solver_fixture, constant_functions_when_null_case) {
