@@ -3,7 +3,7 @@
 #include "bap_solver.h"
 #include "definitions.h"
 #include "unit_constants.h"
-#include <cassert>
+#include <assert.h>
 
 void accumulate_distribution(const struct game* const game,
                              const player_t player,

@@ -6,43 +6,43 @@
 #include "grid.h"
 #include "unit_constants.h"
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 
-static const struct unit* find_attackee(struct game* const game,
-                                        const struct unit* const attacker) {
+const struct unit* find_attackee(struct game* const game,
+                                 const struct unit* const attacker) {
     const struct unit* best_attackee = NULL;
-    health_wide_t best_metric = 0;
+    typedef int16_t metric_t;
+    metric_t best_metric = SHRT_MIN;
 
-    grid_t y = 0;
+    game->y = 0;
     do {
-        grid_t x = 0;
+        game->x = 0;
         do {
             // Attackee is at an attack-labelled tile
-            if (!(game->labels[y][x] & ATTACKABLE_BIT))
+            if (!(game->labels[game->y][game->x] & ATTACKABLE_BIT))
                 continue;
 
             health_t damage, counter_damage;
             game_simulate_attack(game, &damage, &counter_damage);
 
             const struct unit* const attackee =
-                units_const_get_at(&game->units, x, y);
+                units_const_get_at(&game->units, game->x, game->y);
             assert(attackee);
-            const health_wide_t damage_metric =
-                (health_wide_t)damage * models_cost[attackee->model];
-            const health_wide_t counter_damage_metric =
-                (health_wide_t)counter_damage * models_cost[attacker->model];
+            const metric_t damage_metric =
+                (metric_t)damage * (metric_t)models_cost[attackee->model];
+            const metric_t counter_damage_metric =
+                (metric_t)counter_damage *
+                (metric_t)models_cost[attacker->model];
 
-            if (counter_damage_metric > damage_metric)
-                continue;
-
-            const health_wide_t metric = damage_metric - counter_damage_metric;
+            const metric_t metric = damage_metric - counter_damage_metric;
 
             if (metric > best_metric) {
                 best_metric = metric;
                 best_attackee = attackee;
             }
-        } while (++x);
-    } while (++y);
+        } while (++game->x);
+    } while (++game->y);
 
     return best_attackee;
 }
