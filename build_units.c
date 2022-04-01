@@ -3,6 +3,7 @@
 #include "bap_solver.h"
 #include "definitions.h"
 #include "unit_constants.h"
+#include <cassert>
 
 void accumulate_distribution(const struct game* const game,
                              const player_t player,
@@ -26,22 +27,23 @@ void inputs_initialise_distributions(const struct game* const game,
     }
 }
 
-void inputs_initialise_capturables(const struct game* const game,
+void inputs_initialise_capturables(struct game* const game,
                                    struct bap_inputs* const inputs) {
-    grid_t y = 0;
+    game->y = 0;
     do {
-        grid_t x = 0;
+        game->x = 0;
         do {
-            if (game->territory[y][x] != game->turn)
+            if (!game_is_buildable(game))
                 continue;
 
-            const tile_t capturable = game->map[y][x] - TERRIAN_CAPACITY;
+            const tile_t capturable =
+                game->map[game->y][game->x] - TERRIAN_CAPACITY;
             ++inputs->capturables[capturable];
-        } while (++x);
-    } while (++y);
+        } while (++game->x);
+    } while (++game->y);
 }
 
-void inputs_initialise(const struct game* const game,
+void inputs_initialise(struct game* const game,
                        struct bap_inputs* const inputs) {
     inputs_initialise_distributions(game, inputs);
     inputs_initialise_capturables(game, inputs);
@@ -50,25 +52,21 @@ void inputs_initialise(const struct game* const game,
 
 void realise_allocations(struct game* const game,
                          grid_wide_t allocations[MODEL_CAPACITY]) {
-    grid_t y = 0;
+    game->y = 0;
     do {
-        grid_t x = 0;
+        game->x = 0;
         do {
-            if (game->territory[y][x] != game->turn)
+            if (!game_is_buildable(game))
                 continue;
 
-            if (units_const_get_at(&game->units, x, y))
-                continue;
-
-            const tile_t capturable = game->map[y][x] - TERRIAN_CAPACITY;
+            const tile_t capturable =
+                game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
             for (model_t model = buildable_models[capturable];
                  model < buildable_models[capturable + 1]; ++model) {
                 if (allocations[model] == 0)
                     continue;
 
-                game->x = x;
-                game->y = y;
                 const bool error = action_build(game, model);
 
                 if (error)
@@ -77,11 +75,12 @@ void realise_allocations(struct game* const game,
                 --allocations[model];
                 break;
             }
-        } while (++x);
-    } while (++y);
+        } while (++game->x);
+    } while (++game->y);
 }
 
 void build_units(struct game* const game) {
+    assert(!units_has_selection(&game->units));
     struct bap_inputs inputs = {0};
     inputs_initialise(game, &inputs);
     grid_wide_t allocations[MODEL_CAPACITY] = {0};
