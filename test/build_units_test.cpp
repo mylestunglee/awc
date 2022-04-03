@@ -28,7 +28,7 @@ TEST_F(game_fixture, inputs_initialise_distributions) {
 TEST_F(game_fixture, inputs_initialise_capturables) {
     struct bap_inputs inputs = {0};
     game->territory[3][2] = game->turn;
-    game->map[3][2] = TERRIAN_CAPACITY + CAPTURABLE_FACTORY;
+    game->map[3][2] = TILE_FACTORY;
 
     inputs_initialise_capturables(game, &inputs);
 
@@ -39,7 +39,7 @@ TEST_F(game_fixture, inputs_initialise) {
     struct bap_inputs inputs = {0};
     insert_unit({.health = 2, .model = MODEL_INFANTRY});
     game->territory[3][2] = game->turn;
-    game->map[3][2] = TERRIAN_CAPACITY + CAPTURABLE_FACTORY;
+    game->map[3][2] = TILE_FACTORY;
     game->golds[game->turn] = 5 * GOLD_SCALE;
 
     inputs_initialise(game, &inputs);
@@ -53,7 +53,7 @@ TEST_F(game_fixture, realise_allocations) {
     grid_wide_t allocations[MODEL_CAPACITY] = {0};
     allocations[MODEL_INFANTRY] = 1;
     game->territory[3][2] = game->turn;
-    game->map[3][2] = TERRIAN_CAPACITY + CAPTURABLE_FACTORY;
+    game->map[3][2] = TILE_FACTORY;
     game->golds[game->turn] = models_cost[MODEL_INFANTRY];
 
     realise_allocations(game, allocations);
@@ -63,7 +63,7 @@ TEST_F(game_fixture, realise_allocations) {
 
 TEST_F(game_fixture, build_units) {
     game->territory[3][2] = game->turn;
-    game->map[3][2] = TERRIAN_CAPACITY + CAPTURABLE_FACTORY;
+    game->map[3][2] = TILE_FACTORY;
     game->golds[game->turn] = models_cost[MODEL_INFANTRY];
 
     build_units(game);

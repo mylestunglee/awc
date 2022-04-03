@@ -47,15 +47,13 @@ const struct unit* find_attackee(struct game* const game,
     return best_attackee;
 }
 
-static void handle_ranged_attack(struct game* const game,
-                                 struct unit* const attacker,
-                                 const struct unit* const attackee) {
+void prepare_ranged_attack(struct game* const game,
+                          const struct unit* const attackee) {
     game->x = attackee->x;
     game->y = attackee->y;
-    action_attack(game);
 }
 
-static void handle_direct_attack(struct game* const game,
+void prepare_direct_attack(struct game* const game,
                                  struct unit* const attacker,
                                  const struct unit* const attackee) {
 
@@ -66,6 +64,8 @@ static void handle_direct_attack(struct game* const game,
 
     const grid_t x = attackee->x;
     const grid_t y = attackee->y;
+    game->x = x;
+    game->y = y;
     const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
     const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
 
@@ -93,12 +93,8 @@ static void handle_direct_attack(struct game* const game,
 
     assert(max_energy > 0);
 
-    // Apply attack
-    game->x = x;
-    game->y = y;
     game->prev_x = adjacent_x[best_i];
     game->prev_y = adjacent_y[best_i];
-    action_attack(game);
 }
 
 static void handle_attack(struct game* const game,
@@ -109,9 +105,11 @@ static void handle_attack(struct game* const game,
         return;
 
     if (models_min_range[attacker->model])
-        handle_ranged_attack(game, attacker, attackee);
+        prepare_ranged_attack(game, attackee);
     else
-        handle_direct_attack(game, attacker, attackee);
+        prepare_direct_attack(game, attacker, attackee);
+
+    action_attack(game);
 }
 
 static void update_max_energy(const struct game* const game, grid_t x, grid_t y,

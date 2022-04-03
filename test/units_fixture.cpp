@@ -7,5 +7,5 @@ units_fixture::units_fixture()
 }
 
 void units_fixture::insert(const struct unit& unit) {
-    units_insert(units, &unit);
+    assert(!units_insert(units, &unit));
 }
