@@ -48,14 +48,13 @@ const struct unit* find_attackee(struct game* const game,
 }
 
 void prepare_ranged_attack(struct game* const game,
-                          const struct unit* const attackee) {
+                           const struct unit* const attackee) {
     game->x = attackee->x;
     game->y = attackee->y;
 }
 
-void prepare_direct_attack(struct game* const game,
-                                 struct unit* const attacker,
-                                 const struct unit* const attackee) {
+void prepare_direct_attack(struct game* const game, struct unit* const attacker,
+                           const struct unit* const attackee) {
 
     // Find maximal defense tile around attackee
     energy_t max_energy = 0;

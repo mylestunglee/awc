@@ -13,21 +13,18 @@ TEST(action_test, merge_health_bounds_overflow) {
 }
 
 TEST_F(game_fixture, move_selected_unit_when_no_merge) {
-    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
-    units_select_at(&game->units, 2, 3);
+    const auto* const unit = insert_selected_unit(
+        {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
 
     ASSERT_EQ(move_selected_unit(game, 5, 3), HEALTH_MAX);
 
-    const struct unit* const unit = units_const_get_selected(&game->units);
-    ASSERT_TRUE(unit);
     ASSERT_EQ(unit->x, 5);
     ASSERT_FALSE(unit->enabled);
 }
 
 TEST_F(game_fixture, move_selected_unit_when_merge_with_disabled_unit) {
-    insert_unit({.health = 7, .x = 2, .y = 3, .enabled = true});
+    insert_selected_unit({.health = 7, .x = 2, .y = 3, .enabled = true});
     insert_unit({.health = 11, .x = 5, .y = 3});
-    units_select_at(&game->units, 2, 3);
 
     ASSERT_EQ(move_selected_unit(game, 5, 3), 7);
 
@@ -35,9 +32,8 @@ TEST_F(game_fixture, move_selected_unit_when_merge_with_disabled_unit) {
 }
 
 TEST_F(game_fixture, move_selected_unit_when_merge_with_enabled_unit) {
-    insert_unit({.health = 7, .x = 2, .y = 3, .enabled = true});
+    insert_selected_unit({.health = 7, .x = 2, .y = 3, .enabled = true});
     insert_unit({.health = 11, .x = 5, .y = 3, .enabled = true});
-    units_select_at(&game->units, 2, 3);
 
     ASSERT_EQ(move_selected_unit(game, 5, 3), 18);
 
@@ -47,9 +43,8 @@ TEST_F(game_fixture, move_selected_unit_when_merge_with_enabled_unit) {
 TEST_F(game_fixture,
        simulate_restricted_attack_scales_with_game_simulate_attack) {
     health_t HEALTH_MAX_even = HEALTH_MAX & '\xfe';
-    insert_unit({.health = HEALTH_MAX_even, .x = 2, .y = 3});
+    insert_selected_unit({.health = HEALTH_MAX_even, .x = 2, .y = 3});
     insert_unit({.x = 5, .y = 7});
-    units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;
 
@@ -65,9 +60,10 @@ TEST_F(game_fixture,
 }
 
 TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
-    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
-    insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
-    units_select_at(&game->units, 2, 3);
+    const auto* const attacker = insert_selected_unit(
+        {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
+    const auto* const attackee =
+        insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
     game->prev_x = 4;
     game->prev_y = 7;
     game->x = 5;
@@ -79,9 +75,8 @@ TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
 
     action_attack(game);
 
-    const struct unit* const attacker = units_const_get_at(&game->units, 4, 7);
-    const struct unit* const attackee = units_const_get_at(&game->units, 5, 7);
-    ASSERT_TRUE(attacker);
+    ASSERT_EQ(attacker->x, 4);
+    ASSERT_EQ(attacker->y, 7);
     ASSERT_FALSE(attacker->enabled);
     ASSERT_LT(attacker->health, HEALTH_MAX);
     ASSERT_GT(attacker->health, attackee->health);
@@ -89,13 +84,12 @@ TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
 }
 
 TEST_F(game_fixture, action_attack_where_ranged_unit_kills) {
-    insert_unit({.health = HEALTH_MAX,
-                 .model = MODEL_ARTILLERY,
-                 .x = 2,
-                 .y = 3,
-                 .enabled = true});
+    insert_selected_unit({.health = HEALTH_MAX,
+                          .model = MODEL_ARTILLERY,
+                          .x = 2,
+                          .y = 3,
+                          .enabled = true});
     insert_unit({.health = 1, .x = 5, .y = 7});
-    units_select_at(&game->units, 2, 3);
     game->x = 5;
     game->y = 7;
     game->map[7][5] = TILE_PLAINS;
@@ -109,9 +103,8 @@ TEST_F(game_fixture, action_attack_where_ranged_unit_kills) {
 }
 
 TEST_F(game_fixture, action_attack_where_counter_damage_kills) {
-    insert_unit({.health = 1, .x = 2, .y = 3, .enabled = true});
+    insert_selected_unit({.health = 1, .x = 2, .y = 3, .enabled = true});
     insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
-    units_select_at(&game->units, 2, 3);
     game->prev_x = 4;
     game->prev_y = 7;
     game->x = 5;
@@ -167,8 +160,7 @@ TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
 }
 
 TEST_F(game_fixture, can_selected_unit_capture_returns_true_when_capturable) {
-    insert_unit({.x = 2, .y = 3});
-    units_select_at(&game->units, 2, 3);
+    insert_selected_unit({.x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
     game->map[3][2] = TILE_CITY;
@@ -179,8 +171,7 @@ TEST_F(game_fixture, can_selected_unit_capture_returns_true_when_capturable) {
 
 TEST_F(game_fixture,
        can_selected_unit_capture_returns_false_when_uncapturable) {
-    insert_unit({.x = 2, .y = 3});
-    units_select_at(&game->units, 2, 3);
+    insert_selected_unit({.x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
 
@@ -225,8 +216,8 @@ TEST_F(game_fixture, action_capture_when_capture_unoccupied_city) {
 }
 
 TEST_F(game_fixture, action_move_returns_true_when_start_capturing) {
-    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
-    units_select_at(&game->units, 2, 3);
+    const auto* const unit = insert_selected_unit(
+        {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
     game->x = 5;
     game->y = 7;
     game->labels[7][5] = ACCESSIBLE_BIT;
@@ -236,19 +227,18 @@ TEST_F(game_fixture, action_move_returns_true_when_start_capturing) {
 
     ASSERT_TRUE(action_move(game));
 
-    const struct unit* const unit = units_const_get_at(&game->units, 5, 7);
-    ASSERT_TRUE(unit);
+    ASSERT_EQ(unit->x, 5);
+    ASSERT_EQ(unit->y, 7);
     ASSERT_EQ(game->territory[7][5], NULL_PLAYER);
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 
 TEST_F(game_fixture, action_move_returns_true_when_finish_capturing) {
-    insert_unit({.health = HEALTH_MAX,
-                 .x = 2,
-                 .y = 3,
-                 .enabled = true,
-                 .capture_progress = HEALTH_MAX});
-    units_select_at(&game->units, 2, 3);
+    insert_selected_unit({.health = HEALTH_MAX,
+                          .x = 2,
+                          .y = 3,
+                          .enabled = true,
+                          .capture_progress = HEALTH_MAX});
     game->x = 2;
     game->y = 3;
     game->labels[3][2] = ACCESSIBLE_BIT;
@@ -269,8 +259,7 @@ TEST_F(game_fixture, action_move_turns_false_when_cannot_move) {
 }
 
 TEST_F(game_fixture, action_self_destruct_returns_true_when_selected) {
-    insert_unit({.x = 2, .y = 3});
-    units_select_at(&game->units, 2, 3);
+    insert_selected_unit({.x = 2, .y = 3});
     game->dirty_labels = true;
 
     ASSERT_TRUE(action_self_destruct(game));

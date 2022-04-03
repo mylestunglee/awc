@@ -8,7 +8,8 @@
 class game_fixture : public ::testing::Test {
 protected:
     game_fixture();
-    void insert_unit(const struct unit&);
+    struct unit* insert_unit(const struct unit& = {});
+    struct unit* insert_selected_unit(const struct unit& = {});
 
 private:
     std::unique_ptr<struct game> managed_game;

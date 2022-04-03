@@ -43,8 +43,7 @@ TEST_F(game_fixture, start_turn) {
 }
 
 TEST_F(game_fixture, end_turn) {
-    insert_unit({.x = 2, .y = 3, .enabled = true});
-    units_select_at(&game->units, 2, 3);
+    insert_selected_unit({.x = 2, .y = 3, .enabled = true});
     game->dirty_labels = true;
     end_turn(game);
     ASSERT_FALSE(units_has_selection(&game->units));

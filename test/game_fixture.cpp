@@ -5,6 +5,13 @@ game_fixture::game_fixture()
     game_initialise(game);
 }
 
-void game_fixture::insert_unit(const struct unit& unit) {
-    units_insert(&game->units, &unit);
+struct unit* game_fixture::insert_unit(const struct unit& unit) {
+    assert(!units_insert(&game->units, &unit));
+    return units_get_at(&game->units, unit.x, unit.y);
+}
+
+struct unit* game_fixture::insert_selected_unit(const struct unit& unit) {
+    auto inserted_unit = insert_unit(unit);
+    units_select_at(&game->units, inserted_unit->x, inserted_unit->y);
+    return inserted_unit;
 }
