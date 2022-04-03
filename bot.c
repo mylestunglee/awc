@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 const struct unit* find_attackee(struct game* const game,
-                                 const struct unit* const attacker) {
+                                 const model_t attacker_model) {
     const struct unit* best_attackee = NULL;
     typedef int16_t metric_t;
     metric_t best_metric = SHRT_MIN;
@@ -33,7 +33,7 @@ const struct unit* find_attackee(struct game* const game,
                 (metric_t)damage * (metric_t)models_cost[attackee->model];
             const metric_t counter_damage_metric =
                 (metric_t)counter_damage *
-                (metric_t)models_cost[attacker->model];
+                (metric_t)models_cost[attacker_model];
 
             const metric_t metric = damage_metric - counter_damage_metric;
 
@@ -47,14 +47,8 @@ const struct unit* find_attackee(struct game* const game,
     return best_attackee;
 }
 
-void prepare_ranged_attack(struct game* const game,
-                           const struct unit* const attackee) {
-    game->x = attackee->x;
-    game->y = attackee->y;
-}
-
-void prepare_direct_attack(struct game* const game, struct unit* const attacker,
-                           const struct unit* const attackee) {
+void set_prev_position(struct game* const game, const model_t attacker_model,
+                       const struct unit* const attackee) {
 
     // Find maximal defense tile around attackee
     energy_t max_energy = 0;
@@ -63,8 +57,6 @@ void prepare_direct_attack(struct game* const game, struct unit* const attacker,
 
     const grid_t x = attackee->x;
     const grid_t y = attackee->y;
-    game->x = x;
-    game->y = y;
     const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
     const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
 
@@ -76,12 +68,11 @@ void prepare_direct_attack(struct game* const game, struct unit* const attacker,
         if (!(game->labels[i_y][i_x] & ACCESSIBLE_BIT))
             continue;
 
-        const model_t model = attacker->model;
         const tile_t tile = game->map[i_y][i_x];
-        const health_t defense = tile_defense[model][tile];
+        const health_t defense = tile_defense[attacker_model][tile];
         const energy_t energy = game->energies[i_y][i_x];
 
-        // Lexicographical ordering over defence then energy
+        // Lexicographical ordering of defense over energy
         if (defense > max_defense ||
             (defense == max_defense && energy > max_energy)) {
             max_defense = defense;
@@ -96,17 +87,23 @@ void prepare_direct_attack(struct game* const game, struct unit* const attacker,
     game->prev_y = adjacent_y[best_i];
 }
 
+void prepare_attack(struct game* const game, const model_t attacker_model,
+                    const struct unit* const attackee) {
+    game->x = attackee->x;
+    game->y = attackee->y;
+
+    if (!models_min_range[attacker_model])
+        set_prev_position(game, attacker_model, attackee);
+}
+
 static void handle_attack(struct game* const game,
-                          struct unit* const attacker) {
-    const struct unit* const attackee = find_attackee(game, attacker);
+                          const model_t attacker_model) {
+    const struct unit* const attackee = find_attackee(game, attacker_model);
 
     if (attackee == NULL)
         return;
 
-    if (models_min_range[attacker->model])
-        prepare_ranged_attack(game, attackee);
-    else
-        prepare_direct_attack(game, attacker, attackee);
+    prepare_attack(game, attacker_model, attackee);
 
     action_attack(game);
 }
@@ -153,8 +150,6 @@ static energy_t find_nearest_capturable(struct game* const game,
 
 // Capture nearest enemy capturable
 static void handle_capture(struct game* const game, struct unit* const unit) {
-    assert(unit->enabled);
-
     // Unit can capture
     if (unit->model >= UNIT_CAPTURABLE_UPPER_BOUND)
         return;
@@ -179,13 +174,16 @@ static void handle_local(struct game* const game, struct unit* const unit) {
     game->x = unit->x;
     game->y = unit->y;
 
+    const model_t model = unit->model;
+
     // Scan for local targets
     grid_explore(game, false);
-    handle_attack(game, unit);
+    handle_attack(game, model);
     if (!unit->enabled) {
         return;
     }
 
+    // TODO: refactor unit->model
     handle_capture(game, unit);
 
     if (!unit->enabled)

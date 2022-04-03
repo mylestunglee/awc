@@ -5,29 +5,20 @@
 #include "test_constants.hpp"
 
 TEST_F(game_fixture, find_attackee_maximises_metric) {
-    const auto* const attacker = insert_selected_unit({.player = 0, .x = 2});
-    insert_unit({.health = HEALTH_MAX, .player = 1, .x = 3});
+    insert_selected_unit();
+    insert_unit({.health = HEALTH_MAX, .x = 3});
     const auto* const expected_attackee =
-        insert_unit({.health = HEALTH_MAX / 2, .player = 2, .x = 5});
+        insert_unit({.health = HEALTH_MAX / 2, .x = 5});
     game->labels[0][3] = ATTACKABLE_BIT;
     game->labels[0][5] = ATTACKABLE_BIT;
 
-    auto actual_attackee = find_attackee(game, attacker);
+    auto actual_attackee = find_attackee(game, MODEL_INFANTRY);
 
     ASSERT_EQ(actual_attackee, expected_attackee);
 }
 
-TEST_F(game_fixture, prepare_ranged_attack_sets_x_y) {
-    const auto* const unit = insert_unit({.x = 2, .y = 3});
-
-    prepare_ranged_attack(game, unit);
-
-    ASSERT_EQ(game->x, 2);
-    ASSERT_EQ(game->y, 3);
-}
-
-TEST_F(game_fixture, prepare_direct_attack_maximises_defense) {
-    auto* const attacker = insert_unit({.x = 3, .y = 3});
+TEST_F(game_fixture, set_prev_position_maximises_defense) {
+    auto* const attackee = insert_unit({.x = 3, .y = 3});
     game->labels[3][2] = ACCESSIBLE_BIT;
     game->labels[3][4] = ACCESSIBLE_BIT;
     game->map[3][2] = TILE_PLAINS;
@@ -35,11 +26,31 @@ TEST_F(game_fixture, prepare_direct_attack_maximises_defense) {
     game->energies[3][2] = 1;
     game->energies[3][4] = 1;
 
-    prepare_direct_attack(game, attacker, attacker);
+    set_prev_position(game, MODEL_INFANTRY, attackee);
 
     ASSERT_EQ(game->prev_x, 4);
     ASSERT_EQ(game->prev_y, 3);
-    ASSERT_EQ(game->x, 3);
+}
+
+TEST_F(game_fixture, prepare_attack_sets_position_for_ranged_unit) {
+    const auto* const attackee = insert_unit({.x = 2, .y = 3});
+
+    prepare_attack(game, MODEL_ARTILLERY, attackee);
+
+    ASSERT_EQ(game->x, 2);
+    ASSERT_EQ(game->y, 3);
+}
+
+TEST_F(game_fixture, prepare_attack_sets_position_for_direct_unit) {
+    const auto* const attackee = insert_unit({.x = 2, .y = 3});
+    game->labels[3][1] = ACCESSIBLE_BIT;
+    game->energies[3][1] = 1;
+
+    prepare_attack(game, MODEL_INFANTRY, attackee);
+
+    ASSERT_EQ(game->prev_x, 1);
+    ASSERT_EQ(game->prev_y, 3);
+    ASSERT_EQ(game->x, 2);
     ASSERT_EQ(game->y, 3);
 }
 
