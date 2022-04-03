@@ -54,17 +54,13 @@ TEST_F(game_fixture, prepare_attack_sets_position_for_direct_unit) {
     ASSERT_EQ(game->y, 3);
 }
 
-/*
-TEST_F(game_fixture, handle_ranged_attack) {
-    insert_unit({.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .x = 2,
-.enabled = true}); units_select_at(&game->units, 2, 0); insert_unit({.health =
-HEALTH_MAX, .x = 3}); game->labels[0][3] = ATTACKABLE_BIT; game->dirty_labels =
-true;
+TEST_F(game_fixture, attempt_attack_reduces_attackee_health) {
+    insert_selected_unit({.health = HEALTH_MAX, .enabled = true});
+    const auto* const attackee = insert_unit({.health = HEALTH_MAX, .x = 2});
+    game->labels[0][2] = ATTACKABLE_BIT;
+    game->dirty_labels = true;
 
-    handle_ranged_attack(game, units_const_get_at(&game->units, 3, 0));
+    attempt_attack(game, MODEL_ARTILLERY);
 
-    ASSERT_EQ(game->x, 3);
-    auto attacker = units_const_get_at(&game->units, 2, 0);
-    ASSERT_EQ(attacker->health, HEALTH_MAX);
+    ASSERT_LT(attackee->health, HEALTH_MAX);
 }
-*/

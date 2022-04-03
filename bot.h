@@ -8,6 +8,7 @@ void set_prev_position(struct game* const, const model_t,
                        const struct unit* const);
 void prepare_attack(struct game* const, const model_t,
                     const struct unit* const);
+void attempt_attack(struct game* const, const model_t);
 #endif
 void bot_play(struct game* const game);
 

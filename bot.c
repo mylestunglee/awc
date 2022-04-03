@@ -96,15 +96,13 @@ void prepare_attack(struct game* const game, const model_t attacker_model,
         set_prev_position(game, attacker_model, attackee);
 }
 
-static void handle_attack(struct game* const game,
-                          const model_t attacker_model) {
+void attempt_attack(struct game* const game, const model_t attacker_model) {
     const struct unit* const attackee = find_attackee(game, attacker_model);
 
     if (attackee == NULL)
         return;
 
     prepare_attack(game, attacker_model, attackee);
-
     action_attack(game);
 }
 
@@ -149,9 +147,9 @@ static energy_t find_nearest_capturable(struct game* const game,
 }
 
 // Capture nearest enemy capturable
-static void handle_capture(struct game* const game, struct unit* const unit) {
+static void handle_capture(struct game* const game, const model_t model) {
     // Unit can capture
-    if (unit->model >= UNIT_CAPTURABLE_UPPER_BOUND)
+    if (model >= UNIT_CAPTURABLE_UPPER_BOUND)
         return;
 
     grid_t x, y;
@@ -178,13 +176,12 @@ static void handle_local(struct game* const game, struct unit* const unit) {
 
     // Scan for local targets
     grid_explore(game, false);
-    handle_attack(game, model);
+    attempt_attack(game, model);
     if (!unit->enabled) {
         return;
     }
 
-    // TODO: refactor unit->model
-    handle_capture(game, unit);
+    handle_capture(game, model);
 
     if (!unit->enabled)
         return;
