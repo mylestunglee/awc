@@ -106,60 +106,58 @@ void attempt_attack(struct game* const game, const model_t attacker_model) {
     action_attack(game);
 }
 
-static void update_max_energy(const struct game* const game, grid_t x, grid_t y,
-                              energy_t* const max_energy,
-                              grid_t* const update_x, grid_t* const update_y) {
-
+energy_t update_max_energy(const struct game* const game,
+                           const energy_t max_energy, grid_t* const updated_x,
+                           grid_t* const updated_y) {
+    const grid_t x = game->x;
+    const grid_t y = game->y;
     const energy_t energy = game->energies[y][x];
 
-    if (energy <= *max_energy)
-        return;
+    if (energy > max_energy && game->labels[y][x] & ACCESSIBLE_BIT) {
+        *updated_x = x;
+        *updated_y = y;
+        return energy;
+    }
 
-    if (!(game->labels[y][x] & ACCESSIBLE_BIT))
-        return;
-
-    *max_energy = energy;
-    *update_x = x;
-    *update_y = y;
+    return max_energy;
 }
 
-static energy_t find_nearest_capturable(struct game* const game,
-                                        grid_t* const nearest_x,
-                                        grid_t* const nearest_y) {
+energy_t find_nearest_capturable(struct game* const game) {
+    grid_t nearest_x = 0;
+    grid_t nearest_y = 0;
     // Maximise remaining energy to find nearest
     energy_t max_energy = 0;
-    grid_t y = 0;
+    game->y = 0;
     do {
-        grid_t x = 0;
+        game->x = 0;
         do {
-            // Tile is capturable
-            if (game->map[y][x] < TERRIAN_CAPACITY)
+            if (game->map[game->y][game->x] < TERRIAN_CAPACITY)
                 continue;
 
-            if (game_is_friendly(game, game->territory[y][x]))
+            if (game_is_friendly(game, game->territory[game->y][game->x]))
                 continue;
 
-            update_max_energy(game, x, y, &max_energy, nearest_x, nearest_y);
-        } while (++x);
-    } while (++y);
+            max_energy =
+                update_max_energy(game, max_energy, &nearest_x, &nearest_y);
+        } while (++game->x);
+    } while (++game->y);
+
+    game->x = nearest_x;
+    game->y = nearest_y;
 
     return max_energy;
 }
 
 // Capture nearest enemy capturable
-static void handle_capture(struct game* const game, const model_t model) {
-    // Unit can capture
+void handle_capture(struct game* const game, const model_t model) {
     if (model >= UNIT_CAPTURABLE_UPPER_BOUND)
         return;
 
-    grid_t x, y;
-    const energy_t found = find_nearest_capturable(game, &x, &y);
+    const bool found = find_nearest_capturable(game) > 0;
 
-    if (found == 0)
+    if (!found)
         return;
 
-    game->x = x;
-    game->y = y;
     bool success = action_move(game);
     assert(success);
 }
@@ -200,11 +198,11 @@ static void find_nearest_attackee_target_ranged(
 
     for (grid_wide_t j = -max_range; j <= max_range; ++j)
         for (grid_wide_t i = -max_range; i <= max_range; ++i) {
-            const grid_wide_t distance = abs(i) + abs(j);
-            if (models_min_range[model] <= distance && distance <= max_range)
-                update_max_energy(game, (grid_wide_t)(attackee->x) + i,
-                                  (grid_wide_t)(attackee->y) + j, max_energy,
-                                  nearest_x, nearest_y);
+            // const grid_wide_t distance = abs(i) + abs(j);
+            // if (models_min_range[model] <= distance && distance <= max_range)
+            //    update_max_energy(game, (grid_wide_t)(attackee->x) + i,
+            //                      (grid_wide_t)(attackee->y) + j, max_energy,
+            //                      nearest_x, nearest_y);
         }
 }
 
@@ -213,14 +211,14 @@ static void find_nearest_attackee_target_direct(
     energy_t* const max_energy, grid_t* const nearest_x,
     grid_t* const nearest_y) {
 
-    const grid_t x = attackee->x;
-    const grid_t y = attackee->y;
-    const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
-    const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
+    // const grid_t x = attackee->x;
+    // const grid_t y = attackee->y;
+    // const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
+    // const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
 
-    for (uint8_t i = 0; i < 4; ++i)
-        update_max_energy(game, adjacent_x[i], adjacent_y[i], max_energy,
-                          nearest_x, nearest_y);
+    // for (uint8_t i = 0; i < 4; ++i)
+    //    update_max_energy(game, adjacent_x[i], adjacent_y[i], max_energy,
+    //                      nearest_x, nearest_y);
 }
 
 static energy_t find_nearest_attackee_target(struct game* const game,
@@ -270,9 +268,9 @@ static bool find_nearest_target(struct game* const game,
     energy_t capturable_energy = 0;
 
     if (unit->model < UNIT_CAPTURABLE_UPPER_BOUND) {
-        grid_t capturable_x, capturable_y;
-        capturable_energy =
-            find_nearest_capturable(game, &capturable_x, &capturable_y);
+        capturable_energy = find_nearest_capturable(game);
+        const grid_t capturable_x = game->x;
+        const grid_t capturable_y = game->y;
 
         if (attackee_target_energy > capturable_energy) {
             *nearest_x = attackee_target_x;
@@ -321,8 +319,10 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
     // Number of turns of unit movement to look ahead
     const energy_t look_ahead = 16;
 
-    assert(game->x == unit->x);
-    assert(game->y == unit->y);
+    // assert(game->x == unit->x);
+    // assert(game->y == unit->y);
+    game->x = unit->x;
+    game->y = unit->y;
 
     // label_attackable_tiles argument=false is unimportant because attack_bit
     // is unread
