@@ -9,6 +9,10 @@ void set_prev_position(struct game* const, const model_t,
 void prepare_attack(struct game* const, const model_t,
                     const struct unit* const);
 void attempt_attack(struct game* const, const model_t);
+energy_t update_max_energy(const struct game* const, const energy_t,
+                           grid_t* const, grid_t* const);
+energy_t find_nearest_capturable(struct game* const);
+void handle_capture(struct game* const, const model_t);
 #endif
 void bot_play(struct game* const game);
 

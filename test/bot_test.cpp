@@ -64,3 +64,87 @@ TEST_F(game_fixture, attempt_attack_reduces_attackee_health) {
 
     ASSERT_LT(attackee->health, HEALTH_MAX);
 }
+
+TEST_F(game_fixture, update_max_energy_returns_updated_energy) {
+    game->x = 2;
+    game->y = 3;
+    game->energies[3][2] = 7;
+    game->labels[3][2] = ACCESSIBLE_BIT;
+    grid_t updated_x = 0;
+    grid_t updated_y = 0;
+
+    const auto max_energy = update_max_energy(game, 5, &updated_x, &updated_y);
+
+    ASSERT_EQ(max_energy, 7);
+    ASSERT_EQ(updated_x, 2);
+    ASSERT_EQ(updated_y, 3);
+}
+
+TEST_F(game_fixture, update_max_energy_returns_current_energy) {
+    grid_t updated_x = 0;
+    grid_t updated_y = 0;
+
+    const auto max_energy = update_max_energy(game, 5, &updated_x, &updated_y);
+
+    ASSERT_EQ(max_energy, 5);
+    ASSERT_EQ(updated_x, 0);
+    ASSERT_EQ(updated_y, 0);
+}
+
+TEST_F(game_fixture, find_nearest_capturable_returns_max_energy_when_found) {
+    game->map[3][2] = TILE_CITY;
+    game->territory[3][2] = 1;
+    game->energies[3][2] = 5;
+    game->labels[3][2] = ACCESSIBLE_BIT;
+    game->map[3][4] = TILE_CITY;
+    game->territory[3][4] = 1;
+    game->energies[3][4] = 7;
+    game->labels[3][4] = ACCESSIBLE_BIT;
+
+    const auto max_energy = find_nearest_capturable(game);
+
+    ASSERT_EQ(max_energy, 7);
+    ASSERT_EQ(game->x, 4);
+    ASSERT_EQ(game->y, 3);
+}
+
+TEST_F(game_fixture, find_nearest_capturable_returns_zero_when_unfound) {
+    const auto max_energy = find_nearest_capturable(game);
+
+    ASSERT_EQ(max_energy, 0);
+}
+
+TEST_F(game_fixture, handle_capture_when_uncapturable_unit) {
+    const auto* const unit =
+        insert_unit({.model = MODEL_ARTILLERY, .enabled = true});
+
+    handle_capture(game, unit->model);
+
+    ASSERT_TRUE(unit->enabled);
+}
+
+TEST_F(game_fixture, handle_capture_when_no_capturable_exists) {
+    const auto* const unit =
+        insert_unit({.model = MODEL_INFANTRY, .enabled = true});
+
+    handle_capture(game, unit->model);
+
+    ASSERT_TRUE(unit->enabled);
+}
+
+TEST_F(game_fixture, handle_capture_when_capturable_exists) {
+    game->map[3][2] = TILE_CITY;
+    game->territory[3][2] = 1;
+    game->energies[3][2] = 5;
+    game->labels[3][2] = ACCESSIBLE_BIT;
+    game->dirty_labels = true;
+
+    const auto* const unit =
+        insert_selected_unit({.model = MODEL_INFANTRY, .enabled = true});
+
+    handle_capture(game, unit->model);
+
+    ASSERT_FALSE(unit->enabled);
+    ASSERT_EQ(unit->x, 2);
+    ASSERT_EQ(unit->y, 3);
+}
