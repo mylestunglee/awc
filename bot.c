@@ -215,12 +215,10 @@ void handle_local(struct game* const game, const struct unit* const unit) {
     grid_clear_labels(game);
 }
 
-energy_t find_nearest_attackee_target_ranged(struct game* const game,
-                                             const model_t attacker_model,
-                                             const struct unit* const attackee,
-                                             energy_t max_energy,
-                                             grid_t* const nearest_x,
-                                             grid_t* const nearest_y) {
+energy_t find_nearest_attackable_attackee_ranged(
+    struct game* const game, const model_t attacker_model,
+    const struct unit* const attackee, energy_t max_energy,
+    grid_t* const nearest_x, grid_t* const nearest_y) {
 
     const grid_wide_t max_range = models_max_range[attacker_model];
 
@@ -240,11 +238,9 @@ energy_t find_nearest_attackee_target_ranged(struct game* const game,
     return max_energy;
 }
 
-energy_t find_nearest_attackee_target_direct(struct game* const game,
-                                             const struct unit* const attackee,
-                                             energy_t max_energy,
-                                             grid_t* const nearest_x,
-                                             grid_t* const nearest_y) {
+energy_t find_nearest_attackable_attackee_direct(
+    struct game* const game, const struct unit* const attackee,
+    energy_t max_energy, grid_t* const nearest_x, grid_t* const nearest_y) {
 
     const grid_t x = attackee->x;
     const grid_t y = attackee->y;
@@ -260,10 +256,10 @@ energy_t find_nearest_attackee_target_direct(struct game* const game,
     return max_energy;
 }
 
-static energy_t find_nearest_attackee_target(struct game* const game,
-                                             const model_t attacker_model,
-                                             grid_t* const nearest_x,
-                                             grid_t* const nearest_y) {
+static energy_t find_nearest_attackable(struct game* const game,
+                                        const model_t attacker_model,
+                                        grid_t* const nearest_x,
+                                        grid_t* const nearest_y) {
 
     // Maximise remaining energy to find nearest
     energy_t max_energy = 0;
@@ -278,13 +274,14 @@ static energy_t find_nearest_attackee_target(struct game* const game,
         while (attackee) {
             // Attackee is attackable
             if (units_damage[attacker_model][attackee->model] > 0) {
+                // TODO: move into helper function
                 // If attacker is ranged
                 if (models_min_range[attacker_model])
-                    max_energy = find_nearest_attackee_target_ranged(
+                    max_energy = find_nearest_attackable_attackee_ranged(
                         game, attacker_model, attackee, max_energy, nearest_x,
                         nearest_y);
                 else
-                    max_energy = find_nearest_attackee_target_direct(
+                    max_energy = find_nearest_attackable_attackee_direct(
                         game, attackee, max_energy, nearest_x, nearest_y);
             }
 
@@ -300,7 +297,7 @@ static bool find_nearest_target(struct game* const game, const model_t model,
                                 grid_t* const nearest_y) {
 
     grid_t attackee_target_x, attackee_target_y;
-    const energy_t attackee_target_energy = find_nearest_attackee_target(
+    const energy_t attackee_target_energy = find_nearest_attackable(
         game, model, &attackee_target_x, &attackee_target_y);
 
     energy_t capturable_energy = 0;

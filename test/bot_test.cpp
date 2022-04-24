@@ -221,3 +221,35 @@ TEST_F(game_fixture, handle_local_clears_labels_when_unactionable) {
 
     ASSERT_FALSE(game->dirty_labels);
 }
+
+TEST_F(game_fixture,
+       find_nearest_attackable_attackee_ranged_returns_accessible_target) {
+    grid_t nearest_x = 0;
+    grid_t nearest_y = 0;
+    const auto* const attackee = insert_unit({.x = 2, .y = 3});
+    game->labels[3][0] = ACCESSIBLE_BIT;
+    game->energies[3][0] = 5;
+
+    const auto max_energy = find_nearest_attackable_attackee_ranged(
+        game, MODEL_ARTILLERY, attackee, 0, &nearest_x, &nearest_y);
+
+    ASSERT_EQ(max_energy, 5);
+    ASSERT_EQ(nearest_x, 0);
+    ASSERT_EQ(nearest_y, 3);
+}
+
+TEST_F(game_fixture,
+       find_nearest_attackable_attackee_direct_returns_accessible_target) {
+    grid_t nearest_x = 0;
+    grid_t nearest_y = 0;
+    const auto* const attackee = insert_unit({.x = 2, .y = 3});
+    game->labels[3][1] = ACCESSIBLE_BIT;
+    game->energies[3][1] = 5;
+
+    const auto max_energy = find_nearest_attackable_attackee_direct(
+        game, attackee, 0, &nearest_x, &nearest_y);
+
+    ASSERT_EQ(max_energy, 5);
+    ASSERT_EQ(nearest_x, 1);
+    ASSERT_EQ(nearest_y, 3);
+}
