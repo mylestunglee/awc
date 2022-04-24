@@ -215,41 +215,53 @@ void handle_local(struct game* const game, const struct unit* const unit) {
     grid_clear_labels(game);
 }
 
-static void find_nearest_attackee_target_ranged(
-    const struct game* const game, const struct unit* const attacker,
-    const struct unit* const attackee, energy_t* const max_energy,
-    grid_t* const nearest_x, grid_t* const nearest_y) {
+energy_t find_nearest_attackee_target_ranged(struct game* const game,
+                                             const model_t attacker_model,
+                                             const struct unit* const attackee,
+                                             energy_t max_energy,
+                                             grid_t* const nearest_x,
+                                             grid_t* const nearest_y) {
 
-    const model_t model = attacker->model;
-    const grid_wide_t max_range = models_max_range[model];
+    const grid_wide_t max_range = models_max_range[attacker_model];
 
     for (grid_wide_t j = -max_range; j <= max_range; ++j)
         for (grid_wide_t i = -max_range; i <= max_range; ++i) {
-            // const grid_wide_t distance = abs(i) + abs(j);
-            // if (models_min_range[model] <= distance && distance <= max_range)
-            //    update_max_energy(game, (grid_wide_t)(attackee->x) + i,
-            //                      (grid_wide_t)(attackee->y) + j, max_energy,
-            //                      nearest_x, nearest_y);
+            const grid_wide_t distance = abs(i) + abs(j);
+            if (models_min_range[attacker_model] <= distance &&
+                distance <= max_range) {
+                game->x = (grid_wide_t)(attackee->x) + i;
+                game->y = (grid_wide_t)(attackee->y) + j;
+
+                max_energy =
+                    update_max_energy(game, max_energy, nearest_x, nearest_y);
+            }
         }
+
+    return max_energy;
 }
 
-static void find_nearest_attackee_target_direct(
-    const struct game* const game, const struct unit* const attackee,
-    energy_t* const max_energy, grid_t* const nearest_x,
-    grid_t* const nearest_y) {
+energy_t find_nearest_attackee_target_direct(struct game* const game,
+                                             const struct unit* const attackee,
+                                             energy_t max_energy,
+                                             grid_t* const nearest_x,
+                                             grid_t* const nearest_y) {
 
-    // const grid_t x = attackee->x;
-    // const grid_t y = attackee->y;
-    // const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
-    // const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
+    const grid_t x = attackee->x;
+    const grid_t y = attackee->y;
+    const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
+    const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
 
-    // for (uint8_t i = 0; i < 4; ++i)
-    //    update_max_energy(game, adjacent_x[i], adjacent_y[i], max_energy,
-    //                      nearest_x, nearest_y);
+    for (uint8_t i = 0; i < 4; ++i) {
+        game->x = adjacent_x[i];
+        game->y = adjacent_y[i];
+        max_energy = update_max_energy(game, max_energy, nearest_x, nearest_y);
+    }
+
+    return max_energy;
 }
 
 static energy_t find_nearest_attackee_target(struct game* const game,
-                                             const struct unit* const attacker,
+                                             const model_t attacker_model,
                                              grid_t* const nearest_x,
                                              grid_t* const nearest_y) {
 
@@ -265,15 +277,15 @@ static energy_t find_nearest_attackee_target(struct game* const game,
             units_const_get_first(&game->units, player);
         while (attackee) {
             // Attackee is attackable
-            if (units_damage[attacker->model][attackee->model] > 0) {
+            if (units_damage[attacker_model][attackee->model] > 0) {
                 // If attacker is ranged
-                if (models_min_range[attacker->model])
-                    find_nearest_attackee_target_ranged(game, attacker,
-                                                        attackee, &max_energy,
-                                                        nearest_x, nearest_y);
+                if (models_min_range[attacker_model])
+                    max_energy = find_nearest_attackee_target_ranged(
+                        game, attacker_model, attackee, max_energy, nearest_x,
+                        nearest_y);
                 else
-                    find_nearest_attackee_target_direct(
-                        game, attackee, &max_energy, nearest_x, nearest_y);
+                    max_energy = find_nearest_attackee_target_direct(
+                        game, attackee, max_energy, nearest_x, nearest_y);
             }
 
             attackee = units_const_get_next(&game->units, attackee);
@@ -283,18 +295,17 @@ static energy_t find_nearest_attackee_target(struct game* const game,
     return max_energy;
 }
 
-static bool find_nearest_target(struct game* const game,
-                                struct unit* const unit,
+static bool find_nearest_target(struct game* const game, const model_t model,
                                 grid_t* const nearest_x,
                                 grid_t* const nearest_y) {
 
     grid_t attackee_target_x, attackee_target_y;
     const energy_t attackee_target_energy = find_nearest_attackee_target(
-        game, unit, &attackee_target_x, &attackee_target_y);
+        game, model, &attackee_target_x, &attackee_target_y);
 
     energy_t capturable_energy = 0;
 
-    if (unit->model < UNIT_CAPTURABLE_UPPER_BOUND) {
+    if (model < UNIT_CAPTURABLE_UPPER_BOUND) {
         capturable_energy = find_nearest_capturable(game);
         const grid_t capturable_x = game->x;
         const grid_t capturable_y = game->y;
@@ -314,9 +325,8 @@ static bool find_nearest_target(struct game* const game,
     return attackee_target_energy > 0 || capturable_energy > 0;
 }
 
-static void move_towards_target(struct game* const game,
-                                struct unit* const unit, const grid_t x,
-                                const grid_t y) {
+static void move_towards_target(struct game* const game, const model_t model,
+                                const grid_t x, const grid_t y) {
 
     grid_find_path(game, x, y);
 
@@ -325,7 +335,7 @@ static void move_towards_target(struct game* const game,
     assert(!list_empty(list));
 
     const energy_t accessible_energy =
-        list_back_peek(list).energy - unit_movement_ranges[unit->model];
+        list_back_peek(list).energy - unit_movement_ranges[model];
 
     while (!list_empty(list) &&
            list_back_peek(list).energy >= accessible_energy) {
@@ -355,10 +365,10 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
     // is unread
     grid_explore_recursive(game, false, look_ahead);
     grid_t x, y;
-    bool found = find_nearest_target(game, unit, &x, &y);
+    bool found = find_nearest_target(game, unit->model, &x, &y);
 
     if (found)
-        move_towards_target(game, unit, x, y);
+        move_towards_target(game, unit->model, x, y);
     else {
         assert(game->dirty_labels);
         grid_clear_labels(game);
