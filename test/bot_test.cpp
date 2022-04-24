@@ -54,13 +54,13 @@ TEST_F(game_fixture, prepare_attack_sets_position_for_direct_unit) {
     ASSERT_EQ(game->y, 3);
 }
 
-TEST_F(game_fixture, attempt_attack_reduces_attackee_health) {
+TEST_F(game_fixture, handle_attack_reduces_attackee_health) {
     insert_selected_unit({.health = HEALTH_MAX, .enabled = true});
     const auto* const attackee = insert_unit({.health = HEALTH_MAX, .x = 2});
     game->labels[0][2] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
-    attempt_attack(game, MODEL_ARTILLERY);
+    handle_attack(game, MODEL_ARTILLERY);
 
     ASSERT_LT(attackee->health, HEALTH_MAX);
 }
@@ -147,4 +147,42 @@ TEST_F(game_fixture, handle_capture_when_capturable_exists) {
     ASSERT_FALSE(unit->enabled);
     ASSERT_EQ(unit->x, 2);
     ASSERT_EQ(unit->y, 3);
+}
+
+TEST_F(game_fixture, handle_local_prioritises_attack_over_capture) {
+    const auto* const attacker = insert_selected_unit(
+        {.health = HEALTH_MAX, .player = 0, .x = 1, .enabled = true});
+    const auto* const attackee =
+        insert_unit({.health = HEALTH_MAX, .player = 1, .x = 3});
+    for (auto i = 1; i < 4; ++i)
+        game->map[0][i] = TILE_PLAINS;
+    game->map[0][0] = TILE_CITY;
+    game->territory[0][0] = 1;
+
+    handle_local(game, attacker);
+
+    ASSERT_EQ(attacker->x, 2);
+    ASSERT_LT(attackee->health, HEALTH_MAX);
+    ASSERT_FALSE(game->dirty_labels);
+}
+
+TEST_F(game_fixture, handle_local_capture_when_unattackable) {
+    const auto* const unit =
+        insert_selected_unit({.health = HEALTH_MAX, .enabled = true});
+    game->map[0][0] = TILE_PLAINS;
+    game->map[0][1] = TILE_CITY;
+    game->territory[0][1] = 1;
+
+    handle_local(game, unit);
+
+    ASSERT_EQ(unit->x, 1);
+    ASSERT_EQ(unit->capture_progress, HEALTH_MAX);
+    ASSERT_FALSE(game->dirty_labels);
+}
+
+TEST_F(game_fixture, handle_local_clears_labels_when_unactionable) {
+    const auto* const unit = insert_selected_unit({.enabled = true});
+    handle_local(game, unit);
+
+    ASSERT_FALSE(game->dirty_labels);
 }

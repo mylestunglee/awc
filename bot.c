@@ -96,7 +96,7 @@ void prepare_attack(struct game* const game, const model_t attacker_model,
         set_prev_position(game, attacker_model, attackee);
 }
 
-void attempt_attack(struct game* const game, const model_t attacker_model) {
+void handle_attack(struct game* const game, const model_t attacker_model) {
     const struct unit* const attackee = find_attackee(game, attacker_model);
 
     if (attackee == NULL)
@@ -148,7 +148,6 @@ energy_t find_nearest_capturable(struct game* const game) {
     return max_energy;
 }
 
-// Capture nearest enemy capturable
 void handle_capture(struct game* const game, const model_t model) {
     if (model >= UNIT_CAPTURABLE_UPPER_BOUND)
         return;
@@ -162,29 +161,24 @@ void handle_capture(struct game* const game, const model_t model) {
     assert(success);
 }
 
-// Attempt single-turn operation
-static void handle_local(struct game* const game, struct unit* const unit) {
+void handle_local(struct game* const game, const struct unit* const unit) {
     assert(unit->enabled);
-
-    // Populate labels and workspace
-    game->x = unit->x;
-    game->y = unit->y;
-
     const model_t model = unit->model;
 
-    // Scan for local targets
+    game->x = unit->x;
+    game->y = unit->y;
     grid_explore(game, false);
-    attempt_attack(game, model);
-    if (!unit->enabled) {
+
+    handle_attack(game, model);
+
+    if (!unit->enabled)
         return;
-    }
 
     handle_capture(game, model);
 
     if (!unit->enabled)
         return;
 
-    assert(game->dirty_labels);
     grid_clear_labels(game);
 }
 
