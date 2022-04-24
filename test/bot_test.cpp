@@ -1,8 +1,43 @@
 #define EXPOSE_BOT_INTERNALS
 #include "../bot.h"
 #include "../constants.h"
+#include "../unit_constants.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
+
+TEST_F(game_fixture,
+       simulate_defended_attack_with_default_defense_when_ranged) {
+    insert_selected_unit({.health = HEALTH_MAX, .model = MODEL_ARTILLERY});
+    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
+    game->x = 2;
+    game->y = 3;
+
+    health_t damage, expected_counter_damage, actual_counter_damage;
+    game_simulate_attack(game, &damage, &expected_counter_damage);
+
+    simulate_defended_attack(game, &damage, &actual_counter_damage);
+
+    ASSERT_EQ(actual_counter_damage, expected_counter_damage);
+}
+
+TEST_F(game_fixture,
+       simulate_defended_attack_with_maximal_defense_when_direct) {
+    insert_selected_unit({.health = HEALTH_MAX});
+    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
+    game->x = 2;
+    game->y = 3;
+
+    health_t damage, undefended_counter_damage, defended_counter_damage;
+    game_simulate_attack(game, &damage, &undefended_counter_damage);
+
+    game->map[3][1] = TILE_PLAINS;
+    game->labels[3][1] = ACCESSIBLE_BIT;
+    game->labels[3][3] = ACCESSIBLE_BIT;
+
+    simulate_defended_attack(game, &damage, &defended_counter_damage);
+
+    ASSERT_LT(defended_counter_damage, undefended_counter_damage);
+}
 
 TEST_F(game_fixture, find_attackee_maximises_metric) {
     insert_selected_unit();

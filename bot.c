@@ -9,6 +9,39 @@
 #include <limits.h>
 #include <stdlib.h>
 
+void simulate_defended_attack(struct game* const game, health_t* const damage,
+                              health_t* const counter_damage) {
+    const struct unit* const attacker = units_const_get_selected(&game->units);
+
+    if (models_min_range[attacker->model]) {
+        game_simulate_attack(game, damage, counter_damage);
+        return;
+    }
+
+    const tile_t original_tile = game->map[attacker->y][attacker->x];
+    const grid_t x = game->x;
+    const grid_t y = game->y;
+    const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
+    const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
+    const movement_t movement = unit_movement_types[attacker->model];
+    health_t best_defense = 0;
+
+    for (uint8_t i = 0; i < 4; ++i) {
+        const grid_t x_i = adjacent_x[i];
+        const grid_t y_i = adjacent_y[i];
+        const tile_t tile = game->map[y_i][x_i];
+        const health_t defense = tile_defense[movement][tile];
+        if (game->labels[y_i][x_i] & ACCESSIBLE_BIT &&
+            defense >= best_defense) {
+            best_defense = defense;
+            game->map[attacker->y][attacker->x] = tile;
+        }
+    }
+
+    game_simulate_attack(game, damage, counter_damage);
+    game->map[attacker->y][attacker->x] = original_tile;
+}
+
 const struct unit* find_attackee(struct game* const game,
                                  const model_t attacker_model) {
     const struct unit* best_attackee = NULL;
@@ -24,7 +57,7 @@ const struct unit* find_attackee(struct game* const game,
                 continue;
 
             health_t damage, counter_damage;
-            game_simulate_attack(game, &damage, &counter_damage);
+            simulate_defended_attack(game, &damage, &counter_damage);
 
             const struct unit* const attackee =
                 units_const_get_at(&game->units, game->x, game->y);
@@ -62,15 +95,15 @@ void set_prev_position(struct game* const game, const model_t attacker_model,
 
     // Each tile has four adjacent tiles
     for (uint8_t i = 0; i < 4; ++i) {
-        const grid_t i_x = adjacent_x[i];
-        const grid_t i_y = adjacent_y[i];
+        const grid_t x_i = adjacent_x[i];
+        const grid_t y_i = adjacent_y[i];
 
-        if (!(game->labels[i_y][i_x] & ACCESSIBLE_BIT))
+        if (!(game->labels[y_i][x_i] & ACCESSIBLE_BIT))
             continue;
 
-        const tile_t tile = game->map[i_y][i_x];
+        const tile_t tile = game->map[y_i][x_i];
         const health_t defense = tile_defense[attacker_model][tile];
-        const energy_t energy = game->energies[i_y][i_x];
+        const energy_t energy = game->energies[y_i][x_i];
 
         // Lexicographical ordering of defense over energy
         if (defense > max_defense ||
