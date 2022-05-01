@@ -256,6 +256,20 @@ energy_t find_nearest_attackable_attackee_direct(
     return max_energy;
 }
 
+energy_t find_nearest_attackable_attackee(struct game* const game,
+                                          const model_t attacker_model,
+                                          const struct unit* const attackee,
+                                          energy_t max_energy,
+                                          grid_t* const nearest_x,
+                                          grid_t* const nearest_y) {
+    if (models_min_range[attacker_model])
+        return find_nearest_attackable_attackee_ranged(
+            game, attacker_model, attackee, max_energy, nearest_x, nearest_y);
+    else
+        return find_nearest_attackable_attackee_direct(
+            game, attackee, max_energy, nearest_x, nearest_y);
+}
+
 static energy_t find_nearest_attackable(struct game* const game,
                                         const model_t attacker_model,
                                         grid_t* const nearest_x,
@@ -273,17 +287,10 @@ static energy_t find_nearest_attackable(struct game* const game,
             units_const_get_first(&game->units, player);
         while (attackee) {
             // Attackee is attackable
-            if (units_damage[attacker_model][attackee->model] > 0) {
-                // TODO: move into helper function
-                // If attacker is ranged
-                if (models_min_range[attacker_model])
-                    max_energy = find_nearest_attackable_attackee_ranged(
-                        game, attacker_model, attackee, max_energy, nearest_x,
-                        nearest_y);
-                else
-                    max_energy = find_nearest_attackable_attackee_direct(
-                        game, attackee, max_energy, nearest_x, nearest_y);
-            }
+            if (units_damage[attacker_model][attackee->model] > 0)
+                max_energy = find_nearest_attackable_attackee(
+                    game, attacker_model, attackee, max_energy, nearest_x,
+                    nearest_y);
 
             attackee = units_const_get_next(&game->units, attackee);
         }
