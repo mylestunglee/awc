@@ -253,3 +253,27 @@ TEST_F(game_fixture,
     ASSERT_EQ(nearest_x, 1);
     ASSERT_EQ(nearest_y, 3);
 }
+
+TEST_F(game_fixture, find_nearest_attackable_attackee_when_ranged) {
+    grid_t dummy;
+    const auto* const attackee = insert_unit({.x = 2, .y = 3});
+    game->labels[3][0] = ACCESSIBLE_BIT;
+    game->energies[3][0] = 5;
+
+    const auto max_energy = find_nearest_attackable_attackee(
+        game, MODEL_ARTILLERY, attackee, 0, &dummy, &dummy);
+
+    ASSERT_EQ(max_energy, 5);
+}
+
+TEST_F(game_fixture, find_nearest_attackable_attackee_when_direct) {
+    grid_t dummy;
+    const auto* const attackee = insert_unit({.x = 2, .y = 3});
+    game->labels[3][1] = ACCESSIBLE_BIT;
+    game->energies[3][1] = 5;
+
+    const auto max_energy = find_nearest_attackable_attackee(
+        game, MODEL_INFANTRY, attackee, 0, &dummy, &dummy);
+
+    ASSERT_EQ(max_energy, 5);
+}

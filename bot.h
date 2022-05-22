@@ -25,6 +25,9 @@ energy_t find_nearest_attackable_attackee_direct(struct game* const,
                                                  const struct unit* const,
                                                  energy_t, grid_t* const,
                                                  grid_t* const);
+energy_t find_nearest_attackable_attackee(struct game* const, const model_t,
+                                          const struct unit* const, energy_t,
+                                          grid_t* const, grid_t* const);
 #endif
 void bot_play(struct game* const game);
 

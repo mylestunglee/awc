@@ -270,10 +270,10 @@ energy_t find_nearest_attackable_attackee(struct game* const game,
             game, attackee, max_energy, nearest_x, nearest_y);
 }
 
-static energy_t find_nearest_attackable(struct game* const game,
-                                        const model_t attacker_model,
-                                        grid_t* const nearest_x,
-                                        grid_t* const nearest_y) {
+energy_t find_nearest_attackable(struct game* const game,
+                                 const model_t attacker_model,
+                                 grid_t* const nearest_x,
+                                 grid_t* const nearest_y) {
 
     // Maximise remaining energy to find nearest
     energy_t max_energy = 0;
