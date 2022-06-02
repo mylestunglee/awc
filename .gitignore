@@ -6,3 +6,4 @@ test/*_test
 *.txt
 html
 latex
+reports
