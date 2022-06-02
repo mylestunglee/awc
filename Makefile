@@ -10,7 +10,7 @@ REPORTS_DIRECTORY = reports
 	$(CC) $(CFLAGS) $(LIBRARIES) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
-.PHONY: default clean run test clean_test coverage_reports
+.PHONY: default clean test clean_test coverage_reports
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBRARIES) -o $@
@@ -19,9 +19,6 @@ default: $(TARGET)
 
 test:
 	$(MAKE) -C test
-
-runtest:
-	$(MAKE) -C test run
 
 format:
 	clang-format -style=file -i *.c *.h test/*.cpp

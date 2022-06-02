@@ -3,10 +3,7 @@
 #include "../constants.h"
 #include "../turn.h"
 #include "game_fixture.hpp"
-#include <cstdio>
-#include <fstream>
-
-constexpr tile_t TILE_PLAINS = 1;
+#include "test_constants.hpp"
 
 TEST_F(game_fixture, repair_units_increases_unit_health) {
     insert_unit({.x = 2, .y = 3});

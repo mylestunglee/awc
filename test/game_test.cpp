@@ -4,7 +4,6 @@
 #include "../game.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
-#include <cstdio>
 #include <fstream>
 
 TEST_F(game_fixture, game_load_sets_map) {

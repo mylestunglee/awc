@@ -27,8 +27,5 @@ HEADERS = $(wildcard ../*.h)
 
 default: $(TARGETS)
 
-run: $(TARGETS)
-	@bash run_tests.sh $(TARGETS)
-
 clean:
 	rm -f $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS)
