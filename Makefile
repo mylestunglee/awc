@@ -10,7 +10,7 @@ REPORTS_DIRECTORY = reports
 	$(CC) $(CFLAGS) $(LIBRARIES) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
-.PHONY: default clean test clean_test coverage_reports
+.PHONY: default clean test run_test clean_test coverage_reports
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBRARIES) -o $@
@@ -31,6 +31,9 @@ doc:
 
 clean: clean_test
 	rm -rf $(TARGET) $(OBJECTS) $(REPORTS_DIRECTORY)
+
+run_test:
+	$(MAKE) -C test run
 
 clean_test:
 	$(MAKE) -C test clean
@@ -63,6 +66,6 @@ $(REPORTS_DIRECTORY)/%_coverage: $(REPORTS_DIRECTORY) %_test_coverage/report/ind
 	mv $*_test_coverage/report $@
 	rm -r $*_test_coverage
 
-COVERAGE_REPORTS = $(patsubst test/%_test.cpp, $(REPORTS_DIRECTORY)/%_coverage, $(wildcard test/*_test.cpp))
+COVERAGE_REPORTS = $(patsubst test/%_test.cpp, $(REPORTS_DIRECTORY)/%_coverage, $(wildcard test/*_test.cpp) test/all_test.cpp) 
 
 coverage_reports: $(COVERAGE_REPORTS)
