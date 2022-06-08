@@ -49,7 +49,7 @@ TEST_F(game_fixture, inputs_initialise) {
     ASSERT_EQ(inputs.budget, 5 * GOLD_SCALE);
 }
 
-TEST_F(game_fixture, realise_allocations) {
+TEST_F(game_fixture, realise_allocations_builds_one_unit) {
     grid_wide_t allocations[MODEL_CAPACITY] = {0};
     allocations[MODEL_INFANTRY] = 1;
     game->territory[3][2] = game->turn;
@@ -58,7 +58,30 @@ TEST_F(game_fixture, realise_allocations) {
 
     realise_allocations(game, allocations);
 
+    ASSERT_EQ(allocations[MODEL_INFANTRY], 0);
     ASSERT_EQ(game->golds[game->turn], 0);
+}
+
+TEST_F(game_fixture, realise_allocations_builds_no_units_when_no_allocations) {
+    grid_wide_t allocations[MODEL_CAPACITY] = {0};
+    game->territory[3][2] = game->turn;
+    game->map[3][2] = TILE_FACTORY;
+
+    realise_allocations(game, allocations);
+
+    ASSERT_EQ(game->units.size, 0);
+}
+
+TEST_F(game_fixture, realise_allocations_builds_no_units_when_full) {
+    game->units.size = UNITS_CAPACITY;
+    grid_wide_t allocations[MODEL_CAPACITY] = {0};
+    allocations[MODEL_INFANTRY] = 1;
+    game->territory[3][2] = game->turn;
+    game->map[3][2] = TILE_FACTORY;
+
+    realise_allocations(game, allocations);
+
+    ASSERT_FALSE(units_const_get_at(&game->units, 2, 3));
 }
 
 TEST_F(game_fixture, build_units) {
