@@ -1,10 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "bitarray.h"
 #include "list.h"
 #include "units.h"
-
-#define BITARRAY_SIZE(bits) (bits + 7) / 8
 
 typedef int32_t gold_t;
 
@@ -23,8 +22,7 @@ struct game {
     gold_t golds[PLAYERS_CAPACITY];
     gold_t incomes[PLAYERS_CAPACITY];
     uint8_t bots[BITARRAY_SIZE(PLAYERS_CAPACITY)];
-    uint8_t alliances[BITARRAY_SIZE(
-        (PLAYERS_CAPACITY * (PLAYERS_CAPACITY - 1)) / 2)];
+    uint8_t alliances[BITMATRIX_SIZE(PLAYERS_CAPACITY)];
     bool dirty_labels;
 };
 
