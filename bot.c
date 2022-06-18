@@ -299,17 +299,16 @@ energy_t find_nearest_attackable(struct game* const game,
     return max_energy;
 }
 
-static bool find_nearest_target(struct game* const game, const model_t model,
-                                grid_t* const nearest_x,
-                                grid_t* const nearest_y) {
+bool find_nearest_target(struct game* const game, const model_t attacker_model,
+                         grid_t* const nearest_x, grid_t* const nearest_y) {
 
     grid_t attackee_target_x, attackee_target_y;
     const energy_t attackee_target_energy = find_nearest_attackable(
-        game, model, &attackee_target_x, &attackee_target_y);
+        game, attacker_model, &attackee_target_x, &attackee_target_y);
 
     energy_t capturable_energy = 0;
 
-    if (model < UNIT_CAPTURABLE_UPPER_BOUND) {
+    if (attacker_model < UNIT_CAPTURABLE_UPPER_BOUND) {
         capturable_energy = find_nearest_capturable(game);
         const grid_t capturable_x = game->x;
         const grid_t capturable_y = game->y;

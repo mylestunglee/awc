@@ -144,6 +144,9 @@ TEST_F(game_fixture, find_nearest_capturable_returns_max_energy_when_found) {
 }
 
 TEST_F(game_fixture, find_nearest_capturable_returns_zero_when_unfound) {
+    game->map[3][2] = TILE_CITY;
+    game->territory[3][2] = game->turn;
+
     const auto max_energy = find_nearest_capturable(game);
 
     ASSERT_EQ(max_energy, 0);
@@ -276,4 +279,70 @@ TEST_F(game_fixture, find_nearest_attackable_attackee_when_direct) {
         game, MODEL_INFANTRY, attackee, 0, &dummy, &dummy);
 
     ASSERT_EQ(max_energy, 5);
+}
+
+TEST_F(game_fixture, find_nearest_attackable) {
+    grid_t dummy;
+    insert_unit({.player = 1, .x = 2, .y = 3});
+    game->labels[3][1] = ACCESSIBLE_BIT;
+    game->energies[3][1] = 5;
+
+    const auto max_energy =
+        find_nearest_attackable(game, MODEL_INFANTRY, &dummy, &dummy);
+
+    ASSERT_EQ(max_energy, 5);
+}
+
+TEST_F(game_fixture, find_nearest_target_when_attackable_target) {
+    grid_t nearest_x = 0;
+    grid_t nearest_y = 0;
+    insert_unit({.player = 1, .x = 2, .y = 3});
+    game->labels[3][1] = ACCESSIBLE_BIT;
+    game->energies[3][1] = 5;
+
+    ASSERT_TRUE(
+        find_nearest_target(game, MODEL_INFANTRY, &nearest_x, &nearest_y));
+
+    ASSERT_EQ(nearest_x, 1);
+    ASSERT_EQ(nearest_y, 3);
+}
+
+TEST_F(game_fixture, find_nearest_target_when_capturable_target) {
+    grid_t nearest_x = 0;
+    grid_t nearest_y = 0;
+    game->map[3][2] = TILE_CITY;
+    game->territory[3][2] = 1;
+    game->energies[3][2] = 5;
+    game->labels[3][2] = ACCESSIBLE_BIT;
+
+    ASSERT_TRUE(
+        find_nearest_target(game, MODEL_INFANTRY, &nearest_x, &nearest_y));
+
+    ASSERT_EQ(nearest_x, 2);
+    ASSERT_EQ(nearest_y, 3);
+}
+
+TEST_F(game_fixture,
+       find_nearest_target_favours_capturable_over_attackable_target) {
+    grid_t nearest_x = 0;
+    grid_t nearest_y = 0;
+    insert_unit({.player = 1, .x = 2, .y = 3});
+    game->labels[3][1] = ACCESSIBLE_BIT;
+    game->energies[3][1] = 5;
+    game->map[5][2] = TILE_CITY;
+    game->territory[5][2] = 1;
+    game->energies[5][2] = 5;
+    game->labels[5][2] = ACCESSIBLE_BIT;
+
+    ASSERT_TRUE(
+        find_nearest_target(game, MODEL_INFANTRY, &nearest_x, &nearest_y));
+
+    ASSERT_EQ(nearest_x, 2);
+    ASSERT_EQ(nearest_y, 5);
+}
+
+TEST_F(game_fixture, find_nearest_target_when_no_target) {
+    grid_t dummy;
+
+    ASSERT_FALSE(find_nearest_target(game, MODEL_HELICOPTER, &dummy, &dummy));
 }
