@@ -40,12 +40,15 @@ void end_turn(struct game* const game) {
 }
 
 void next_alive_turn(struct game* const game) {
+    bool alive_player_found = false;
     for (player_t i = 0; i < PLAYERS_CAPACITY; ++i) {
         game->turn = (game->turn + 1) % PLAYERS_CAPACITY;
-        if (game_is_alive(game, game->turn))
-            return;
+        if (game_is_alive(game, game->turn)) {
+            alive_player_found = true;
+            break;
+        }
     }
-    assert(false);
+    assert(alive_player_found);
 }
 
 bool exists_alive_non_bot(const struct game* const game) {
