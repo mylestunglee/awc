@@ -82,7 +82,7 @@ const static uint8_t
                             {'\xb1', '\x11', '\x11', '\x1c'},
                             {'\xb1', '\x11', '\x11', '\x1c'}}};
 
-void graphics_init() { setlocale(LC_CTYPE, ""); }
+void graphics_init() { setlocale(LC_CTYPE, "C.UTF-8"); }
 
 void render_block(uint32_t progress, uint32_t completion, const grid_t tile_x,
                   wchar_t* const symbol, uint8_t* const style) {

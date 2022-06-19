@@ -7,6 +7,18 @@
 #include "units_fixture.hpp"
 #include <utility>
 
+TEST(graphics_test, graphics_init_sets_empty_character_locale) {
+    using namespace std::literals::string_literals;
+
+    graphics_init();
+
+    std::string locale = setlocale(LC_CTYPE, nullptr);
+    ASSERT_NE(locale, "C"s);
+
+    // Reset to default locale
+    setlocale(LC_CTYPE, "C");
+}
+
 TEST(graphics_test, render_block_with_no_progress_is_empty) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
