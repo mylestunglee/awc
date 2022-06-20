@@ -65,7 +65,7 @@ void grid_compute_incomes(player_t territory[GRID_SIZE][GRID_SIZE],
         do {
             const player_t player = territory[y][x];
             if (player != NULL_PLAYER)
-                ++incomes[player];
+                incomes[player] += GOLD_SCALE;
         } while (++x);
     } while (++y);
 }

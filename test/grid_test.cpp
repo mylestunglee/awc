@@ -103,7 +103,7 @@ TEST_F(grid_fixture, grid_compute_incomes_computes_incomes) {
 
     grid_compute_incomes(territory, incomes);
 
-    ASSERT_EQ(incomes[2], 3);
+    ASSERT_EQ(incomes[2], 3000);
 }
 
 TEST_F(
