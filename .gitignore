@@ -4,6 +4,7 @@ test/*_test
 test/all_test.cpp
 *.o
 *.txt
+*state
 html
 latex
 reports

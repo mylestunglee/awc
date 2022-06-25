@@ -328,7 +328,7 @@ bool find_nearest_target(struct game* const game, const model_t attacker_model,
     return attackee_target_energy > 0 || capturable_energy > 0;
 }
 
-static void move_towards_target(struct game* const game, const model_t model,
+void move_towards_target(struct game* const game, const model_t model,
                                 const grid_t x, const grid_t y) {
 
     grid_find_path(game, x, y);
@@ -337,6 +337,7 @@ static void move_towards_target(struct game* const game, const model_t model,
 
     assert(!list_empty(list));
 
+    // Restrict accessible energy to one turn
     const energy_t accessible_energy =
         list_back_peek(list).energy - unit_movement_ranges[model];
 
@@ -350,9 +351,6 @@ static void move_towards_target(struct game* const game, const model_t model,
     }
 
     assert(ACCESSIBLE_BIT & game->labels[game->y][game->x]);
-
-    const bool success = action_move(game);
-    assert(success);
 }
 
 static void handle_nonlocal(struct game* const game, struct unit* const unit) {
@@ -367,12 +365,14 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
     // label_attackable_tiles argument=false is unimportant because attack_bit
     // is unread
     grid_explore_recursive(game, false, look_ahead);
-    grid_t x, y;
-    bool found = find_nearest_target(game, unit->model, &x, &y);
+    grid_t target_x, target_y;
+    bool found = find_nearest_target(game, unit->model, &target_x, &target_y);
 
-    if (found)
-        move_towards_target(game, unit->model, x, y);
-    else {
+    if (found) {
+        move_towards_target(game, unit->model, target_x, target_y);
+        const bool success = action_move(game);
+        assert(success);
+    } else {
         assert(game->dirty_labels);
         grid_clear_labels(game);
     }

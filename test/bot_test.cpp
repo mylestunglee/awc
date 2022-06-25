@@ -346,3 +346,14 @@ TEST_F(game_fixture, find_nearest_target_when_no_target) {
 
     ASSERT_FALSE(find_nearest_target(game, MODEL_HELICOPTER, &dummy, &dummy));
 }
+
+TEST_F(game_fixture, move_towards_target_moves_one_turn) {
+    for (auto x = 1; x <= 5; ++x) {
+        game->labels[0][x] = ACCESSIBLE_BIT; 
+        game->energies[0][x] = x;
+    }
+    
+    move_towards_target(game, MODEL_INFANTRY, 1, 0);
+
+    ASSERT_EQ(game->x, 2);
+}
