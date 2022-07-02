@@ -4,14 +4,6 @@
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 
-TEST(action_test, merge_health_returns_added_health) {
-    ASSERT_EQ(merge_health(2, 3), 5);
-}
-
-TEST(action_test, merge_health_bounds_overflow) {
-    ASSERT_EQ(merge_health(HEALTH_MAX, 1), HEALTH_MAX);
-}
-
 TEST_F(game_fixture, move_selected_unit_when_no_merge) {
     const auto* const unit = insert_selected_unit(
         {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
@@ -38,25 +30,6 @@ TEST_F(game_fixture, move_selected_unit_when_merge_with_enabled_unit) {
     ASSERT_EQ(move_selected_unit(game, 5, 3), 18);
 
     ASSERT_EQ(game->units.size, 1);
-}
-
-TEST_F(game_fixture,
-       simulate_restricted_attack_scales_with_game_simulate_attack) {
-    health_t HEALTH_MAX_even = HEALTH_MAX & '\xfe';
-    insert_selected_unit({.health = HEALTH_MAX_even, .x = 2, .y = 3});
-    insert_unit({.x = 5, .y = 7});
-    game->x = 5;
-    game->y = 7;
-
-    health_t HEALTH_MAX_damage = 0;
-    health_t counter_damage = 0;
-    game_simulate_attack(game, &HEALTH_MAX_damage, &counter_damage);
-
-    health_t health_half_damage = 0;
-    simulate_restricted_attack(game, HEALTH_MAX / 2, &health_half_damage,
-                               &counter_damage);
-
-    ASSERT_EQ(HEALTH_MAX_damage / 2, health_half_damage);
 }
 
 TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {

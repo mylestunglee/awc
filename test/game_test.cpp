@@ -77,10 +77,11 @@ TEST_F(game_fixture, calc_damage_between_two_infantry) {
               static_cast<health_t>(55.0 * 0.9 * 255.0 / 100.0));
 }
 
-TEST_F(game_fixture, game_simulate_attack_kill_attackee) {
-    insert_selected_unit(
+TEST_F(game_fixture, calc_damage_pair_kill_attackee) {
+    auto* attacker = insert_selected_unit(
         {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 2, .y = 3});
-    insert_unit({.health = 1, .model = MODEL_INFANTRY, .x = 5, .y = 7});
+    auto* attackee =
+        insert_unit({.health = 1, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     game->x = 5;
     game->y = 7;
     game->map[7][5] = TILE_PLAINS;
@@ -88,16 +89,16 @@ TEST_F(game_fixture, game_simulate_attack_kill_attackee) {
     health_t damage = 0;
     health_t counter_damage = 0;
 
-    game_simulate_attack(game, &damage, &counter_damage);
+    calc_damage_pair(game, attacker, attackee, &damage, &counter_damage);
 
     ASSERT_GT(damage, 0);
     ASSERT_EQ(counter_damage, 0);
 }
 
-TEST_F(game_fixture, game_simulate_attack_ranged_units_do_not_counter_attack) {
-    insert_selected_unit(
+TEST_F(game_fixture, calc_damage_pair_ranged_units_do_not_counter_attack) {
+    auto* attacker = insert_selected_unit(
         {.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .x = 2, .y = 3});
-    insert_unit(
+    auto* attackee = insert_unit(
         {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     game->x = 5;
     game->y = 7;
@@ -106,16 +107,16 @@ TEST_F(game_fixture, game_simulate_attack_ranged_units_do_not_counter_attack) {
     health_t damage = 0;
     health_t counter_damage = 0;
 
-    game_simulate_attack(game, &damage, &counter_damage);
+    calc_damage_pair(game, attacker, attackee, &damage, &counter_damage);
 
     ASSERT_GT(damage, 0);
     ASSERT_EQ(counter_damage, 0);
 }
 
-TEST_F(game_fixture, game_simulate_attack_when_counter_attacking) {
-    insert_selected_unit(
+TEST_F(game_fixture, calc_damage_pair_when_counter_attacking) {
+    auto* attacker = insert_selected_unit(
         {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 2, .y = 3});
-    insert_unit(
+    auto* attackee = insert_unit(
         {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 5, .y = 7});
     game->x = 5;
     game->y = 7;
@@ -125,11 +126,31 @@ TEST_F(game_fixture, game_simulate_attack_when_counter_attacking) {
     health_t damage = 0;
     health_t counter_damage = 0;
 
-    game_simulate_attack(game, &damage, &counter_damage);
+    calc_damage_pair(game, attacker, attackee, &damage, &counter_damage);
 
     ASSERT_EQ(damage, calc_damage(game, units_const_get_at(&game->units, 2, 3),
                                   units_const_get_at(&game->units, 5, 7)));
     ASSERT_EQ(counter_damage, (HEALTH_MAX - damage) * damage / HEALTH_MAX);
+}
+
+TEST_F(game_fixture,
+       calc_damage_pair_with_health_scales_with_calc_damage_pair) {
+    const auto HEALTH_MAX_EVEN = HEALTH_MAX & '\xfe';
+    auto* attacker =
+        insert_selected_unit({.health = HEALTH_MAX_EVEN, .x = 2, .y = 3});
+    auto* attackee = insert_unit({.x = 5, .y = 7});
+    game->x = 5;
+    game->y = 7;
+
+    health_t damage = 0;
+    health_t counter_damage = 0;
+    calc_damage_pair(game, attacker, attackee, &damage, &counter_damage);
+
+    health_t health_half_damage = 0;
+    calc_damage_pair_with_health(game, attacker, attackee, HEALTH_MAX / 2,
+                                 &health_half_damage, &counter_damage);
+
+    ASSERT_EQ(damage / 2, health_half_damage);
 }
 
 TEST_F(game_fixture, game_is_attackable_returns_true_when_directly_attackable) {

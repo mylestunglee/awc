@@ -5,15 +5,6 @@
 #include "unit_constants.h"
 #include <assert.h>
 
-health_t merge_health(const health_t source, const health_t target) {
-    health_wide_t merged_health = (health_wide_t)source + (health_wide_t)target;
-    if (merged_health > (health_wide_t)HEALTH_MAX)
-        return HEALTH_MAX;
-    else
-        return merged_health;
-}
-
-// Returns actionable health after move considering possible merge
 health_t move_selected_unit(struct game* const game, const grid_t x,
                             const grid_t y) {
     struct unit* const source = units_get_selected(&game->units);
@@ -22,29 +13,15 @@ health_t move_selected_unit(struct game* const game, const grid_t x,
 
     health_t result = source->health;
     if (source != target && target) {
-        assert(units_mergable(source, target));
-        source->health = merge_health(source->health, target->health);
+        source->health = units_merge_health(source, target);
         if (target->enabled)
             result = source->health;
         units_delete_at(&game->units, x, y);
     }
+
     units_move_selection(&game->units, x, y);
     units_disable_selection(&game->units);
     return result;
-}
-
-// Simulate attack with attacker with artifically lower health
-void simulate_restricted_attack(struct game* const game,
-                                const health_t attacker_health,
-                                health_t* const damage,
-                                health_t* const counter_damage) {
-
-    struct unit* const attacker = units_get_selected(&game->units);
-    const health_t health = attacker->health;
-    assert(attacker_health <= health);
-    attacker->health = attacker_health;
-    game_simulate_attack(game, damage, counter_damage);
-    attacker->health = health;
 }
 
 void action_attack(struct game* const game) {
@@ -56,16 +33,11 @@ void action_attack(struct game* const game) {
     assert(game->dirty_labels);
     grid_clear_labels(game);
 
-    // If unit is direct, move to attack
-    health_t actionable_health = attacker->health;
-    if (!models_min_range[attacker->model])
-        actionable_health =
-            move_selected_unit(game, game->prev_x, game->prev_y);
-
-    // Compute damage
     health_t damage, counter_damage;
-    simulate_restricted_attack(game, actionable_health, &damage,
-                               &counter_damage);
+    game_calc_damage(game, &damage, &counter_damage);
+
+    if (units_direct(attacker->model))
+        (void)move_selected_unit(game, game->prev_x, game->prev_y);
 
     // Apply damage
     if (damage >= attackee->health) {

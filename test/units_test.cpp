@@ -190,3 +190,23 @@ TEST_F(units_fixture, units_delete_player_deletes_all_player_units) {
     units_delete_player(units, 2);
     ASSERT_EQ(units->size, 0);
 }
+
+TEST(units_test, merge_health_returns_added_health) {
+    struct unit source {
+        .health = 2
+    };
+    struct unit target {
+        .health = 3
+    };
+    ASSERT_EQ(units_merge_health(&source, &target), 5);
+}
+
+TEST(units_test, merge_health_bounds_overflow) {
+    struct unit source {
+        .health = HEALTH_MAX
+    };
+    struct unit target {
+        .health = 1
+    };
+    ASSERT_EQ(units_merge_health(&source, &target), HEALTH_MAX);
+}

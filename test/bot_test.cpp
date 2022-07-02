@@ -13,7 +13,7 @@ TEST_F(game_fixture,
     game->y = 3;
 
     health_t damage, expected_counter_damage, actual_counter_damage;
-    game_simulate_attack(game, &damage, &expected_counter_damage);
+    game_calc_damage(game, &damage, &expected_counter_damage);
 
     simulate_defended_attack(game, &damage, &actual_counter_damage);
 
@@ -28,7 +28,7 @@ TEST_F(game_fixture,
     game->y = 3;
 
     health_t damage, undefended_counter_damage, defended_counter_damage;
-    game_simulate_attack(game, &damage, &undefended_counter_damage);
+    game_calc_damage(game, &damage, &undefended_counter_damage);
 
     game->map[3][1] = TILE_PLAINS;
     game->labels[3][1] = ACCESSIBLE_BIT;
@@ -349,10 +349,10 @@ TEST_F(game_fixture, find_nearest_target_when_no_target) {
 
 TEST_F(game_fixture, move_towards_target_moves_one_turn) {
     for (auto x = 1; x <= 5; ++x) {
-        game->labels[0][x] = ACCESSIBLE_BIT; 
+        game->labels[0][x] = ACCESSIBLE_BIT;
         game->energies[0][x] = x;
     }
-    
+
     move_towards_target(game, MODEL_INFANTRY, 1, 0);
 
     ASSERT_EQ(game->x, 2);

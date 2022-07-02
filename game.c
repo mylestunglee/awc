@@ -68,7 +68,6 @@ bool game_hover_next_unit(struct game* const game) {
     return true;
 }
 
-// Calculate damage when attacker attacks attackee
 health_t calc_damage(const struct game* const game,
                      const struct unit* const attacker,
                      const struct unit* const attackee) {
@@ -84,28 +83,61 @@ health_t calc_damage(const struct game* const game,
            (attack_max * defense_max);
 }
 
-// Calculate damage and counter-damage values without performing attack
-void game_simulate_attack(const struct game* const game, health_t* const damage,
-                          health_t* const counter_damage) {
+void calc_damage_pair(const struct game* const game,
+                      const struct unit* const attacker,
+                      const struct unit* const attackee, health_t* const damage,
+                      health_t* const counter_damage) {
+    struct unit attackee_copy = *attackee;
 
-    const struct unit* const attacker = units_const_get_selected(&game->units);
-    struct unit attackee = *units_const_get_at(&game->units, game->x, game->y);
-
-    *damage = calc_damage(game, attacker, &attackee);
+    *damage = calc_damage(game, attacker, attackee);
 
     // Apply damage
-    if (*damage > attackee.health) {
+    if (*damage > attackee->health) {
         *counter_damage = 0;
         return;
     }
 
-    attackee.health -= *damage;
+    attackee_copy.health -= *damage;
 
     // Ranged units do not give counter-attacks
-    if (models_min_range[attacker->model] || models_min_range[attackee.model])
+    if (models_min_range[attacker->model] || models_min_range[attackee->model])
         *counter_damage = 0;
     else
-        *counter_damage = calc_damage(game, &attackee, attacker);
+        *counter_damage = calc_damage(game, &attackee_copy, attacker);
+}
+
+void calc_damage_pair_with_health(const struct game* const game,
+                                  const struct unit* const attacker,
+                                  const struct unit* const attackee,
+                                  const health_t attacker_health,
+                                  health_t* const damage,
+                                  health_t* const counter_damage) {
+    struct unit attacker_copy = *attacker;
+    attacker_copy.health = attacker_health;
+    calc_damage_pair(game, &attacker_copy, attackee, damage, counter_damage);
+}
+
+void game_calc_damage(const struct game* const game, health_t* const damage,
+                      health_t* const counter_damage) {
+    const struct unit* const attacker = units_const_get_selected(&game->units);
+    const struct unit* const adjacent =
+        units_const_get_at(&game->units, game->prev_x, game->prev_y);
+    const struct unit* const attackee =
+        units_const_get_at(&game->units, game->x, game->y);
+
+    assert(attacker);
+    assert(attackee);
+
+    if (units_ranged(attacker->model) || adjacent == NULL ||
+        !adjacent->enabled) {
+        assert(adjacent == NULL || units_mergable(attacker, adjacent));
+        calc_damage_pair(game, attacker, attackee, damage, counter_damage);
+        return;
+    }
+
+    const health_t merged_health = units_merge_health(attacker, adjacent);
+    calc_damage_pair_with_health(game, attacker, attackee, merged_health,
+                                 damage, counter_damage);
 }
 
 bool game_is_attackable(const struct game* const game) {

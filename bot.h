@@ -32,8 +32,8 @@ energy_t find_nearest_attackable(struct game* const, const model_t,
                                  grid_t* const, grid_t* const);
 bool find_nearest_target(struct game* const, const model_t, grid_t* const,
                          grid_t* const);
-void move_towards_target(struct game* const, const model_t,
-                                const grid_t, const grid_t);
+void move_towards_target(struct game* const, const model_t, const grid_t,
+                         const grid_t);
 #endif
 void bot_play(struct game* const game);
 

@@ -276,10 +276,23 @@ bool units_mergable(const struct unit* const source,
            source->model == target->model;
 }
 
+health_t units_merge_health(const struct unit* const source,
+                            const struct unit* const target) {
+    assert(units_mergable(source, target));
+    health_wide_t merged_health =
+        (health_wide_t)source->health + (health_wide_t)target->health;
+    if (merged_health > (health_wide_t)HEALTH_MAX)
+        return HEALTH_MAX;
+    else
+        return merged_health;
+}
+
 bool units_exists(const struct units* const units, const grid_t x,
                   const grid_t y) {
     return units->grid[y][x] != NULL_UNIT;
 }
+
+bool units_direct(const model_t model) { return models_min_range[model] == 0; }
 
 bool units_ranged(const model_t model) { return models_min_range[model] > 0; }
 

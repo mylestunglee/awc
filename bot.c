@@ -13,8 +13,8 @@ void simulate_defended_attack(struct game* const game, health_t* const damage,
                               health_t* const counter_damage) {
     const struct unit* const attacker = units_const_get_selected(&game->units);
 
-    if (models_min_range[attacker->model]) {
-        game_simulate_attack(game, damage, counter_damage);
+    if (units_ranged(attacker->model)) {
+        game_calc_damage(game, damage, counter_damage);
         return;
     }
 
@@ -35,10 +35,12 @@ void simulate_defended_attack(struct game* const game, health_t* const damage,
             defense >= best_defense) {
             best_defense = defense;
             game->map[attacker->y][attacker->x] = tile;
+            game->prev_x = x_i;
+            game->prev_x = y_i;
         }
     }
 
-    game_simulate_attack(game, damage, counter_damage);
+    game_calc_damage(game, damage, counter_damage);
     game->map[attacker->y][attacker->x] = original_tile;
 }
 
@@ -329,7 +331,7 @@ bool find_nearest_target(struct game* const game, const model_t attacker_model,
 }
 
 void move_towards_target(struct game* const game, const model_t model,
-                                const grid_t x, const grid_t y) {
+                         const grid_t x, const grid_t y) {
 
     grid_find_path(game, x, y);
 

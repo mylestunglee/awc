@@ -480,7 +480,7 @@ static void print_normal_text(const struct game* const game) {
 static void print_attack_text(const struct game* const game) {
     // TODO: fix attack damage not matching resultant printed health
     health_t damage, counter_damage;
-    game_simulate_attack(game, &damage, &counter_damage);
+    game_calc_damage(game, &damage, &counter_damage);
     const health_wide_t percent = 100;
     wprintf(L"Damage: %u%% Counter-damage: %u%%\n",
             (damage * percent) / HEALTH_MAX,

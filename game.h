@@ -36,9 +36,16 @@ bool game_hover_next_unit(struct game* const);
 #ifdef EXPOSE_GAME_INTERNALS
 health_t calc_damage(const struct game* const, const struct unit* const,
                      const struct unit* const);
+void calc_damage_pair(const struct game* const, const struct unit* const,
+                      const struct unit* const, health_t* const,
+                      health_t* const);
+void calc_damage_pair_with_health(const struct game* const,
+                                  const struct unit* const,
+                                  const struct unit* const, const health_t,
+                                  health_t* const, health_t* const);
 #endif
-void game_simulate_attack(const struct game* const, health_t* const,
-                          health_t* const);
+void game_calc_damage(const struct game* const, health_t* const,
+                      health_t* const);
 bool game_is_attackable(const struct game* const);
 bool game_is_buildable(const struct game* const);
 bool game_is_alive(const struct game* const, const player_t);
