@@ -26,6 +26,8 @@ TEST_F(game_fixture,
     insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
+    game->prev_x = 1;
+    game->prev_y = 3;
 
     health_t damage, undefended_counter_damage, defended_counter_damage;
     game_calc_damage(game, &damage, &undefended_counter_damage);
@@ -90,7 +92,7 @@ TEST_F(game_fixture, prepare_attack_sets_position_for_direct_unit) {
 }
 
 TEST_F(game_fixture, handle_attack_reduces_attackee_health) {
-    insert_selected_unit({.health = HEALTH_MAX, .enabled = true});
+    insert_selected_unit({.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .enabled = true});
     const auto* const attackee = insert_unit({.health = HEALTH_MAX, .x = 2});
     game->labels[0][2] = ATTACKABLE_BIT;
     game->dirty_labels = true;
