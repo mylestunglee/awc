@@ -92,7 +92,8 @@ TEST_F(game_fixture, prepare_attack_sets_position_for_direct_unit) {
 }
 
 TEST_F(game_fixture, handle_attack_reduces_attackee_health) {
-    insert_selected_unit({.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .enabled = true});
+    insert_selected_unit(
+        {.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .enabled = true});
     const auto* const attackee = insert_unit({.health = HEALTH_MAX, .x = 2});
     game->labels[0][2] = ATTACKABLE_BIT;
     game->dirty_labels = true;

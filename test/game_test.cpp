@@ -153,6 +153,97 @@ TEST_F(game_fixture,
     ASSERT_EQ(damage / 2, health_half_damage);
 }
 
+TEST_F(game_fixture, game_calc_damage_when_ranged) {
+    auto* attacker = insert_selected_unit(
+        {.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .x = 2, .y = 3});
+    auto* attackee = insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
+
+    health_t expected_damage;
+    health_t expected_counter_damage;
+    health_t actual_damage;
+    health_t actual_counter_damage;
+
+    game->x = 5;
+    game->y = 7;
+
+    calc_damage_pair(game, attacker, attackee, &expected_damage,
+                     &expected_counter_damage);
+    game_calc_damage(game, &actual_damage, &actual_counter_damage);
+
+    ASSERT_EQ(actual_damage, expected_damage);
+    ASSERT_EQ(actual_counter_damage, expected_counter_damage);
+}
+
+TEST_F(game_fixture, game_calc_damage_when_direct_and_no_merge) {
+    auto* attacker = insert_selected_unit(
+        {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+    auto* attackee = insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
+
+    health_t expected_damage;
+    health_t expected_counter_damage;
+    health_t actual_damage;
+    health_t actual_counter_damage;
+
+    game->x = 5;
+    game->y = 7;
+
+    calc_damage_pair(game, attacker, attackee, &expected_damage,
+                     &expected_counter_damage);
+    game_calc_damage(game, &actual_damage, &actual_counter_damage);
+
+    ASSERT_EQ(actual_damage, expected_damage);
+    ASSERT_EQ(actual_counter_damage, expected_counter_damage);
+}
+
+TEST_F(game_fixture, game_calc_damage_when_direct_and_disabled_merge) {
+    auto* attacker = insert_selected_unit(
+        {.health = HEALTH_MAX / 2, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+    auto* attackee = insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
+    insert_unit({.health = HEALTH_MAX / 2, .x = 4, .y = 7});
+
+    health_t expected_damage;
+    health_t expected_counter_damage;
+    health_t actual_damage;
+    health_t actual_counter_damage;
+
+    game->prev_x = 4;
+    game->prev_y = 7;
+    game->x = 5;
+    game->y = 7;
+
+    calc_damage_pair(game, attacker, attackee, &expected_damage,
+                     &expected_counter_damage);
+    game_calc_damage(game, &actual_damage, &actual_counter_damage);
+
+    ASSERT_EQ(actual_damage, expected_damage);
+    ASSERT_EQ(actual_counter_damage, expected_counter_damage);
+}
+
+TEST_F(game_fixture, game_calc_damage_when_merge) {
+    auto* attacker = insert_selected_unit(
+        {.health = HEALTH_MAX / 2, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+    auto* attackee = insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
+    insert_unit({.health = HEALTH_MAX / 2, .x = 4, .y = 7, .enabled = true});
+
+    health_t expected_damage;
+    health_t expected_counter_damage;
+    health_t actual_damage;
+    health_t actual_counter_damage;
+
+    game->prev_x = 4;
+    game->prev_y = 7;
+    game->x = 5;
+    game->y = 7;
+
+    game_calc_damage(game, &actual_damage, &actual_counter_damage);
+    attacker->health *= 2;
+    calc_damage_pair(game, attacker, attackee, &expected_damage,
+                     &expected_counter_damage);
+
+    ASSERT_EQ(actual_damage, expected_damage);
+    ASSERT_EQ(actual_counter_damage, expected_counter_damage);
+}
+
 TEST_F(game_fixture, game_is_attackable_returns_true_when_directly_attackable) {
     insert_selected_unit();
     game->prev_x = 2;
