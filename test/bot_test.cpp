@@ -360,3 +360,25 @@ TEST_F(game_fixture, move_towards_target_moves_one_turn) {
 
     ASSERT_EQ(game->x, 2);
 }
+
+TEST_F(game_fixture, handle_nonlocal_moves_unit_when_target_exists) {
+    auto* unit = insert_selected_unit({.enabled = true});
+    game->map[0][1] = TILE_CITY;
+    game->territory[0][1] = NULL_PLAYER;
+    game->labels[0][1] = ACCESSIBLE_BIT;
+    game->dirty_labels = true;
+
+    handle_nonlocal(game, unit);
+
+    ASSERT_EQ(unit->x, 1);
+    ASSERT_FALSE(game->dirty_labels);
+}
+
+TEST_F(game_fixture, handle_nonlocal_does_nothing_when_no_target_exists) {
+    auto* unit = insert_selected_unit();
+    game->dirty_labels = true;
+
+    handle_nonlocal(game, unit);
+
+    ASSERT_FALSE(game->dirty_labels);
+}

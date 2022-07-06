@@ -34,6 +34,8 @@ bool find_nearest_target(struct game* const, const model_t, grid_t* const,
                          grid_t* const);
 void move_towards_target(struct game* const, const model_t, const grid_t,
                          const grid_t);
+void handle_nonlocal(struct game* const, struct unit* const);
+void interact_unit(struct game* const, struct unit* const);
 #endif
 void bot_play(struct game* const game);
 

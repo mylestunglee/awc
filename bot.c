@@ -355,12 +355,10 @@ void move_towards_target(struct game* const game, const model_t model,
     assert(ACCESSIBLE_BIT & game->labels[game->y][game->x]);
 }
 
-static void handle_nonlocal(struct game* const game, struct unit* const unit) {
+void handle_nonlocal(struct game* const game, struct unit* const unit) {
     // Number of turns of unit movement to look ahead
     const energy_t look_ahead = 16;
 
-    // assert(game->x == unit->x);
-    // assert(game->y == unit->y);
     game->x = unit->x;
     game->y = unit->y;
 
@@ -380,7 +378,7 @@ static void handle_nonlocal(struct game* const game, struct unit* const unit) {
     }
 }
 
-static void interact_unit(struct game* const game, struct unit* const unit) {
+void interact_unit(struct game* const game, struct unit* const unit) {
     assert(game->turn == unit->player);
 
     if (!unit->enabled)
