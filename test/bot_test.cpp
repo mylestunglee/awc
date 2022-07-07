@@ -351,26 +351,31 @@ TEST_F(game_fixture, find_nearest_target_when_no_target) {
 }
 
 TEST_F(game_fixture, move_towards_target_moves_one_turn) {
-    for (auto x = 1; x <= 5; ++x) {
+    for (auto x = 0; x < 5; ++x) {
         game->labels[0][x] = ACCESSIBLE_BIT;
-        game->energies[0][x] = x;
+        game->energies[0][x] = 5 - x;
     }
 
-    move_towards_target(game, MODEL_INFANTRY, 1, 0);
+    move_towards_target(game, MODEL_INFANTRY, 5, 0);
 
-    ASSERT_EQ(game->x, 2);
+    ASSERT_EQ(game->x, 3);
 }
 
 TEST_F(game_fixture, handle_nonlocal_moves_unit_when_target_exists) {
     auto* unit = insert_selected_unit({.enabled = true});
-    game->map[0][1] = TILE_CITY;
-    game->territory[0][1] = NULL_PLAYER;
-    game->labels[0][1] = ACCESSIBLE_BIT;
+
+    for (auto i = 1; i < 5; ++i) {
+        game->labels[0][i] = ACCESSIBLE_BIT;
+        game->map[0][i] = TILE_PLAINS;
+    }
+    game->labels[0][5] = ACCESSIBLE_BIT;
+    game->map[0][5] = TILE_CITY;
+    game->territory[0][5] = NULL_PLAYER;
     game->dirty_labels = true;
 
     handle_nonlocal(game, unit);
 
-    ASSERT_EQ(unit->x, 1);
+    ASSERT_EQ(unit->x, 3);
     ASSERT_FALSE(game->dirty_labels);
 }
 
@@ -381,4 +386,60 @@ TEST_F(game_fixture, handle_nonlocal_does_nothing_when_no_target_exists) {
     handle_nonlocal(game, unit);
 
     ASSERT_FALSE(game->dirty_labels);
+}
+
+TEST_F(game_fixture, interact_unit_when_local_move_is_possible) {
+    auto* unit = insert_unit({.enabled = true});
+
+    game->map[0][1] = TILE_CITY;
+    game->territory[0][1] = NULL_PLAYER;
+    game->labels[0][1] = ACCESSIBLE_BIT;
+    game->dirty_labels = true;
+
+    interact_unit(game, unit);
+
+    ASSERT_FALSE(unit->enabled);
+}
+
+TEST_F(game_fixture, interact_unit_when_disabled_unit) {
+    auto* unit = insert_unit();
+
+    game->map[0][1] = TILE_CITY;
+    game->territory[0][1] = NULL_PLAYER;
+    game->labels[0][1] = ACCESSIBLE_BIT;
+    game->dirty_labels = true;
+
+    interact_unit(game, unit);
+
+    ASSERT_EQ(unit->x, 0);
+}
+
+TEST_F(game_fixture, interact_unit_when_nonlocal_move_is_possible) {
+    auto* unit = insert_unit({.enabled = true});
+
+    for (auto i = 1; i < 5; ++i) {
+        game->labels[0][i] = ACCESSIBLE_BIT;
+        game->map[0][i] = TILE_PLAINS;
+    }
+    game->labels[0][5] = ACCESSIBLE_BIT;
+    game->map[0][5] = TILE_CITY;
+    game->territory[0][5] = NULL_PLAYER;
+    game->dirty_labels = true;
+
+    interact_unit(game, unit);
+
+    ASSERT_FALSE(unit->enabled);
+}
+
+TEST_F(game_fixture, interact_units) {
+    auto* unit = insert_unit({.enabled = true});
+
+    game->map[0][1] = TILE_CITY;
+    game->territory[0][1] = NULL_PLAYER;
+    game->labels[0][1] = ACCESSIBLE_BIT;
+    game->dirty_labels = true;
+
+    interact_units(game);
+
+    ASSERT_FALSE(unit->enabled);
 }

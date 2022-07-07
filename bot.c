@@ -394,7 +394,7 @@ void interact_unit(struct game* const game, struct unit* const unit) {
     units_clear_selection(&game->units);
 }
 
-static void interact_units(struct game* const game) {
+void interact_units(struct game* const game) {
     assert(!units_has_selection(&game->units));
 
     struct units* const units = &game->units;
