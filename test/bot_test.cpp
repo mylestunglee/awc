@@ -417,3 +417,34 @@ TEST_F(game_fixture, interact_units) {
 
     ASSERT_FALSE(unit->enabled);
 }
+
+TEST_F(game_fixture, bot_play_clears_labels) {
+    game->dirty_labels = true;
+
+    bot_play(game);
+
+    ASSERT_FALSE(game->dirty_labels);
+}
+
+TEST_F(game_fixture, bot_play_interacts_units) {
+    auto* unit = insert_unit({.enabled = true});
+
+    game->map[0][1] = TILE_CITY;
+    game->territory[0][1] = NULL_PLAYER;
+    game->labels[0][1] = ACCESSIBLE_BIT;
+    game->dirty_labels = true;
+
+    bot_play(game);
+
+    ASSERT_FALSE(unit->enabled);
+}
+
+TEST_F(game_fixture, bot_play_build_units) {
+    game->map[0][0] = TILE_FACTORY;
+    game->territory[0][0] = 0;
+    game->golds[game->turn] = GOLD_SCALE;
+
+    bot_play(game);
+
+    ASSERT_EQ(game->units.size, 1);
+}
