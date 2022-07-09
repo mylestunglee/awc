@@ -3,13 +3,8 @@
 #include "game.h"
 
 #ifdef EXPOSE_BOT_INTERNALS
-void simulate_defended_attack(struct game* const, health_t* const,
-                              health_t* const);
+void simulate_attack(struct game* const, health_t* const, health_t* const);
 const struct unit* find_attackee(struct game* const, const model_t);
-void set_prev_position(struct game* const, const model_t,
-                       const struct unit* const);
-void prepare_attack(struct game* const, const model_t,
-                    const struct unit* const);
 void handle_attack(struct game* const, const model_t);
 energy_t update_max_energy(const struct game* const, const energy_t,
                            grid_t* const, grid_t* const);

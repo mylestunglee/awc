@@ -9,8 +9,10 @@
 #include <limits.h>
 #include <stdlib.h>
 
-void simulate_defended_attack(struct game* const game, health_t* const damage,
-                              health_t* const counter_damage) {
+// Finds prev position to attack unit at cursor with best defense over minimal
+// distance
+void simulate_attack(struct game* const game, health_t* const damage,
+                     health_t* const counter_damage) {
     const struct unit* const attacker = units_const_get_selected(&game->units);
 
     if (units_ranged(attacker->model)) {
@@ -24,16 +26,21 @@ void simulate_defended_attack(struct game* const game, health_t* const damage,
     const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
     const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
     const movement_t movement = unit_movement_types[attacker->model];
-    health_t best_defense = 0;
+    health_t max_defense = 0;
+    health_t max_energy = 0;
 
     for (uint8_t i = 0; i < 4; ++i) {
         const grid_t x_i = adjacent_x[i];
         const grid_t y_i = adjacent_y[i];
         const tile_t tile = game->map[y_i][x_i];
         const health_t defense = tile_defense[movement][tile];
+        const energy_t energy = game->energies[y_i][x_i];
+
         if (game->labels[y_i][x_i] & ACCESSIBLE_BIT &&
-            defense >= best_defense) {
-            best_defense = defense;
+            (defense > max_defense ||
+             (defense == max_defense && energy > max_energy))) {
+            max_defense = defense;
+            max_energy = energy;
             game->map[attacker->y][attacker->x] = tile;
             game->prev_x = x_i;
             game->prev_y = y_i;
@@ -44,11 +51,13 @@ void simulate_defended_attack(struct game* const game, health_t* const damage,
     game->map[attacker->y][attacker->x] = original_tile;
 }
 
+// Finds best attackee while setting prev position
 const struct unit* find_attackee(struct game* const game,
                                  const model_t attacker_model) {
     const struct unit* best_attackee = NULL;
     typedef int16_t metric_t;
     metric_t best_metric = SHRT_MIN;
+    grid_t best_prev_x, best_prev_y;
 
     game->y = 0;
     do {
@@ -59,7 +68,7 @@ const struct unit* find_attackee(struct game* const game,
                 continue;
 
             health_t damage, counter_damage;
-            simulate_defended_attack(game, &damage, &counter_damage);
+            simulate_attack(game, &damage, &counter_damage);
 
             const struct unit* const attackee =
                 units_const_get_at(&game->units, game->x, game->y);
@@ -69,66 +78,22 @@ const struct unit* find_attackee(struct game* const game,
             const metric_t counter_damage_metric =
                 (metric_t)counter_damage *
                 (metric_t)models_cost[attacker_model];
-
             const metric_t metric = damage_metric - counter_damage_metric;
 
             if (metric > best_metric) {
                 best_metric = metric;
                 best_attackee = attackee;
+                best_prev_x = game->prev_x;
+                best_prev_y = game->prev_y;
             }
         } while (++game->x);
     } while (++game->y);
 
+    // Restore prev position from best simulate_attack
+    game->prev_x = best_prev_x;
+    game->prev_y = best_prev_y;
+
     return best_attackee;
-}
-
-void set_prev_position(struct game* const game, const model_t attacker_model,
-                       const struct unit* const attackee) {
-
-    // Find maximal defense tile around attackee
-    energy_t max_energy = 0;
-    health_t max_defense = 0;
-    uint8_t best_i = 0;
-
-    const grid_t x = attackee->x;
-    const grid_t y = attackee->y;
-    const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
-    const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
-
-    // Each tile has four adjacent tiles
-    for (uint8_t i = 0; i < 4; ++i) {
-        const grid_t x_i = adjacent_x[i];
-        const grid_t y_i = adjacent_y[i];
-
-        if (!(game->labels[y_i][x_i] & ACCESSIBLE_BIT))
-            continue;
-
-        const tile_t tile = game->map[y_i][x_i];
-        const health_t defense = tile_defense[attacker_model][tile];
-        const energy_t energy = game->energies[y_i][x_i];
-
-        // Lexicographical ordering of defense over energy
-        if (defense > max_defense ||
-            (defense == max_defense && energy > max_energy)) {
-            max_defense = defense;
-            max_energy = energy;
-            best_i = i;
-        }
-    }
-
-    assert(max_energy > 0);
-
-    game->prev_x = adjacent_x[best_i];
-    game->prev_y = adjacent_y[best_i];
-}
-
-void prepare_attack(struct game* const game, const model_t attacker_model,
-                    const struct unit* const attackee) {
-    game->x = attackee->x;
-    game->y = attackee->y;
-
-    if (!models_min_range[attacker_model])
-        set_prev_position(game, attacker_model, attackee);
 }
 
 void handle_attack(struct game* const game, const model_t attacker_model) {
@@ -137,7 +102,9 @@ void handle_attack(struct game* const game, const model_t attacker_model) {
     if (attackee == NULL)
         return;
 
-    prepare_attack(game, attacker_model, attackee);
+    game->x = attackee->x;
+    game->y = attackee->y;
+
     action_attack(game);
 }
 

@@ -5,8 +5,7 @@
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 
-TEST_F(game_fixture,
-       simulate_defended_attack_with_default_defense_when_ranged) {
+TEST_F(game_fixture, simulate_attack_when_ranged) {
     insert_selected_unit({.health = HEALTH_MAX, .model = MODEL_ARTILLERY});
     insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
     game->x = 2;
@@ -15,13 +14,14 @@ TEST_F(game_fixture,
     health_t damage, expected_counter_damage, actual_counter_damage;
     game_calc_damage(game, &damage, &expected_counter_damage);
 
-    simulate_defended_attack(game, &damage, &actual_counter_damage);
+    simulate_attack(game, &damage, &actual_counter_damage);
 
     ASSERT_EQ(actual_counter_damage, expected_counter_damage);
+    ASSERT_EQ(game->prev_x, 0);
+    ASSERT_EQ(game->prev_y, 0);
 }
 
-TEST_F(game_fixture,
-       simulate_defended_attack_with_maximal_defense_when_direct) {
+TEST_F(game_fixture, simulate_attack_sets_prev_position_when_direct) {
     insert_selected_unit({.health = HEALTH_MAX});
     insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
     game->x = 2;
@@ -29,16 +29,19 @@ TEST_F(game_fixture,
     game->prev_x = 1;
     game->prev_y = 3;
 
-    health_t damage, undefended_counter_damage, defended_counter_damage;
-    game_calc_damage(game, &damage, &undefended_counter_damage);
+    health_t damage, expected_counter_damage, actual_counter_damage;
+    game_calc_damage(game, &damage, &expected_counter_damage);
 
-    game->map[3][1] = TILE_PLAINS;
     game->labels[3][1] = ACCESSIBLE_BIT;
-    game->labels[3][3] = ACCESSIBLE_BIT;
+    game->energies[3][1] = 1;
+    game->prev_x = 0;
+    game->prev_y = 0;
 
-    simulate_defended_attack(game, &damage, &defended_counter_damage);
+    simulate_attack(game, &damage, &actual_counter_damage);
 
-    ASSERT_LT(defended_counter_damage, undefended_counter_damage);
+    ASSERT_EQ(actual_counter_damage, expected_counter_damage);
+    ASSERT_EQ(game->prev_x, 1);
+    ASSERT_EQ(game->prev_y, 3);
 }
 
 TEST_F(game_fixture, find_attackee_maximises_metric) {
@@ -52,43 +55,6 @@ TEST_F(game_fixture, find_attackee_maximises_metric) {
     auto actual_attackee = find_attackee(game, MODEL_INFANTRY);
 
     ASSERT_EQ(actual_attackee, expected_attackee);
-}
-
-TEST_F(game_fixture, set_prev_position_maximises_defense) {
-    auto* const attackee = insert_unit({.x = 3, .y = 3});
-    game->labels[3][2] = ACCESSIBLE_BIT;
-    game->labels[3][4] = ACCESSIBLE_BIT;
-    game->map[3][2] = TILE_PLAINS;
-    game->map[3][4] = TILE_FACTORY;
-    game->energies[3][2] = 1;
-    game->energies[3][4] = 1;
-
-    set_prev_position(game, MODEL_INFANTRY, attackee);
-
-    ASSERT_EQ(game->prev_x, 4);
-    ASSERT_EQ(game->prev_y, 3);
-}
-
-TEST_F(game_fixture, prepare_attack_sets_position_for_ranged_unit) {
-    const auto* const attackee = insert_unit({.x = 2, .y = 3});
-
-    prepare_attack(game, MODEL_ARTILLERY, attackee);
-
-    ASSERT_EQ(game->x, 2);
-    ASSERT_EQ(game->y, 3);
-}
-
-TEST_F(game_fixture, prepare_attack_sets_position_for_direct_unit) {
-    const auto* const attackee = insert_unit({.x = 2, .y = 3});
-    game->labels[3][1] = ACCESSIBLE_BIT;
-    game->energies[3][1] = 1;
-
-    prepare_attack(game, MODEL_INFANTRY, attackee);
-
-    ASSERT_EQ(game->prev_x, 1);
-    ASSERT_EQ(game->prev_y, 3);
-    ASSERT_EQ(game->x, 2);
-    ASSERT_EQ(game->y, 3);
 }
 
 TEST_F(game_fixture, handle_attack_reduces_attackee_health) {
