@@ -250,7 +250,6 @@ const struct unit* units_const_get_selected(const struct units* const units) {
 
 void units_select_at(struct units* const units, const grid_t x,
                      const grid_t y) {
-    assert(units->selected == NULL_UNIT);
     assert(units->grid[y][x] != NULL_UNIT);
     units->selected = units->grid[y][x];
 }

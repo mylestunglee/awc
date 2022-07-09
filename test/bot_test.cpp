@@ -431,6 +431,14 @@ TEST_F(game_fixture, interact_unit_when_nonlocal_move_is_possible) {
     ASSERT_FALSE(unit->enabled);
 }
 
+TEST_F(game_fixture, interact_unit_maintains_enabled_when_move_is_impossible) {
+    auto* unit = insert_unit({.enabled = true});
+
+    interact_unit(game, unit);
+
+    ASSERT_TRUE(unit->enabled);
+}
+
 TEST_F(game_fixture, interact_units) {
     auto* unit = insert_unit({.enabled = true});
 

@@ -36,7 +36,7 @@ void simulate_defended_attack(struct game* const game, health_t* const damage,
             best_defense = defense;
             game->map[attacker->y][attacker->x] = tile;
             game->prev_x = x_i;
-            game->prev_x = y_i;
+            game->prev_y = y_i;
         }
     }
 
@@ -384,7 +384,6 @@ void interact_unit(struct game* const game, struct unit* const unit) {
     if (!unit->enabled)
         return;
 
-    // TODO: tidy selection by pointer?
     units_select_at(&game->units, unit->x, unit->y);
     handle_local(game, unit);
 
@@ -395,8 +394,6 @@ void interact_unit(struct game* const game, struct unit* const unit) {
 }
 
 void interact_units(struct game* const game) {
-    assert(!units_has_selection(&game->units));
-
     struct units* const units = &game->units;
     struct unit* unit = units_get_first(units, game->turn);
     while (unit) {
@@ -406,7 +403,7 @@ void interact_units(struct game* const game) {
 }
 
 void bot_play(struct game* const game) {
-    game_deselect(game);
+    grid_clear_labels(game);
     interact_units(game);
     build_units(game);
 }
