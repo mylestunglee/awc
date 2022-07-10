@@ -409,7 +409,7 @@ bool render_pixel(const struct game* const game, const grid_t x, const grid_t y,
                        style);
 }
 
-static void apply_style(const uint8_t style, const uint8_t prev_style) {
+void apply_style(const uint8_t style, const uint8_t prev_style) {
     if (style != prev_style) {
         const uint8_t forecolour = style >> 4;
         const uint8_t backcolour = style & 15;

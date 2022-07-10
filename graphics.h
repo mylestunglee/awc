@@ -45,8 +45,8 @@ bool decode_texture(const uint8_t, const bool, const player_t, wchar_t* const,
 bool render_unit(const struct units* const, const grid_t, const grid_t,
                  const grid_t, const grid_t, wchar_t* const, uint8_t* const);
 
-void render_highlight(const uint8_t label, wchar_t* const symbol,
-                      uint8_t* const style);
+void render_highlight(const uint8_t, wchar_t* const,
+                      uint8_t* const);
 
 void render_attack_arrows(const struct game* const, const grid_t,
                           wchar_t* const, uint8_t* const);
@@ -55,11 +55,11 @@ bool render_tile(const struct game* const, const grid_t, const grid_t,
                  const grid_t, const grid_t, const bool, wchar_t* const,
                  uint8_t* const);
 
-bool render_pixel(const struct game* const game, const grid_t x, const grid_t y,
-                  const grid_t tile_x, const grid_t tile_y,
-                  const bool attack_enabled, const bool build_enabled,
-                  wchar_t* const symbol, uint8_t* const style);
-
+bool render_pixel(const struct game* const, const grid_t, const grid_t,
+                  const grid_t, const grid_t,
+                  const bool, const bool,
+                  wchar_t* const, uint8_t* const);
+void apply_style(const uint8_t, const uint8_t);
 #endif
 
 #endif

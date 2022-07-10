@@ -5,7 +5,6 @@
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 #include "units_fixture.hpp"
-#include <utility>
 
 TEST(graphics_test, graphics_init_sets_empty_character_locale) {
     using namespace std::literals::string_literals;
