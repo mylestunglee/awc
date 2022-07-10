@@ -23,16 +23,16 @@
 #define accessible_attackable_style '\xd0'
 #define buildable_style '\xf0'
 
-const static uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
+static const uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
                                          '^', '\\', '/', '[', ']', '-', '='};
 
-const static uint8_t player_styles[PLAYERS_CAPACITY + 1] = {
+static const uint8_t player_styles[PLAYERS_CAPACITY + 1] = {
     '\xf4', '\xf1', '\xf3', '\xf8', '\xf8', '\xf8'};
 
-const static uint8_t tile_styles[TERRIAN_CAPACITY] = {
+static const uint8_t tile_styles[TERRIAN_CAPACITY] = {
     '\x80', '\xa2', '\x32', '\x13', '\x3b',
     '\xc4', '\xd4', '\x4c', '\x78', '\x78'};
-const static uint8_t
+static const uint8_t
     unit_textures[MODEL_CAPACITY][unit_height][(unit_width + 1) / 2] = {
         {{'\x03', '\xf3', '\x00'}, {'\x08', '\x88', '\x00'}},
         {{'\x0E', '\xfe', '\x00'}, {'\x08', '\x88', '\x00'}},
@@ -50,7 +50,7 @@ const static uint8_t
         {{'\x2a', '\xfa', '\x20'}, {'\x92', '\x2c', '\xe0'}},
         {{'\x88', '\xf8', '\x80'}, {'\x92', '\x22', '\xa0'}}};
 
-const static uint8_t
+static const uint8_t
     capturable_textures[CAPTURABLE_CAPACITY][tile_height]
                        [(tile_width + 1) / 2] = {
                            {

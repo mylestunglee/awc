@@ -44,7 +44,7 @@ bool bap_glpk_solvable(const struct bap_inputs* const);
 #ifdef EXPOSE_BAP_GLPK_SOLVER_INTERNALS
 index_t count_distribution_rows(const struct bap_inputs* const);
 index_t count_allocation_rows(const struct bap_inputs* const);
-index_t count_budget_row(const struct bap_inputs* const);
+index_t count_budget_row();
 index_t count_surplus_rows(const struct bap_inputs* const);
 index_t count_rows(const struct bap_inputs* const);
 void set_next_row(struct bap_glpk_temps* const, const char variable,
@@ -63,7 +63,7 @@ void create_rows(const struct bap_inputs* const, struct bap_glpk_temps* const);
 
 index_t count_a_columns(const struct bap_inputs* const);
 index_t count_b_columns(const struct bap_inputs* const);
-index_t count_objective_column(const struct bap_inputs* const);
+index_t count_objective_column();
 index_t count_columns(const struct bap_inputs* const);
 void set_next_matrix_column(struct bap_glpk_temps* const, const char,
                             const index_t, const index_t, const int,
@@ -79,8 +79,7 @@ void create_columns(const struct bap_inputs* const,
 
 void sparse_matrix_set(struct bap_glpk_temps* const, const int, const int,
                        const double);
-void set_distribution_submatrix(const struct bap_inputs* const,
-                                struct bap_glpk_temps* const);
+void set_distribution_submatrix(struct bap_glpk_temps* const);
 void set_allocation_submatrix(const struct bap_inputs* const,
                               struct bap_glpk_temps* const);
 void set_budget_submatrix(const struct bap_inputs* const,

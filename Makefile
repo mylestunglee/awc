@@ -1,6 +1,6 @@
 TARGET = awc
 CC = gcc
-CFLAGS = -g -Wall -pedantic -Wunused-macros
+CFLAGS = -g -Wall -Wextra -Wunused-macros
 LIBRARIES = -lglpk
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)

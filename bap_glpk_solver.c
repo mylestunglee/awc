@@ -80,7 +80,7 @@ index_t count_allocation_rows(const struct bap_inputs* const inputs) {
     return count;
 }
 
-index_t count_budget_row(const struct bap_inputs* const inputs) { return 1; }
+index_t count_budget_row() { return 1; }
 
 index_t count_surplus_rows(const struct bap_inputs* const inputs) {
     index_t count = 0;
@@ -92,7 +92,7 @@ index_t count_surplus_rows(const struct bap_inputs* const inputs) {
 
 index_t count_rows(const struct bap_inputs* const inputs) {
     return count_distribution_rows(inputs) + count_allocation_rows(inputs) +
-           count_budget_row(inputs) + count_surplus_rows(inputs);
+           count_budget_row() + count_surplus_rows(inputs);
 }
 
 void set_next_row(struct bap_glpk_temps* const temps, const char variable_name,
@@ -178,13 +178,11 @@ index_t count_b_columns(const struct bap_inputs* const inputs) {
     return count;
 }
 
-index_t count_objective_column(const struct bap_inputs* const inputs) {
-    return 1;
-}
+index_t count_objective_column() { return 1; }
 
 index_t count_columns(const struct bap_inputs* const inputs) {
     return count_a_columns(inputs) + count_b_columns(inputs) +
-           count_objective_column(inputs);
+           count_objective_column();
 }
 
 void set_next_matrix_column(struct bap_glpk_temps* const temps,
@@ -256,8 +254,7 @@ void sparse_matrix_set(struct bap_glpk_temps* const temps, const int row,
     ++temps->curr_index;
 }
 
-void set_distribution_submatrix(const struct bap_inputs* const inputs,
-                                struct bap_glpk_temps* const temps) {
+void set_distribution_submatrix(struct bap_glpk_temps* const temps) {
     for (index_t row = temps->distribution_row_start_index;
          row < temps->distribution_row_end_index; ++row)
         for (index_t column = temps->a_column_start_index;
@@ -331,7 +328,7 @@ void set_surplus_submatrix(const struct bap_inputs* const inputs,
 void set_matrix(const struct bap_inputs* const inputs,
                 struct bap_glpk_temps* const temps) {
     temps->curr_index = 1;
-    set_distribution_submatrix(inputs, temps);
+    set_distribution_submatrix(temps);
     set_allocation_submatrix(inputs, temps);
     set_budget_submatrix(inputs, temps);
     set_surplus_submatrix(inputs, temps);

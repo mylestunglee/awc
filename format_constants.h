@@ -16,15 +16,15 @@
 #define ENABLED_FORMAT "%8s"
 #define TILE_FORMAT "%hhu"
 
-const static uint8_t tile_symbols[TILE_CAPACITY] = {
+static const uint8_t tile_symbols[TILE_CAPACITY] = {
     '.', '"', 'Y', '^', ':', '~', '*', '\'', '-', '=', 'C', 'F', 'A', 'S', 'H'};
 
-const static char* const model_names[MODEL_CAPACITY] = {
+static const char* const model_names[MODEL_CAPACITY] = {
     "infantry",  "mech",    "recon",     "tank",    "battletank",
     "artillery", "rockets", "antiair",   "missles", "battlecopter",
     "fighter",   "bomber",  "submarine", "crusier", "battleship"};
 
-const static char* const tile_names[TILE_CAPACITY] = {
+static const char* const tile_names[TILE_CAPACITY] = {
     "void", "plains",  "forest",  "mountains", "beach",
     "sea",  "reef",    "river",   "road",      "bridge",
     "city", "factory", "airport", "habour",    "HQ"};
