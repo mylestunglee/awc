@@ -250,11 +250,13 @@ void grid_explore_recursive(struct game* const game,
     grid_explore_mark_attackable_ranged(game, game->x, game->y, model, player,
                                         label_attackable_tiles);
 
-    struct list_node node = {.x = game->x,
-                             .y = game->y,
-                             .energy = init_exploration_energy(scalar, model)};
-
-    list_insert(list, &node);
+    {
+        struct list_node node = {.x = game->x,
+                                 .y = game->y,
+                                 .energy =
+                                     init_exploration_energy(scalar, model)};
+        list_insert(list, &node);
+    }
 
     while (!list_empty(list)) {
         const struct list_node node = list_front_pop(list);

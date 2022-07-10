@@ -453,14 +453,14 @@ static uint8_t apply_pixel(const struct game* const game, const grid_t x,
     return style;
 }
 
-static void reset_cursor() {
+static void reset_cursor(void) {
     wprintf(L"\033[0;0H");
     wprintf(L"\033[2J\033[1;1H");
 }
 
-static void reset_black() { wprintf(L"%c[30;40m", '\x1b'); }
+static void reset_black(void) { wprintf(L"%c[30;40m", '\x1b'); }
 
-static void reset_style() { wprintf(L"%c[0m", '\x1b'); }
+static void reset_style(void) { wprintf(L"%c[0m", '\x1b'); }
 
 static void print_normal_text(const struct game* const game) {
     wprintf(

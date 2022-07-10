@@ -90,6 +90,7 @@ const struct unit* find_attackee(struct game* const game,
     } while (++game->y);
 
     // Restore prev position from best simulate_attack
+    assert(best_metric > SHRT_MIN);
     game->prev_x = best_prev_x;
     game->prev_y = best_prev_y;
 

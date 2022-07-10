@@ -80,7 +80,7 @@ index_t count_allocation_rows(const struct bap_inputs* const inputs) {
     return count;
 }
 
-index_t count_budget_row() { return 1; }
+index_t count_budget_row(void) { return 1; }
 
 index_t count_surplus_rows(const struct bap_inputs* const inputs) {
     index_t count = 0;
@@ -178,7 +178,7 @@ index_t count_b_columns(const struct bap_inputs* const inputs) {
     return count;
 }
 
-index_t count_objective_column() { return 1; }
+index_t count_objective_column(void) { return 1; }
 
 index_t count_columns(const struct bap_inputs* const inputs) {
     return count_a_columns(inputs) + count_b_columns(inputs) +
