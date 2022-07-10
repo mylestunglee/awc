@@ -353,12 +353,11 @@ void render_attack_arrows(const struct game* const game, const grid_t tile_x,
         } else if ((grid_t)(game->prev_y + 1) == game->y) {
             assert(game->prev_x == game->x);
             *symbol = L'▼';
-        } else if ((grid_t)(game->prev_y - 1) == game->y) {
+        } else {
+            assert((grid_t)(game->prev_y - 1) == game->y);
             assert(game->prev_x == game->x);
             *symbol = L'▲';
-        } else
-            // Previous position incorrectly set
-            assert(false);
+        }
 
         // Set foreground colour to attackable style
         *style = (*style & '\x0f') | attackable_style;
