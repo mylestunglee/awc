@@ -62,10 +62,10 @@ clean_test:
 $(REPORTS_DIRECTORY):
 	mkdir -p $(REPORTS_DIRECTORY)
 
-$(REPORTS_DIRECTORY)/%_coverage: $(REPORTS_DIRECTORY) %_test_coverage/report/index.html
+$(REPORTS_DIRECTORY)/%_test_coverage_report: $(REPORTS_DIRECTORY) %_test_coverage/report/index.html
 	mv $*_test_coverage/report $@
 	rm -r $*_test_coverage
 
-COVERAGE_REPORTS = $(patsubst test/%_test.cpp, $(REPORTS_DIRECTORY)/%_coverage, $(wildcard test/*_test.cpp) test/all_test.cpp) 
+COVERAGE_REPORTS = $(patsubst test/%_test.cpp, $(REPORTS_DIRECTORY)/%_test_coverage_report, $(wildcard test/*_test.cpp) test/all_test.cpp)
 
 coverage_reports: $(COVERAGE_REPORTS)
