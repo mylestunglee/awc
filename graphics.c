@@ -438,10 +438,10 @@ void apply_style(const uint8_t style, const uint8_t prev_style) {
 }
 
 // Returns previous style
-static uint8_t apply_pixel(const struct game* const game, const grid_t x,
-                           const grid_t y, const grid_t tile_x,
-                           const grid_t tile_y, const bool attack_enabled,
-                           const bool build_enabled, const uint8_t prev_style) {
+uint8_t apply_pixel(const struct game* const game, const grid_t x,
+                    const grid_t y, const grid_t tile_x, const grid_t tile_y,
+                    const bool attack_enabled, const bool build_enabled,
+                    const uint8_t prev_style) {
     wchar_t symbol;
     uint8_t style;
     const bool rendered =
@@ -453,16 +453,16 @@ static uint8_t apply_pixel(const struct game* const game, const grid_t x,
     return style;
 }
 
-static void reset_cursor(void) {
+void reset_cursor(void) {
     wprintf(L"\033[0;0H");
     wprintf(L"\033[2J\033[1;1H");
 }
 
-static void reset_black(void) { wprintf(L"%c[30;40m", '\x1b'); }
+void reset_black(void) { wprintf(L"%c[30;40m", '\x1b'); }
 
-static void reset_style(void) { wprintf(L"%c[0m", '\x1b'); }
+void reset_style(void) { wprintf(L"%c[0m", '\x1b'); }
 
-static void print_normal_text(const struct game* const game) {
+void print_normal_text(const struct game* const game) {
     wprintf(
         L"turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u\n",
         game->turn, game->x, game->y, tile_names[game->map[game->y][game->x]],
@@ -476,8 +476,7 @@ static void print_normal_text(const struct game* const game) {
                 unit->health, model_names[unit->model], unit->capture_progress);
 }
 
-static void print_attack_text(const struct game* const game) {
-    // TODO: fix attack damage not matching resultant printed health
+void print_attack_text(const struct game* const game) {
     health_t damage, counter_damage;
     game_calc_damage(game, &damage, &counter_damage);
     const health_wide_t percent = 100;
@@ -486,7 +485,7 @@ static void print_attack_text(const struct game* const game) {
             (counter_damage * percent) / HEALTH_MAX);
 }
 
-static void print_build_text(const struct game* const game) {
+void print_build_text(const struct game* const game) {
     const tile_t tile = game->map[game->y][game->x];
     assert(tile >= TERRIAN_CAPACITY);
     const tile_t capturable = tile - TERRIAN_CAPACITY;
@@ -499,8 +498,8 @@ static void print_build_text(const struct game* const game) {
     wprintf(L"\n");
 }
 
-static void print_text(const struct game* const game, const bool attack_enabled,
-                       const bool build_enabled) {
+void print_text(const struct game* const game, const bool attack_enabled,
+                const bool build_enabled) {
     if (attack_enabled)
         print_attack_text(game);
     else if (build_enabled)
