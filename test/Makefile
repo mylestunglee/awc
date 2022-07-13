@@ -40,4 +40,4 @@ run: all_test
 	./$<
 
 clean:
-	rm -f $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS) all_test.cpp
+	rm -f $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS) all_test.cpp all_test

@@ -57,7 +57,8 @@ const struct unit* find_attackee(struct game* const game,
     const struct unit* best_attackee = NULL;
     typedef int16_t metric_t;
     metric_t best_metric = SHRT_MIN;
-    grid_t best_prev_x, best_prev_y;
+    grid_t best_prev_x = game->prev_x;
+    grid_t best_prev_y = game->prev_y;
 
     game->y = 0;
     do {
@@ -90,7 +91,6 @@ const struct unit* find_attackee(struct game* const game,
     } while (++game->y);
 
     // Restore prev position from best simulate_attack
-    assert(best_metric > SHRT_MIN);
     game->prev_x = best_prev_x;
     game->prev_y = best_prev_y;
 

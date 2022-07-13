@@ -187,7 +187,7 @@ TEST_F(bap_glpk_solver_internal_fixture, set_distribution_submatrix) {
     temps->a_column_start_index = 5;
     temps->a_column_end_index = 6;
 
-    set_distribution_submatrix(inputs, temps);
+    set_distribution_submatrix(temps);
 
     ASSERT_EQ(temps->matrix_values[1], 1.0);
     ASSERT_EQ(temps->curr_index, 2);

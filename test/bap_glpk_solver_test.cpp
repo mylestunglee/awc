@@ -22,13 +22,13 @@ TEST_F(bap_glpk_solver_fixture, constant_functions_when_null_case) {
 
     ASSERT_EQ(count_distribution_rows(&inputs), 0);
     ASSERT_EQ(count_allocation_rows(&inputs), 0);
-    ASSERT_EQ(count_budget_row(&inputs), 1);
+    ASSERT_EQ(count_budget_row(), 1);
     ASSERT_EQ(count_surplus_rows(&inputs), 0);
     ASSERT_EQ(count_rows(&inputs), 1);
 
     ASSERT_EQ(count_a_columns(&inputs), 0);
     ASSERT_EQ(count_b_columns(&inputs), 0);
-    ASSERT_EQ(count_objective_column(&inputs), 1);
+    ASSERT_EQ(count_objective_column(), 1);
     ASSERT_EQ(count_columns(&inputs), 1);
 }
 
@@ -44,13 +44,13 @@ TEST_F(bap_glpk_solver_fixture, constant_functions_when_single_distribution) {
 
     ASSERT_EQ(count_distribution_rows(&inputs), 1);
     ASSERT_EQ(count_allocation_rows(&inputs), 0);
-    ASSERT_EQ(count_budget_row(&inputs), 1);
+    ASSERT_EQ(count_budget_row(), 1);
     ASSERT_EQ(count_surplus_rows(&inputs), 1);
     ASSERT_EQ(count_rows(&inputs), 3);
 
     ASSERT_EQ(count_a_columns(&inputs), 1);
     ASSERT_EQ(count_b_columns(&inputs), 0);
-    ASSERT_EQ(count_objective_column(&inputs), 1);
+    ASSERT_EQ(count_objective_column(), 1);
     ASSERT_EQ(count_columns(&inputs), 2);
 }
 
@@ -66,13 +66,13 @@ TEST_F(bap_glpk_solver_fixture, constant_functions_when_single_allocation) {
 
     ASSERT_EQ(count_distribution_rows(&inputs), 0);
     ASSERT_EQ(count_allocation_rows(&inputs), 1);
-    ASSERT_EQ(count_budget_row(&inputs), 1);
+    ASSERT_EQ(count_budget_row(), 1);
     ASSERT_EQ(count_surplus_rows(&inputs), 1);
     ASSERT_EQ(count_rows(&inputs), 3);
 
     ASSERT_EQ(count_a_columns(&inputs), 0);
     ASSERT_EQ(count_b_columns(&inputs), 8);
-    ASSERT_EQ(count_objective_column(&inputs), 1);
+    ASSERT_EQ(count_objective_column(), 1);
     ASSERT_EQ(count_columns(&inputs), 9);
 }
 
