@@ -1,7 +1,12 @@
-#include <stdio.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
+
+#ifdef __cplusplus
+#define getchar() 0
+#else
+#include <stdio.h>
+#endif
 
 char getch(void) {
     struct termios prev, curr;
