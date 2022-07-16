@@ -6,6 +6,16 @@
 
 #ifdef EXPOSE_FILE_INTERNALS
 bool load_turn(const char* const, const char* const, player_t* const);
+bool load_map(const char* const, const char* const, grid_t* const,
+              tile_t[GRID_SIZE][GRID_SIZE]);
+bool load_territory(const char* const, const char* const,
+                    player_t[GRID_SIZE][GRID_SIZE]);
+bool load_bot(const char* const, const char* const, uint8_t* const);
+bool load_gold(const char* const, const char* const, gold_t[PLAYERS_CAPACITY]);
+bool load_team(const char* const, char*, uint8_t* const);
+bool load_unit(const char* const, const char* const, const model_t,
+               struct units* const);
+bool load_units(const char* const, const char* const, struct units* const);
 #endif
 bool file_load(struct game* const, const char* const);
 bool file_save(const struct game* const, const char* const);

@@ -3,117 +3,184 @@
 #include "constants.h"
 #include "format_constants.h"
 #include "units.h"
-#include <stdbool.h>
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
-bool load_turn(const char* const command, const char* const params, player_t* const turn) {
+bool load_turn(const char* const command, const char* const params,
+               player_t* const turn) {
     if (strcmp(command, "turn"))
         return false;
 
     return sscanf(params, TURN_FORMAT, turn) == 1;
 }
 
-static void file_load_map(tile_t map[GRID_SIZE][GRID_SIZE],
-                          const char* const tokens, const grid_t y) {
+bool load_map(const char* const command, const char* const params,
+              grid_t* const y, tile_t map[GRID_SIZE][GRID_SIZE]) {
+    if (strcmp(command, "map"))
+        return false;
+
     char map_str[GRID_SIZE] = {0};
-    if (sscanf(tokens, ROW_FORMAT, map_str) != 1)
-        return;
+    assert(sscanf(params, ROW_FORMAT, map_str) == 1);
 
     grid_t x = 0;
 
     // Read symbols left to right
     while (map_str[x] != '\0') {
         // Find tile index for symbol
-        for (tile_t tile = 0; tile < TILE_CAPACITY; ++tile) {
+        for (tile_t tile = 0; tile < TILE_CAPACITY; ++tile)
             if (map_str[x] == tile_symbols[tile]) {
-                map[y][x] = tile;
+                map[*y][x] = tile;
                 break;
             }
-        }
         ++x;
     }
+
+    ++*y;
+
+    return true;
 }
 
-static void file_load_territory(player_t territory[GRID_SIZE][GRID_SIZE],
-                                const char* const tokens) {
+bool load_territory(const char* const command, const char* const params,
+                    player_t territory[GRID_SIZE][GRID_SIZE]) {
+    if (strcmp(command, "territory"))
+        return false;
+
     grid_t x, y;
     player_t player;
 
-    if (sscanf(tokens, PLAYER_FORMAT GRID_FORMAT GRID_FORMAT, &player, &x,
+    if (sscanf(params, PLAYER_FORMAT GRID_FORMAT GRID_FORMAT, &player, &x,
                &y) != 3)
-        return;
+        return false;
 
-    if (player < PLAYERS_CAPACITY)
-        territory[y][x] = player;
+    if (player >= NULL_PLAYER)
+        return false;
+
+    territory[y][x] = player;
+
+    return true;
 }
 
-static void file_load_bot(uint8_t* const bots, const char* const tokens) {
+bool load_bot(const char* const command, const char* const params,
+              uint8_t* const bots) {
+    if (strcmp(command, "bot"))
+        return false;
+
     player_t player;
-    if (sscanf(tokens, PLAYER_FORMAT, &player) != 1)
-        return;
 
-    if (player < PLAYERS_CAPACITY)
-        bitarray_set(bots, player);
+    if (sscanf(params, PLAYER_FORMAT, &player) != 1)
+        return false;
+
+    if (player >= NULL_PLAYER)
+        return false;
+
+    bitarray_set(bots, player);
+
+    return true;
 }
 
-static void file_load_unit(struct units* const units, const char* const tokens,
-                           const model_t model) {
-    grid_t x, y;
-    player_t player;
-    health_t health;
-    char enabled[8];
-    if (sscanf(
-            tokens,
-            PLAYER_FORMAT GRID_FORMAT GRID_FORMAT HEALTH_FORMAT ENABLED_FORMAT,
-            &player, &x, &y, &health, enabled) != 5)
-        return;
+bool load_gold(const char* const command, const char* const params,
+               gold_t golds[PLAYERS_CAPACITY]) {
+    if (strcmp(command, "gold"))
+        return false;
 
-    if (player < PLAYERS_CAPACITY) {
-        const struct unit unit = {.health = health,
-                                  .model = model,
-                                  .player = player,
-                                  .x = x,
-                                  .y = y,
-                                  .enabled = !strcmp(enabled, "enabled")};
-        units_insert(units, &unit);
-    }
-}
-
-static void file_load_gold(gold_t golds[PLAYERS_CAPACITY],
-                           const char* const tokens) {
     player_t player;
     gold_t gold;
 
-    if (sscanf(tokens, PLAYER_FORMAT GOLD_FORMAT, &player, &gold) != 2)
-        return;
+    if (sscanf(params, PLAYER_FORMAT GOLD_FORMAT, &player, &gold) != 2)
+        return false;
 
-    if (player < PLAYERS_CAPACITY)
-        golds[player] = gold;
+    if (player >= NULL_PLAYER)
+        return false;
+
+    golds[player] = gold;
+
+    return true;
 }
 
-static void file_load_team(uint8_t* const alliances, char* tokens) {
+bool load_team(const char* const command, char* params,
+               uint8_t* const alliances) {
+    if (strcmp(command, "team"))
+        return false;
+
     player_t team[PLAYERS_CAPACITY];
     player_t size = 0;
 
     const char* const delim = " ";
 
     // Parse tokens into integer array
-    char* token = __strtok_r(NULL, delim, &tokens);
+    char* token = __strtok_r(NULL, delim, &params);
     while (token) {
-        if (sscanf(token, PLAYER_FORMAT, &team[size]) != 1)
-            continue;
+        player_t player;
 
+        if (sscanf(token, PLAYER_FORMAT, &player) != 1)
+            return false;
+
+        if (player >= NULL_PLAYER)
+            return false;
+
+        team[size] = player;
         ++size;
 
-        token = __strtok_r(NULL, delim, &tokens);
+        token = __strtok_r(NULL, delim, &params);
     }
+
+    if (size == 0)
+        return false;
 
     // Convert integer array into relation
     for (player_t p = 0; p < size; ++p)
-        for (player_t q = p + 1; q < size; ++q) {
+        for (player_t q = p + 1; q < size; ++q)
             bitmatrix_set(alliances, team[p], team[q]);
-        }
+
+    return true;
+}
+
+bool load_unit(const char* const command, const char* const params,
+               const model_t model, struct units* const units) {
+    if (strcmp(command, model_names[model]))
+        return false;
+
+    grid_t x, y;
+    player_t player;
+    health_t health;
+    char enabled_buffer[9];
+
+    if (sscanf(
+            params,
+            PLAYER_FORMAT GRID_FORMAT GRID_FORMAT HEALTH_FORMAT ENABLED_FORMAT,
+            &player, &x, &y, &health, enabled_buffer) != 5)
+        return false;
+
+    if (player >= NULL_PLAYER)
+        return false;
+
+    bool enabled;
+    if (!strcmp(enabled_buffer, "enabled"))
+        enabled = true;
+    else if (!strcmp(enabled_buffer, "disabled"))
+        enabled = false;
+    else
+        return false;
+
+    const struct unit unit = {.health = health,
+                              .model = model,
+                              .player = player,
+                              .x = x,
+                              .y = y,
+                              .enabled = enabled};
+    units_insert(units, &unit);
+
+    return true;
+}
+
+bool load_units(const char* const command, const char* const params,
+                struct units* const units) {
+    for (model_t model = 0; model < MODEL_CAPACITY; ++model)
+        if (load_unit(command, params, model, units))
+            return true;
+
+    return false;
 }
 
 bool file_load(struct game* const game, const char* const filename) {
@@ -126,6 +193,7 @@ bool file_load(struct game* const game, const char* const filename) {
     const uint16_t buffer_size = 4096;
     char line[buffer_size];
     grid_t y = 0;
+    bool error = false;
 
     while (fgets(line, buffer_size, file)) {
         // Remove trailing new-line character
@@ -136,28 +204,20 @@ bool file_load(struct game* const game, const char* const filename) {
 
         if (command == NULL)
             continue;
-        else if (load_turn(command, params, &game->turn))
-            {}
-        else if (!strcmp(command, "map")) {
-            file_load_map(game->map, params, y);
-            ++y;
-        } else if (!strcmp(command, "territory"))
-            file_load_territory(game->territory, params);
-        else if (!strcmp(command, "gold"))
-            file_load_gold(game->golds, params);
-        else if (!strcmp(command, "bot"))
-            file_load_bot(game->bots, params);
-        else if (!strcmp(command, "team"))
-            file_load_team(game->alliances, params);
+        else if (load_turn(command, params, &game->turn) ||
+                 load_map(command, params, &y, game->map) ||
+                 load_territory(command, params, game->territory) ||
+                 load_bot(command, params, game->bots) ||
+                 load_gold(command, params, game->golds) ||
+                 load_team(command, params, game->alliances) ||
+                 load_units(command, params, &game->units))
+            continue;
         else
-            for (model_t model = 0; model < MODEL_CAPACITY; ++model)
-                if (!strcmp(command, model_names[model])) {
-                    file_load_unit(&game->units, params, model);
-                    break;
-                }
+            // Parse remaining lines
+            error = true;
     }
 
-    return fclose(file) < 0;
+    return fclose(file) < 0 || error;
 }
 
 static grid_wide_t file_row_length(const struct game* const game,
