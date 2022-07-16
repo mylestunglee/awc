@@ -7,6 +7,13 @@
 #include <stdio.h>
 #include <string.h>
 
+bool load_turn(const char* const command, const char* const params, player_t* const turn) {
+    if (strcmp(command, "turn"))
+        return false;
+
+    return sscanf(params, TURN_FORMAT, turn) == 1;
+}
+
 static void file_load_map(tile_t map[GRID_SIZE][GRID_SIZE],
                           const char* const tokens, const grid_t y) {
     char map_str[GRID_SIZE] = {0};
@@ -124,28 +131,28 @@ bool file_load(struct game* const game, const char* const filename) {
         // Remove trailing new-line character
         line[strcspn(line, "\n")] = '\0';
 
-        char* tokens;
-        char* key = __strtok_r(line, delim, &tokens);
+        char* params;
+        char* command = __strtok_r(line, delim, &params);
 
-        if (key == NULL)
+        if (command == NULL)
             continue;
-        else if (!strcmp(key, "turn"))
-            sscanf(tokens, TURN_FORMAT, &game->turn);
-        else if (!strcmp(key, "map")) {
-            file_load_map(game->map, tokens, y);
+        else if (load_turn(command, params, &game->turn))
+            {}
+        else if (!strcmp(command, "map")) {
+            file_load_map(game->map, params, y);
             ++y;
-        } else if (!strcmp(key, "territory"))
-            file_load_territory(game->territory, tokens);
-        else if (!strcmp(key, "gold"))
-            file_load_gold(game->golds, tokens);
-        else if (!strcmp(key, "bot"))
-            file_load_bot(game->bots, tokens);
-        else if (!strcmp(key, "team"))
-            file_load_team(game->alliances, tokens);
+        } else if (!strcmp(command, "territory"))
+            file_load_territory(game->territory, params);
+        else if (!strcmp(command, "gold"))
+            file_load_gold(game->golds, params);
+        else if (!strcmp(command, "bot"))
+            file_load_bot(game->bots, params);
+        else if (!strcmp(command, "team"))
+            file_load_team(game->alliances, params);
         else
             for (model_t model = 0; model < MODEL_CAPACITY; ++model)
-                if (!strcmp(key, model_names[model])) {
-                    file_load_unit(&game->units, tokens, model);
+                if (!strcmp(command, model_names[model])) {
+                    file_load_unit(&game->units, params, model);
                     break;
                 }
     }

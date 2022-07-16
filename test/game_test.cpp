@@ -13,7 +13,7 @@ TEST_F(game_fixture, game_load_sets_map) {
         ofstream file(filename);
         file << "map \"";
     }
-    game_load(game, filename);
+    ASSERT_TRUE(game_load(game, filename));
     remove(filename);
     ASSERT_EQ(game->map[0][0], TILE_PLAINS);
 }
