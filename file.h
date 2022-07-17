@@ -18,6 +18,9 @@ bool load_unit(const char* const, const char* const, const model_t,
 bool load_units(const char* const, const char* const, struct units* const);
 #endif
 bool file_load(struct game* const, const char* const);
+#ifdef EXPOSE_FILE_INTERNALS
+grid_wide_t calc_row_length(const tile_t[GRID_SIZE][GRID_SIZE], const grid_t);
+#endif
 bool file_save(const struct game* const, const char* const);
 
 #endif

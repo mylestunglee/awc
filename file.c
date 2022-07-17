@@ -220,20 +220,21 @@ bool file_load(struct game* const game, const char* const filename) {
     return fclose(file) < 0 || error;
 }
 
-static grid_wide_t file_row_length(const struct game* const game,
-                                   const grid_t y) {
+grid_wide_t calc_row_length(const tile_t map[GRID_SIZE][GRID_SIZE],
+                            const grid_t y) {
     for (grid_wide_t x = GRID_SIZE - 1; x >= 0; --x) {
-        if (game->map[y][x]) {
+        if (map[y][x]) {
             return x;
         }
     }
     return -1;
 }
 
-static void file_save_map(const struct game* const game, FILE* const file) {
+static void file_save_map(const tile_t map[GRID_SIZE][GRID_SIZE],
+                          FILE* const file) {
     grid_t y = 0;
     do {
-        const grid_wide_t length = file_row_length(game, y);
+        const grid_wide_t length = calc_row_length(map, y);
 
         if (length < 0)
             continue;
@@ -241,7 +242,7 @@ static void file_save_map(const struct game* const game, FILE* const file) {
         fprintf(file, "map ");
 
         for (grid_wide_t x = 0; x <= length; ++x) {
-            fprintf(file, "%c", tile_symbols[game->map[y][x]]);
+            fprintf(file, "%c", tile_symbols[map[y][x]]);
         }
         fprintf(file, "\n");
     } while (++y);
@@ -347,7 +348,7 @@ bool file_save(const struct game* const game, const char* const filename) {
         return true;
 
     fprintf(file, "turn " TURN_FORMAT "\n", game->turn);
-    file_save_map(game, file);
+    file_save_map(game->map, file);
     file_save_units(&game->units, file);
     file_save_territory(game->territory, file);
     file_save_golds(game->golds, file);
