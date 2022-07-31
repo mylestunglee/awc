@@ -183,6 +183,17 @@ bool load_units(const char* const command, const char* const params,
     return false;
 }
 
+bool load_command(struct game* const game, const char* const command,
+                  char* const params, grid_t* const y) {
+    return load_turn(command, params, &game->turn) ||
+           load_map(command, params, y, game->map) ||
+           load_territory(command, params, game->territory) ||
+           load_bot(command, params, game->bots) ||
+           load_gold(command, params, game->golds) ||
+           load_team(command, params, game->alliances) ||
+           load_units(command, params, &game->units);
+}
+
 bool file_load(struct game* const game, const char* const filename) {
     FILE* const file = fopen(filename, "r");
 
@@ -204,13 +215,7 @@ bool file_load(struct game* const game, const char* const filename) {
 
         if (command == NULL)
             continue;
-        else if (load_turn(command, params, &game->turn) ||
-                 load_map(command, params, &y, game->map) ||
-                 load_territory(command, params, game->territory) ||
-                 load_bot(command, params, game->bots) ||
-                 load_gold(command, params, game->golds) ||
-                 load_team(command, params, game->alliances) ||
-                 load_units(command, params, &game->units))
+        else if (load_command(game, command, params, &y))
             continue;
         else
             // Parse remaining lines

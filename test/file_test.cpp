@@ -4,6 +4,7 @@
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 #include "units_fixture.hpp"
+#include <fstream>
 #include <string>
 
 using namespace std::literals::string_literals;
@@ -175,4 +176,50 @@ TEST_F(units_fixture, load_unit_when_valid_inserts_disabled_unit) {
     const auto* const unit = units_const_get_at(units, 3, 5);
     ASSERT_TRUE(unit);
     ASSERT_FALSE(unit->enabled);
+}
+
+TEST_F(units_fixture, load_units_when_valid_unit) {
+    const auto params = "2 3 5 7 enabled"s;
+
+    ASSERT_TRUE(load_units("infantry", params.c_str(), units));
+
+    ASSERT_TRUE(units_const_get_at(units, 3, 5));
+}
+
+TEST(file_test, load_units_when_invalid_unit) {
+    ASSERT_FALSE(load_units("", nullptr, nullptr));
+}
+
+TEST_F(game_fixture, load_command_returns_true_when_valid_command) {
+    auto params = "2"s;
+    grid_t y;
+
+    ASSERT_TRUE(load_command(game, "turn", params.data(), &y));
+}
+
+TEST_F(game_fixture, file_load_returns_false_when_valid_contents) {
+    using namespace std;
+    auto filename = "test_state.txt";
+    {
+        ofstream file(filename);
+        file << "map \"";
+    }
+
+    ASSERT_FALSE(file_load(game, filename));
+
+    ASSERT_EQ(game->map[0][0], TILE_PLAINS);
+    remove(filename);
+}
+
+TEST_F(game_fixture, game_load_returns_true_when_invalid_contents) {
+    using namespace std;
+    auto filename = "test_state.txt";
+    {
+        ofstream file(filename);
+        file << "command \"";
+    }
+
+    ASSERT_TRUE(file_load(game, filename));
+
+    remove(filename);
 }

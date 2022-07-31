@@ -13,10 +13,12 @@ TEST_F(game_fixture, game_load_sets_map) {
         ofstream file(filename);
         file << "map \"";
     }
+
     ASSERT_FALSE(game_load(game, filename));
+
     remove(filename);
     ASSERT_EQ(game->map[0][0], TILE_PLAINS);
-    // TODO: test other functionality from game_load
+    // TODO: test other game_load functionality
 }
 
 TEST_F(game_fixture, find_next_unit_returns_first_enabled_unit_while_hovering) {

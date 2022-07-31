@@ -16,6 +16,8 @@ bool load_team(const char* const, char*, uint8_t* const);
 bool load_unit(const char* const, const char* const, const model_t,
                struct units* const);
 bool load_units(const char* const, const char* const, struct units* const);
+bool load_command(struct game* const, const char* const, char* const,
+                  grid_t* const);
 #endif
 bool file_load(struct game* const, const char* const);
 #ifdef EXPOSE_FILE_INTERNALS
