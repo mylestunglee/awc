@@ -190,11 +190,10 @@ TEST(file_test, load_units_when_invalid_unit) {
     ASSERT_FALSE(load_units("", nullptr, nullptr));
 }
 
-TEST_F(game_fixture, load_command_returns_true_when_valid_command) {
-    auto params = "2"s;
+TEST_F(game_fixture, load_command_returns_false_when_invalid_command) {
     grid_t y;
 
-    ASSERT_TRUE(load_command(game, "turn", params.data(), &y));
+    ASSERT_FALSE(load_command(game, "", nullptr, &y));
 }
 
 TEST_F(game_fixture, file_load_returns_false_when_valid_contents) {
@@ -211,7 +210,7 @@ TEST_F(game_fixture, file_load_returns_false_when_valid_contents) {
     remove(filename);
 }
 
-TEST_F(game_fixture, game_load_returns_true_when_invalid_contents) {
+TEST_F(game_fixture, file_load_returns_true_when_invalid_contents) {
     using namespace std;
     auto filename = "test_state.txt";
     {
@@ -222,4 +221,59 @@ TEST_F(game_fixture, game_load_returns_true_when_invalid_contents) {
     ASSERT_TRUE(file_load(game, filename));
 
     remove(filename);
+}
+
+TEST_F(game_fixture, file_load_returns_true_when_file_does_not_exist) {
+    ASSERT_TRUE(file_load(game, ""));
+}
+
+TEST(file_test, calc_row_length_when_empty_row) {
+    tile_t row[GRID_SIZE] = {0};
+
+    ASSERT_EQ(calc_row_length(row), 0);
+}
+
+TEST(file_test, calc_row_length_when_leftmost_tile_is_not_void) {
+    tile_t row[GRID_SIZE] = {0};
+    row[0] = TILE_PLAINS;
+
+    ASSERT_EQ(calc_row_length(row), 1);
+}
+
+TEST(file_test, calc_row_length_when_rightmost_is_not_void) {
+    tile_t row[GRID_SIZE] = {0};
+    row[GRID_SIZE - 1] = TILE_PLAINS;
+
+    ASSERT_EQ(calc_row_length(row), GRID_SIZE);
+}
+
+class file_fixture : public ::testing::Test {
+public:
+    file_fixture() { file_ = open_memstream(&buffer, &size); }
+
+    ~file_fixture() {
+        fclose(file_);
+        free(buffer);
+    }
+
+    FILE* file() { return file_; }
+
+    std::string contents() {
+        fflush(file_);
+        return std::string(buffer);
+    }
+
+private:
+    FILE* file_ = nullptr;
+    char* buffer = nullptr;
+    size_t size = 0;
+};
+
+TEST_F(file_fixture, file_save_map) {
+    tile_t map[GRID_SIZE][GRID_SIZE] = {0};
+    map[0][0] = TILE_PLAINS;
+
+    file_save_map(map, file());
+
+    ASSERT_EQ(contents(), "map \"\n");
 }

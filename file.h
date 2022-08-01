@@ -3,6 +3,7 @@
 
 #include "game.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 #ifdef EXPOSE_FILE_INTERNALS
 bool load_turn(const char* const, const char* const, player_t* const);
@@ -21,7 +22,8 @@ bool load_command(struct game* const, const char* const, char* const,
 #endif
 bool file_load(struct game* const, const char* const);
 #ifdef EXPOSE_FILE_INTERNALS
-grid_wide_t calc_row_length(const tile_t[GRID_SIZE][GRID_SIZE], const grid_t);
+grid_wide_t calc_row_length(const tile_t[GRID_SIZE]);
+void file_save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file);
 #endif
 bool file_save(const struct game* const, const char* const);
 

@@ -225,28 +225,26 @@ bool file_load(struct game* const game, const char* const filename) {
     return fclose(file) < 0 || error;
 }
 
-grid_wide_t calc_row_length(const tile_t map[GRID_SIZE][GRID_SIZE],
-                            const grid_t y) {
+grid_wide_t calc_row_length(const tile_t row[GRID_SIZE]) {
     for (grid_wide_t x = GRID_SIZE - 1; x >= 0; --x) {
-        if (map[y][x]) {
-            return x;
+        if (row[x] != TILE_VOID) {
+            return x + 1;
         }
     }
-    return -1;
+    return 0;
 }
 
-static void file_save_map(const tile_t map[GRID_SIZE][GRID_SIZE],
-                          FILE* const file) {
+void file_save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file) {
     grid_t y = 0;
     do {
-        const grid_wide_t length = calc_row_length(map, y);
+        const grid_wide_t length = calc_row_length(map[y]);
 
-        if (length < 0)
+        if (length == 0)
             continue;
 
         fprintf(file, "map ");
 
-        for (grid_wide_t x = 0; x <= length; ++x) {
+        for (grid_wide_t x = 0; x < length; ++x) {
             fprintf(file, "%c", tile_symbols[map[y][x]]);
         }
         fprintf(file, "\n");
