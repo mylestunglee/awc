@@ -143,13 +143,14 @@ bool load_unit(const char* const command, const char* const params,
 
     grid_t x, y;
     player_t player;
-    health_t health;
-    char enabled_buffer[9];
+    health_t health = HEALTH_MAX;
+    char enabled_buffer[9] = "enabled";
+    capture_progress_t capture_progress = 0;
 
-    if (sscanf(
-            params,
-            PLAYER_FORMAT GRID_FORMAT GRID_FORMAT HEALTH_FORMAT ENABLED_FORMAT,
-            &player, &x, &y, &health, enabled_buffer) != 5)
+    if (sscanf(params,
+               PLAYER_FORMAT GRID_FORMAT GRID_FORMAT HEALTH_FORMAT
+                   ENABLED_FORMAT CAPTURE_COMPLETION_FORMAT,
+               &player, &x, &y, &health, enabled_buffer, &capture_progress) < 3)
         return false;
 
     if (player >= NULL_PLAYER)
@@ -234,7 +235,7 @@ grid_wide_t calc_row_length(const tile_t row[GRID_SIZE]) {
     return 0;
 }
 
-void file_save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file) {
+void save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file) {
     grid_t y = 0;
     do {
         const grid_wide_t length = calc_row_length(map[y]);
@@ -251,15 +252,17 @@ void file_save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file) {
     } while (++y);
 }
 
-static void file_save_units(const struct units* const units, FILE* const file) {
+void save_units(const struct units* const units, FILE* const file) {
     for (player_t player = 0; player < PLAYERS_CAPACITY; ++player) {
         const struct unit* unit = units_const_get_first(units, player);
         while (unit) {
             fprintf(file,
                     MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
-                                      " " GRID_FORMAT " " HEALTH_FORMAT " %s\n",
+                                      " " GRID_FORMAT " " HEALTH_FORMAT
+                                      " %s " CAPTURE_COMPLETION_FORMAT "\n",
                     model_names[unit->model], unit->player, unit->x, unit->y,
-                    unit->health, unit->enabled ? "enabled" : "disabled");
+                    unit->health, unit->enabled ? "enabled" : "disabled",
+                    unit->capture_progress);
             unit = units_const_get_next(units, unit);
         }
     }
@@ -351,8 +354,8 @@ bool file_save(const struct game* const game, const char* const filename) {
         return true;
 
     fprintf(file, "turn " TURN_FORMAT "\n", game->turn);
-    file_save_map(game->map, file);
-    file_save_units(&game->units, file);
+    save_map(game->map, file);
+    save_units(&game->units, file);
     file_save_territory(game->territory, file);
     file_save_golds(game->golds, file);
     file_save_bots(game->bots, file);

@@ -179,7 +179,7 @@ TEST_F(units_fixture, load_unit_when_valid_inserts_disabled_unit) {
 }
 
 TEST_F(units_fixture, load_units_when_valid_unit) {
-    const auto params = "2 3 5 7 enabled"s;
+    const auto params = "2 3 5"s;
 
     ASSERT_TRUE(load_units("infantry", params.c_str(), units));
 
@@ -247,33 +247,49 @@ TEST(file_test, calc_row_length_when_rightmost_is_not_void) {
     ASSERT_EQ(calc_row_length(row), GRID_SIZE);
 }
 
-class file_fixture : public ::testing::Test {
+class file_fixture {
 public:
-    file_fixture() { file_ = open_memstream(&buffer, &size); }
+    file_fixture() { file = open_memstream(&buffer, &size); }
 
     ~file_fixture() {
-        fclose(file_);
+        fclose(file);
         free(buffer);
     }
 
-    FILE* file() { return file_; }
+    FILE* ref() { return file; }
 
-    std::string contents() {
-        fflush(file_);
+    std::string data() {
+        fflush(file);
         return std::string(buffer);
     }
 
 private:
-    FILE* file_ = nullptr;
+    FILE* file = nullptr;
     char* buffer = nullptr;
     size_t size = 0;
 };
 
-TEST_F(file_fixture, file_save_map) {
+TEST(file_test, save_map) {
+    file_fixture file;
     tile_t map[GRID_SIZE][GRID_SIZE] = {0};
     map[0][0] = TILE_PLAINS;
 
-    file_save_map(map, file());
+    save_map(map, file.ref());
 
-    ASSERT_EQ(contents(), "map \"\n");
+    ASSERT_EQ(file.data(), "map \"\n");
+}
+
+TEST_F(units_fixture, save_units) {
+    file_fixture file;
+    insert({.health = 2,
+            .model = MODEL_INFANTRY,
+            .player = 3,
+            .x = 5,
+            .y = 7,
+            .enabled = true,
+            .capture_progress = 11});
+
+    save_units(units, file.ref());
+
+    ASSERT_EQ(file.data(), "infantry     3   5   7    2 enabled 11\n");
 }

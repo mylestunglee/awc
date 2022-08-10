@@ -5,7 +5,7 @@
 
 #define UNIT_FORMAT "%02X"
 #define GRID_FORMAT "%3hhu"
-#define PLAYER_FORMAT "%3hhu"
+#define PLAYER_FORMAT "%hhu"
 #define HEALTH_FORMAT "%4hhu"
 #define ROW_FORMAT "%256s"
 #define MODEL_NAME_FORMAT "%-12s"
@@ -15,6 +15,7 @@
 #define GOLD_FORMAT "%d"
 #define ENABLED_FORMAT "%8s"
 #define TILE_FORMAT "%hhu"
+#define CAPTURE_COMPLETION_FORMAT "%hu"
 
 static const uint8_t tile_symbols[TILE_CAPACITY] = {
     '.', '"', 'Y', '^', ':', '~', '*', '\'', '-', '=', 'C', 'F', 'A', 'S', 'H'};

@@ -23,7 +23,8 @@ bool load_command(struct game* const, const char* const, char* const,
 bool file_load(struct game* const, const char* const);
 #ifdef EXPOSE_FILE_INTERNALS
 grid_wide_t calc_row_length(const tile_t[GRID_SIZE]);
-void file_save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file);
+void save_map(const tile_t[GRID_SIZE][GRID_SIZE], FILE* const);
+void save_units(const struct units* const, FILE* const);
 #endif
 bool file_save(const struct game* const, const char* const);
 
