@@ -269,6 +269,14 @@ private:
     size_t size = 0;
 };
 
+TEST(file_test, save_turn) {
+    file_fixture file;
+
+    save_turn(2, file.ref());
+
+    ASSERT_EQ(file.data(), "turn 2\n");
+}
+
 TEST(file_test, save_map) {
     file_fixture file;
     tile_t map[GRID_SIZE][GRID_SIZE] = {0};
@@ -358,4 +366,15 @@ TEST(file_test, save_bots) {
     save_bots(&bots, file.ref());
 
     ASSERT_EQ(file.data(), "bot 1\n");
+}
+
+TEST(file_test, save_teams) {
+    file_fixture file;
+    uint8_t alliances[BITMATRIX_SIZE(PLAYERS_CAPACITY)];
+
+    alliances[0] = (1 << 1) + (1 << 2) + (1 << 7);
+
+    save_teams(alliances, file.ref());
+
+    ASSERT_EQ(file.data(), "team 0 2 3\n");
 }

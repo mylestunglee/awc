@@ -226,6 +226,10 @@ bool file_load(struct game* const game, const char* const filename) {
     return fclose(file) < 0 || error;
 }
 
+void save_turn(const player_t turn, FILE* const file) {
+    fprintf(file, "turn " TURN_FORMAT "\n", turn);
+}
+
 grid_wide_t calc_row_length(const tile_t row[GRID_SIZE]) {
     for (grid_wide_t x = GRID_SIZE - 1; x >= 0; --x) {
         if (row[x] != TILE_VOID) {
@@ -317,8 +321,8 @@ void save_bots(const uint8_t* const bots, FILE* const file) {
             fprintf(file, "bot " PLAYER_FORMAT "\n", player);
 }
 
-static void file_save_teams(const uint8_t* const alliances, FILE* const file) {
-    uint8_t copy[sizeof(((struct game*)NULL)->alliances)];
+void save_teams(const uint8_t* const alliances, FILE* const file) {
+    uint8_t copy[BITMATRIX_SIZE(PLAYERS_CAPACITY)];
     memcpy(copy, alliances, sizeof(copy));
 
     // For each possible member and following members
@@ -373,13 +377,13 @@ bool file_save(const struct game* const game, const char* const filename) {
     if (!file)
         return true;
 
-    fprintf(file, "turn " TURN_FORMAT "\n", game->turn);
+    save_turn(game->turn, file);
     save_map(game->map, file);
     save_units(&game->units, file);
     save_territory(game->territory, file);
     save_golds(game->golds, file);
     save_bots(game->bots, file);
-    file_save_teams(game->alliances, file);
+    save_teams(game->alliances, file);
 
     return fclose(file) < 0;
 }

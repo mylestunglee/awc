@@ -22,6 +22,7 @@ bool load_command(struct game* const, const char* const, char* const,
 #endif
 bool file_load(struct game* const, const char* const);
 #ifdef EXPOSE_FILE_INTERNALS
+void save_turn(const player_t, FILE* const);
 grid_wide_t calc_row_length(const tile_t[GRID_SIZE]);
 void save_map(const tile_t[GRID_SIZE][GRID_SIZE], FILE* const);
 void save_unit(const struct unit* const unit, FILE* const file);
@@ -29,6 +30,7 @@ void save_units(const struct units* const, FILE* const);
 void save_territory(const player_t[GRID_SIZE][GRID_SIZE], FILE* const);
 void save_golds(const gold_t[PLAYERS_CAPACITY], FILE* const);
 void save_bots(const uint8_t* const, FILE* const);
+void save_teams(const uint8_t* const alliances, FILE* const file);
 #endif
 bool file_save(const struct game* const, const char* const);
 
