@@ -371,12 +371,7 @@ void save_teams(const uint8_t* const alliances, FILE* const file) {
         }
 }
 
-bool file_save(const struct game* const game, const char* const filename) {
-    FILE* const file = fopen(filename, "w");
-
-    if (!file)
-        return true;
-
+void save_game(const struct game* const game, FILE* const file) {
     save_turn(game->turn, file);
     save_map(game->map, file);
     save_units(&game->units, file);
@@ -384,6 +379,15 @@ bool file_save(const struct game* const game, const char* const filename) {
     save_golds(game->golds, file);
     save_bots(game->bots, file);
     save_teams(game->alliances, file);
+}
+
+bool file_save(const struct game* const game, const char* const filename) {
+    FILE* const file = fopen(filename, "w");
+
+    if (!file)
+        return true;
+
+    save_game(game, file);
 
     return fclose(file) < 0;
 }

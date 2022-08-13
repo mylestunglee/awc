@@ -4,6 +4,7 @@
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 #include "units_fixture.hpp"
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -377,4 +378,35 @@ TEST(file_test, save_teams) {
     save_teams(alliances, file.ref());
 
     ASSERT_EQ(file.data(), "team 0 2 3\n");
+}
+
+TEST_F(game_fixture, save_game) {
+    file_fixture file;
+    game->map[0][0] = TILE_PLAINS;
+    insert_unit();
+    game->territory[0][0] = 0;
+    game->golds[0] = 1;
+    bitarray_set(game->bots, 0);
+    bitmatrix_set(game->alliances, 0, 1);
+
+    save_game(game, file.ref());
+
+    auto new_lines = 0;
+    for (const auto c : file.data())
+        if (c == '\n')
+            ++new_lines;
+
+    ASSERT_EQ(new_lines, 7);
+}
+
+TEST_F(game_fixture, file_save_returns_true_when_invalid_filename) {
+    ASSERT_TRUE(file_save(nullptr, ""));
+}
+
+TEST_F(game_fixture, file_save_returns_false_when_successful) {
+    ASSERT_FALSE(file_save(game, "savegame"));
+
+    ASSERT_EQ(std::filesystem::file_size("savegame"), 7);
+
+    remove("savegame");
 }

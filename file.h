@@ -31,6 +31,7 @@ void save_territory(const player_t[GRID_SIZE][GRID_SIZE], FILE* const);
 void save_golds(const gold_t[PLAYERS_CAPACITY], FILE* const);
 void save_bots(const uint8_t* const, FILE* const);
 void save_teams(const uint8_t* const alliances, FILE* const file);
+void save_game(const struct game* const, FILE* const);
 #endif
 bool file_save(const struct game* const, const char* const);
 
