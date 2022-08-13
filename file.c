@@ -268,8 +268,8 @@ void save_units(const struct units* const units, FILE* const file) {
     }
 }
 
-static void file_save_territory(const player_t territory[GRID_SIZE][GRID_SIZE],
-                                FILE* const file) {
+void save_territory(const player_t territory[GRID_SIZE][GRID_SIZE],
+                    FILE* const file) {
     grid_t y = 0;
     do {
         grid_t x = 0;
@@ -283,15 +283,14 @@ static void file_save_territory(const player_t territory[GRID_SIZE][GRID_SIZE],
     } while (++y);
 }
 
-static void file_save_golds(const gold_t golds[PLAYERS_CAPACITY],
-                            FILE* const file) {
+void save_golds(const gold_t golds[PLAYERS_CAPACITY], FILE* const file) {
     for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
         if (golds[player])
             fprintf(file, "gold " PLAYER_FORMAT " " GOLD_FORMAT "\n", player,
                     golds[player]);
 }
 
-static void file_save_bots(const uint8_t* const bots, FILE* const file) {
+void save_bots(const uint8_t* const bots, FILE* const file) {
     for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
         if (bitarray_get(bots, player))
             fprintf(file, "bot " PLAYER_FORMAT "\n", player);
@@ -356,9 +355,9 @@ bool file_save(const struct game* const game, const char* const filename) {
     fprintf(file, "turn " TURN_FORMAT "\n", game->turn);
     save_map(game->map, file);
     save_units(&game->units, file);
-    file_save_territory(game->territory, file);
-    file_save_golds(game->golds, file);
-    file_save_bots(game->bots, file);
+    save_territory(game->territory, file);
+    save_golds(game->golds, file);
+    save_bots(game->bots, file);
     file_save_teams(game->alliances, file);
 
     return fclose(file) < 0;

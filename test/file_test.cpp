@@ -293,3 +293,33 @@ TEST_F(units_fixture, save_units) {
 
     ASSERT_EQ(file.data(), "infantry     3   5   7    2 enabled 11\n");
 }
+
+TEST(file_test, save_territory) {
+    file_fixture file;
+    player_t territory[GRID_SIZE][GRID_SIZE];
+    memset(territory, NULL_PLAYER, sizeof territory);
+    territory[3][2] = 0;
+
+    save_territory(territory, file.ref());
+
+    ASSERT_EQ(file.data(), "territory 0   2   3\n");
+}
+
+TEST(file_test, save_golds) {
+    file_fixture file;
+    gold_t golds[PLAYERS_CAPACITY] = {0};
+    golds[2] = 3;
+
+    save_golds(golds, file.ref());
+
+    ASSERT_EQ(file.data(), "gold 2 3\n");
+}
+
+TEST(file_test, save_bots) {
+    file_fixture file;
+    uint8_t bots = '\x02';
+
+    save_bots(&bots, file.ref());
+
+    ASSERT_EQ(file.data(), "bot 1\n");
+}
