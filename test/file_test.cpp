@@ -150,27 +150,54 @@ TEST(file_test, load_unit_when_invalid_player) {
         load_unit("infantry", params.c_str(), MODEL_INFANTRY, nullptr));
 }
 
+TEST_F(units_fixture, load_unit_when_unspecified_health_returns_true) {
+    const auto params = "2 3 5"s;
+
+    ASSERT_TRUE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
+
+    const auto* const unit = units_const_get_at(units, 3, 5);
+    ASSERT_EQ(unit->health, HEALTH_MAX);
+}
+
+TEST_F(units_fixture, load_unit_when_invalid_health_returns_false) {
+    const auto params = "2 3 5 a"s;
+
+    ASSERT_FALSE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
+}
+
+TEST_F(units_fixture, load_unit_when_valid_inserts_default_enabled_unit) {
+    const auto params = "0 3 5 7"s;
+
+    ASSERT_TRUE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
+
+    const auto* const unit = units_const_get_at(units, 3, 5);
+    ASSERT_TRUE(unit);
+    ASSERT_EQ(unit->player, 0);
+    ASSERT_EQ(unit->health, 7);
+    ASSERT_TRUE(unit->enabled);
+}
+
 TEST(file_test, load_unit_when_invalid_enabled) {
-    const auto params = "2 3 5 abled"s;
+    const auto params = "2 3 5 7 abled"s;
 
     ASSERT_FALSE(
         load_unit("infantry", params.c_str(), MODEL_INFANTRY, nullptr));
 }
 
 TEST_F(units_fixture, load_unit_when_valid_inserts_enabled_unit) {
-    const auto params = "2 3 5 enabled"s;
+    const auto params = "2 3 5 7 enabled"s;
 
     ASSERT_TRUE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
 
     const auto* const unit = units_const_get_at(units, 3, 5);
     ASSERT_TRUE(unit);
     ASSERT_EQ(unit->player, 2);
-    ASSERT_EQ(unit->health, HEALTH_MAX);
+    ASSERT_EQ(unit->health, 7);
     ASSERT_TRUE(unit->enabled);
 }
 
 TEST_F(units_fixture, load_unit_when_valid_inserts_disabled_unit) {
-    const auto params = "2 3 5 disabled"s;
+    const auto params = "2 3 5 7 disabled"s;
 
     ASSERT_TRUE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
 
@@ -180,7 +207,7 @@ TEST_F(units_fixture, load_unit_when_valid_inserts_disabled_unit) {
 }
 
 TEST_F(units_fixture, load_units_when_valid_unit) {
-    const auto params = "2 3 5 enabled"s;
+    const auto params = "2 3 5 7 enabled"s;
 
     ASSERT_TRUE(load_units("infantry", params.c_str(), units));
 
@@ -291,13 +318,25 @@ TEST(file_test, save_map) {
 TEST(file_test, save_unit_no_capture_progress_and_no_health) {
     file_fixture file;
     const struct unit unit {
-        .health = HEALTH_MAX, .model = MODEL_INFANTRY, .player = 3, .x = 5,
+        .health = HEALTH_MAX, .model = MODEL_INFANTRY, .player = 0, .x = 5,
         .y = 7, .enabled = true, .capture_progress = 0
     };
 
     save_unit(&unit, file.ref());
 
-    ASSERT_EQ(file.data(), "infantry     3   5   7  enabled\n");
+    ASSERT_EQ(file.data(), "infantry     0   5   7\n");
+}
+
+TEST(file_test, save_unit_no_capture_progress_and_no_enabled) {
+    file_fixture file;
+    const struct unit unit {
+        .health = 2, .model = MODEL_INFANTRY, .player = 0, .x = 5, .y = 7,
+        .enabled = true, .capture_progress = 0
+    };
+
+    save_unit(&unit, file.ref());
+
+    ASSERT_EQ(file.data(), "infantry     0   5   7   2\n");
 }
 
 TEST(file_test, save_unit_no_capture_progress) {
@@ -309,7 +348,7 @@ TEST(file_test, save_unit_no_capture_progress) {
 
     save_unit(&unit, file.ref());
 
-    ASSERT_EQ(file.data(), "infantry     3   5   7  enabled    2\n");
+    ASSERT_EQ(file.data(), "infantry     3   5   7   2  enabled\n");
 }
 
 TEST(file_test, save_unit_all_fields) {
@@ -321,7 +360,7 @@ TEST(file_test, save_unit_all_fields) {
 
     save_unit(&unit, file.ref());
 
-    ASSERT_EQ(file.data(), "infantry     3   5   7  enabled    2 11\n");
+    ASSERT_EQ(file.data(), "infantry     3   5   7   2  enabled 11\n");
 }
 
 TEST_F(units_fixture, save_units) {

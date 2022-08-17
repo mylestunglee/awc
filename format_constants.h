@@ -6,7 +6,7 @@
 #define UNIT_FORMAT "%02X"
 #define GRID_FORMAT "%3hhu"
 #define PLAYER_FORMAT "%hhu"
-#define HEALTH_FORMAT "%4hhu"
+#define HEALTH_FORMAT "%3hhu"
 #define ROW_FORMAT "%256s"
 #define MODEL_NAME_FORMAT "%-12s"
 #define MODEL_FORMAT "%hhu"

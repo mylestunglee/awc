@@ -141,23 +141,32 @@ bool load_unit(const char* const command, const char* const params,
     if (strcmp(command, model_names[model]))
         return false;
 
-    grid_t x, y;
     player_t player;
-    health_t health = HEALTH_MAX;
-    char enabled_buffer[9];
+    grid_t x, y;
+    char health_buffer[4] = "";
+    char enabled_buffer[9] = "";
     capture_progress_t capture_progress = 0;
 
     if (sscanf(params,
-               PLAYER_FORMAT GRID_FORMAT GRID_FORMAT ENABLED_FORMAT
-                   HEALTH_FORMAT CAPTURE_COMPLETION_FORMAT,
-               &player, &x, &y, enabled_buffer, &health, &capture_progress) < 4)
+               PLAYER_FORMAT GRID_FORMAT GRID_FORMAT
+               "%4s" ENABLED_FORMAT CAPTURE_COMPLETION_FORMAT,
+               &player, &x, &y, health_buffer, enabled_buffer,
+               &capture_progress) < 3)
         return false;
 
+    // Replace with PLAYERS_CAPACITY
     if (player >= NULL_PLAYER)
         return false;
 
+    health_t health = HEALTH_MAX;
+    if (health_buffer[0] != '\0' &&
+        sscanf(health_buffer, HEALTH_FORMAT, &health) != 1)
+        return false;
+
     bool enabled;
-    if (!strcmp(enabled_buffer, "enabled"))
+    if (enabled_buffer[0] == '\0')
+        enabled = player == 0;
+    else if (!strcmp(enabled_buffer, "enabled"))
         enabled = true;
     else if (!strcmp(enabled_buffer, "disabled"))
         enabled = false;
@@ -258,28 +267,35 @@ void save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file) {
 
 void save_unit(const struct unit* const unit, FILE* const file) {
     if (unit->capture_progress == 0) {
-        if (unit->health == HEALTH_MAX)
+        if (unit->player == 0) {
+            if (unit->health == HEALTH_MAX)
+                fprintf(file,
+                        MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
+                                          " " GRID_FORMAT "\n",
+                        model_names[unit->model], unit->player, unit->x,
+                        unit->y);
+            else
+                fprintf(file,
+                        MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
+                                          " " GRID_FORMAT " " HEALTH_FORMAT
+                                          "\n",
+                        model_names[unit->model], unit->player, unit->x,
+                        unit->y, unit->health);
+        } else
             fprintf(file,
                     MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
-                                      " " GRID_FORMAT " " ENABLED_FORMAT "\n",
+                                      " " GRID_FORMAT " " HEALTH_FORMAT
+                                      " " ENABLED_FORMAT "\n",
                     model_names[unit->model], unit->player, unit->x, unit->y,
-                    unit->enabled ? "enabled" : "disabled");
-
-        else
-            fprintf(file,
-                    MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
-                                      " " GRID_FORMAT " " ENABLED_FORMAT
-                                      " " HEALTH_FORMAT "\n",
-                    model_names[unit->model], unit->player, unit->x, unit->y,
-                    unit->enabled ? "enabled" : "disabled", unit->health);
+                    unit->health, unit->enabled ? "enabled" : "disabled");
     } else
         fprintf(file,
                 MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
-                                  " " GRID_FORMAT " " ENABLED_FORMAT
-                                  " " HEALTH_FORMAT
+                                  " " GRID_FORMAT " " HEALTH_FORMAT
+                                  " " ENABLED_FORMAT
                                   " " CAPTURE_COMPLETION_FORMAT "\n",
                 model_names[unit->model], unit->player, unit->x, unit->y,
-                unit->enabled ? "enabled" : "disabled", unit->health,
+                unit->health, unit->enabled ? "enabled" : "disabled",
                 unit->capture_progress);
 }
 
