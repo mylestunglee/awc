@@ -226,7 +226,7 @@ TEST_F(game_fixture, load_command_returns_false_when_invalid_command) {
 
 TEST_F(game_fixture, file_load_returns_false_when_valid_contents) {
     using namespace std;
-    auto filename = "test_state.txt";
+    const auto filename = "file1.txt";
     {
         ofstream file(filename);
         file << "map \"";
@@ -240,7 +240,7 @@ TEST_F(game_fixture, file_load_returns_false_when_valid_contents) {
 
 TEST_F(game_fixture, file_load_returns_true_when_invalid_contents) {
     using namespace std;
-    auto filename = "test_state.txt";
+    const auto filename = "file2.txt";
     {
         ofstream file(filename);
         file << "command \"";

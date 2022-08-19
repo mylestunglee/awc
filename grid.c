@@ -47,7 +47,8 @@ void grid_correct_territory(player_t territory[GRID_SIZE][GRID_SIZE],
     do {
         grid_t x = 0;
         do {
-            if (territory[y][x] > PLAYERS_CAPACITY)
+            if (territory[y][x] > PLAYERS_CAPACITY ||
+                map[y][x] < TERRIAN_CAPACITY)
                 territory[y][x] = NULL_PLAYER;
             if (map[y][x] > TILE_CAPACITY)
                 map[y][x] = TILE_VOID;

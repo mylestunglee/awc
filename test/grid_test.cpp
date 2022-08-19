@@ -94,6 +94,14 @@ TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_hqs) {
     ASSERT_EQ(territory[2][3], NULL_PLAYER);
 }
 
+TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_capturables) {
+    territory[2][3] = 0;
+
+    grid_correct_territory(territory, map);
+
+    ASSERT_EQ(territory[2][3], NULL_PLAYER);
+}
+
 TEST_F(grid_fixture, grid_compute_incomes_computes_incomes) {
     ASSERT_NE(NULL_PLAYER, 2);
     gold_t incomes[PLAYERS_CAPACITY] = {0};

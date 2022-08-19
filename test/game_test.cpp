@@ -38,17 +38,42 @@ TEST_F(game_fixture, skip_empty_turns_adds_golds) {
     ASSERT_EQ(game->golds[game->turn], GOLD_SCALE);
 }
 
+TEST_F(game_fixture, game_load_resets_state) {
+    game->map[3][2] = TILE_PLAINS;
+
+    game_load(game, "");
+
+    ASSERT_EQ(game->map[3][2], TILE_VOID);
+}
+
 TEST_F(game_fixture, game_load_sets_map) {
     using namespace std;
-    auto filename = "test_state.txt";
+    const auto filename = "game1.txt";
     {
         ofstream file(filename);
-        file << "map \"";
+        file << "map \"\nterritory 0 0 0";
     }
 
     ASSERT_FALSE(game_load(game, filename));
 
     ASSERT_EQ(game->map[0][0], TILE_PLAINS);
+    ASSERT_EQ(game->territory[0][0], NULL_PLAYER);
+
+    remove(filename);
+}
+
+TEST_F(game_fixture, game_load_computes_income) {
+    using namespace std;
+    const auto filename = "game2.txt";
+    {
+        ofstream file(filename);
+        file << "map C\nterritory 0 0 0";
+    }
+
+    ASSERT_FALSE(game_load(game, filename));
+
+    ASSERT_EQ(game->incomes[0], GOLD_SCALE);
+    ASSERT_EQ(game->golds[0], GOLD_SCALE);
 
     remove(filename);
 }
