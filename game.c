@@ -14,11 +14,33 @@ void game_initialise(struct game* const game) {
     units_initialise(&game->units);
 }
 
+bool are_turns_empty(const struct game* const game) {
+    if (game->units.size > 0)
+        return false;
+
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
+        if (game->golds[player] > 0)
+            return false;
+
+    return true;
+}
+
+void skip_turns(struct game* const game) {
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
+        game->golds[player] += game->incomes[player];
+}
+
+void skip_empty_turns(struct game* const game) {
+    if (are_turns_empty(game))
+        skip_turns(game);
+}
+
 bool game_load(struct game* const game, const char* const filename) {
     game_initialise(game);
     const bool error = file_load(game, filename);
     grid_correct_territory(game->territory, game->map);
     grid_compute_incomes(game->territory, game->incomes);
+    skip_empty_turns(game);
     return error;
 }
 

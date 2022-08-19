@@ -6,6 +6,38 @@
 #include "test_constants.hpp"
 #include <fstream>
 
+TEST_F(game_fixture, are_turns_empty_returns_false_when_unit_exists) {
+    insert_unit();
+
+    ASSERT_FALSE(are_turns_empty(game));
+}
+
+TEST_F(game_fixture, are_turns_empty_returns_false_when_gold_exists) {
+    game->golds[game->turn] = GOLD_SCALE;
+
+    ASSERT_FALSE(are_turns_empty(game));
+}
+
+TEST_F(game_fixture, are_turns_empty_returns_true_when_turns_are_empty) {
+    ASSERT_TRUE(are_turns_empty(game));
+}
+
+TEST_F(game_fixture, skip_turns_adds_golds) {
+    game->incomes[game->turn] = GOLD_SCALE;
+
+    skip_turns(game);
+
+    ASSERT_EQ(game->golds[game->turn], GOLD_SCALE);
+}
+
+TEST_F(game_fixture, skip_empty_turns_adds_golds) {
+    game->incomes[game->turn] = GOLD_SCALE;
+
+    skip_empty_turns(game);
+
+    ASSERT_EQ(game->golds[game->turn], GOLD_SCALE);
+}
+
 TEST_F(game_fixture, game_load_sets_map) {
     using namespace std;
     auto filename = "test_state.txt";
@@ -16,9 +48,9 @@ TEST_F(game_fixture, game_load_sets_map) {
 
     ASSERT_FALSE(game_load(game, filename));
 
-    remove(filename);
     ASSERT_EQ(game->map[0][0], TILE_PLAINS);
-    // TODO: test other game_load functionality
+
+    remove(filename);
 }
 
 TEST_F(game_fixture, find_next_unit_returns_first_enabled_unit_while_hovering) {

@@ -27,6 +27,11 @@ struct game {
 };
 
 void game_initialise(struct game* const);
+#ifdef EXPOSE_GAME_INTERNALS
+bool are_turns_empty(const struct game* const);
+void skip_turns(struct game* const);
+void skip_empty_turns(struct game* const);
+#endif
 bool game_load(struct game* const, const char* const);
 void game_deselect(struct game* const);
 #ifdef EXPOSE_GAME_INTERNALS
