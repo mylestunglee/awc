@@ -53,7 +53,7 @@ bool load_territory(const char* const command, const char* const params,
                &y) != 3)
         return false;
 
-    if (player >= NULL_PLAYER)
+    if (player >= PLAYERS_CAPACITY)
         return false;
 
     territory[y][x] = player;
@@ -71,7 +71,7 @@ bool load_bot(const char* const command, const char* const params,
     if (sscanf(params, PLAYER_FORMAT, &player) != 1)
         return false;
 
-    if (player >= NULL_PLAYER)
+    if (player >= PLAYERS_CAPACITY)
         return false;
 
     bitarray_set(bots, player);
@@ -90,7 +90,7 @@ bool load_gold(const char* const command, const char* const params,
     if (sscanf(params, PLAYER_FORMAT GOLD_FORMAT, &player, &gold) != 2)
         return false;
 
-    if (player >= NULL_PLAYER)
+    if (player >= PLAYERS_CAPACITY)
         return false;
 
     golds[player] = gold;
@@ -116,7 +116,7 @@ bool load_team(const char* const command, char* params,
         if (sscanf(token, PLAYER_FORMAT, &player) != 1)
             return false;
 
-        if (player >= NULL_PLAYER)
+        if (player >= PLAYERS_CAPACITY)
             return false;
 
         team[size] = player;
@@ -155,7 +155,7 @@ bool load_unit(const char* const command, const char* const params,
         return false;
 
     // Replace with PLAYERS_CAPACITY
-    if (player >= NULL_PLAYER)
+    if (player >= PLAYERS_CAPACITY)
         return false;
 
     health_t health = HEALTH_MAX;

@@ -189,7 +189,6 @@ bool game_is_friendly(const struct game* const game, const player_t player) {
 }
 
 void game_remove_player(struct game* const game, const player_t player) {
-    assert(player != NULL_PLAYER);
     units_delete_player(&game->units, player);
     grid_clear_player_territory(game->map, game->territory, player);
     game->incomes[player] = 0;

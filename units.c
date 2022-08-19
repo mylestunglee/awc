@@ -65,7 +65,7 @@ unit_t insert_with_players(struct units* const units,
 
 bool units_insert(struct units* const units, const struct unit* const unit) {
     assert(units->grid[unit->y][unit->x] == NULL_UNIT);
-    assert(unit->player != NULL_PLAYER);
+    assert(unit->player < PLAYERS_CAPACITY);
 
     const unit_t index = insert_with_players(units, unit);
 
@@ -148,6 +148,8 @@ void units_move_selection(struct units* const units, const grid_t x,
 // Sets enabled property for each unit of a player
 void units_set_enabled(struct units* const units, const player_t player,
                        const bool enabled) {
+    assert(player < PLAYERS_CAPACITY);
+
     unit_t curr = units->firsts[player];
 
     while (curr != NULL_UNIT) {
@@ -158,6 +160,8 @@ void units_set_enabled(struct units* const units, const player_t player,
 
 // Clears all units of a player
 void units_delete_player(struct units* const units, const player_t player) {
+    assert(player < PLAYERS_CAPACITY);
+
     while (units->firsts[player] != NULL_UNIT)
         units_delete(units, units->firsts[player]);
 }

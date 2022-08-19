@@ -221,7 +221,7 @@ TEST(graphics_test, decode_texture_returns_true_on_transparent_texture) {
     ASSERT_TRUE(decode_texture('\x00', false, 0, &symbol, &style));
 }
 
-TEST(graphics_test, decode_texture_fetches_NULL_PLAYER_symbol) {
+TEST(graphics_test, decode_texture_fetches_null_player_symbol) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
 
