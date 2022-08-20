@@ -72,22 +72,22 @@ territory   0   3  21
 territory   0   5  21
 territory   0   2  22
 territory   1  37  22
-infantry       0  14   2 255 enabled
-infantry       0   6   5 255 enabled
-battleship     0  24   9 255 enabled
-fighter        0  21  11 255 enabled
-battleship     0  24  12 255 enabled
-battleship     0  22  13 255 enabled
-bomber         0  23  15 255 enabled
-crusier        0  18  16 255 enabled
-bomber         0  24  17 255 enabled
-fighter        0  18  18 255 enabled
-artillery      0   5  20 255 enabled
-battletank     0   2  21 255 enabled
-battletank     0   4  21 255 enabled
-artillery      0   1  22 255 enabled
-infantry       0  24  23 255 enabled
-battletank     0  18  25 255 enabled
-infantry       0  19  26 255 enabled
-infantry       0  25  27 255 enabled
-battletank     0  18  28 255 enabled
+infantry       0  14   2
+infantry       0   6   5
+battleship     0  24   9
+fighter        0  21  11
+battleship     0  24  12
+battleship     0  22  13
+bomber         0  23  15
+crusier        0  18  16
+bomber         0  24  17
+fighter        0  18  18
+artillery      0   5  20
+battletank     0   2  21
+battletank     0   4  21
+artillery      0   1  22
+infantry       0  24  23
+battletank     0  18  25
+infantry       0  19  26
+infantry       0  25  27
+battletank     0  18  28
