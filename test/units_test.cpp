@@ -33,7 +33,7 @@ TEST_F(units_fixture, units_initialise_clears_grid) {
 
 TEST_F(units_fixture, insert_with_frees_sets_next_start) {
     units->start = 2;
-    struct unit unit;
+    struct unit unit{};
     insert_with_frees(units, &unit);
     ASSERT_EQ(units->start, 3);
     ASSERT_EQ(units->frees[2], NULL_UNIT);
@@ -50,7 +50,7 @@ TEST_F(units_fixture, insert_with_frees_inserts_unit) {
 }
 
 TEST_F(units_fixture, insert_with_frees_fails_when_full) {
-    struct unit unit;
+    struct unit unit{};
     units->size = UNITS_CAPACITY;
     auto index = insert_with_frees(units, &unit);
     ASSERT_EQ(index, NULL_UNIT);
@@ -108,7 +108,7 @@ TEST_F(units_fixture, units_insert_sets_grid) {
 }
 
 TEST_F(units_fixture, units_insert_propogates_failure) {
-    struct unit unit;
+    struct unit unit{};
     units->size = UNITS_CAPACITY;
     auto error = units_insert(units, &unit);
     ASSERT_TRUE(error);

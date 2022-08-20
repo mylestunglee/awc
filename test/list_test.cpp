@@ -22,7 +22,7 @@ TEST_F(list_fixture, list_initialise_list_is_empty) {
 
 TEST_F(list_fixture, list_insert_increments_end) {
     list->end = 2;
-    struct list_node node;
+    struct list_node node{};
     list_insert(list, &node);
     ASSERT_EQ(list->end, 3);
 }
@@ -39,7 +39,7 @@ TEST_F(list_fixture, list_insert_inserts_node) {
 TEST_F(list_fixture, list_insert_does_not_insert_when_full) {
     list->start = 3;
     list->end = 2;
-    struct list_node node;
+    struct list_node node{};
     list_insert(list, &node);
     ASSERT_EQ(list->start, 3);
     ASSERT_EQ(list->end, 2);
