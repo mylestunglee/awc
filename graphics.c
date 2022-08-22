@@ -252,8 +252,7 @@ bool render_selection(const struct game* const game, const grid_t x,
     const bool selected = calc_selection_symbol(tile_x, tile_y, symbol);
 
     if (selected)
-        *style =
-            calc_selection_style(game, x, y, attackable, buildable);
+        *style = calc_selection_style(game, x, y, attackable, buildable);
 
     return selected;
 }
@@ -401,11 +400,10 @@ bool render_pixel(const struct game* const game, const grid_t x, const grid_t y,
                                   style) ||
            render_capture_progress_bar(&game->units, x, y, tile_x, tile_y,
                                        symbol, style) ||
-           render_selection(game, x, y, tile_x, tile_y, attackable,
-                            buildable, symbol, style) ||
+           render_selection(game, x, y, tile_x, tile_y, attackable, buildable,
+                            symbol, style) ||
            render_unit(&game->units, x, y, tile_x, tile_y, symbol, style) ||
-           render_tile(game, x, y, tile_x, tile_y, attackable, symbol,
-                       style);
+           render_tile(game, x, y, tile_x, tile_y, attackable, symbol, style);
 }
 
 void apply_style(const uint8_t style, const uint8_t prev_style) {
@@ -443,9 +441,8 @@ uint8_t apply_pixel(const struct game* const game, const grid_t x,
                     const uint8_t prev_style) {
     wchar_t symbol;
     uint8_t style;
-    const bool rendered =
-        render_pixel(game, x, y, tile_x, tile_y, attackable, buildable,
-                     &symbol, &style);
+    const bool rendered = render_pixel(game, x, y, tile_x, tile_y, attackable,
+                                       buildable, &symbol, &style);
     assert(rendered);
     apply_style(style, prev_style);
     wprintf(L"%lc", symbol);
@@ -529,9 +526,8 @@ void graphics_render(const struct game* const game) {
             uint8_t prev_style = '\x00';
             for (grid_t x = screen_left; x != screen_right; ++x) {
                 for (uint8_t tile_x = 0; tile_x < tile_width; ++tile_x)
-                    prev_style =
-                        apply_pixel(game, x, y, tile_x, tile_y, attackable,
-                                    buildable, prev_style);
+                    prev_style = apply_pixel(game, x, y, tile_x, tile_y,
+                                             attackable, buildable, prev_style);
             }
             reset_style();
             wprintf(L"\n");

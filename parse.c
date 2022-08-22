@@ -130,7 +130,7 @@ bool parse_build(struct game* const game, const char input) {
     const model_t value = input - '1';
     const model_t model = value + buildable_models[capturable];
 
-    return !action_build(game, model);
+    return action_build(game, model);
 }
 
 bool parse_deselect(struct game* const game) {
@@ -139,10 +139,9 @@ bool parse_deselect(struct game* const game) {
 }
 
 bool parse_space(struct game* const game, const char input) {
-    return input == KEY_ACTION &&
-           (!action_attack(game) || action_select(game) ||
-            action_highlight(game) || action_move(game) ||
-            parse_deselect(game));
+    return input == KEY_ACTION && (action_attack(game) && action_select(game) &&
+                                   action_highlight(game) &&
+                                   action_move(game) && parse_deselect(game));
 }
 
 // Returns true if needs to quit
@@ -153,8 +152,7 @@ bool parse_command(struct game* const game, const char input) {
     (void)(parse_next_turn(game, input) || parse_panning(game, input) ||
            parse_select_next_unit(game, input) ||
            parse_self_destruct(game, input) || parse_surrender(game, input) ||
-           parse_build(game, input) ||
-           parse_space(game, input));
+           parse_build(game, input) || parse_space(game, input));
 
     return false;
 }

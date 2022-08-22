@@ -141,12 +141,12 @@ bool action_move(struct game* const game) {
 
 bool action_self_destruct(struct game* const game) {
     if (!units_has_selection(&game->units))
-        return false;
+        return true;
 
     units_delete_selected(&game->units);
     assert(game->dirty_labels);
     game_deselect(game);
-    return true;
+    return false;
 }
 
 bool at_least_two_alive_players(const struct game* const game) {
@@ -159,11 +159,11 @@ bool at_least_two_alive_players(const struct game* const game) {
 
 bool action_surrender(struct game* const game) {
     if (!at_least_two_alive_players(game))
-        return false;
+        return true;
 
     game_remove_player(game, game->turn);
     turn_next(game);
-    return true;
+    return false;
 }
 
 bool action_select(struct game* const game) {
@@ -175,10 +175,10 @@ bool action_select(struct game* const game) {
         grid_clear_labels(game);
         grid_explore(game, false);
         units_select_at(&game->units, game->x, game->y);
-        return true;
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 bool action_highlight(struct game* const game) {
@@ -188,5 +188,5 @@ bool action_highlight(struct game* const game) {
     if (highlightable)
         grid_explore(game, true);
 
-    return highlightable;
+    return !highlightable;
 }
