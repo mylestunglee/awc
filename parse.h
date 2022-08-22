@@ -3,17 +3,17 @@
 
 #include "game.h"
 
-bool parse_quit(const char);
-bool parse_file(struct game* const, const char);
-bool parse_next_turn(struct game* const, const char);
-bool parse_panning(struct game* const, const char);
-bool parse_select_next_unit(struct game* const, const char);
-bool parse_self_destruct(struct game* const, const char);
-bool parse_surrender(struct game* const, const char);
-bool parse_build(struct game* const, const char);
-bool parse_attack(struct game* const, const bool);
-bool parse_deselect(struct game* const);
-bool parse_space(struct game* const, const char);
+#define KEY_QUIT 'q'
+#define KEY_NEXT_TURN 'n'
+#define KEY_PAN_UP 'w'
+#define KEY_PAN_LFFT 'a'
+#define KEY_PAN_DOWN 's'
+#define KEY_PAN_RIGHT 'd'
+#define KEY_HOVER_NEXT_UNIT 'm'
+#define KEY_SELF_DESTRUCT 'k'
+#define KEY_SURRENDER 'K'
+#define KEY_ACTION ' '
+
 bool parse_command(struct game* const, const char);
 
 #endif
