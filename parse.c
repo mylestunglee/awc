@@ -76,19 +76,19 @@ bool parse_command(struct game* const game, const char input) {
         return game_load(game, "state5.txt");
     }
     case '6': {
-        return file_save(game, "state1.txt");
+        return game_save(game, "state1.txt");
     }
     case '7': {
-        return file_save(game, "state2.txt");
+        return game_save(game, "state2.txt");
     }
     case '8': {
-        return file_save(game, "state3.txt");
+        return game_save(game, "state3.txt");
     }
     case '9': {
-        return file_save(game, "state4.txt");
+        return game_save(game, "state4.txt");
     }
     case '0': {
-        return file_save(game, "state5.txt");
+        return game_save(game, "state5.txt");
     }
     }
 

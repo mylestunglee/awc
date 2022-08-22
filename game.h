@@ -33,6 +33,7 @@ void skip_turns(struct game* const);
 void skip_empty_turns(struct game* const);
 #endif
 bool game_load(struct game* const, const char* const);
+bool game_save(struct game* const, const char* const);
 void game_deselect(struct game* const);
 #ifdef EXPOSE_GAME_INTERNALS
 health_t calc_damage(const struct game* const, const struct unit* const,

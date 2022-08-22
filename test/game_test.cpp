@@ -78,6 +78,10 @@ TEST_F(game_fixture, game_load_computes_income) {
     remove(filename);
 }
 
+TEST_F(game_fixture, game_save_returns_true_when_invalid_filename) {
+    ASSERT_TRUE(game_save(nullptr, ""));
+}
+
 TEST_F(game_fixture, calc_damage_between_two_infantry) {
     insert_unit({.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 0});
     insert_unit({.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 1});

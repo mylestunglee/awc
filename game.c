@@ -44,6 +44,10 @@ bool game_load(struct game* const game, const char* const filename) {
     return error;
 }
 
+bool game_save(struct game* const game, const char* const filename) {
+    return file_save(game, filename);
+}
+
 void game_deselect(struct game* const game) {
     units_clear_selection(&game->units);
     grid_clear_labels(game);
