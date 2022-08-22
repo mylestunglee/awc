@@ -62,4 +62,4 @@ TEST_F(game_fixture, print_text_when_build_enabled) {
 
 TEST_F(game_fixture, print_text_default) { print_text(game, false, false); }
 
-TEST_F(game_fixture, graphics_render) { graphics_render(game, false, false); }
+TEST_F(game_fixture, graphics_render) { graphics_render(game); }

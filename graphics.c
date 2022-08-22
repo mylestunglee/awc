@@ -200,21 +200,20 @@ uint8_t calc_tile_style(const struct game* const game, const grid_t x,
                                    : player_styles[game->territory[y][x]];
 }
 
-uint8_t calc_action_style(const bool attack_enabled, const bool build_enabled) {
-    assert(!(attack_enabled && build_enabled));
-    if (attack_enabled)
+uint8_t calc_action_style(const bool attackable, const bool buildable) {
+    if (attackable)
         return attackable_style;
-    else if (build_enabled)
+    else if (buildable)
         return buildable_style;
     else
         return accessible_style;
 }
 
 uint8_t calc_selection_style(const struct game* const game, const grid_t x,
-                             const grid_t y, const bool attack_enabled,
-                             const bool build_enabled) {
+                             const grid_t y, const bool attackable,
+                             const bool buildable) {
     return (calc_tile_style(game, x, y) & '\x0f') |
-           calc_action_style(attack_enabled, build_enabled);
+           calc_action_style(attackable, buildable);
 }
 
 bool calc_selection_symbol(const grid_t tile_x, const grid_t tile_y,
@@ -245,7 +244,7 @@ bool calc_selection_symbol(const grid_t tile_x, const grid_t tile_y,
 
 bool render_selection(const struct game* const game, const grid_t x,
                       const grid_t y, const grid_t tile_x, const grid_t tile_y,
-                      const bool attack_enabled, const bool build_enabled,
+                      const bool attackable, const bool buildable,
                       wchar_t* const symbol, uint8_t* const style) {
     if (game->x != x || game->y != y)
         return false;
@@ -254,7 +253,7 @@ bool render_selection(const struct game* const game, const grid_t x,
 
     if (selected)
         *style =
-            calc_selection_style(game, x, y, attack_enabled, build_enabled);
+            calc_selection_style(game, x, y, attackable, buildable);
 
     return selected;
 }
@@ -366,7 +365,7 @@ void render_attack_arrows(const struct game* const game, const grid_t tile_x,
 
 bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
                  const grid_t tile_x, const grid_t tile_y,
-                 const bool attack_enabled, wchar_t* const symbol,
+                 const bool attackable, wchar_t* const symbol,
                  uint8_t* const style) {
 
     const tile_t tile = game->map[y][x];
@@ -386,7 +385,7 @@ bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
     }
 
     // Show arrows highlighting position to attack unit
-    if (attack_enabled && x == game->prev_x && y == game->prev_y)
+    if (attackable && x == game->prev_x && y == game->prev_y)
         render_attack_arrows(game, tile_x, symbol, style);
     else if (highlightable)
         render_highlight(game->labels[y][x], symbol, style);
@@ -396,16 +395,16 @@ bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
 
 bool render_pixel(const struct game* const game, const grid_t x, const grid_t y,
                   const grid_t tile_x, const grid_t tile_y,
-                  const bool attack_enabled, const bool build_enabled,
+                  const bool attackable, const bool buildable,
                   wchar_t* const symbol, uint8_t* const style) {
     return render_unit_health_bar(&game->units, x, y, tile_x, tile_y, symbol,
                                   style) ||
            render_capture_progress_bar(&game->units, x, y, tile_x, tile_y,
                                        symbol, style) ||
-           render_selection(game, x, y, tile_x, tile_y, attack_enabled,
-                            build_enabled, symbol, style) ||
+           render_selection(game, x, y, tile_x, tile_y, attackable,
+                            buildable, symbol, style) ||
            render_unit(&game->units, x, y, tile_x, tile_y, symbol, style) ||
-           render_tile(game, x, y, tile_x, tile_y, attack_enabled, symbol,
+           render_tile(game, x, y, tile_x, tile_y, attackable, symbol,
                        style);
 }
 
@@ -440,12 +439,12 @@ void apply_style(const uint8_t style, const uint8_t prev_style) {
 // Returns previous style
 uint8_t apply_pixel(const struct game* const game, const grid_t x,
                     const grid_t y, const grid_t tile_x, const grid_t tile_y,
-                    const bool attack_enabled, const bool build_enabled,
+                    const bool attackable, const bool buildable,
                     const uint8_t prev_style) {
     wchar_t symbol;
     uint8_t style;
     const bool rendered =
-        render_pixel(game, x, y, tile_x, tile_y, attack_enabled, build_enabled,
+        render_pixel(game, x, y, tile_x, tile_y, attackable, buildable,
                      &symbol, &style);
     assert(rendered);
     apply_style(style, prev_style);
@@ -498,18 +497,21 @@ void print_build_text(const struct game* const game) {
     wprintf(L"\n");
 }
 
-void print_text(const struct game* const game, const bool attack_enabled,
-                const bool build_enabled) {
-    if (attack_enabled)
+void print_text(const struct game* const game, const bool attackable,
+                const bool buildable) {
+    if (attackable)
         print_attack_text(game);
-    else if (build_enabled)
+    else if (buildable)
         print_build_text(game);
     else
         print_normal_text(game);
 }
 
-void graphics_render(const struct game* const game, const bool attack_enabled,
-                     const bool build_enabled) {
+void graphics_render(const struct game* const game) {
+    const bool attackable = game_is_attackable(game);
+    const bool buildable = game_is_buildable(game);
+    assert(!(attackable && buildable));
+
     reset_cursor();
 
     int console_width, console_height;
@@ -528,13 +530,13 @@ void graphics_render(const struct game* const game, const bool attack_enabled,
             for (grid_t x = screen_left; x != screen_right; ++x) {
                 for (uint8_t tile_x = 0; tile_x < tile_width; ++tile_x)
                     prev_style =
-                        apply_pixel(game, x, y, tile_x, tile_y, attack_enabled,
-                                    build_enabled, prev_style);
+                        apply_pixel(game, x, y, tile_x, tile_y, attackable,
+                                    buildable, prev_style);
             }
             reset_style();
             wprintf(L"\n");
         }
     }
 
-    print_text(game, attack_enabled, build_enabled);
+    print_text(game, attackable, buildable);
 }

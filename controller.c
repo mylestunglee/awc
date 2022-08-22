@@ -7,15 +7,11 @@ void controller_run(struct game* const game) {
     graphics_init();
 
     do {
-        const bool attackable = game_is_attackable(game);
-        const bool buildable = game_is_buildable(game);
-        assert(!(attackable && buildable));
-
-        graphics_render(game, attackable, buildable);
+        graphics_render(game);
 
         const char input = getch();
 
-        if (parse_command(game, input, attackable, buildable))
+        if (parse_command(game, input))
             break;
 
     } while (true);

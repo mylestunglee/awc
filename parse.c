@@ -160,8 +160,9 @@ bool parse_space(struct game* const game, const char input,
 }
 
 // Returns true if needs to quit
-bool parse_command(struct game* const game, const char input,
-                   const bool attackable, const bool buildable) {
+bool parse_command(struct game* const game, const char input) {
+    const bool attackable = game_is_attackable(game);
+    const bool buildable = game_is_buildable(game);
 
     if (parse_quit(input) || parse_file(game, input))
         return true;

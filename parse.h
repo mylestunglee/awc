@@ -14,7 +14,6 @@ bool parse_build(struct game* const, const char, const bool);
 bool parse_attack(struct game* const, const bool);
 bool parse_deselect(struct game* const);
 bool parse_space(struct game* const, const char, const bool);
-bool parse_command(struct game* const, const char, const bool attack_enabled,
-                   const bool build_enabled);
+bool parse_command(struct game* const, const char);
 
 #endif

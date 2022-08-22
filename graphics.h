@@ -50,5 +50,5 @@ void print_attack_text(const struct game* const);
 void print_build_text(const struct game* const);
 void print_text(const struct game* const, const bool, const bool);
 #endif
-void graphics_render(const struct game* const, const bool, const bool);
+void graphics_render(const struct game* const);
 #endif
