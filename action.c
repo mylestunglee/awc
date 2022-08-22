@@ -4,6 +4,7 @@
 #include "turn.h"
 #include "unit_constants.h"
 #include <assert.h>
+#include <stddef.h>
 
 health_t move_selected_unit(struct game* const game, const grid_t x,
                             const grid_t y) {
@@ -189,4 +190,45 @@ bool action_highlight(struct game* const game) {
         grid_explore(game, true);
 
     return !highlightable;
+}
+
+const struct unit* find_next_unit(const struct game* const game) {
+    const struct unit* const curr =
+        units_const_get_at(&game->units, game->x, game->y);
+    if (curr && curr->player == game->turn) {
+        const struct unit* next = curr;
+
+        do {
+            next = units_const_get_next_cyclic(&game->units, next);
+
+            if (!next || next == curr)
+                return NULL;
+        } while (!next->enabled);
+
+        return next;
+    } else {
+        const struct unit* next =
+            units_const_get_first(&game->units, game->turn);
+
+        while (next && !next->enabled)
+            next = units_const_get_next(&game->units, next);
+
+        return next;
+    }
+}
+
+// Hovers the next enabled unit, returns unit was selected
+bool action_hover_next_unit(struct game* const game) {
+    const struct unit* const unit = find_next_unit(game);
+    if (!unit)
+        return false;
+
+    assert(unit->enabled);
+
+    game->x = unit->x;
+    game->y = unit->y;
+
+    game_deselect(game);
+
+    return true;
 }

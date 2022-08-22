@@ -14,6 +14,7 @@ bool parse_command(struct game* const game, const char input) {
     }
     case KEY_NEXT_TURN: {
         turn_next(game);
+        action_hover_next_unit(game);
         break;
     }
     case KEY_PAN_UP: {
@@ -41,7 +42,7 @@ bool parse_command(struct game* const game, const char input) {
         break;
     }
     case KEY_HOVER_NEXT_UNIT: {
-        game_hover_next_unit(game);
+        action_hover_next_unit(game);
         break;
     }
     case KEY_SELF_DESTRUCT: {

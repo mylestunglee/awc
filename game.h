@@ -35,10 +35,6 @@ void skip_empty_turns(struct game* const);
 bool game_load(struct game* const, const char* const);
 void game_deselect(struct game* const);
 #ifdef EXPOSE_GAME_INTERNALS
-const struct unit* find_next_unit(const struct game* const);
-#endif
-bool game_hover_next_unit(struct game* const);
-#ifdef EXPOSE_GAME_INTERNALS
 health_t calc_damage(const struct game* const, const struct unit* const,
                      const struct unit* const);
 void calc_damage_pair(const struct game* const, const struct unit* const,

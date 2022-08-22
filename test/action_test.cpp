@@ -303,3 +303,53 @@ TEST_F(game_fixture, action_highlight_returns_false_when_unit_selectable) {
 TEST_F(game_fixture, action_highlight_returns_true_when_unit_unselectable) {
     ASSERT_TRUE(action_highlight(game));
 }
+
+
+TEST_F(game_fixture, find_next_unit_returns_first_enabled_unit_while_hovering) {
+    insert_unit({.x = 2, .enabled = true});
+    insert_unit({.x = 3, .enabled = false});
+    insert_unit({.x = 5, .enabled = true});
+    game->x = 5;
+
+    auto unit = find_next_unit(game);
+
+    ASSERT_TRUE(unit);
+    ASSERT_EQ(unit->x, 2);
+}
+
+TEST_F(game_fixture, find_next_unit_returns_null_when_no_more_enabled_units) {
+    insert_unit({.x = 2, .enabled = false});
+    game->x = 2;
+
+    auto unit = find_next_unit(game);
+
+    ASSERT_FALSE(unit);
+}
+
+TEST_F(game_fixture,
+       find_next_unit_returns_first_enabled_unit_while_not_hovering) {
+    insert_unit({.x = 2, .enabled = false});
+    insert_unit({.x = 3, .enabled = true});
+    insert_unit({.x = 5, .enabled = false});
+
+    auto unit = find_next_unit(game);
+
+    ASSERT_TRUE(unit);
+    ASSERT_EQ(unit->x, 3);
+}
+
+TEST_F(game_fixture, find_next_unit_returns_null_when_no_units) {
+    ASSERT_FALSE(find_next_unit(game));
+}
+
+TEST_F(game_fixture, action_hover_next_unit_returns_true_when_hovering) {
+    insert_unit({.x = 2, .enabled = true});
+
+    ASSERT_TRUE(action_hover_next_unit(game));
+
+    ASSERT_EQ(game->x, 2);
+}
+
+TEST_F(game_fixture, action_hover_next_unit_returns_false_when_not_hovering) {
+    ASSERT_FALSE(action_hover_next_unit(game));
+}

@@ -22,5 +22,9 @@ bool at_least_two_alive_players(const struct game* const game);
 bool action_surrender(struct game* const game);
 bool action_select(struct game* const game);
 bool action_highlight(struct game* const game);
+#ifdef EXPOSE_ACTION_INTERNALS
+const struct unit* find_next_unit(const struct game* const);
+#endif
+bool action_hover_next_unit(struct game* const);
 
 #endif

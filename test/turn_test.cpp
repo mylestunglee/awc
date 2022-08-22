@@ -102,7 +102,6 @@ TEST_F(game_fixture, turn_next_sets_units_enabled) {
     ASSERT_FALSE(units_const_get_first(&game->units, 0)->enabled);
     ASSERT_TRUE(units_const_get_first(&game->units, 1)->enabled);
     ASSERT_EQ(game->turn, 1);
-    ASSERT_EQ(game->x, 3);
 }
 
 TEST_F(game_fixture, turn_next_plays_bot_turn) {
