@@ -6,7 +6,7 @@
 #ifdef EXPOSE_ACTION_INTERNALS
 health_t move_selected_unit(struct game* const, const grid_t, const grid_t);
 #endif
-void action_attack(struct game* const);
+bool action_attack(struct game* const);
 bool action_build(struct game* const, const model_t);
 #ifdef EXPOSE_ACTION_INTERNALS
 bool can_selected_unit_capture(const struct game* const);

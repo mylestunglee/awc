@@ -125,11 +125,7 @@ bool parse_surrender(struct game* const game, const char input) {
     return input == KEY_SURRENDER && (action_surrender(game) || true);
 }
 
-bool parse_build(struct game* const game, const char input,
-                 const bool buildable) {
-    if (!buildable)
-        return false;
-
+bool parse_build(struct game* const game, const char input) {
     const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
     const model_t value = input - '1';
     const model_t model = value + buildable_models[capturable];
@@ -137,41 +133,28 @@ bool parse_build(struct game* const game, const char input,
     return !action_build(game, model);
 }
 
-bool parse_attack(struct game* const game, const bool attackable) {
-    if (attackable) {
-        action_attack(game);
-        return true;
-    }
-
-    return false;
-}
-
 bool parse_deselect(struct game* const game) {
     game_deselect(game);
     return true;
 }
 
-bool parse_space(struct game* const game, const char input,
-                 const bool attackable) {
+bool parse_space(struct game* const game, const char input) {
     return input == KEY_ACTION &&
-           (parse_attack(game, attackable) || action_select(game) ||
+           (!action_attack(game) || action_select(game) ||
             action_highlight(game) || action_move(game) ||
             parse_deselect(game));
 }
 
 // Returns true if needs to quit
 bool parse_command(struct game* const game, const char input) {
-    const bool attackable = game_is_attackable(game);
-    const bool buildable = game_is_buildable(game);
-
     if (parse_quit(input) || parse_file(game, input))
         return true;
 
     (void)(parse_next_turn(game, input) || parse_panning(game, input) ||
            parse_select_next_unit(game, input) ||
            parse_self_destruct(game, input) || parse_surrender(game, input) ||
-           parse_build(game, input, buildable) ||
-           parse_space(game, input, attackable));
+           parse_build(game, input) ||
+           parse_space(game, input));
 
     return false;
 }

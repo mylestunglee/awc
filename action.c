@@ -24,7 +24,10 @@ health_t move_selected_unit(struct game* const game, const grid_t x,
     return result;
 }
 
-void action_attack(struct game* const game) {
+bool action_attack(struct game* const game) {
+    if (!game_is_attackable(game))
+        return true;
+
     struct unit* const attacker = units_get_selected(&game->units);
     struct unit* const attackee = units_get_at(&game->units, game->x, game->y);
     assert(attacker);
@@ -44,7 +47,7 @@ void action_attack(struct game* const game) {
         units_delete_at(&game->units, game->x, game->y);
         units_clear_selection(&game->units);
         assert(counter_damage == 0);
-        return;
+        return false;
     }
 
     attackee->health -= damage;
@@ -56,6 +59,8 @@ void action_attack(struct game* const game) {
         attacker->health -= counter_damage;
         units_clear_selection(&game->units);
     }
+
+    return false;
 }
 
 // Build unit at (game->x, game->y), returns true iff build is successful

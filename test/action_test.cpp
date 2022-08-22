@@ -43,6 +43,7 @@ TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
     game->y = 7;
     game->map[7][4] = TILE_PLAINS;
     game->map[7][5] = TILE_PLAINS;
+    game->labels[7][4] = ACCESSIBLE_BIT;
     game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
@@ -84,6 +85,7 @@ TEST_F(game_fixture, action_attack_where_counter_damage_kills) {
     game->y = 7;
     game->map[7][4] = TILE_PLAINS;
     game->map[7][5] = TILE_PLAINS;
+    game->labels[7][4] = ACCESSIBLE_BIT;
     game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
