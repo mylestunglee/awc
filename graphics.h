@@ -1,8 +1,11 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include "game.h"
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+struct game;
 
 void graphics_init(void);
 #ifdef EXPOSE_GRAPHICS_INTERNALS

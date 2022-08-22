@@ -1,7 +1,9 @@
 #ifndef PARSE_H
 #define PARSE_H
 
-#include "game.h"
+#include <stdbool.h>
+
+struct game;
 
 #define KEY_QUIT 'q'
 #define KEY_NEXT_TURN 'n'

@@ -1,7 +1,10 @@
 #ifndef TURN_H
 #define TURN_H
 
-#include "game.h"
+#include <stdbool.h>
+
+struct game;
+
 #define HEAL_RATE (health_t)51
 
 #ifdef EXPOSE_TURN_INTERNALS

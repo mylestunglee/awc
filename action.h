@@ -1,7 +1,9 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include "game.h"
+#include "units.h"
+
+struct game;
 
 #ifdef EXPOSE_ACTION_INTERNALS
 health_t move_selected_unit(struct game* const, const grid_t, const grid_t);
