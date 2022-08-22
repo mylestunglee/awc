@@ -160,8 +160,8 @@ void handle_capture(struct game* const game, const model_t model) {
     if (!found)
         return;
 
-    bool success = action_move(game);
-    assert(success);
+    const bool error = action_move(game);
+    assert(!error);
 }
 
 void handle_local(struct game* const game, const struct unit* const unit) {
@@ -338,8 +338,8 @@ void handle_nonlocal(struct game* const game, struct unit* const unit) {
 
     if (found) {
         move_towards_target(game, unit->model, target_x, target_y);
-        const bool success = action_move(game);
-        assert(success);
+        const bool error = action_move(game);
+        assert(!error);
     } else {
         assert(game->dirty_labels);
         grid_clear_labels(game);

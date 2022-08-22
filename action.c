@@ -66,10 +66,10 @@ bool action_attack(struct game* const game) {
 
 // Build unit at (game->x, game->y), returns true iff build is successful
 bool action_build(struct game* const game, const model_t model) {
-    const gold_t cost = models_cost[model];
+    if (!game_is_buildable(game))
+        return true;
 
-    assert(game->territory[game->y][game->x] == game->turn);
-    assert(game->map[game->y][game->x] >= TERRIAN_CAPACITY);
+    const gold_t cost = models_cost[model];
     const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
     if (model < buildable_models[capturable] ||
@@ -135,9 +135,9 @@ bool action_move(struct game* const game) {
             units_update_capture_progress(&game->units, capture_progress))
             action_capture(game);
         game_deselect(game);
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 bool action_self_destruct(struct game* const game) {
@@ -221,7 +221,7 @@ const struct unit* find_next_unit(const struct game* const game) {
 bool action_hover_next_unit(struct game* const game) {
     const struct unit* const unit = find_next_unit(game);
     if (!unit)
-        return false;
+        return true;
 
     assert(unit->enabled);
 
@@ -230,5 +230,5 @@ bool action_hover_next_unit(struct game* const game) {
 
     game_deselect(game);
 
-    return true;
+    return false;
 }

@@ -1,10 +1,10 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#include "definitions.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "definitions.h"
 
 struct game;
 

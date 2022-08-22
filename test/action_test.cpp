@@ -32,7 +32,12 @@ TEST_F(game_fixture, move_selected_unit_when_merge_with_enabled_unit) {
     ASSERT_EQ(game->units.size, 1);
 }
 
-TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
+TEST_F(game_fixture, action_attack_returns_true_when_unattackable) {
+    ASSERT_TRUE(action_attack(game));
+}
+
+TEST_F(game_fixture,
+       action_attack_returns_false_where_direct_unit_with_counter_damage) {
     const auto* const attacker = insert_selected_unit(
         {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
     const auto* const attackee =
@@ -47,7 +52,7 @@ TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
     game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
-    action_attack(game);
+    ASSERT_FALSE(action_attack(game));
 
     ASSERT_EQ(attacker->x, 4);
     ASSERT_EQ(attacker->y, 7);
@@ -57,7 +62,7 @@ TEST_F(game_fixture, action_attack_where_direct_unit_with_counter_damage) {
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 
-TEST_F(game_fixture, action_attack_where_ranged_unit_kills) {
+TEST_F(game_fixture, action_attack_returns_false_where_ranged_unit_kills) {
     insert_selected_unit({.health = HEALTH_MAX,
                           .model = MODEL_ARTILLERY,
                           .x = 2,
@@ -70,13 +75,13 @@ TEST_F(game_fixture, action_attack_where_ranged_unit_kills) {
     game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
-    action_attack(game);
+    ASSERT_FALSE(action_attack(game));
 
     ASSERT_FALSE(units_const_get_at(&game->units, 5, 7));
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 
-TEST_F(game_fixture, action_attack_where_counter_damage_kills) {
+TEST_F(game_fixture, action_attack_returns_false_where_counter_damage_kills) {
     insert_selected_unit({.health = 1, .x = 2, .y = 3, .enabled = true});
     insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
     game->prev_x = 4;
@@ -89,7 +94,7 @@ TEST_F(game_fixture, action_attack_where_counter_damage_kills) {
     game->labels[7][5] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
-    action_attack(game);
+    ASSERT_FALSE(action_attack(game));
 
     ASSERT_FALSE(units_const_get_at(&game->units, 4, 7));
     ASSERT_FALSE(units_has_selection(&game->units));
@@ -190,7 +195,7 @@ TEST_F(game_fixture, action_capture_when_capture_unoccupied_city) {
     ASSERT_EQ(game->incomes[game->turn], 6000);
 }
 
-TEST_F(game_fixture, action_move_returns_true_when_start_capturing) {
+TEST_F(game_fixture, action_move_returns_false_when_start_capturing) {
     const auto* const unit = insert_selected_unit(
         {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
     game->x = 5;
@@ -200,7 +205,7 @@ TEST_F(game_fixture, action_move_returns_true_when_start_capturing) {
     game->map[7][5] = TILE_CITY;
     game->territory[7][5] = NULL_PLAYER;
 
-    ASSERT_TRUE(action_move(game));
+    ASSERT_FALSE(action_move(game));
 
     ASSERT_EQ(unit->x, 5);
     ASSERT_EQ(unit->y, 7);
@@ -208,7 +213,7 @@ TEST_F(game_fixture, action_move_returns_true_when_start_capturing) {
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 
-TEST_F(game_fixture, action_move_returns_true_when_finish_capturing) {
+TEST_F(game_fixture, action_move_returns_false_when_finish_capturing) {
     insert_selected_unit({.health = HEALTH_MAX,
                           .x = 2,
                           .y = 3,
@@ -221,7 +226,7 @@ TEST_F(game_fixture, action_move_returns_true_when_finish_capturing) {
     game->map[3][2] = TILE_CITY;
     game->territory[3][2] = NULL_PLAYER;
 
-    ASSERT_TRUE(action_move(game));
+    ASSERT_FALSE(action_move(game));
 
     const struct unit* const unit = units_const_get_at(&game->units, 2, 3);
     ASSERT_TRUE(unit);
@@ -229,8 +234,8 @@ TEST_F(game_fixture, action_move_returns_true_when_finish_capturing) {
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 
-TEST_F(game_fixture, action_move_turns_false_when_cannot_move) {
-    ASSERT_FALSE(action_move(game));
+TEST_F(game_fixture, action_move_turns_true_when_cannot_move) {
+    ASSERT_TRUE(action_move(game));
 }
 
 TEST_F(game_fixture, action_self_destruct_returns_false_when_selected) {
@@ -304,7 +309,6 @@ TEST_F(game_fixture, action_highlight_returns_true_when_unit_unselectable) {
     ASSERT_TRUE(action_highlight(game));
 }
 
-
 TEST_F(game_fixture, find_next_unit_returns_first_enabled_unit_while_hovering) {
     insert_unit({.x = 2, .enabled = true});
     insert_unit({.x = 3, .enabled = false});
@@ -342,14 +346,14 @@ TEST_F(game_fixture, find_next_unit_returns_null_when_no_units) {
     ASSERT_FALSE(find_next_unit(game));
 }
 
-TEST_F(game_fixture, action_hover_next_unit_returns_true_when_hovering) {
+TEST_F(game_fixture, action_hover_next_unit_returns_false_when_hovering) {
     insert_unit({.x = 2, .enabled = true});
 
-    ASSERT_TRUE(action_hover_next_unit(game));
+    ASSERT_FALSE(action_hover_next_unit(game));
 
     ASSERT_EQ(game->x, 2);
 }
 
-TEST_F(game_fixture, action_hover_next_unit_returns_false_when_not_hovering) {
-    ASSERT_FALSE(action_hover_next_unit(game));
+TEST_F(game_fixture, action_hover_next_unit_returns_true_when_not_hovering) {
+    ASSERT_TRUE(action_hover_next_unit(game));
 }
