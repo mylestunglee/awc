@@ -9,7 +9,7 @@
 TEST(graphics_test, graphics_init_sets_empty_character_locale) {
     using namespace std::literals::string_literals;
 
-    graphics_init();
+    graphics_initialise();
 
     std::string locale = setlocale(LC_CTYPE, nullptr);
     ASSERT_NE(locale, "C"s);
