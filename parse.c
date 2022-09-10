@@ -1,6 +1,5 @@
 #include "parse.h"
 #include "action.h"
-#include "constants.h"
 #include "turn.h"
 #include "unit_constants.h"
 #include <ctype.h>
@@ -139,35 +138,35 @@ void parse_initialise(void) {
     }
     while (++input);
 
-    parsers[KEY_BULID_1] = &parse_build_1;
-    parsers[KEY_BULID_2] = &parse_build_2;
-    parsers[KEY_BULID_3] = &parse_build_3;
-    parsers[KEY_BULID_4] = &parse_build_4;
-    parsers[KEY_BULID_5] = &parse_build_5;
-    parsers[KEY_BULID_6] = &parse_build_6;
-    parsers[KEY_BULID_7] = &parse_build_7;
-    parsers[KEY_BULID_8] = &parse_build_8;
-    parsers[KEY_BULID_9] = &parse_build_9;
-    parsers[KEY_BULID_10] = &parse_build_10;
-    parsers[KEY_LOAD_1] = &parse_load_1;
-    parsers[KEY_LOAD_2] = &parse_load_2;
-    parsers[KEY_LOAD_3] = &parse_load_3;
-    parsers[KEY_LOAD_4] = &parse_load_4;
-    parsers[KEY_LOAD_5] = &parse_load_5;
-    parsers[KEY_SAVE_1] = &parse_save_1;
-    parsers[KEY_SAVE_2] = &parse_save_2;
-    parsers[KEY_SAVE_3] = &parse_save_3;
-    parsers[KEY_SAVE_4] = &parse_save_4;
-    parsers[KEY_SAVE_5] = &parse_save_5;
-    parsers[KEY_NEXT_TURN] = &parse_next_turn;
-    parsers[KEY_PAN_UP] = &parse_pan_up;
-    parsers[KEY_PAN_LFFT] = &parse_pan_left;
-    parsers[KEY_PAN_DOWN] = &parse_pan_down;
-    parsers[KEY_PAN_RIGHT] = &parse_pan_right;
-    parsers[KEY_HOVER_NEXT_UNIT] = &action_hover_next_unit;
-    parsers[KEY_SELF_DESTRUCT] = &action_self_destruct;
-    parsers[KEY_SURRENDER] = &action_surrender;
-    parsers[KEY_ACTION] = &parse_action;
+    parsers['1'] = &parse_build_1;
+    parsers['2'] = &parse_build_2;
+    parsers['3'] = &parse_build_3;
+    parsers['4'] = &parse_build_4;
+    parsers['5'] = &parse_build_5;
+    parsers['6'] = &parse_build_6;
+    parsers['7'] = &parse_build_7;
+    parsers['8'] = &parse_build_8;
+    parsers['9'] = &parse_build_9;
+    parsers['0'] = &parse_build_10;
+    parsers['!'] = &parse_load_1;
+    parsers['"'] = &parse_load_2;
+    parsers['#'] = &parse_load_3;
+    parsers['$'] = &parse_load_4;
+    parsers['%'] = &parse_load_5;
+    parsers['^'] = &parse_save_1;
+    parsers['&'] = &parse_save_2;
+    parsers['*'] = &parse_save_3;
+    parsers['('] = &parse_save_4;
+    parsers[')'] = &parse_save_5;
+    parsers['n'] = &parse_next_turn;
+    parsers['w'] = &parse_pan_up;
+    parsers['a'] = &parse_pan_left;
+    parsers['s'] = &parse_pan_down;
+    parsers['d'] = &parse_pan_right;
+    parsers['m'] = &action_hover_next_unit;
+    parsers['k'] = &action_self_destruct;
+    parsers['K'] = &action_surrender;
+    parsers[' '] = &parse_action;
 }
 
 bool parse_command(struct game* const game, const uint8_t input) {

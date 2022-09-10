@@ -1,41 +1,41 @@
 #ifndef PARSE_H
 #define PARSE_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#define KEY_BULID_1 '1'
-#define KEY_BULID_2 '2'
-#define KEY_BULID_3 '3'
-#define KEY_BULID_4 '4'
-#define KEY_BULID_5 '5'
-#define KEY_BULID_6 '6'
-#define KEY_BULID_7 '7'
-#define KEY_BULID_8 '8'
-#define KEY_BULID_9 '9'
-#define KEY_BULID_10 '0'
-#define KEY_LOAD_1 '!'
-#define KEY_LOAD_2 '"'
-#define KEY_LOAD_3 '#'
-#define KEY_LOAD_4 '$'
-#define KEY_LOAD_5 '%'
-#define KEY_SAVE_1 '^'
-#define KEY_SAVE_2 '&'
-#define KEY_SAVE_3 '*'
-#define KEY_SAVE_4 '('
-#define KEY_SAVE_5 ')'
-#define KEY_NEXT_TURN 'n'
-#define KEY_PAN_UP 'w'
-#define KEY_PAN_LFFT 'a'
-#define KEY_PAN_DOWN 's'
-#define KEY_PAN_RIGHT 'd'
-#define KEY_HOVER_NEXT_UNIT 'm'
-#define KEY_SELF_DESTRUCT 'k'
-#define KEY_SURRENDER 'K'
-#define KEY_ACTION ' '
+#include "units.h"
 
 struct game;
 
+#ifdef EXPOSE_PARSE_INTERNALS
+bool parse_error(struct game* const);
+bool parse_nothing(struct game* const);
+bool parse_build(struct game* const, const model_t offset);
+bool parse_build_1(struct game* const);
+bool parse_build_2(struct game* const);
+bool parse_build_3(struct game* const);
+bool parse_build_4(struct game* const);
+bool parse_build_5(struct game* const);
+bool parse_build_6(struct game* const);
+bool parse_build_7(struct game* const);
+bool parse_build_8(struct game* const);
+bool parse_build_9(struct game* const);
+bool parse_build_10(struct game* const);
+bool parse_load_1(struct game* const);
+bool parse_load_2(struct game* const);
+bool parse_load_3(struct game* const);
+bool parse_load_4(struct game* const);
+bool parse_load_5(struct game* const);
+bool parse_save_1(struct game* const);
+bool parse_save_2(struct game* const);
+bool parse_save_3(struct game* const);
+bool parse_save_4(struct game* const);
+bool parse_save_5(struct game* const);
+bool parse_next_turn(struct game* const);
+bool parse_pan_up(struct game* const);
+bool parse_pan_left(struct game* const);
+bool parse_pan_down(struct game* const);
+bool parse_pan_right(struct game* const);
+bool parse_action(struct game* const);
+#endif
 void parse_initialise(void);
 bool parse_command(struct game* const, const uint8_t);
 
