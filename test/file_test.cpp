@@ -256,7 +256,7 @@ TEST_F(game_fixture, file_load_returns_true_when_file_does_not_exist) {
 }
 
 TEST(file_test, calc_row_length_when_empty_row) {
-    tile_t row[GRID_SIZE] = {0};
+    const tile_t row[GRID_SIZE] = {0};
 
     ASSERT_EQ(calc_row_length(row), 0);
 }
@@ -273,6 +273,26 @@ TEST(file_test, calc_row_length_when_rightmost_is_not_void) {
     row[GRID_SIZE - 1] = TILE_PLAINS;
 
     ASSERT_EQ(calc_row_length(row), GRID_SIZE);
+}
+
+TEST(file_test, calc_row_count_when_empty_map) {
+    const tile_t map[GRID_SIZE][GRID_SIZE] = {0};
+
+    ASSERT_EQ(calc_row_count(map), 0);
+}
+
+TEST(file_test, calc_row_length_when_upmost_row_is_not_void) {
+    tile_t map[GRID_SIZE][GRID_SIZE] = {0};
+    map[0][0] = TILE_PLAINS;
+
+    ASSERT_EQ(calc_row_count(map), 1);
+}
+
+TEST(file_test, calc_row_length_when_downmost_row_is_not_void) {
+    tile_t map[GRID_SIZE][GRID_SIZE] = {0};
+    map[GRID_SIZE - 1][0] = TILE_PLAINS;
+
+    ASSERT_EQ(calc_row_count(map), GRID_SIZE);
 }
 
 class file_fixture {
@@ -305,7 +325,7 @@ TEST(file_test, save_turn) {
     ASSERT_EQ(file.data(), "turn 2\n");
 }
 
-TEST(file_test, save_map) {
+TEST(file_test, save_map_when_no_empty_rows) {
     file_fixture file;
     tile_t map[GRID_SIZE][GRID_SIZE] = {0};
     map[0][0] = TILE_PLAINS;
@@ -313,6 +333,16 @@ TEST(file_test, save_map) {
     save_map(map, file.ref());
 
     ASSERT_EQ(file.data(), "map \"\n");
+}
+
+TEST(file_test, save_map_when_empty_row) {
+    file_fixture file;
+    tile_t map[GRID_SIZE][GRID_SIZE] = {0};
+    map[1][0] = TILE_PLAINS;
+
+    save_map(map, file.ref());
+
+    ASSERT_EQ(file.data(), "map\nmap \"\n");
 }
 
 TEST(file_test, save_unit_no_capture_progress_and_no_health) {

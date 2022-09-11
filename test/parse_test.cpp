@@ -1,8 +1,9 @@
 #define EXPOSE_PARSE_INTERNALS
-#include "../parse.h"
 #include "../constants.h"
+#include "../parse.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
+#include <filesystem>
 
 TEST(parse_test, parse_error_returns_true) {
     ASSERT_TRUE(parse_error(nullptr));
@@ -70,3 +71,46 @@ TEST_F(game_fixture, parse_bulid_10_returns_false) {
     ASSERT_FALSE(parse_build_10(game));
 }
 
+void parse_save_load_n_returns_false(
+    struct game* const game, const char* const filename,
+    const std::function<bool(struct game* const)> parse_save,
+    const std::function<bool(struct game* const)> parse_load) {
+    assert(!std::filesystem::exists(filename));
+
+    game->map[3][2] = TILE_PLAINS;
+
+    ASSERT_FALSE(parse_save(game));
+
+    game_initialise(game);
+
+    ASSERT_FALSE(parse_load(game));
+
+    ASSERT_EQ(game->map[3][2], TILE_PLAINS);
+
+    remove(filename);
+}
+
+TEST_F(game_fixture, parse_save_load_1_returns_false) {
+    parse_save_load_n_returns_false(game, "state1.txt", parse_save_1,
+                                    parse_load_1);
+}
+
+TEST_F(game_fixture, parse_save_load_2_returns_false) {
+    parse_save_load_n_returns_false(game, "state2.txt", parse_save_2,
+                                    parse_load_2);
+}
+
+TEST_F(game_fixture, parse_save_load_3_returns_false) {
+    parse_save_load_n_returns_false(game, "state1.txt", parse_save_3,
+                                    parse_load_3);
+}
+
+TEST_F(game_fixture, parse_save_load_4_returns_false) {
+    parse_save_load_n_returns_false(game, "state1.txt", parse_save_4,
+                                    parse_load_4);
+}
+
+TEST_F(game_fixture, parse_save_load_5_returns_false) {
+    parse_save_load_n_returns_false(game, "state1.txt", parse_save_5,
+                                    parse_load_5);
+}

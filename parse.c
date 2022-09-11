@@ -132,11 +132,9 @@ bool (*parsers[256])(struct game* const);
 
 void parse_initialise(void) {
     uint8_t input = 0;
-    do
-    {
+    do {
         parsers[input] = isprint(input) ? &parse_nothing : &parse_error;
-    }
-    while (++input);
+    } while (++input);
 
     parsers['1'] = &parse_build_1;
     parsers['2'] = &parse_build_2;

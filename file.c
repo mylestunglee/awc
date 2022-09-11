@@ -20,16 +20,13 @@ bool load_map(const char* const command, const char* const params,
     if (strcmp(command, "map"))
         return false;
 
-    char map_str[GRID_SIZE] = {0};
-    assert(sscanf(params, ROW_FORMAT, map_str) == 1);
-
     grid_t x = 0;
 
     // Read symbols left to right
-    while (map_str[x] != '\0') {
+    while (params[x] != '\0') {
         // Find tile index for symbol
         for (tile_t tile = 0; tile < TILE_CAPACITY; ++tile)
-            if (map_str[x] == tile_symbols[tile]) {
+            if (params[x] == tile_symbols[tile]) {
                 map[*y][x] = tile;
                 break;
             }
@@ -240,29 +237,38 @@ void save_turn(const player_t turn, FILE* const file) {
 }
 
 grid_wide_t calc_row_length(const tile_t row[GRID_SIZE]) {
-    for (grid_wide_t x = GRID_SIZE - 1; x >= 0; --x) {
-        if (row[x] != TILE_VOID) {
+    for (grid_wide_t x = GRID_SIZE - 1; x >= 0; --x)
+        if (row[x] != TILE_VOID)
             return x + 1;
-        }
-    }
+
+    return 0;
+}
+
+grid_wide_t calc_row_count(const tile_t map[GRID_SIZE][GRID_SIZE]) {
+    for (grid_wide_t y = GRID_SIZE - 1; y >= 0; --y)
+        if (calc_row_length(map[y]) > 0)
+            return y + 1;
+
     return 0;
 }
 
 void save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file) {
-    grid_t y = 0;
-    do {
-        const grid_wide_t length = calc_row_length(map[y]);
+    grid_wide_t row_count = calc_row_count(map);
 
-        if (length == 0)
-            continue;
+    for (grid_wide_t y = 0; y < row_count; y++) {
+        const grid_wide_t row_length = calc_row_length(map[y]);
 
-        fprintf(file, "map ");
+        fprintf(file, "map");
 
-        for (grid_wide_t x = 0; x < length; ++x) {
-            fprintf(file, "%c", tile_symbols[map[y][x]]);
+        if (row_length > 0) {
+            fprintf(file, " ");
+
+            for (grid_wide_t x = 0; x < row_length; ++x)
+                fprintf(file, "%c", tile_symbols[map[y][x]]);
         }
+
         fprintf(file, "\n");
-    } while (++y);
+    }
 }
 
 void save_unit(const struct unit* const unit, FILE* const file) {
