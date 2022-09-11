@@ -114,3 +114,83 @@ TEST_F(game_fixture, parse_save_load_5_returns_false) {
     parse_save_load_n_returns_false(game, "state1.txt", parse_save_5,
                                     parse_load_5);
 }
+
+TEST_F(game_fixture, parse_next_turn_returns_false) {
+    insert_unit({.player = 1, .x = 2, .enabled = false});
+
+    ASSERT_FALSE(parse_next_turn(game));
+
+    ASSERT_EQ(game->turn, 1);
+    ASSERT_EQ(game->x, 2);
+}
+
+TEST_F(game_fixture, parse_pan_up_returns_false) {
+    game->x = 2;
+    game->y = 3;
+
+    ASSERT_FALSE(parse_pan_up(game));
+
+    ASSERT_EQ(game->x, 2);
+    ASSERT_EQ(game->y, 2);
+    ASSERT_EQ(game->prev_x, 2);
+    ASSERT_EQ(game->prev_y, 3);
+}
+
+TEST_F(game_fixture, parse_pan_left_returns_false) {
+    game->x = 2;
+    game->y = 3;
+
+    ASSERT_FALSE(parse_pan_left(game));
+
+    ASSERT_EQ(game->x, 1);
+    ASSERT_EQ(game->y, 3);
+    ASSERT_EQ(game->prev_x, 2);
+    ASSERT_EQ(game->prev_y, 3);
+}
+
+TEST_F(game_fixture, parse_pan_down_returns_false) {
+    game->x = 2;
+    game->y = 3;
+
+    ASSERT_FALSE(parse_pan_down(game));
+
+    ASSERT_EQ(game->x, 2);
+    ASSERT_EQ(game->y, 4);
+    ASSERT_EQ(game->prev_x, 2);
+    ASSERT_EQ(game->prev_y, 3);
+}
+
+TEST_F(game_fixture, parse_pan_right_returns_false) {
+    game->x = 2;
+    game->y = 3;
+
+    ASSERT_FALSE(parse_pan_right(game));
+
+    ASSERT_EQ(game->x, 3);
+    ASSERT_EQ(game->y, 3);
+    ASSERT_EQ(game->prev_x, 2);
+    ASSERT_EQ(game->prev_y, 3);
+}
+
+TEST_F(game_fixture, parse_action_select_returns_false) {
+    insert_unit({.enabled = true});
+
+    ASSERT_FALSE(parse_action(game));
+
+    ASSERT_TRUE(units_const_get_at(&game->units, 0, 0)->enabled);
+}
+
+TEST_F(game_fixture, parse_action_deselect_returns_false) {
+    insert_selected_unit({.enabled = true});
+    game->x = 1;
+
+    ASSERT_FALSE(parse_action(game));
+
+    ASSERT_FALSE(units_has_selection(&game->units));
+}
+
+TEST(parse_test, parse_command_returns_true) {
+    parse_initialise();
+
+    ASSERT_TRUE(parse_command(nullptr, '\0'));
+}
