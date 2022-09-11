@@ -16,10 +16,8 @@ void controller_run(struct game* const game) {
         if (input == 'q')
             break;
 
-        if (parse_command(game, input)) {
+        if (parse_command(game, input))
             break;
-            printf("Command failed");
-        }
 
     } while (true);
 }
