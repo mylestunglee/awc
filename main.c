@@ -1,4 +1,6 @@
 #include "controller.h"
+#include "game.h"
+#include "console.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -22,7 +24,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    controller_run(game);
+    controller_run(game, getch);
 
     free(game);
 

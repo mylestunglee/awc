@@ -1,10 +1,8 @@
-#include "controller.h"
-#include "console.h"
 #include "graphics.h"
 #include "parse.h"
 #include <stdio.h>
 
-void controller_run(struct game* const game) {
+void controller_run(struct game* const game, char (*getch)(void)) {
     parse_initialise();
     graphics_initialise();
 
@@ -13,10 +11,7 @@ void controller_run(struct game* const game) {
 
         const char input = getch();
 
-        if (input == 'q')
-            break;
-
-        if (parse_command(game, input))
+        if (input == 'q' || parse_command(game, input))
             break;
 
     } while (true);

@@ -1,8 +1,8 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "game.h"
+struct game;
 
-void controller_run(struct game* const game);
+void controller_run(struct game* const game, char (*getch)(void));
 
 #endif
