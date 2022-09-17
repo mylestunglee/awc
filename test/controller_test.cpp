@@ -17,8 +17,9 @@ TEST_F(game_fixture, controller_run_pan_right) {
 
     controller_run(game, [] {
         ++count;
-        return count == 1 ? 'a' : 'q';
+        return count == 1 ? 'd' : 'q';
     });
 
+    ASSERT_EQ(game->x, 1);
     ASSERT_EQ(count, 2);
 }
