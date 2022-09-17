@@ -8,21 +8,21 @@
 typedef int32_t gold_t;
 
 struct game {
-    tile_t map[GRID_SIZE][GRID_SIZE];
     struct units units;
-    grid_t x;
-    grid_t y;
-    uint8_t labels[GRID_SIZE][GRID_SIZE];
-    energy_t energies[GRID_SIZE][GRID_SIZE];
     struct list list;
-    grid_t prev_x;
-    grid_t prev_y;
-    player_t turn;
-    player_t territory[GRID_SIZE][GRID_SIZE];
     gold_t golds[PLAYERS_CAPACITY];
     gold_t incomes[PLAYERS_CAPACITY];
+    energy_t energies[GRID_SIZE][GRID_SIZE];
+    tile_t map[GRID_SIZE][GRID_SIZE];
+    uint8_t labels[GRID_SIZE][GRID_SIZE];
     uint8_t bots[BITARRAY_SIZE(PLAYERS_CAPACITY)];
     uint8_t alliances[BITMATRIX_SIZE(PLAYERS_CAPACITY)];
+    player_t territory[GRID_SIZE][GRID_SIZE];
+    player_t turn;
+    grid_t x;
+    grid_t y;
+    grid_t prev_x;
+    grid_t prev_y;
     bool dirty_labels;
 };
 

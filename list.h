@@ -16,9 +16,9 @@ typedef uint16_t list_t;
 #define LIST_CAPACITY 0x10000
 
 struct list {
+    struct list_node nodes[LIST_CAPACITY];
     list_t start;
     list_t end;
-    struct list_node nodes[LIST_CAPACITY];
 };
 
 void list_initialise(struct list* const);

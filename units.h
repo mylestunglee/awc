@@ -26,13 +26,13 @@ struct unit {
 
 struct units {
     struct unit data[UNITS_CAPACITY];
-    unit_t start;
-    unit_t size;
     unit_t frees[UNITS_CAPACITY];
     unit_t firsts[PLAYERS_CAPACITY];
     unit_t prevs[UNITS_CAPACITY];
     unit_t nexts[UNITS_CAPACITY];
     unit_t grid[GRID_SIZE][GRID_SIZE];
+    unit_t start;
+    unit_t size;
     unit_t selected;
 };
 
