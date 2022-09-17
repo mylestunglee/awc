@@ -8,3 +8,4 @@ test/all_test.cpp
 html
 latex
 reports
+.vscode

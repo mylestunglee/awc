@@ -2,16 +2,16 @@
 #include "parse.h"
 #include <stdio.h>
 
-void controller_run(struct game* const game, char (*getch)(void)) {
+void controller_run(struct game* const game, char (*read_command)(void)) {
     parse_initialise();
     graphics_initialise();
 
     do {
         graphics_render(game);
 
-        const char input = getch();
+        const char command = read_command();
 
-        if (input == 'q' || parse_command(game, input))
+        if (command == 'q' || parse_command(game, command))
             break;
 
     } while (true);
