@@ -214,11 +214,11 @@ TEST_F(game_fixture, action_move_returns_false_when_start_capturing) {
 }
 
 TEST_F(game_fixture, action_move_returns_false_when_finish_capturing) {
-    insert_selected_unit({.health = HEALTH_MAX,
+    insert_selected_unit({.capture_progress = HEALTH_MAX,
+                          .health = HEALTH_MAX,
                           .x = 2,
                           .y = 3,
-                          .enabled = true,
-                          .capture_progress = HEALTH_MAX});
+                          .enabled = true});
     game->x = 2;
     game->y = 3;
     game->labels[3][2] = ACCESSIBLE_BIT;

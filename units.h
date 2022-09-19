@@ -8,20 +8,20 @@
 #define UNITS_CAPACITY (unit_t)0xff
 #define NULL_UNIT UNITS_CAPACITY
 
-typedef uint8_t unit_t;
+typedef uint16_t capture_progress_t;
 typedef uint8_t health_t;
 typedef uint16_t health_wide_t;
 typedef uint8_t model_t;
-typedef uint16_t capture_progress_t;
+typedef uint8_t unit_t;
 
 struct unit {
+    capture_progress_t capture_progress;
     health_t health;
     model_t model;
     player_t player;
     grid_t x;
     grid_t y;
     bool enabled;
-    capture_progress_t capture_progress;
 };
 
 struct units {

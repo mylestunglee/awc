@@ -236,7 +236,7 @@ TEST_F(game_fixture,
 TEST_F(game_fixture, is_node_unexplorable_returns_true_when_visited) {
     insert_unit({.x = 0, .y = 0});
     game->energies[3][2] = 7;
-    struct list_node node = { .energy = 5, .x = 2, .y = 3};
+    struct list_node node = {.energy = 5, .x = 2, .y = 3};
 
     auto unexplorable = is_node_unexplorable(game, &node, 0);
 

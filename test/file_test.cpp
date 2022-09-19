@@ -349,7 +349,7 @@ TEST(file_test, save_unit_no_capture_progress_and_no_health) {
     file_fixture file;
     const struct unit unit {
         .health = HEALTH_MAX, .model = MODEL_INFANTRY, .player = 0, .x = 5,
-        .y = 7, .enabled = true, .capture_progress = 0
+        .y = 7, .enabled = true
     };
 
     save_unit(&unit, file.ref());
@@ -361,7 +361,7 @@ TEST(file_test, save_unit_no_capture_progress_and_no_enabled) {
     file_fixture file;
     const struct unit unit {
         .health = 2, .model = MODEL_INFANTRY, .player = 0, .x = 5, .y = 7,
-        .enabled = true, .capture_progress = 0
+        .enabled = true
     };
 
     save_unit(&unit, file.ref());
@@ -373,7 +373,7 @@ TEST(file_test, save_unit_no_capture_progress) {
     file_fixture file;
     const struct unit unit {
         .health = 2, .model = MODEL_INFANTRY, .player = 3, .x = 5, .y = 7,
-        .enabled = true, .capture_progress = 0
+        .enabled = true
     };
 
     save_unit(&unit, file.ref());
@@ -384,8 +384,8 @@ TEST(file_test, save_unit_no_capture_progress) {
 TEST(file_test, save_unit_all_fields) {
     file_fixture file;
     const struct unit unit {
-        .health = 2, .model = MODEL_INFANTRY, .player = 3, .x = 5, .y = 7,
-        .enabled = true, .capture_progress = 11
+        .capture_progress = 11, .health = 2, .model = MODEL_INFANTRY,
+        .player = 3, .x = 5, .y = 7, .enabled = true
     };
 
     save_unit(&unit, file.ref());
