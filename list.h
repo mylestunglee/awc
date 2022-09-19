@@ -7,9 +7,9 @@
 typedef uint16_t energy_t;
 
 struct list_node {
+    energy_t energy;
     grid_t x;
     grid_t y;
-    energy_t energy;
 };
 
 typedef uint16_t list_t;

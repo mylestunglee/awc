@@ -236,7 +236,7 @@ TEST_F(game_fixture,
 TEST_F(game_fixture, is_node_unexplorable_returns_true_when_visited) {
     insert_unit({.x = 0, .y = 0});
     game->energies[3][2] = 7;
-    struct list_node node = {.x = 2, .y = 3, .energy = 5};
+    struct list_node node = { .energy = 5, .x = 2, .y = 3};
 
     auto unexplorable = is_node_unexplorable(game, &node, 0);
 
@@ -309,7 +309,7 @@ TEST_F(game_fixture, explore_adjacent_tiles_explores_adjacent_tiles) {
     game->map[4][2] = TILE_PLAINS;
     game->map[3][1] = TILE_PLAINS;
 
-    struct list_node node = {.x = 2, .y = 3, .energy = 5};
+    struct list_node node = {.energy = 5, .x = 2, .y = 3};
 
     explore_adjacent_tiles(game, &node, 0);
 
@@ -335,7 +335,7 @@ TEST_F(game_fixture, explore_adjacent_tiles_explores_adjacent_tiles) {
 TEST_F(game_fixture,
        explore_adjacent_tiles_does_not_explore_unaccessible_tiles) {
     ASSERT_EQ(movement_type_cost[0][TILE_VOID], 0);
-    struct list_node node = {.x = 2, .y = 3, .energy = 5};
+    struct list_node node = {.energy = 5, .x = 2, .y = 3};
 
     explore_adjacent_tiles(game, &node, 0);
 
@@ -351,7 +351,7 @@ TEST_F(game_fixture,
     game->map[4][2] = TILE_PLAINS;
     game->map[3][1] = TILE_PLAINS;
 
-    struct list_node node = {.x = 2, .y = 3, .energy = 1};
+    struct list_node node = {.energy = 1, .x = 2, .y = 3};
 
     explore_adjacent_tiles(game, &node, 0);
 
@@ -361,7 +361,7 @@ TEST_F(game_fixture,
 TEST_F(game_fixture, explore_node_does_not_explore_occupied_tile) {
     insert_unit({.x = 0, .y = 0});
     insert_unit({.player = 1, .x = 2, .y = 3});
-    struct list_node node = {.x = 2, .y = 3, .energy = 5};
+    struct list_node node = {.energy = 5, .x = 2, .y = 3};
 
     explore_node(game, &node, NULL_PLAYER, 0, false);
 
@@ -372,7 +372,7 @@ TEST_F(game_fixture, explore_node_sets_energies) {
     game->x = 2;
     game->y = 3;
     insert_unit({.x = 2, .y = 3});
-    struct list_node node = {.x = 5, .y = 7, .energy = 11};
+    struct list_node node = {.energy = 11, .x = 5, .y = 7};
 
     explore_node(game, &node, NULL_PLAYER, 0, false);
 
@@ -384,7 +384,7 @@ TEST_F(game_fixture, explore_node_sets_attackable_label_if_accessible) {
     game->y = 3;
     insert_unit({.x = 2, .y = 3});
     game->map[7][5] = TILE_PLAINS;
-    struct list_node node = {.x = 5, .y = 7, .energy = 11};
+    struct list_node node = {.energy = 11, .x = 5, .y = 7};
 
     explore_node(game, &node, NULL_PLAYER, 0, true);
 
@@ -395,7 +395,7 @@ TEST_F(game_fixture, explore_node_explores_adjacent_tiles) {
     game->x = 2;
     game->y = 3;
     insert_unit({.x = 2, .y = 3});
-    struct list_node node = {.x = 5, .y = 7, .energy = 11};
+    struct list_node node = {.energy = 11, .x = 5, .y = 7};
     game->map[7][6] = TILE_PLAINS;
 
     explore_node(game, &node, NULL_PLAYER, 0, false);

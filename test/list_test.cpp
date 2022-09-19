@@ -29,7 +29,7 @@ TEST_F(list_fixture, list_insert_increments_end) {
 
 TEST_F(list_fixture, list_insert_inserts_node) {
     list->end = 2;
-    struct list_node node = {.x = 3, .y = 5, .energy = 7};
+    struct list_node node = {.energy = 7, .x = 3, .y = 5};
     list_insert(list, &node);
     ASSERT_EQ(list->nodes[2].x, 3);
     ASSERT_EQ(list->nodes[2].y, 5);
@@ -55,7 +55,7 @@ TEST_F(list_fixture, list_front_pop_increments_start) {
 TEST_F(list_fixture, list_front_pop_returns_first_node) {
     list->start = 2;
     list->end = 5;
-    list->nodes[2] = {.x = 3, .y = 5, .energy = 7};
+    list->nodes[2] = {.energy = 7, .x = 3, .y = 5};
     auto node = list_front_pop(list);
     ASSERT_EQ(node.x, list->nodes[2].x);
     ASSERT_EQ(node.y, list->nodes[2].y);
@@ -72,7 +72,7 @@ TEST_F(list_fixture, list_back_pop_decrements_end) {
 TEST_F(list_fixture, list_back_pop_returns_last_node) {
     list->start = 2;
     list->end = 5;
-    list->nodes[4] = {.x = 3, .y = 5, .energy = 7};
+    list->nodes[4] = {.energy = 7, .x = 3, .y = 5};
     auto node = list_back_pop(list);
     ASSERT_EQ(node.x, list->nodes[4].x);
     ASSERT_EQ(node.y, list->nodes[4].y);
@@ -90,7 +90,7 @@ TEST_F(list_fixture, list_front_peek_does_not_change_start_or_end) {
 TEST_F(list_fixture, list_front_peek_returns_first_node) {
     list->start = 2;
     list->end = 5;
-    list->nodes[2] = {.x = 3, .y = 5, .energy = 7};
+    list->nodes[2] = {.energy = 7, .x = 3, .y = 5};
     auto node = list_front_peek(list);
     ASSERT_EQ(node.x, list->nodes[2].x);
     ASSERT_EQ(node.y, list->nodes[2].y);
@@ -100,7 +100,7 @@ TEST_F(list_fixture, list_front_peek_returns_first_node) {
 TEST_F(list_fixture, list_back_peek_returns_last_node) {
     list->start = 2;
     list->end = 5;
-    list->nodes[4] = {.x = 3, .y = 5, .energy = 7};
+    list->nodes[4] = {.energy = 7, .x = 3, .y = 5};
     auto node = list_back_peek(list);
     ASSERT_EQ(node.x, list->nodes[4].x);
     ASSERT_EQ(node.y, list->nodes[4].y);

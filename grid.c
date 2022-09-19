@@ -194,7 +194,7 @@ void explore_adjacent_tiles(struct game* const game,
             continue;
 
         struct list_node adjacent_node = {
-            .x = x_i, .y = y_i, .energy = (energy_t)(node->energy - cost)};
+            .energy = (energy_t)(node->energy - cost), .x = x_i, .y = y_i};
 
         list_insert(&game->list, &adjacent_node);
     }
@@ -252,10 +252,10 @@ void grid_explore_recursive(struct game* const game,
                                         label_attackable_tiles);
 
     {
-        struct list_node node = {.x = game->x,
-                                 .y = game->y,
-                                 .energy =
-                                     init_exploration_energy(scalar, model)};
+        struct list_node node = {.energy =
+                                     init_exploration_energy(scalar, model),
+                                 .x = game->x,
+                                 .y = game->y};
         list_insert(list, &node);
     }
 
@@ -279,7 +279,7 @@ void grid_find_path(struct game* const game, grid_t x, grid_t y) {
 
     while (true) {
         struct list_node node = {
-            .x = x, .y = y, .energy = game->energies[y][x]};
+            .energy = game->energies[y][x], .x = x, .y = y};
         list_insert(&game->list, &node);
 
         energy_t next_energy = 0;
