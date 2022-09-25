@@ -3,6 +3,7 @@
 #include "turn.h"
 #include "unit_constants.h"
 #include <ctype.h>
+#include <assert.h>
 
 bool parse_error(struct game* const game) {
     (void)game;
@@ -168,5 +169,6 @@ void parse_initialise(void) {
 }
 
 bool parse_command(struct game* const game, const uint8_t input) {
+    assert(parsers[input]);
     return (*parsers[input])(game);
 }
