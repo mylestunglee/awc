@@ -89,7 +89,7 @@ TEST_F(game_fixture, calc_damage_between_two_infantry) {
 
     ASSERT_EQ(calc_damage(game, units_const_get_at(&game->units, 0, 0),
                           units_const_get_at(&game->units, 1, 0)),
-              static_cast<health_t>(55.0 * 0.9 * 255.0 / 100.0));
+              static_cast<health_t>(55.0 * 0.9));
 }
 
 TEST_F(game_fixture, calc_damage_pair_kill_attackee) {
@@ -145,14 +145,14 @@ TEST_F(game_fixture, calc_damage_pair_when_counter_attacking) {
 
     ASSERT_EQ(damage, calc_damage(game, units_const_get_at(&game->units, 2, 3),
                                   units_const_get_at(&game->units, 5, 7)));
-    ASSERT_EQ(counter_damage, (HEALTH_MAX - damage) * damage / HEALTH_MAX);
+    ASSERT_EQ(counter_damage,
+              ((HEALTH_MAX - damage) * damage + HEALTH_MAX / 2) / HEALTH_MAX);
 }
 
 TEST_F(game_fixture,
        calc_damage_pair_with_health_scales_with_calc_damage_pair) {
-    const auto HEALTH_MAX_EVEN = HEALTH_MAX & '\xfe';
     auto* attacker =
-        insert_selected_unit({.health = HEALTH_MAX_EVEN, .x = 2, .y = 3});
+        insert_selected_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
     auto* attackee = insert_unit({.x = 5, .y = 7});
     game->x = 5;
     game->y = 7;

@@ -2,8 +2,8 @@
 #include "action.h"
 #include "turn.h"
 #include "unit_constants.h"
-#include <ctype.h>
 #include <assert.h>
+#include <ctype.h>
 
 bool parse_error(struct game* const game) {
     (void)game;

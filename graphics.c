@@ -475,10 +475,7 @@ void print_normal_text(const struct game* const game) {
 void print_attack_text(const struct game* const game) {
     health_t damage, counter_damage;
     game_calc_damage(game, &damage, &counter_damage);
-    const health_wide_t percent = 100;
-    wprintf(L"Damage: %u%% Counter-damage: %u%%\n",
-            (damage * percent) / HEALTH_MAX,
-            (counter_damage * percent) / HEALTH_MAX);
+    wprintf(L"Damage: %u%% Counter-damage: %u%%\n", damage, counter_damage);
 }
 
 void print_build_text(const struct game* const game) {

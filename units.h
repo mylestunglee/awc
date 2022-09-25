@@ -4,15 +4,15 @@
 #include "definitions.h"
 #include <stdbool.h>
 
-#define HEALTH_MAX (health_t)0xff
-#define UNITS_CAPACITY (unit_t)0xff
-#define NULL_UNIT UNITS_CAPACITY
-
 typedef uint16_t capture_progress_t;
 typedef uint8_t health_t;
 typedef uint16_t health_wide_t;
 typedef uint8_t model_t;
 typedef uint8_t unit_t;
+
+#define HEALTH_MAX 100
+#define UNITS_CAPACITY 255
+#define NULL_UNIT UNITS_CAPACITY
 
 struct unit {
     capture_progress_t capture_progress;
