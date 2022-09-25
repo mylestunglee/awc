@@ -10,7 +10,7 @@
 
 #define tile_width 8
 #define tile_height 4
-#define unit_left 1
+#define unit_left 2
 #define unit_top 1
 #define unit_width 5
 #define unit_height 2

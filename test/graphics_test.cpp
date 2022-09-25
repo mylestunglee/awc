@@ -21,7 +21,7 @@ TEST(graphics_test, graphics_init_sets_empty_character_locale) {
 TEST(graphics_test, render_block_with_no_progress_is_empty) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_block(0, 1, 1, &symbol, &style);
+    render_block(0, 1, 2, &symbol, &style);
     ASSERT_EQ(symbol, ' ');
     ASSERT_EQ(style, '\x90');
 }
@@ -29,7 +29,7 @@ TEST(graphics_test, render_block_with_no_progress_is_empty) {
 TEST(graphics_test, render_block_with_near_completion_is_nearly_full) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_block(254, 255, 1, &symbol, &style);
+    render_block(254, 255, 2, &symbol, &style);
     ASSERT_EQ(symbol, ' ');
     ASSERT_EQ(style, '\x0A');
 }
@@ -37,7 +37,7 @@ TEST(graphics_test, render_block_with_near_completion_is_nearly_full) {
 TEST(graphics_test, render_block_with_half_completion_is_half_full) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_block(128, 255, 3, &symbol, &style);
+    render_block(128, 255, 4, &symbol, &style);
     ASSERT_EQ(symbol, L'▌');
     ASSERT_EQ(style, '\xb0');
 }
@@ -45,8 +45,8 @@ TEST(graphics_test, render_block_with_half_completion_is_half_full) {
 TEST(graphics_test, render_percentage_with_low_progress_is_right_aligned) {
     wchar_t left_symbol = ' ';
     wchar_t right_symbol = ' ';
-    render_percentage(23, 100, 4, &left_symbol);
-    render_percentage(23, 100, 5, &right_symbol);
+    render_percentage(23, 100, 5, &left_symbol);
+    render_percentage(23, 100, 6, &right_symbol);
     ASSERT_EQ(left_symbol, '2');
     ASSERT_EQ(right_symbol, '3');
 }
@@ -54,8 +54,8 @@ TEST(graphics_test, render_percentage_with_low_progress_is_right_aligned) {
 TEST(graphics_test, render_percentage_with_high_progress_is_left_aligned) {
     wchar_t left_symbol = ' ';
     wchar_t right_symbol = ' ';
-    render_percentage(57, 100, 1, &left_symbol);
-    render_percentage(57, 100, 2, &right_symbol);
+    render_percentage(57, 100, 2, &left_symbol);
+    render_percentage(57, 100, 3, &right_symbol);
     ASSERT_EQ(left_symbol, '5');
     ASSERT_EQ(right_symbol, '7');
 }
@@ -63,7 +63,7 @@ TEST(graphics_test, render_percentage_with_high_progress_is_left_aligned) {
 TEST(graphics_test, render_bar_overlaps_percentage_over_block) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_bar(57, 100, 1, &symbol, &style);
+    render_bar(57, 100, 2, &symbol, &style);
     ASSERT_EQ(symbol, '5');
     ASSERT_EQ(style, '\x0B');
 }
@@ -73,7 +73,7 @@ TEST_F(units_fixture,
     wchar_t symbol = 0;
     uint8_t style = '\x00';
 
-    ASSERT_FALSE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
+    ASSERT_FALSE(render_unit_health_bar(units, 0, 0, 2, 3, &symbol, &style));
 }
 
 TEST_F(units_fixture, render_unit_health_bar_returns_false_outside_health_bar) {
@@ -88,7 +88,7 @@ TEST_F(units_fixture, render_unit_health_bar_returns_false_when_max_health) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
 
-    ASSERT_FALSE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
+    ASSERT_FALSE(render_unit_health_bar(units, 0, 0, 2, 3, &symbol, &style));
 }
 
 TEST_F(units_fixture, render_unit_health_bar_shows_unit_health) {
@@ -96,7 +96,7 @@ TEST_F(units_fixture, render_unit_health_bar_shows_unit_health) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
 
-    ASSERT_TRUE(render_unit_health_bar(units, 0, 0, 1, 3, &symbol, &style));
+    ASSERT_TRUE(render_unit_health_bar(units, 0, 0, 2, 3, &symbol, &style));
 
     ASSERT_NE(symbol, 0);
     ASSERT_NE(style, '\x00');
@@ -108,7 +108,7 @@ TEST_F(units_fixture,
     uint8_t style = '\x00';
 
     ASSERT_FALSE(
-        render_capture_progress_bar(units, 0, 1, 1, 0, &symbol, &style));
+        render_capture_progress_bar(units, 0, 1, 2, 0, &symbol, &style));
 }
 
 TEST_F(units_fixture,
@@ -118,7 +118,7 @@ TEST_F(units_fixture,
     uint8_t style = '\x00';
 
     ASSERT_FALSE(
-        render_capture_progress_bar(units, 0, 1, 1, 0, &symbol, &style));
+        render_capture_progress_bar(units, 0, 1, 2, 0, &symbol, &style));
 }
 
 TEST_F(units_fixture, render_capture_progress_bar_shows_capture_progress) {
@@ -127,7 +127,7 @@ TEST_F(units_fixture, render_capture_progress_bar_shows_capture_progress) {
     uint8_t style = '\x00';
 
     ASSERT_TRUE(
-        render_capture_progress_bar(units, 0, 1, 1, 0, &symbol, &style));
+        render_capture_progress_bar(units, 0, 1, 2, 0, &symbol, &style));
 
     ASSERT_NE(symbol, 0);
     ASSERT_NE(style, '\x00');
@@ -261,7 +261,7 @@ TEST_F(units_fixture, render_unit_ignores_no_unit) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
 
-    ASSERT_FALSE(render_unit(units, 0, 0, 2, 1, &symbol, &style));
+    ASSERT_FALSE(render_unit(units, 0, 0, 3, 1, &symbol, &style));
 
     ASSERT_EQ(symbol, 0);
     ASSERT_EQ(style, 0);
@@ -272,7 +272,7 @@ TEST_F(units_fixture, render_unit_ignores_transparent) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
 
-    ASSERT_FALSE(render_unit(units, 0, 0, 1, 1, &symbol, &style));
+    ASSERT_FALSE(render_unit(units, 0, 0, 2, 1, &symbol, &style));
 }
 
 TEST_F(units_fixture, render_unit_gives_unit_texture) {
@@ -280,7 +280,7 @@ TEST_F(units_fixture, render_unit_gives_unit_texture) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
 
-    ASSERT_TRUE(render_unit(units, 0, 0, 2, 1, &symbol, &style));
+    ASSERT_TRUE(render_unit(units, 0, 0, 3, 1, &symbol, &style));
 
     ASSERT_EQ(symbol, 'o');
     ASSERT_EQ(style, '\xf4');
@@ -291,7 +291,7 @@ TEST_F(units_fixture, render_unit_gives_shaded_unit_texture_when_disabled) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
 
-    ASSERT_TRUE(render_unit(units, 0, 0, 2, 1, &symbol, &style));
+    ASSERT_TRUE(render_unit(units, 0, 0, 3, 1, &symbol, &style));
 
     ASSERT_EQ(symbol, 'o');
     ASSERT_EQ(style, '\x04');
@@ -443,7 +443,7 @@ std::pair<wchar_t, uint8_t> render_pixel_helper(const struct game* const game,
 TEST_F(game_fixture, render_pixel_shows_unit_health_bar) {
     insert_unit({.health = HEALTH_MAX - 1});
 
-    const auto [symbol, style] = render_pixel_helper(game, 0, 0, 1, 3);
+    const auto [symbol, style] = render_pixel_helper(game, 0, 0, 2, 3);
 
     ASSERT_EQ(symbol, '9');
     ASSERT_EQ(style, '\x0a');
@@ -452,7 +452,7 @@ TEST_F(game_fixture, render_pixel_shows_unit_health_bar) {
 TEST_F(game_fixture, render_pixel_shows_capture_progress) {
     insert_unit({.capture_progress = CAPTURE_COMPLETION - 1});
 
-    const auto [symbol, style] = render_pixel_helper(game, 0, 1, 1, 0);
+    const auto [symbol, style] = render_pixel_helper(game, 0, 1, 2, 0);
 
     ASSERT_EQ(symbol, '9');
     ASSERT_EQ(style, '\x0a');
@@ -468,7 +468,7 @@ TEST_F(game_fixture, render_pixel_shows_selection) {
 TEST_F(game_fixture, render_pixel_shows_unit) {
     insert_unit({.enabled = true});
 
-    const auto [symbol, style] = render_pixel_helper(game, 0, 0, 2, 1);
+    const auto [symbol, style] = render_pixel_helper(game, 0, 0, 3, 1);
 
     ASSERT_EQ(symbol, 'o');
     ASSERT_EQ(style, '\xf4');
