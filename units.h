@@ -15,12 +15,12 @@ typedef uint8_t unit_t;
 #define NULL_UNIT UNITS_CAPACITY
 
 struct unit {
-    capture_progress_t capture_progress;
-    health_t health;
-    model_t model;
-    player_t player;
     grid_t x;
     grid_t y;
+    player_t player;
+    model_t model;
+    health_t health;
+    health_t capture_progress;
     bool enabled;
 };
 

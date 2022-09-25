@@ -83,8 +83,8 @@ TEST_F(game_fixture, game_save_returns_true_when_invalid_filename) {
 }
 
 TEST_F(game_fixture, calc_damage_between_two_infantry) {
-    insert_unit({.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 0});
-    insert_unit({.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 1});
+    insert_unit({.x = 0,  .health = HEALTH_MAX});
+    insert_unit({.x = 1,  .health = HEALTH_MAX});
     game->map[0][1] = TILE_PLAINS;
 
     ASSERT_EQ(calc_damage(game, units_const_get_at(&game->units, 0, 0),
@@ -94,9 +94,9 @@ TEST_F(game_fixture, calc_damage_between_two_infantry) {
 
 TEST_F(game_fixture, calc_damage_pair_kill_attackee) {
     auto* attacker = insert_selected_unit(
-        {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+        {.x = 2, .y = 3,  .health = HEALTH_MAX});
     auto* attackee =
-        insert_unit({.health = 1, .model = MODEL_INFANTRY, .x = 5, .y = 7});
+        insert_unit({.x = 5, .y = 7,  .health = 1});
     game->x = 5;
     game->y = 7;
     game->map[7][5] = TILE_PLAINS;
@@ -112,9 +112,9 @@ TEST_F(game_fixture, calc_damage_pair_kill_attackee) {
 
 TEST_F(game_fixture, calc_damage_pair_ranged_units_do_not_counter_attack) {
     auto* attacker = insert_selected_unit(
-        {.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .x = 2, .y = 3});
+        {.x = 2, .y = 3, .model = MODEL_ARTILLERY, .health = HEALTH_MAX});
     auto* attackee = insert_unit(
-        {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 5, .y = 7});
+        {.x = 5, .y = 7,  .health = HEALTH_MAX});
     game->x = 5;
     game->y = 7;
     game->map[7][5] = TILE_PLAINS;
@@ -130,9 +130,9 @@ TEST_F(game_fixture, calc_damage_pair_ranged_units_do_not_counter_attack) {
 
 TEST_F(game_fixture, calc_damage_pair_when_counter_attacking) {
     auto* attacker = insert_selected_unit(
-        {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 2, .y = 3});
+        {.x = 2, .y = 3,  .health = HEALTH_MAX});
     auto* attackee = insert_unit(
-        {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 5, .y = 7});
+        {.x = 5, .y = 7,  .health = HEALTH_MAX});
     game->x = 5;
     game->y = 7;
     game->map[3][2] = TILE_PLAINS;
@@ -152,7 +152,7 @@ TEST_F(game_fixture, calc_damage_pair_when_counter_attacking) {
 TEST_F(game_fixture,
        calc_damage_pair_with_health_scales_with_calc_damage_pair) {
     auto* attacker =
-        insert_selected_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
+        insert_selected_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
     auto* attackee = insert_unit({.x = 5, .y = 7});
     game->x = 5;
     game->y = 7;
@@ -170,8 +170,8 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture, game_calc_damage_when_ranged) {
     auto* attacker = insert_selected_unit(
-        {.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .x = 2, .y = 3});
-    auto* attackee = insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
+        {.x = 2, .y = 3, .model = MODEL_ARTILLERY, .health = HEALTH_MAX});
+    auto* attackee = insert_unit({.x = 5, .y = 7, .health = HEALTH_MAX});
 
     health_t expected_damage;
     health_t expected_counter_damage;
@@ -191,8 +191,8 @@ TEST_F(game_fixture, game_calc_damage_when_ranged) {
 
 TEST_F(game_fixture, game_calc_damage_when_direct_and_no_merge) {
     auto* attacker = insert_selected_unit(
-        {.health = HEALTH_MAX, .model = MODEL_INFANTRY, .x = 2, .y = 3});
-    auto* attackee = insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
+        {.x = 2, .y = 3,  .health = HEALTH_MAX});
+    auto* attackee = insert_unit({.x = 5, .y = 7, .health = HEALTH_MAX});
 
     health_t expected_damage;
     health_t expected_counter_damage;
@@ -212,9 +212,9 @@ TEST_F(game_fixture, game_calc_damage_when_direct_and_no_merge) {
 
 TEST_F(game_fixture, game_calc_damage_when_direct_and_disabled_merge) {
     auto* attacker = insert_selected_unit(
-        {.health = HEALTH_MAX / 2, .model = MODEL_INFANTRY, .x = 2, .y = 3});
-    auto* attackee = insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
-    insert_unit({.health = HEALTH_MAX / 2, .x = 4, .y = 7});
+        {.x = 2, .y = 3,  .health = HEALTH_MAX / 2});
+    auto* attackee = insert_unit({.x = 5, .y = 7, .health = HEALTH_MAX});
+    insert_unit({.x = 4, .y = 7, .health = HEALTH_MAX / 2});
 
     health_t expected_damage;
     health_t expected_counter_damage;
@@ -236,9 +236,9 @@ TEST_F(game_fixture, game_calc_damage_when_direct_and_disabled_merge) {
 
 TEST_F(game_fixture, game_calc_damage_when_merge) {
     auto* attacker = insert_selected_unit(
-        {.health = HEALTH_MAX / 2, .model = MODEL_INFANTRY, .x = 2, .y = 3});
-    auto* attackee = insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
-    insert_unit({.health = HEALTH_MAX / 2, .x = 4, .y = 7, .enabled = true});
+        {.x = 2, .y = 3,  .health = HEALTH_MAX / 2});
+    auto* attackee = insert_unit({.x = 5, .y = 7, .health = HEALTH_MAX});
+    insert_unit({.x = 4, .y = 7, .health = HEALTH_MAX / 2, .enabled = true});
 
     health_t expected_damage;
     health_t expected_counter_damage;

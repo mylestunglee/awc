@@ -25,7 +25,7 @@ TEST_F(game_fixture, repair_units_ignores_unit_not_on_territory) {
 }
 
 TEST_F(game_fixture, repair_units_caps_at_maximum_health) {
-    insert_unit({.health = HEALTH_MAX - 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX - 1});
     game->territory[3][2] = game->turn;
 
     repair_units(game);
@@ -93,8 +93,8 @@ TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_dead_player) {
 }
 
 TEST_F(game_fixture, turn_next_sets_units_enabled) {
-    insert_unit({.player = 0, .x = 2, .enabled = true});
-    insert_unit({.player = 1, .x = 3, .enabled = false});
+    insert_unit({.x = 2, .player = 0, .enabled = true});
+    insert_unit({.x = 3, .player = 1, .enabled = false});
 
     turn_next(game);
 
@@ -104,7 +104,7 @@ TEST_F(game_fixture, turn_next_sets_units_enabled) {
 }
 
 TEST_F(game_fixture, turn_next_plays_bot_turn) {
-    insert_unit({.player = 1, .x = 2, .enabled = true});
+    insert_unit({.x = 2, .player = 1, .enabled = true});
     bitarray_set(game->bots, 1);
     game->map[0][2] = TILE_PLAINS;
     game->map[0][3] = TILE_CITY;

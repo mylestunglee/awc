@@ -170,11 +170,11 @@ bool load_unit(const char* const command, const char* const params,
     else
         return false;
 
-    const struct unit unit = {.health = health,
-                              .model = model,
-                              .player = player,
-                              .x = x,
+    const struct unit unit = {.x = x,
                               .y = y,
+                              .player = player,
+                              .model = model,
+                              .health = health,
                               .enabled = enabled};
     units_insert(units, &unit);
 

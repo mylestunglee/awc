@@ -116,7 +116,7 @@ TEST_F(game_fixture, parse_save_load_5_returns_false) {
 }
 
 TEST_F(game_fixture, parse_next_turn_returns_false) {
-    insert_unit({.player = 1, .x = 2, .enabled = false});
+    insert_unit({.x = 2,.player = 1, .enabled = false});
 
     ASSERT_FALSE(parse_next_turn(game));
 

@@ -6,7 +6,7 @@
 
 TEST_F(game_fixture, move_selected_unit_when_no_merge) {
     const auto* const unit = insert_selected_unit(
-        {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
+        {.x = 2, .y = 3, .health = HEALTH_MAX, .enabled = true});
 
     ASSERT_EQ(move_selected_unit(game, 5, 3), HEALTH_MAX);
 
@@ -15,8 +15,8 @@ TEST_F(game_fixture, move_selected_unit_when_no_merge) {
 }
 
 TEST_F(game_fixture, move_selected_unit_when_merge_with_disabled_unit) {
-    insert_selected_unit({.health = 7, .x = 2, .y = 3, .enabled = true});
-    insert_unit({.health = 11, .x = 5, .y = 3});
+    insert_selected_unit({.x = 2, .y = 3, .health = 7, .enabled = true});
+    insert_unit({.x = 5, .y = 3, .health = 11});
 
     ASSERT_EQ(move_selected_unit(game, 5, 3), 7);
 
@@ -24,8 +24,8 @@ TEST_F(game_fixture, move_selected_unit_when_merge_with_disabled_unit) {
 }
 
 TEST_F(game_fixture, move_selected_unit_when_merge_with_enabled_unit) {
-    insert_selected_unit({.health = 7, .x = 2, .y = 3, .enabled = true});
-    insert_unit({.health = 11, .x = 5, .y = 3, .enabled = true});
+    insert_selected_unit({.x = 2, .y = 3, .health = 7, .enabled = true});
+    insert_unit({.x = 5, .y = 3, .health = 11, .enabled = true});
 
     ASSERT_EQ(move_selected_unit(game, 5, 3), 18);
 
@@ -39,9 +39,9 @@ TEST_F(game_fixture, action_attack_returns_true_when_unattackable) {
 TEST_F(game_fixture,
        action_attack_returns_false_where_direct_unit_with_counter_damage) {
     const auto* const attacker = insert_selected_unit(
-        {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
+        {.x = 2, .y = 3, .health = HEALTH_MAX, .enabled = true});
     const auto* const attackee =
-        insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
+        insert_unit({.x = 5, .y = 7, .health = HEALTH_MAX});
     game->prev_x = 4;
     game->prev_y = 7;
     game->x = 5;
@@ -63,12 +63,12 @@ TEST_F(game_fixture,
 }
 
 TEST_F(game_fixture, action_attack_returns_false_where_ranged_unit_kills) {
-    insert_selected_unit({.health = HEALTH_MAX,
-                          .model = MODEL_ARTILLERY,
-                          .x = 2,
+    insert_selected_unit({.x = 2,
                           .y = 3,
+                          .model = MODEL_ARTILLERY,
+                          .health = HEALTH_MAX,
                           .enabled = true});
-    insert_unit({.health = 1, .x = 5, .y = 7});
+    insert_unit({.x = 5, .y = 7, .health = 1});
     game->x = 5;
     game->y = 7;
     game->map[7][5] = TILE_PLAINS;
@@ -82,8 +82,8 @@ TEST_F(game_fixture, action_attack_returns_false_where_ranged_unit_kills) {
 }
 
 TEST_F(game_fixture, action_attack_returns_false_where_counter_damage_kills) {
-    insert_selected_unit({.health = 1, .x = 2, .y = 3, .enabled = true});
-    insert_unit({.health = HEALTH_MAX, .x = 5, .y = 7});
+    insert_selected_unit({.x = 2, .y = 3, .health = 1, .enabled = true});
+    insert_unit({.x = 5, .y = 7, .health = HEALTH_MAX});
     game->prev_x = 4;
     game->prev_y = 7;
     game->x = 5;
@@ -197,7 +197,7 @@ TEST_F(game_fixture, action_capture_when_capture_unoccupied_city) {
 
 TEST_F(game_fixture, action_move_returns_false_when_start_capturing) {
     const auto* const unit = insert_selected_unit(
-        {.health = HEALTH_MAX, .x = 2, .y = 3, .enabled = true});
+        {.x = 2, .y = 3, .health = HEALTH_MAX, .enabled = true});
     game->x = 5;
     game->y = 7;
     game->labels[7][5] = ACCESSIBLE_BIT;
@@ -214,10 +214,10 @@ TEST_F(game_fixture, action_move_returns_false_when_start_capturing) {
 }
 
 TEST_F(game_fixture, action_move_returns_false_when_finish_capturing) {
-    insert_selected_unit({.capture_progress = HEALTH_MAX,
-                          .health = HEALTH_MAX,
-                          .x = 2,
+    insert_selected_unit({.x = 2,
                           .y = 3,
+                          .health = HEALTH_MAX,
+                          .capture_progress = HEALTH_MAX,
                           .enabled = true});
     game->x = 2;
     game->y = 3;

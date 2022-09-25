@@ -6,8 +6,8 @@
 #include "test_constants.hpp"
 
 TEST_F(game_fixture, simulate_attack_when_ranged) {
-    insert_selected_unit({.health = HEALTH_MAX, .model = MODEL_ARTILLERY});
-    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
+    insert_selected_unit({.model = MODEL_ARTILLERY, .health = HEALTH_MAX});
+    insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
     game->x = 2;
     game->y = 3;
 
@@ -23,7 +23,7 @@ TEST_F(game_fixture, simulate_attack_when_ranged) {
 
 TEST_F(game_fixture, simulate_attack_sets_prev_position_when_direct) {
     insert_selected_unit({.health = HEALTH_MAX});
-    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
     game->x = 2;
     game->y = 3;
     game->prev_x = 1;
@@ -46,9 +46,9 @@ TEST_F(game_fixture, simulate_attack_sets_prev_position_when_direct) {
 
 TEST_F(game_fixture, find_attackee_maximises_metric) {
     insert_selected_unit();
-    insert_unit({.health = HEALTH_MAX, .x = 3});
+    insert_unit({.x = 3, .health = HEALTH_MAX});
     const auto* const expected_attackee =
-        insert_unit({.health = HEALTH_MAX / 2, .x = 5});
+        insert_unit({.x = 5, .health = HEALTH_MAX / 2});
     game->labels[0][3] = ATTACKABLE_BIT;
     game->labels[0][5] = ATTACKABLE_BIT;
 
@@ -59,8 +59,8 @@ TEST_F(game_fixture, find_attackee_maximises_metric) {
 
 TEST_F(game_fixture, handle_attack_reduces_attackee_health) {
     insert_selected_unit(
-        {.health = HEALTH_MAX, .model = MODEL_ARTILLERY, .enabled = true});
-    const auto* const attackee = insert_unit({.health = HEALTH_MAX, .x = 2});
+        {.model = MODEL_ARTILLERY, .health = HEALTH_MAX, .enabled = true});
+    const auto* const attackee = insert_unit({.x = 2, .health = HEALTH_MAX});
     game->labels[0][2] = ATTACKABLE_BIT;
     game->dirty_labels = true;
 
@@ -132,7 +132,7 @@ TEST_F(game_fixture, handle_capture_when_uncapturable_unit) {
 
 TEST_F(game_fixture, handle_capture_when_no_capturable_exists) {
     const auto* const unit =
-        insert_unit({.model = MODEL_INFANTRY, .enabled = true});
+        insert_unit({ .enabled = true});
 
     handle_capture(game, unit->model);
 
@@ -147,7 +147,7 @@ TEST_F(game_fixture, handle_capture_when_capturable_exists) {
     game->dirty_labels = true;
 
     const auto* const unit =
-        insert_selected_unit({.model = MODEL_INFANTRY, .enabled = true});
+        insert_selected_unit({ .enabled = true});
 
     handle_capture(game, unit->model);
 
@@ -158,9 +158,9 @@ TEST_F(game_fixture, handle_capture_when_capturable_exists) {
 
 TEST_F(game_fixture, handle_local_prioritises_attack_over_capture) {
     const auto* const attacker = insert_selected_unit(
-        {.health = HEALTH_MAX, .player = 0, .x = 1, .enabled = true});
+        {.x = 1, .player = 0, .health = HEALTH_MAX, .enabled = true});
     const auto* const attackee =
-        insert_unit({.health = HEALTH_MAX, .player = 1, .x = 3});
+        insert_unit({.x = 3, .player = 1, .health = HEALTH_MAX});
     for (auto i = 1; i < 4; ++i)
         game->map[0][i] = TILE_PLAINS;
     game->map[0][0] = TILE_CITY;
@@ -252,7 +252,7 @@ TEST_F(game_fixture, find_nearest_attackable_attackee_when_direct) {
 
 TEST_F(game_fixture, find_nearest_attackable) {
     grid_t dummy;
-    insert_unit({.player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     game->labels[3][1] = ACCESSIBLE_BIT;
     game->energies[3][1] = 5;
 
@@ -265,7 +265,7 @@ TEST_F(game_fixture, find_nearest_attackable) {
 TEST_F(game_fixture, find_nearest_target_when_attackable_target) {
     grid_t nearest_x = 0;
     grid_t nearest_y = 0;
-    insert_unit({.player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     game->labels[3][1] = ACCESSIBLE_BIT;
     game->energies[3][1] = 5;
 
@@ -295,7 +295,7 @@ TEST_F(game_fixture,
        find_nearest_target_favours_capturable_over_attackable_target) {
     grid_t nearest_x = 0;
     grid_t nearest_y = 0;
-    insert_unit({.player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     game->labels[3][1] = ACCESSIBLE_BIT;
     game->energies[3][1] = 5;
     game->map[5][2] = TILE_CITY;

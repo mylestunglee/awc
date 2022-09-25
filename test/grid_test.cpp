@@ -127,7 +127,7 @@ TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_marks_when_damagable_enemy_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
     ASSERT_NE(units_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
-    insert_unit({.player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
 
     grid_explore_mark_attackable_tile(game, 2, 3, MODEL_INFANTRY, 0, false);
 
@@ -138,7 +138,7 @@ TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_undamagable_enemy_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
     ASSERT_EQ(units_damage[MODEL_MISSLES][MODEL_INFANTRY], 0);
-    insert_unit({.player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
 
     grid_explore_mark_attackable_tile(game, 2, 3, MODEL_MISSLES, 0, false);
 
@@ -149,7 +149,7 @@ TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_friendly_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
     ASSERT_NE(units_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
-    insert_unit({.player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     bitmatrix_set(game->alliances, 0, 1);
 
     grid_explore_mark_attackable_tile(game, 2, 3, MODEL_INFANTRY, 0, false);
@@ -214,7 +214,7 @@ TEST_F(game_fixture,
 TEST_F(game_fixture,
        is_node_unexplorable_returns_true_when_blocked_by_enemy_unit) {
     insert_unit({.x = 0, .y = 0});
-    insert_unit({.player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     struct list_node node = {.x = 2, .y = 3};
 
     auto unexplorable = is_node_unexplorable(game, &node, 0);
@@ -224,8 +224,8 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        is_node_unexplorable_returns_false_when_blocked_by_passable_unit) {
-    insert_unit({.model = MODEL_INFANTRY, .x = 0, .y = 0});
-    insert_unit({.model = MODEL_HELICOPTER, .player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 0, .y = 0});
+    insert_unit({.x = 2, .y = 3, .player = 1, .model = MODEL_HELICOPTER});
     struct list_node node = {.x = 2, .y = 3};
 
     auto unexplorable = is_node_unexplorable(game, &node, 0);
@@ -275,8 +275,8 @@ TEST_F(game_fixture, is_node_accessible_returns_true_when_mergable) {
 }
 
 TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
-    insert_unit({.health = HEALTH_MAX, .x = 2, .y = 3});
-    insert_unit({.health = HEALTH_MAX, .x = 0, .y = 0});
+    insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
+    insert_unit({.x = 0, .y = 0, .health = HEALTH_MAX});
     struct list_node node = {.x = 2, .y = 3};
 
     auto accessible = is_node_accessible(game, &node);
@@ -288,7 +288,7 @@ TEST_F(game_fixture, is_node_accessible_returns_false_when_ship_on_bridge) {
     ASSERT_NE(MOVEMENT_TYPE_SHIP, 0);
     ASSERT_EQ(unit_movement_types[MODEL_SUBMARINE], MOVEMENT_TYPE_SHIP);
     game->map[3][2] = TILE_BRIDGE;
-    insert_unit({.model = MODEL_SUBMARINE, .x = 0, .y = 0});
+    insert_unit({.model = MODEL_SUBMARINE});
     struct list_node node = {.x = 2, .y = 3};
 
     auto accessible = is_node_accessible(game, &node);
@@ -360,7 +360,7 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture, explore_node_does_not_explore_occupied_tile) {
     insert_unit({.x = 0, .y = 0});
-    insert_unit({.player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     struct list_node node = {.energy = 5, .x = 2, .y = 3};
 
     explore_node(game, &node, NULL_PLAYER, 0, false);
@@ -408,7 +408,7 @@ TEST(game_test, init_exploration_energy_lookups_movement) {
 }
 
 TEST_F(game_fixture, grid_explore_recursive_clears_energy) {
-    insert_unit({.model = MODEL_INFANTRY, .player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     game->x = 2;
     game->y = 3;
     game->map[3][3] = TILE_PLAINS;
@@ -433,7 +433,7 @@ TEST_F(game_fixture,
     game->map[3][4] = TILE_PLAINS;
     game->map[3][5] = TILE_PLAINS;
     game->map[3][6] = TILE_PLAINS;
-    insert_unit({.model = MODEL_INFANTRY, .player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     game->x = 2;
     game->y = 3;
 
@@ -451,7 +451,7 @@ TEST_F(game_fixture, grid_explore_labels_accessible_tiles) {
     game->map[3][4] = TILE_PLAINS;
     game->map[3][5] = TILE_PLAINS;
     game->map[3][6] = TILE_PLAINS;
-    insert_unit({.model = MODEL_INFANTRY, .player = 1, .x = 2, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 1});
     game->x = 2;
     game->y = 3;
 
@@ -465,8 +465,8 @@ TEST_F(game_fixture, grid_explore_labels_accessible_tiles) {
 }
 
 TEST_F(game_fixture, grid_explore_labels_actionable_attack) {
-    insert_unit({.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3});
-    insert_unit({.model = MODEL_INFANTRY, .player = 1, .x = 3, .y = 3});
+    insert_unit({.x = 2, .y = 3, .player = 0});
+    insert_unit({.x = 3, .y = 3, .player = 1});
     game->x = 2;
     game->y = 3;
 
@@ -476,7 +476,7 @@ TEST_F(game_fixture, grid_explore_labels_actionable_attack) {
 }
 
 TEST_F(game_fixture, grid_explore_labels_potential_attack) {
-    struct unit unit = {.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3};
+    struct unit unit = {.x = 2, .y = 3, .player = 0};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
@@ -489,9 +489,9 @@ TEST_F(game_fixture, grid_explore_labels_potential_attack) {
 TEST_F(game_fixture, grid_explore_is_blocked_by_units) {
     game->map[3][3] = TILE_PLAINS;
     game->map[3][4] = TILE_PLAINS;
-    struct unit alice = {.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3};
+    struct unit alice = {.x = 2, .y = 3, .player = 0};
     units_insert(&game->units, &alice);
-    struct unit bob = {.model = MODEL_INFANTRY, .player = 1, .x = 3, .y = 3};
+    struct unit bob = {.x = 3, .y = 3, .player = 1};
     units_insert(&game->units, &bob);
     game->x = 2;
     game->y = 3;
@@ -504,7 +504,7 @@ TEST_F(game_fixture, grid_explore_is_blocked_by_units) {
 TEST_F(
     game_fixture,
     grid_explore_starting_tile_is_accessible_when_all_adjacent_tiles_are_blocked) {
-    struct unit unit = {.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3};
+    struct unit unit = {.x = 2, .y = 3, .player = 0};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
@@ -516,7 +516,7 @@ TEST_F(
 
 TEST_F(game_fixture, grid_explore_merges_labels) {
     game->map[3][3] = TILE_PLAINS;
-    struct unit unit = {.model = MODEL_INFANTRY, .player = 1, .x = 2, .y = 3};
+    struct unit unit = {.x = 2, .y = 3, .player = 1};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
@@ -527,7 +527,7 @@ TEST_F(game_fixture, grid_explore_merges_labels) {
 }
 
 TEST_F(game_fixture, grid_explore_recursive_initial_energy_scales) {
-    struct unit unit = {.model = MODEL_INFANTRY, .player = 0, .x = 2, .y = 3};
+    struct unit unit = {.x = 2, .y = 3, .player = 0};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;

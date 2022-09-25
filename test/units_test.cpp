@@ -170,7 +170,7 @@ TEST_F(units_fixture, units_move_relocates_unit) {
 
 TEST_F(units_fixture, units_set_enabled_sets_enabled) {
     struct unit unit {
-        .player = 2, .x = 3, .y = 5, .enabled = false
+        .x = 3, .y = 5, .player = 2, .enabled = false
     };
     units_insert(units, &unit);
     unit.y = 7;
@@ -182,7 +182,7 @@ TEST_F(units_fixture, units_set_enabled_sets_enabled) {
 
 TEST_F(units_fixture, units_delete_player_deletes_all_player_units) {
     struct unit unit {
-        .player = 2, .x = 3, .y = 5
+        .x = 3, .y = 5, .player = 2
     };
     units_insert(units, &unit);
     unit.y = 7;
