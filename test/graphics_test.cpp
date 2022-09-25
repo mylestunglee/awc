@@ -21,7 +21,7 @@ TEST(graphics_test, graphics_init_sets_empty_character_locale) {
 TEST(graphics_test, render_block_with_no_progress_is_empty) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_block(0, 1, 2, &symbol, &style);
+    render_block(0, 2, &symbol, &style);
     ASSERT_EQ(symbol, ' ');
     ASSERT_EQ(style, '\x90');
 }
@@ -29,7 +29,7 @@ TEST(graphics_test, render_block_with_no_progress_is_empty) {
 TEST(graphics_test, render_block_with_near_completion_is_nearly_full) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_block(254, 255, 2, &symbol, &style);
+    render_block(99, 2, &symbol, &style);
     ASSERT_EQ(symbol, ' ');
     ASSERT_EQ(style, '\x0A');
 }
@@ -37,7 +37,7 @@ TEST(graphics_test, render_block_with_near_completion_is_nearly_full) {
 TEST(graphics_test, render_block_with_half_completion_is_half_full) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_block(128, 255, 4, &symbol, &style);
+    render_block(50, 4, &symbol, &style);
     ASSERT_EQ(symbol, L'▌');
     ASSERT_EQ(style, '\xb0');
 }
@@ -45,8 +45,8 @@ TEST(graphics_test, render_block_with_half_completion_is_half_full) {
 TEST(graphics_test, render_percentage_with_low_progress_is_right_aligned) {
     wchar_t left_symbol = ' ';
     wchar_t right_symbol = ' ';
-    render_percentage(23, 100, 5, &left_symbol);
-    render_percentage(23, 100, 6, &right_symbol);
+    render_percentage(23, 5, &left_symbol);
+    render_percentage(23, 6, &right_symbol);
     ASSERT_EQ(left_symbol, '2');
     ASSERT_EQ(right_symbol, '3');
 }
@@ -54,8 +54,8 @@ TEST(graphics_test, render_percentage_with_low_progress_is_right_aligned) {
 TEST(graphics_test, render_percentage_with_high_progress_is_left_aligned) {
     wchar_t left_symbol = ' ';
     wchar_t right_symbol = ' ';
-    render_percentage(57, 100, 2, &left_symbol);
-    render_percentage(57, 100, 3, &right_symbol);
+    render_percentage(57, 2, &left_symbol);
+    render_percentage(57, 3, &right_symbol);
     ASSERT_EQ(left_symbol, '5');
     ASSERT_EQ(right_symbol, '7');
 }
@@ -63,7 +63,7 @@ TEST(graphics_test, render_percentage_with_high_progress_is_left_aligned) {
 TEST(graphics_test, render_bar_overlaps_percentage_over_block) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
-    render_bar(57, 100, 2, &symbol, &style);
+    render_bar(57, 2, &symbol, &style);
     ASSERT_EQ(symbol, '5');
     ASSERT_EQ(style, '\x0B');
 }

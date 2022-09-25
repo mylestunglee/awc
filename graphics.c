@@ -84,16 +84,14 @@ static const uint8_t
 
 void graphics_initialise() { setlocale(LC_CTYPE, "C.UTF-8"); }
 
-void render_block(uint32_t progress, uint32_t completion, const grid_t tile_x,
+void render_block(const uint32_t percent, const grid_t tile_x,
                   wchar_t* const symbol, uint8_t* const style) {
-    assert(progress < completion);
-    assert(completion > 0);
     const uint8_t styles[] = {'\x90', '\xb0', '\xa0'};
     const uint8_t inverted_styles[] = {'\x09', '\x0B', '\x0A'};
-    const uint8_t style_index = (3 * progress) / completion;
+    const uint8_t style_index = (3 * percent) / 100;
 
     const wchar_t block_symbols[] = {L'▏', L'▎', L'▍', L'▌', L'▋', L'▊', L'▉'};
-    const int8_t steps = ((8 * unit_width + 1) * progress) / completion -
+    const int8_t steps = ((8 * unit_width + 1) * percent) / 100 -
                          8 * (tile_x - unit_left) - 1;
     if (steps < 0) {
         *style = styles[style_index];
@@ -107,11 +105,9 @@ void render_block(uint32_t progress, uint32_t completion, const grid_t tile_x,
     }
 }
 
-void render_percentage(uint32_t progress, uint32_t completion,
+void render_percentage(const uint32_t percent,
                        const grid_t tile_x, wchar_t* const symbol) {
-    assert(progress < completion);
-    assert(completion > 0);
-    const uint8_t percent = (100 * progress) / completion;
+    assert(percent < 100);
     const wchar_t left_digit = '0' + percent / 10;
     const wchar_t right_digit = '0' + percent % 10;
     if (percent >= 50) {
@@ -133,10 +129,10 @@ void render_percentage(uint32_t progress, uint32_t completion,
     }
 }
 
-void render_bar(uint32_t progress, uint32_t completion, const grid_t tile_x,
+void render_bar(const uint32_t progress, const grid_t tile_x,
                 wchar_t* const symbol, uint8_t* const style) {
-    render_block(progress, completion, tile_x, symbol, style);
-    render_percentage(progress, completion, tile_x, symbol);
+    render_block(progress, tile_x, symbol, style);
+    render_percentage(progress, tile_x, symbol);
 }
 
 bool render_unit_health_bar(const struct units* const units, const grid_t x,
@@ -161,7 +157,7 @@ bool render_unit_health_bar(const struct units* const units, const grid_t x,
     if (health == HEALTH_MAX)
         return false;
 
-    render_bar(health, HEALTH_MAX, tile_x, symbol, style);
+    render_bar(health, tile_x, symbol, style);
 
     return true;
 }
@@ -188,7 +184,7 @@ bool render_capture_progress_bar(const struct units* const units,
     if (capture_progress == 0)
         return false;
 
-    render_bar(capture_progress, CAPTURE_COMPLETION, tile_x, symbol, style);
+    render_bar(capture_progress / (CAPTURE_COMPLETION / HEALTH_MAX), tile_x, symbol, style);
 
     return true;
 }
