@@ -12,7 +12,7 @@
 #define MODEL_FORMAT "%hhu"
 #define TURN_FORMAT "%hhu"
 #define HEALTH_WIDE_FORMAT "%hu"
-#define GOLD_FORMAT "%d"
+#define GOLD_FORMAT "%i"
 #define ENABLED_FORMAT "%8s"
 #define TILE_FORMAT "%hhu"
 #define CAPTURE_COMPLETION_FORMAT "%hu"
@@ -24,10 +24,5 @@ static const char* const model_names[MODEL_CAPACITY] = {
     "infantry",  "mech",    "recon",     "tank",    "battletank",
     "artillery", "rockets", "antiair",   "missles", "battlecopter",
     "fighter",   "bomber",  "submarine", "crusier", "battleship"};
-
-static const char* const tile_names[TILE_CAPACITY] = {
-    "void", "plains",  "forest",  "mountains", "beach",
-    "sea",  "reef",    "river",   "road",      "bridge",
-    "city", "factory", "airport", "habour",    "HQ"};
 
 #endif

@@ -82,6 +82,11 @@ static const uint8_t
                             {'\xb1', '\x11', '\x11', '\x1c'},
                             {'\xb1', '\x11', '\x11', '\x1c'}}};
 
+static const char* const tile_names[TILE_CAPACITY] = {
+    "void", "plains",  "forest",  "mountains", "beach",
+    "sea",  "reef",    "river",   "road",      "bridge",
+    "city", "factory", "airport", "habour",    "HQ"};
+
 void graphics_initialise() { setlocale(LC_CTYPE, "C.UTF-8"); }
 
 void render_block(const uint32_t percent, const grid_t tile_x,
@@ -456,22 +461,33 @@ void reset_style(void) { wprintf(L"%c[0m", '\x1b'); }
 
 void print_normal_text(const struct game* const game) {
     wprintf(
-        L"turn=%hhu x=%hhu y=%hhu tile=%s territory=%hhu label=%u gold=%u\n",
-        game->turn, game->x, game->y, tile_names[game->map[game->y][game->x]],
-        game->territory[game->y][game->x], game->labels[game->y][game->x],
-        game->golds[game->turn]);
+        L"turn=" TURN_FORMAT " gold=" GOLD_FORMAT " tile=%s",
+        game->turn,
+        game->golds[game->turn],
+        tile_names[game->map[game->y][game->x]]);
 
-    const struct unit* unit =
-        units_const_get_at(&game->units, game->x, game->y);
-    if (unit)
-        wprintf(L"unit health=" HEALTH_FORMAT " model=%s capture_progress=%u",
-                unit->health, model_names[unit->model], unit->capture_progress);
+    {
+        const player_t territory = game->territory[game->y][game->x];
+        if (territory != NULL_PLAYER)
+            wprintf(
+                L" territory=%u",
+                territory + 1);
+    }
+
+    {
+        const struct unit* unit =
+            units_const_get_at(&game->units, game->x, game->y);
+        if (unit)
+            wprintf(L" model=%s", model_names[unit->model]);
+    }
+
+    wprintf(L"\n");
 }
 
 void print_attack_text(const struct game* const game) {
     health_t damage, counter_damage;
     game_calc_damage(game, &damage, &counter_damage);
-    wprintf(L"Damage: %u%% Counter-damage: %u%%\n", damage, counter_damage);
+    wprintf(L"attack mode: damage=%u%% counter-damage=%u%%\n", damage, counter_damage);
 }
 
 void print_build_text(const struct game* const game) {
@@ -479,10 +495,10 @@ void print_build_text(const struct game* const game) {
     assert(tile >= TERRIAN_CAPACITY);
     const tile_t capturable = tile - TERRIAN_CAPACITY;
 
-    wprintf(L"in build mode:");
+    wprintf(L"build mode:");
     for (model_t model = buildable_models[capturable];
          model < buildable_models[capturable + 1]; ++model) {
-        wprintf(L"(" MODEL_FORMAT ") %s ", model + 1, model_names[model]);
+        wprintf(L" %s=" MODEL_FORMAT, model_names[model], model + 1);
     }
     wprintf(L"\n");
 }

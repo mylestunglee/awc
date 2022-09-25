@@ -25,6 +25,7 @@ TEST(graphics_coverage_test, reset_black) { reset_black(); }
 TEST(graphics_coverage_test, reset_style) { reset_style(); }
 
 TEST_F(game_fixture, print_normal_text) {
+    game->territory[0][0] = 0;
     insert_unit();
 
     print_normal_text(game);

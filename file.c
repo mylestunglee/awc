@@ -151,13 +151,15 @@ bool load_unit(const char* const command, const char* const params,
                &capture_progress) < 3)
         return false;
 
-    // Replace with PLAYERS_CAPACITY
     if (player >= PLAYERS_CAPACITY)
         return false;
 
     health_t health = HEALTH_MAX;
     if (health_buffer[0] != '\0' &&
         sscanf(health_buffer, HEALTH_FORMAT, &health) != 1)
+        return false;
+
+    if (health > HEALTH_MAX)
         return false;
 
     bool enabled;

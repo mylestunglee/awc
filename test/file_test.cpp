@@ -165,6 +165,12 @@ TEST_F(units_fixture, load_unit_when_invalid_health_returns_false) {
     ASSERT_FALSE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
 }
 
+TEST_F(units_fixture, load_unit_when_extreme_health_returns_false) {
+    const auto params = "2 3 5 255"s;
+
+    ASSERT_FALSE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
+}
+
 TEST_F(units_fixture, load_unit_when_valid_inserts_default_enabled_unit) {
     const auto params = "0 3 5 7"s;
 
