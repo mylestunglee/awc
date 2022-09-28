@@ -111,9 +111,9 @@ TEST_F(game_fixture, calc_damage_pair_kill_attackee) {
 }
 
 TEST_F(game_fixture, calc_damage_pair_ranged_units_do_not_counter_attack) {
-    auto* attacker = insert_selected_unit(
+    const auto* attacker = insert_selected_unit(
         {.x = 2, .y = 3, .model = MODEL_ARTILLERY, .health = HEALTH_MAX});
-    auto* attackee = insert_unit(
+    const auto* attackee = insert_unit(
         {.x = 5, .y = 7,  .health = HEALTH_MAX});
     game->x = 5;
     game->y = 7;

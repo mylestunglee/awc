@@ -11,7 +11,7 @@ struct unit* game_fixture::insert_unit(const struct unit& unit) {
 }
 
 struct unit* game_fixture::insert_selected_unit(const struct unit& unit) {
-    auto inserted_unit = insert_unit(unit);
+    auto* inserted_unit = insert_unit(unit);
     units_select_at(&game->units, inserted_unit->x, inserted_unit->y);
     return inserted_unit;
 }

@@ -16,7 +16,7 @@ TEST_F(game_fixture, accumulate_distribution) {
 
 TEST_F(game_fixture, inputs_initialise_distributions) {
     struct bap_inputs inputs = {0};
-    insert_unit({.x = 1, .player = 0,  .health = 2});
+    insert_unit({.x = 1,  .health = 2});
     insert_unit({.x = 2, .player = 1,  .health = 3});
 
     inputs_initialise_distributions(game, &inputs);

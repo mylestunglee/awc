@@ -93,7 +93,7 @@ TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_dead_player) {
 }
 
 TEST_F(game_fixture, turn_next_sets_units_enabled) {
-    insert_unit({.x = 2, .player = 0, .enabled = true});
+    insert_unit({.x = 2, .enabled = true});
     insert_unit({.x = 3, .player = 1, .enabled = false});
 
     turn_next(game);

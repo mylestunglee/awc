@@ -465,7 +465,7 @@ TEST_F(game_fixture, grid_explore_labels_accessible_tiles) {
 }
 
 TEST_F(game_fixture, grid_explore_labels_actionable_attack) {
-    insert_unit({.x = 2, .y = 3, .player = 0});
+    insert_unit({.x = 2, .y = 3});
     insert_unit({.x = 3, .y = 3, .player = 1});
     game->x = 2;
     game->y = 3;
@@ -476,7 +476,7 @@ TEST_F(game_fixture, grid_explore_labels_actionable_attack) {
 }
 
 TEST_F(game_fixture, grid_explore_labels_potential_attack) {
-    struct unit unit = {.x = 2, .y = 3, .player = 0};
+    struct unit unit = {.x = 2, .y = 3};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
@@ -489,7 +489,7 @@ TEST_F(game_fixture, grid_explore_labels_potential_attack) {
 TEST_F(game_fixture, grid_explore_is_blocked_by_units) {
     game->map[3][3] = TILE_PLAINS;
     game->map[3][4] = TILE_PLAINS;
-    struct unit alice = {.x = 2, .y = 3, .player = 0};
+    struct unit alice = {.x = 2, .y = 3};
     units_insert(&game->units, &alice);
     struct unit bob = {.x = 3, .y = 3, .player = 1};
     units_insert(&game->units, &bob);
@@ -504,7 +504,7 @@ TEST_F(game_fixture, grid_explore_is_blocked_by_units) {
 TEST_F(
     game_fixture,
     grid_explore_starting_tile_is_accessible_when_all_adjacent_tiles_are_blocked) {
-    struct unit unit = {.x = 2, .y = 3, .player = 0};
+    struct unit unit = {.x = 2, .y = 3};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;
@@ -527,7 +527,7 @@ TEST_F(game_fixture, grid_explore_merges_labels) {
 }
 
 TEST_F(game_fixture, grid_explore_recursive_initial_energy_scales) {
-    struct unit unit = {.x = 2, .y = 3, .player = 0};
+    struct unit unit = {.x = 2, .y = 3};
     units_insert(&game->units, &unit);
     game->x = 2;
     game->y = 3;

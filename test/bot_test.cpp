@@ -158,7 +158,7 @@ TEST_F(game_fixture, handle_capture_when_capturable_exists) {
 
 TEST_F(game_fixture, handle_local_prioritises_attack_over_capture) {
     const auto* const attacker = insert_selected_unit(
-        {.x = 1, .player = 0, .health = HEALTH_MAX, .enabled = true});
+        {.x = 1, .health = HEALTH_MAX, .enabled = true});
     const auto* const attackee =
         insert_unit({.x = 3, .player = 1, .health = HEALTH_MAX});
     for (auto i = 1; i < 4; ++i)
@@ -406,7 +406,7 @@ TEST_F(game_fixture, interact_unit_maintains_enabled_when_move_is_impossible) {
 }
 
 TEST_F(game_fixture, interact_units) {
-    auto* unit = insert_unit({.enabled = true});
+    const auto* unit = insert_unit({.enabled = true});
 
     game->map[0][1] = TILE_CITY;
     game->territory[0][1] = NULL_PLAYER;
@@ -427,7 +427,7 @@ TEST_F(game_fixture, bot_play_clears_labels) {
 }
 
 TEST_F(game_fixture, bot_play_interacts_units) {
-    auto* unit = insert_unit({.enabled = true});
+    const auto* unit = insert_unit({.enabled = true});
 
     game->map[0][1] = TILE_CITY;
     game->territory[0][1] = NULL_PLAYER;

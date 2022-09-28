@@ -22,3 +22,16 @@ TEST_F(game_fixture, capture_city) {
 
     ASSERT_EQ(game->territory[0][1], 0);
 }
+
+TEST_F(game_fixture, attack_enemy) {
+    game->map[0][0] = TILE_PLAINS;
+    game->map[0][1] = TILE_PLAINS;
+    const auto* attacker = insert_unit({.health = HEALTH_MAX, .enabled = true});
+    const auto* attackee = insert_unit({.x = 1, .player = 1, .health = HEALTH_MAX});
+
+    parse_commands(game, " d ");
+
+    ASSERT_LT(attacker->health, HEALTH_MAX);
+    ASSERT_LT(attackee->health, HEALTH_MAX);
+    ASSERT_LT(attackee->health, attacker->health);
+}
