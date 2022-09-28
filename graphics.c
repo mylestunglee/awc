@@ -96,8 +96,8 @@ void render_block(const uint32_t percent, const grid_t tile_x,
     const uint8_t style_index = (3 * percent) / 100;
 
     const wchar_t block_symbols[] = {L'▏', L'▎', L'▍', L'▌', L'▋', L'▊', L'▉'};
-    const int8_t steps = ((8 * unit_width + 1) * percent) / 100 -
-                         8 * (tile_x - unit_left) - 1;
+    const int8_t steps =
+        ((8 * unit_width + 1) * percent) / 100 - 8 * (tile_x - unit_left) - 1;
     if (steps < 0) {
         *style = styles[style_index];
         *symbol = ' ';
@@ -110,8 +110,8 @@ void render_block(const uint32_t percent, const grid_t tile_x,
     }
 }
 
-void render_percentage(const uint32_t percent,
-                       const grid_t tile_x, wchar_t* const symbol) {
+void render_percentage(const uint32_t percent, const grid_t tile_x,
+                       wchar_t* const symbol) {
     assert(percent < 100);
     const wchar_t left_digit = '0' + percent / 10;
     const wchar_t right_digit = '0' + percent % 10;
@@ -189,7 +189,8 @@ bool render_capture_progress_bar(const struct units* const units,
     if (capture_progress == 0)
         return false;
 
-    render_bar(capture_progress / (CAPTURE_COMPLETION / HEALTH_MAX), tile_x, symbol, style);
+    render_bar(capture_progress / (CAPTURE_COMPLETION / HEALTH_MAX), tile_x,
+               symbol, style);
 
     return true;
 }
@@ -460,18 +461,13 @@ void reset_black(void) { wprintf(L"%c[30;40m", '\x1b'); }
 void reset_style(void) { wprintf(L"%c[0m", '\x1b'); }
 
 void print_normal_text(const struct game* const game) {
-    wprintf(
-        L"turn=" TURN_FORMAT " gold=" GOLD_FORMAT " tile=%s",
-        game->turn,
-        game->golds[game->turn],
-        tile_names[game->map[game->y][game->x]]);
+    wprintf(L"turn=" TURN_FORMAT " gold=" GOLD_FORMAT " tile=%s", game->turn,
+            game->golds[game->turn], tile_names[game->map[game->y][game->x]]);
 
     {
         const player_t territory = game->territory[game->y][game->x];
         if (territory != NULL_PLAYER)
-            wprintf(
-                L" territory=%u",
-                territory + 1);
+            wprintf(L" territory=%u", territory + 1);
     }
 
     {
@@ -487,7 +483,8 @@ void print_normal_text(const struct game* const game) {
 void print_attack_text(const struct game* const game) {
     health_t damage, counter_damage;
     game_calc_damage(game, &damage, &counter_damage);
-    wprintf(L"attack mode: damage=%u%% counter-damage=%u%%\n", damage, counter_damage);
+    wprintf(L"attack mode: damage=%u%% counter-damage=%u%%\n", damage,
+            counter_damage);
 }
 
 void print_build_text(const struct game* const game) {

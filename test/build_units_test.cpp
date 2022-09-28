@@ -7,7 +7,7 @@
 
 TEST_F(game_fixture, accumulate_distribution) {
     health_wide_t distribution[MODEL_CAPACITY] = {0};
-    insert_unit({ .health = 2});
+    insert_unit({.health = 2});
 
     accumulate_distribution(game, game->turn, distribution);
 
@@ -16,8 +16,8 @@ TEST_F(game_fixture, accumulate_distribution) {
 
 TEST_F(game_fixture, inputs_initialise_distributions) {
     struct bap_inputs inputs = {0};
-    insert_unit({.x = 1,  .health = 2});
-    insert_unit({.x = 2, .player = 1,  .health = 3});
+    insert_unit({.x = 1, .health = 2});
+    insert_unit({.x = 2, .player = 1, .health = 3});
 
     inputs_initialise_distributions(game, &inputs);
 
@@ -37,7 +37,7 @@ TEST_F(game_fixture, inputs_initialise_capturables) {
 
 TEST_F(game_fixture, inputs_initialise) {
     struct bap_inputs inputs = {0};
-    insert_unit({ .health = 2});
+    insert_unit({.health = 2});
     game->territory[3][2] = game->turn;
     game->map[3][2] = TILE_FACTORY;
     game->golds[game->turn] = 5 * GOLD_SCALE;

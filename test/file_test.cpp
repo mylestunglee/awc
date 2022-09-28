@@ -364,10 +364,7 @@ TEST(file_test, save_unit_no_capture_progress_and_no_health) {
 
 TEST(file_test, save_unit_no_capture_progress_and_no_enabled) {
     file_fixture file;
-    const struct unit unit {
-        .x = 5, .y = 7, .health = 2,
-        .enabled = true
-    };
+    const struct unit unit { .x = 5, .y = 7, .health = 2, .enabled = true };
 
     save_unit(&unit, file.ref());
 
@@ -377,8 +374,7 @@ TEST(file_test, save_unit_no_capture_progress_and_no_enabled) {
 TEST(file_test, save_unit_no_capture_progress) {
     file_fixture file;
     const struct unit unit {
-        .x = 5, .y = 7, .player = 3, .health = 2, 
-        .enabled = true
+        .x = 5, .y = 7, .player = 3, .health = 2, .enabled = true
     };
 
     save_unit(&unit, file.ref());
@@ -389,7 +385,8 @@ TEST(file_test, save_unit_no_capture_progress) {
 TEST(file_test, save_unit_all_fields) {
     file_fixture file;
     const struct unit unit {
-        .x = 5, .y = 7, .player = 3, .health = 2, .capture_progress = 11, .enabled = true
+        .x = 5, .y = 7, .player = 3, .health = 2, .capture_progress = 11,
+        .enabled = true
     };
 
     save_unit(&unit, file.ref());

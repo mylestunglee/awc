@@ -10,11 +10,9 @@ struct game;
 
 void graphics_initialise(void);
 #ifdef EXPOSE_GRAPHICS_INTERNALS
-void render_block(const uint32_t, const grid_t, wchar_t* const,
-                  uint8_t* const);
+void render_block(const uint32_t, const grid_t, wchar_t* const, uint8_t* const);
 void render_percentage(const uint32_t, const grid_t, wchar_t* const);
-void render_bar(const uint32_t, const grid_t, wchar_t* const,
-                uint8_t* const);
+void render_bar(const uint32_t, const grid_t, wchar_t* const, uint8_t* const);
 bool render_unit_health_bar(const struct units* const, const grid_t,
                             const grid_t, const grid_t, const grid_t,
                             wchar_t* const, uint8_t* const);

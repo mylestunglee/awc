@@ -27,7 +27,8 @@ TEST_F(game_fixture, attack_enemy) {
     game->map[0][0] = TILE_PLAINS;
     game->map[0][1] = TILE_PLAINS;
     const auto* attacker = insert_unit({.health = HEALTH_MAX, .enabled = true});
-    const auto* attackee = insert_unit({.x = 1, .player = 1, .health = HEALTH_MAX});
+    const auto* attackee =
+        insert_unit({.x = 1, .player = 1, .health = HEALTH_MAX});
 
     parse_commands(game, " d ");
 

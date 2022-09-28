@@ -131,8 +131,7 @@ TEST_F(game_fixture, handle_capture_when_uncapturable_unit) {
 }
 
 TEST_F(game_fixture, handle_capture_when_no_capturable_exists) {
-    const auto* const unit =
-        insert_unit({ .enabled = true});
+    const auto* const unit = insert_unit({.enabled = true});
 
     handle_capture(game, unit->model);
 
@@ -146,8 +145,7 @@ TEST_F(game_fixture, handle_capture_when_capturable_exists) {
     game->labels[3][2] = ACCESSIBLE_BIT;
     game->dirty_labels = true;
 
-    const auto* const unit =
-        insert_selected_unit({ .enabled = true});
+    const auto* const unit = insert_selected_unit({.enabled = true});
 
     handle_capture(game, unit->model);
 
@@ -157,8 +155,8 @@ TEST_F(game_fixture, handle_capture_when_capturable_exists) {
 }
 
 TEST_F(game_fixture, handle_local_prioritises_attack_over_capture) {
-    const auto* const attacker = insert_selected_unit(
-        {.x = 1, .health = HEALTH_MAX, .enabled = true});
+    const auto* const attacker =
+        insert_selected_unit({.x = 1, .health = HEALTH_MAX, .enabled = true});
     const auto* const attackee =
         insert_unit({.x = 3, .player = 1, .health = HEALTH_MAX});
     for (auto i = 1; i < 4; ++i)
