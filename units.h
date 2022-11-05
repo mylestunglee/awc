@@ -38,27 +38,46 @@ struct units {
 
 void units_initialise(struct units* const);
 bool units_is_insertable(const struct units* const);
+#ifdef EXPOSE_UNITS_INTERNALS
+unit_t insert_with_frees(struct units* const, const struct unit* const);
+unit_t insert_with_players(struct units* const, const struct unit* const);
+#endif
 void units_insert(struct units* const, const struct unit* const);
+#ifdef EXPOSE_UNITS_INTERNALS
+void delete_with_frees(struct units* const, const unit_t);
+void delete_with_players(struct units* const, const unit_t);
+void units_delete(struct units* const, const unit_t);
+#endif
 void units_delete_at(struct units* const, const grid_t, const grid_t);
 void units_delete_selected(struct units* const);
+#ifdef EXPOSE_UNITS_INTERNALS
+void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
+#endif
 void units_move_selection(struct units* const, const grid_t, const grid_t);
 void units_set_enabled(struct units* const, const player_t, const bool);
 void units_delete_player(struct units* const, const player_t);
+#ifdef EXPOSE_UNITS_INTERNALS
+struct unit* units_get_by(struct units* const, const unit_t);
+struct unit* units_get_by_safe(struct units* const, const unit_t);
+const struct unit* units_const_get_by(const struct units* const, const unit_t);
+const struct unit* units_const_get_by_safe(const struct units* const,
+                                           const unit_t);
+#endif
 struct unit* units_get_at(struct units* const, const grid_t, const grid_t);
-struct unit* units_get_at_safe(struct units* const, const grid_t, const grid_t);
 const struct unit* units_const_get_at(const struct units* const, const grid_t,
                                       const grid_t);
-struct unit* units_get_by(struct units* const, const unit_t);
+const struct unit* units_const_get_at_safe(const struct units* const,
+                                           const grid_t, const grid_t);
+
 struct unit* units_get_first(struct units* const, const player_t);
-struct unit* units_get_next(struct units* const, const struct unit* const);
 const struct unit* units_const_get_first(const struct units* const,
                                          const player_t);
-bool units_is_owner(const struct units* const, const player_t);
+struct unit* units_get_next(struct units* const, const struct unit* const);
 const struct unit* units_const_get_next(const struct units* const,
                                         const struct unit* const);
 const struct unit* units_const_get_next_cyclic(const struct units* const,
                                                const struct unit* const);
-const struct unit* units_const_get_by(const struct units* const, const unit_t);
+bool units_is_owner(const struct units* const, const player_t);
 struct unit* units_get_selected(struct units* const);
 const struct unit* units_const_get_selected(const struct units* const);
 void units_select_at(struct units* const, const grid_t, const grid_t);
@@ -74,17 +93,9 @@ bool units_update_capture_progress(struct units* const, const health_t);
 
 #ifdef EXPOSE_UNITS_INTERNALS
 
-void units_delete(struct units* const, const unit_t);
-void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
-unit_t insert_with_frees(struct units* const, const struct unit* const);
-unit_t insert_with_players(struct units* const, const struct unit* const);
-void delete_with_frees(struct units* const, const unit_t);
-void delete_with_players(struct units* const, const unit_t);
-
 unit_t index_by_pointer(const struct units* const, const struct unit* const);
 struct unit* units_get_by_safe(struct units* const, const unit_t);
-const struct unit* units_const_get_by_safe(const struct units* const,
-                                           const unit_t);
+
 #endif
 
 #endif

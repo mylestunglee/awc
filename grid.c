@@ -77,7 +77,8 @@ void grid_explore_mark_attackable_tile(struct game* const game, const grid_t x,
                                        const player_t player,
                                        const bool label_attackable_tiles) {
     if (!label_attackable_tiles) {
-        const struct unit* const unit = units_const_get_at(&game->units, x, y);
+        const struct unit* const unit =
+            units_const_get_at_safe(&game->units, x, y);
         if (!unit)
             return;
         const bool friendly =
@@ -138,7 +139,7 @@ bool is_node_unexplorable(const struct game* const game,
     const struct unit* const source =
         units_const_get_at(&game->units, game->x, game->y);
     const struct unit* const target =
-        units_const_get_at(&game->units, node->x, node->y);
+        units_const_get_at_safe(&game->units, node->x, node->y);
     if (target) {
         const bool unfriendly =
             !bitmatrix_get(game->alliances, player, target->player);
@@ -158,9 +159,8 @@ bool is_node_accessible(const struct game* const game,
                         const struct list_node* const node) {
     const struct unit* const source =
         units_const_get_at(&game->units, game->x, game->y);
-    assert(source);
     const struct unit* const target =
-        units_const_get_at(&game->units, node->x, node->y);
+        units_const_get_at_safe(&game->units, node->x, node->y);
     const bool unoccupied = !target;
     const bool init_tile = source == target;
     const tile_t tile = game->map[node->y][node->x];
@@ -237,7 +237,7 @@ void grid_explore_recursive(struct game* const game,
     struct list* const list = &game->list;
 
     list_initialise(&game->list);
-    assert(units_const_get_at(&game->units, game->x, game->y));
+    assert(units_exists(&game->units, game->x, game->y));
     assert(scalar > 0);
 
     // Use cursor instead of selected property because we want to highlight

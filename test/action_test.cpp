@@ -77,7 +77,7 @@ TEST_F(game_fixture, action_attack_returns_false_where_ranged_unit_kills) {
 
     ASSERT_FALSE(action_attack(game));
 
-    ASSERT_FALSE(units_const_get_at(&game->units, 5, 7));
+    ASSERT_FALSE(units_exists(&game->units, 5, 7));
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 
@@ -96,7 +96,7 @@ TEST_F(game_fixture, action_attack_returns_false_where_counter_damage_kills) {
 
     ASSERT_FALSE(action_attack(game));
 
-    ASSERT_FALSE(units_const_get_at(&game->units, 4, 7));
+    ASSERT_FALSE(units_exists(&game->units, 4, 7));
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 

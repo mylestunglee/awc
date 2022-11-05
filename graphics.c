@@ -152,7 +152,7 @@ bool render_unit_health_bar(const struct units* const units, const grid_t x,
     if (tile_x < unit_left || tile_x > unit_right)
         return false;
 
-    const struct unit* const unit = units_const_get_at(units, x, y);
+    const struct unit* const unit = units_const_get_at_safe(units, x, y);
     if (!unit)
         return false;
 
@@ -179,7 +179,8 @@ bool render_capture_progress_bar(const struct units* const units,
     if (tile_x < unit_left || tile_x >= unit_left + unit_width)
         return false;
 
-    const struct unit* const unit = units_const_get_at(units, x, y - (grid_t)1);
+    const struct unit* const unit =
+        units_const_get_at_safe(units, x, y - (grid_t)1);
     if (!unit)
         return false;
 
@@ -293,7 +294,7 @@ bool render_unit(const struct units* const units, const grid_t x,
         tile_y > unit_bottom)
         return false;
 
-    const struct unit* const unit = units_const_get_at(units, x, y);
+    const struct unit* const unit = units_const_get_at_safe(units, x, y);
     if (!unit)
         return false;
 
@@ -472,7 +473,7 @@ void print_normal_text(const struct game* const game) {
 
     {
         const struct unit* unit =
-            units_const_get_at(&game->units, game->x, game->y);
+            units_const_get_at_safe(&game->units, game->x, game->y);
         if (unit)
             wprintf(L" model=%s", model_names[unit->model]);
     }
@@ -492,6 +493,7 @@ void print_build_text(const struct game* const game) {
     assert(tile >= TERRIAN_CAPACITY);
     const tile_t capturable = tile - TERRIAN_CAPACITY;
 
+    // TODO: print only buildable
     wprintf(L"build mode:");
     for (model_t model = buildable_models[capturable];
          model < buildable_models[capturable + 1]; ++model) {

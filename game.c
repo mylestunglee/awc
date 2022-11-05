@@ -106,12 +106,9 @@ void game_calc_damage(const struct game* const game, health_t* const damage,
                       health_t* const counter_damage) {
     const struct unit* const attacker = units_const_get_selected(&game->units);
     const struct unit* const adjacent =
-        units_const_get_at(&game->units, game->prev_x, game->prev_y);
+        units_const_get_at_safe(&game->units, game->prev_x, game->prev_y);
     const struct unit* const attackee =
         units_const_get_at(&game->units, game->x, game->y);
-
-    assert(attacker);
-    assert(attackee);
 
     if (units_is_ranged(attacker->model) || adjacent == NULL ||
         !adjacent->enabled || attacker == adjacent) {
@@ -150,7 +147,7 @@ bool game_is_buildable(const struct game* const game) {
 
     const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
-    return !units_const_get_at(&game->units, game->x, game->y) &&
+    return !units_exists(&game->units, game->x, game->y) &&
            buildable_models[capturable] < buildable_models[capturable + 1] &&
            !units_has_selection(&game->units) &&
            units_is_insertable(&game->units);

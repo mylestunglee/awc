@@ -72,7 +72,6 @@ const struct unit* find_attackee(struct game* const game,
 
             const struct unit* const attackee =
                 units_const_get_at(&game->units, game->x, game->y);
-            assert(attackee);
             const gold_t damage_metric =
                 (gold_t)damage * models_cost[attackee->model];
             const gold_t counter_damage_metric =

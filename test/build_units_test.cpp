@@ -81,7 +81,7 @@ TEST_F(game_fixture, realise_allocations_builds_no_units_when_full) {
 
     realise_allocations(game, allocations);
 
-    ASSERT_FALSE(units_const_get_at(&game->units, 2, 3));
+    ASSERT_FALSE(units_exists(&game->units, 2, 3));
 }
 
 TEST_F(game_fixture, build_units) {

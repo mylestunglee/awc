@@ -10,7 +10,8 @@ health_t move_selected_unit(struct game* const game, const grid_t x,
                             const grid_t y) {
     struct unit* const source = units_get_selected(&game->units);
     assert(source->enabled);
-    const struct unit* const target = units_get_at_safe(&game->units, x, y);
+    const struct unit* const target =
+        units_const_get_at_safe(&game->units, x, y);
 
     health_t result = source->health;
     if (source != target && target) {
@@ -31,7 +32,6 @@ bool action_attack(struct game* const game) {
 
     struct unit* const attacker = units_get_selected(&game->units);
     struct unit* const attackee = units_get_at(&game->units, game->x, game->y);
-    assert(attacker);
     assert(attacker->enabled);
     assert(game->labels[game->y][game->x] & ATTACKABLE_BIT);
     assert(game->dirty_labels);
@@ -168,7 +168,7 @@ bool action_surrender(struct game* const game) {
 
 bool action_select(struct game* const game) {
     const struct unit* unit =
-        units_const_get_at(&game->units, game->x, game->y);
+        units_const_get_at_safe(&game->units, game->x, game->y);
     const bool selected = units_has_selection(&game->units);
 
     if (!selected && unit && unit->enabled) {
@@ -193,7 +193,7 @@ bool action_highlight(struct game* const game) {
 
 const struct unit* find_next_unit(const struct game* const game) {
     const struct unit* const curr =
-        units_const_get_at(&game->units, game->x, game->y);
+        units_const_get_at_safe(&game->units, game->x, game->y);
     if (curr && curr->player == game->turn) {
         const struct unit* next = curr;
 

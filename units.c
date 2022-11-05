@@ -165,22 +165,16 @@ void units_delete_player(struct units* const units, const player_t player) {
         units_delete(units, units->firsts[player]);
 }
 
+struct unit* units_get_by(struct units* const units, const unit_t unit) {
+    assert(unit != NULL_UNIT);
+    return &units->data[unit];
+}
+
 struct unit* units_get_by_safe(struct units* const units, const unit_t unit) {
     if (unit == NULL_UNIT)
         return NULL;
 
     return units_get_by(units, unit);
-}
-
-struct unit* units_get_at(struct units* const units, const grid_t x,
-                          const grid_t y) {
-    assert(units->grid[y][x] != NULL_UNIT);
-    return units_get_by(units, units->grid[y][x]);
-}
-
-struct unit* units_get_at_safe(struct units* const units, const grid_t x,
-                          const grid_t y) {
-    return units_get_by_safe(units, units->grid[y][x]);
 }
 
 const struct unit* units_const_get_by(const struct units* const units,
@@ -197,18 +191,30 @@ const struct unit* units_const_get_by_safe(const struct units* const units,
     return units_const_get_by(units, unit);
 }
 
-const struct unit* units_const_get_at(const struct units* const units,
-                                      const grid_t x, const grid_t y) {
-    return units_const_get_by_safe(units, units->grid[y][x]);
+struct unit* units_get_at(struct units* const units, const grid_t x,
+                          const grid_t y) {
+    assert(units->grid[y][x] != NULL_UNIT);
+    return units_get_by(units, units->grid[y][x]);
 }
 
-struct unit* units_get_by(struct units* const units, const unit_t unit) {
-    assert(unit != NULL_UNIT);
-    return &units->data[unit];
+const struct unit* units_const_get_at(const struct units* const units,
+                                      const grid_t x, const grid_t y) {
+    assert(units->grid[y][x] != NULL_UNIT);
+    return units_const_get_by(units, units->grid[y][x]);
+}
+
+const struct unit* units_const_get_at_safe(const struct units* const units,
+                                           const grid_t x, const grid_t y) {
+    return units_const_get_by_safe(units, units->grid[y][x]);
 }
 
 struct unit* units_get_first(struct units* const units, const player_t player) {
     return units_get_by_safe(units, units->firsts[player]);
+}
+
+const struct unit* units_const_get_first(const struct units* const units,
+                                         const player_t player) {
+    return units_const_get_by_safe(units, units->firsts[player]);
 }
 
 unit_t index_by_pointer(const struct units* const units,
@@ -222,15 +228,6 @@ struct unit* units_get_next(struct units* const units,
     assert(unit != NULL);
     const unit_t index = index_by_pointer(units, unit);
     return units_get_by_safe(units, units->nexts[index]);
-}
-
-const struct unit* units_const_get_first(const struct units* const units,
-                                         const player_t player) {
-    return units_const_get_by_safe(units, units->firsts[player]);
-}
-
-bool units_is_owner(const struct units* const units, const player_t player) {
-    return units->firsts[player] != NULL_UNIT;
 }
 
 const struct unit* units_const_get_next(const struct units* const units,
@@ -247,6 +244,10 @@ const struct unit* units_const_get_next_cyclic(const struct units* const units,
         return units_const_get_by(units, units->firsts[unit->player]);
     else
         return next;
+}
+
+bool units_is_owner(const struct units* const units, const player_t player) {
+    return units->firsts[player] != NULL_UNIT;
 }
 
 struct unit* units_get_selected(struct units* const units) {
@@ -301,9 +302,13 @@ bool units_exists(const struct units* const units, const grid_t x,
     return units->grid[y][x] != NULL_UNIT;
 }
 
-bool units_is_direct(const model_t model) { return models_min_range[model] == 0; }
+bool units_is_direct(const model_t model) {
+    return models_min_range[model] == 0;
+}
 
-bool units_is_ranged(const model_t model) { return models_min_range[model] > 0; }
+bool units_is_ranged(const model_t model) {
+    return models_min_range[model] > 0;
+}
 
 bool units_update_capture_progress(struct units* const units,
                                    const health_t progress) {
