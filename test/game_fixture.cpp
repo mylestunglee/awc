@@ -6,7 +6,8 @@ game_fixture::game_fixture()
 }
 
 struct unit* game_fixture::insert_unit(const struct unit& unit) {
-    assert(!units_insert(&game->units, &unit));
+    assert(units_is_insertable(&game->units));
+    units_insert(&game->units, &unit);
     return units_get_at(&game->units, unit.x, unit.y);
 }
 

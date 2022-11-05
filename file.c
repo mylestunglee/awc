@@ -172,6 +172,9 @@ bool load_unit(const char* const command, const char* const params,
     else
         return false;
 
+    if (!units_is_insertable(units))
+        return false;
+
     const struct unit unit = {.x = x,
                               .y = y,
                               .player = player,

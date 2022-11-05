@@ -153,7 +153,7 @@ bool game_is_buildable(const struct game* const game) {
     return !units_const_get_at(&game->units, game->x, game->y) &&
            buildable_models[capturable] < buildable_models[capturable + 1] &&
            !units_has_selection(&game->units) &&
-           game->units.size < UNITS_CAPACITY;
+           units_is_insertable(&game->units);
 }
 
 // A player is alive iff:

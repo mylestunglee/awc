@@ -27,6 +27,10 @@ void units_initialise(struct units* const units) {
     units->selected = NULL_UNIT;
 }
 
+bool units_is_insertable(const struct units* const units) {
+    return units->size < UNITS_CAPACITY;
+}
+
 unit_t insert_with_frees(struct units* const units,
                          const struct unit* const unit) {
     assert(units->size <= UNITS_CAPACITY);
@@ -63,18 +67,12 @@ unit_t insert_with_players(struct units* const units,
     return index;
 }
 
-bool units_insert(struct units* const units, const struct unit* const unit) {
+void units_insert(struct units* const units, const struct unit* const unit) {
     assert(units->grid[unit->y][unit->x] == NULL_UNIT);
     assert(unit->player < PLAYERS_CAPACITY);
+    assert(units_is_insertable(units));
 
-    const unit_t index = insert_with_players(units, unit);
-
-    // insert_with_players may fail when units data structure is at capacity
-    if (index == NULL_UNIT)
-        return true;
-
-    units->grid[unit->y][unit->x] = index;
-    return false;
+    units->grid[unit->y][unit->x] = insert_with_players(units, unit);
 }
 
 void delete_with_frees(struct units* const units, const unit_t index) {

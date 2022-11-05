@@ -136,7 +136,7 @@ TEST(file_test, load_team_when_valid_sets_alliances) {
 }
 
 TEST(file_test, load_unit_when_invalid_command) {
-    ASSERT_FALSE(load_unit("", "", 0, nullptr));
+    ASSERT_FALSE(load_unit("", nullptr, 0, nullptr));
 }
 
 TEST(file_test, load_unit_when_invalid_params) {
@@ -148,6 +148,12 @@ TEST(file_test, load_unit_when_invalid_player) {
 
     ASSERT_FALSE(
         load_unit("infantry", params.c_str(), MODEL_INFANTRY, nullptr));
+}
+
+TEST_F(units_fixture, load_units_when_units_full) {
+    const auto params = std::to_string(NULL_PLAYER) + " 0 0 0 enabled"s;
+    units->size = UNITS_CAPACITY;
+    ASSERT_FALSE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
 }
 
 TEST_F(units_fixture, load_unit_when_unspecified_health_returns_true) {

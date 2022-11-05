@@ -86,9 +86,9 @@ bool action_build(struct game* const game, const model_t model) {
                               .model = model,
                               .health = HEALTH_MAX,
                               .enabled = false};
-    const bool error = units_insert(&game->units, &unit);
+    units_insert(&game->units, &unit);
 
-    return error;
+    return false;
 }
 
 bool can_selected_unit_capture(const struct game* const game) {

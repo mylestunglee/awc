@@ -37,7 +37,8 @@ struct units {
 };
 
 void units_initialise(struct units* const);
-bool units_insert(struct units* const, const struct unit* const);
+bool units_is_insertable(const struct units* const);
+void units_insert(struct units* const, const struct unit* const);
 void units_delete_at(struct units* const, const grid_t, const grid_t);
 void units_delete_selected(struct units* const);
 void units_move_selection(struct units* const, const grid_t, const grid_t);

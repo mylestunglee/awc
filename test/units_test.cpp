@@ -31,6 +31,15 @@ TEST_F(units_fixture, units_initialise_clears_grid) {
     ASSERT_EQ(units->grid[2][3], NULL_UNIT);
 }
 
+TEST_F(units_fixture, units_is_insertable_returns_true_when_empty) {
+    ASSERT_TRUE(units_is_insertable(units));
+}
+
+TEST_F(units_fixture, units_is_insertable_returns_false_when_full) {
+    units->size = UNITS_CAPACITY;
+    ASSERT_FALSE(units_is_insertable(units));
+}
+
 TEST_F(units_fixture, insert_with_frees_sets_next_start) {
     units->start = 2;
     struct unit unit {};
@@ -98,20 +107,12 @@ TEST_F(units_fixture, units_insert_sets_grid) {
     struct unit unit {
         .x = 2, .y = 3
     };
-    auto error = units_insert(units, &unit);
-    ASSERT_FALSE(error);
+    units_insert(units, &unit);
     auto index = units->grid[3][2];
     ASSERT_NE(index, NULL_UNIT);
     auto& unit_ref = units->data[index];
     ASSERT_EQ(unit_ref.x, 2);
     ASSERT_EQ(unit_ref.y, 3);
-}
-
-TEST_F(units_fixture, units_insert_propogates_failure) {
-    struct unit unit {};
-    units->size = UNITS_CAPACITY;
-    auto error = units_insert(units, &unit);
-    ASSERT_TRUE(error);
 }
 
 TEST_F(units_fixture, delete_with_frees_links_free_index) {
