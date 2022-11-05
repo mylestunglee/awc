@@ -151,7 +151,7 @@ TEST(file_test, load_unit_when_invalid_player) {
 }
 
 TEST_F(units_fixture, load_units_when_units_full) {
-    const auto params = std::to_string(NULL_PLAYER) + " 0 0 0 enabled"s;
+    const auto params = "0 0 0 0"s;
     units->size = UNITS_CAPACITY;
     ASSERT_FALSE(load_unit("infantry", params.c_str(), MODEL_INFANTRY, units));
 }

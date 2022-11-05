@@ -68,9 +68,7 @@ void realise_allocations(struct game* const game,
                     continue;
 
                 const bool error = action_build(game, model);
-
-                if (error)
-                    return;
+                assert(!error);
 
                 --allocations[model];
                 break;

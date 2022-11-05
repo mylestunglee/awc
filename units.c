@@ -116,6 +116,7 @@ void units_delete_at(struct units* const units, const grid_t x,
 }
 
 void units_delete_selected(struct units* const units) {
+    assert(units->selected != NULL_UNIT);
     units_delete(units, units->selected);
     units_clear_selection(units);
 }
