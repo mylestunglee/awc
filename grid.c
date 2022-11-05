@@ -96,7 +96,7 @@ void grid_explore_mark_attackable_direct(struct game* const game,
                                          const model_t model,
                                          const player_t player,
                                          const bool label_attackable_tiles) {
-    if (units_ranged(model))
+    if (units_is_ranged(model))
         return;
 
     grid_explore_mark_attackable_tile(game, x + 1, y, model, player,
@@ -115,7 +115,7 @@ void grid_explore_mark_attackable_ranged(struct game* const game,
                                          const player_t player,
                                          const bool label_attackable_tiles) {
 
-    if (!units_ranged(model))
+    if (!units_is_ranged(model))
         return;
 
     const grid_wide_t min_range = models_min_range[model];

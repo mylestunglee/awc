@@ -10,7 +10,7 @@ health_t move_selected_unit(struct game* const game, const grid_t x,
                             const grid_t y) {
     struct unit* const source = units_get_selected(&game->units);
     assert(source->enabled);
-    const struct unit* const target = units_get_at(&game->units, x, y);
+    const struct unit* const target = units_get_at_safe(&game->units, x, y);
 
     health_t result = source->health;
     if (source != target && target) {
@@ -40,7 +40,7 @@ bool action_attack(struct game* const game) {
     health_t damage, counter_damage;
     game_calc_damage(game, &damage, &counter_damage);
 
-    if (units_direct(attacker->model))
+    if (units_is_direct(attacker->model))
         (void)move_selected_unit(game, game->prev_x, game->prev_y);
 
     // Apply damage

@@ -15,7 +15,7 @@ void simulate_attack(struct game* const game, health_t* const damage,
                      health_t* const counter_damage) {
     const struct unit* const attacker = units_const_get_selected(&game->units);
 
-    if (units_ranged(attacker->model)) {
+    if (units_is_ranged(attacker->model)) {
         game_calc_damage(game, damage, counter_damage);
         return;
     }

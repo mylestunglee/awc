@@ -45,6 +45,7 @@ void units_move_selection(struct units* const, const grid_t, const grid_t);
 void units_set_enabled(struct units* const, const player_t, const bool);
 void units_delete_player(struct units* const, const player_t);
 struct unit* units_get_at(struct units* const, const grid_t, const grid_t);
+struct unit* units_get_at_safe(struct units* const, const grid_t, const grid_t);
 const struct unit* units_const_get_at(const struct units* const, const grid_t,
                                       const grid_t);
 struct unit* units_get_by(struct units* const, const unit_t);
@@ -67,8 +68,8 @@ void units_disable_selection(struct units* const);
 bool units_mergable(const struct unit* const, const struct unit* const);
 health_t units_merge_health(const struct unit* const, const struct unit* const);
 bool units_exists(const struct units* const, const grid_t, const grid_t);
-bool units_direct(const model_t);
-bool units_ranged(const model_t);
+bool units_is_direct(const model_t);
+bool units_is_ranged(const model_t);
 bool units_update_capture_progress(struct units* const, const health_t);
 
 #ifdef EXPOSE_UNITS_INTERNALS

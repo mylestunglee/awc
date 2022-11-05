@@ -113,7 +113,7 @@ void game_calc_damage(const struct game* const game, health_t* const damage,
     assert(attacker);
     assert(attackee);
 
-    if (units_ranged(attacker->model) || adjacent == NULL ||
+    if (units_is_ranged(attacker->model) || adjacent == NULL ||
         !adjacent->enabled || attacker == adjacent) {
         calc_damage_pair(game, attacker, attackee, damage, counter_damage);
         return;

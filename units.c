@@ -174,6 +174,12 @@ struct unit* units_get_by_safe(struct units* const units, const unit_t unit) {
 
 struct unit* units_get_at(struct units* const units, const grid_t x,
                           const grid_t y) {
+    assert(units->grid[y][x] != NULL_UNIT);
+    return units_get_by(units, units->grid[y][x]);
+}
+
+struct unit* units_get_at_safe(struct units* const units, const grid_t x,
+                          const grid_t y) {
     return units_get_by_safe(units, units->grid[y][x]);
 }
 
@@ -244,6 +250,7 @@ const struct unit* units_const_get_next_cyclic(const struct units* const units,
 }
 
 struct unit* units_get_selected(struct units* const units) {
+    assert(units->selected != NULL_UNIT);
     return units_get_by(units, units->selected);
 }
 
@@ -294,9 +301,9 @@ bool units_exists(const struct units* const units, const grid_t x,
     return units->grid[y][x] != NULL_UNIT;
 }
 
-bool units_direct(const model_t model) { return models_min_range[model] == 0; }
+bool units_is_direct(const model_t model) { return models_min_range[model] == 0; }
 
-bool units_ranged(const model_t model) { return models_min_range[model] > 0; }
+bool units_is_ranged(const model_t model) { return models_min_range[model] > 0; }
 
 bool units_update_capture_progress(struct units* const units,
                                    const health_t progress) {
