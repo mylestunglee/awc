@@ -167,7 +167,7 @@ TEST_F(
     game_fixture,
     grid_explore_mark_attackable_direct_marks_adjacent_tiles_with_direct_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    ASSERT_EQ(models_min_range[MODEL_INFANTRY], 0);
+    ASSERT_TRUE(units_is_direct(MODEL_INFANTRY));
 
     grid_explore_mark_attackable_direct(game, 2, 3, MODEL_INFANTRY, 7, true);
 
@@ -180,7 +180,7 @@ TEST_F(
 TEST_F(game_fixture,
        grid_explore_mark_attackable_direct_unmarked_with_indirect_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    ASSERT_GT(models_min_range[MODEL_ARTILLERY], 0);
+    ASSERT_TRUE(units_is_ranged(MODEL_ARTILLERY));
 
     grid_explore_mark_attackable_direct(game, 2, 3, MODEL_ARTILLERY, 7, true);
 
@@ -189,7 +189,7 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        grid_explore_mark_attackable_ranged_marks_with_correct_range) {
-    ASSERT_GT(models_min_range[MODEL_ARTILLERY], 0);
+    ASSERT_GT(units_is_ranged(MODEL_ARTILLERY), 0);
 
     grid_explore_mark_attackable_ranged(game, 2, 10, MODEL_ARTILLERY, 5, true);
 
@@ -202,7 +202,7 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        grid_explore_mark_attackable_ranged_unmarked_with_direct_unit) {
-    ASSERT_EQ(models_min_range[MODEL_INFANTRY], 0);
+    ASSERT_TRUE(units_is_direct(MODEL_INFANTRY));
 
     grid_explore_mark_attackable_ranged(game, 2, 3, MODEL_INFANTRY, 5, true);
 

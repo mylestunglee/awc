@@ -256,6 +256,7 @@ struct unit* units_get_selected(struct units* const units) {
 }
 
 const struct unit* units_const_get_selected(const struct units* const units) {
+    assert(units->selected != NULL_UNIT);
     return units_const_get_by(units, units->selected);
 }
 

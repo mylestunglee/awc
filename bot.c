@@ -229,7 +229,7 @@ energy_t find_nearest_attackable_attackee(struct game* const game,
                                           energy_t max_energy,
                                           grid_t* const nearest_x,
                                           grid_t* const nearest_y) {
-    if (models_min_range[attacker_model])
+    if (units_is_ranged(attacker_model))
         return find_nearest_attackable_attackee_ranged(
             game, attacker_model, attackee, max_energy, nearest_x, nearest_y);
     else

@@ -293,7 +293,7 @@ void set_budget_submatrix(const struct bap_inputs* const inputs,
 
 double calc_surplus_submatrix_value(const struct bap_inputs* const inputs,
                                     const index_t i, const index_t j) {
-    return (double)units_damage[i][j] * (models_min_range[i] ? 0.5 : 1.0) /
+    return (double)units_damage[i][j] * (units_is_ranged(i) ? 0.5 : 1.0) /
            (double)inputs->enemy_distribution[j];
 }
 

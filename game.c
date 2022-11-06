@@ -85,7 +85,7 @@ void calc_damage_pair(const struct game* const game,
     attackee_copy.health -= *damage;
 
     // Ranged units do not give counter-attacks
-    if (models_min_range[attacker->model] || models_min_range[attackee->model])
+    if (units_is_ranged(attacker->model) || units_is_ranged(attackee->model))
         *counter_damage = 0;
     else
         *counter_damage = calc_damage(game, &attackee_copy, attacker);
@@ -130,7 +130,7 @@ bool game_is_attackable(const struct game* const game) {
     //     b. Attacker and attackee are in different teams
     //     c. Attackee in attacker's range
     return units_has_selection(&game->units) &&
-           (models_min_range[units_const_get_selected(&game->units)->model] ||
+           (units_is_ranged(units_const_get_selected(&game->units)->model) ||
             game->labels[game->prev_y][game->prev_x] & ACCESSIBLE_BIT) &&
            game->labels[game->y][game->x] & ATTACKABLE_BIT;
 }
