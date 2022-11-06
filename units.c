@@ -141,6 +141,7 @@ void units_move(struct units* const units, const unit_t unit, const grid_t x,
 
 void units_move_selection(struct units* const units, const grid_t x,
                           const grid_t y) {
+    assert(units->selected != NULL_UNIT);
     units_move(units, units->selected, x, y);
 }
 
