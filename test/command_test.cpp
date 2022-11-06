@@ -67,7 +67,7 @@ TEST_F(game_fixture, merge_one_attack_enemy) {
 TEST_F(game_fixture, bot_builds_infantry_after_continuing_turn) {
     game->map[0][0] = TILE_FACTORY;
     game->territory[0][0] = 0;
-    game->golds[0] = 1000;
+    game->golds[0] = GOLD_SCALE;
     bitarray_set(game->bots, 0);
 
     parse_commands(game, "n");

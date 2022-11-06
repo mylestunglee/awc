@@ -1,4 +1,5 @@
 #define EXPOSE_GRAPHICS_INTERNALS
+#include "../constants.h"
 #include "../graphics.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
@@ -42,6 +43,7 @@ TEST_F(game_fixture, print_attack_text) {
 
 TEST_F(game_fixture, print_build_text) {
     game->map[0][0] = TILE_FACTORY;
+    game->golds[0] = GOLD_SCALE;
 
     print_build_text(game);
 }

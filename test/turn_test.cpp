@@ -38,7 +38,7 @@ TEST_F(game_fixture, repair_units_caps_at_maximum_health) {
 TEST_F(game_fixture, start_turn) {
     insert_unit({.x = 2, .y = 3});
     game->territory[3][2] = game->turn;
-    game->incomes[game->turn] = 1000;
+    game->incomes[game->turn] = GOLD_SCALE;
 
     start_turn(game);
 
@@ -60,7 +60,7 @@ TEST_F(game_fixture, end_turn) {
 
 TEST_F(game_fixture, next_alive_turn_increments_turn) {
     game->turn = PLAYERS_CAPACITY - 1;
-    game->incomes[0] = 1000;
+    game->incomes[0] = GOLD_SCALE;
 
     next_alive_turn(game);
 
@@ -68,7 +68,7 @@ TEST_F(game_fixture, next_alive_turn_increments_turn) {
 }
 
 TEST_F(game_fixture, next_alive_turn_skips_dead_player) {
-    game->incomes[2] = 1000;
+    game->incomes[2] = GOLD_SCALE;
 
     next_alive_turn(game);
 
@@ -76,13 +76,13 @@ TEST_F(game_fixture, next_alive_turn_skips_dead_player) {
 }
 
 TEST_F(game_fixture, exists_alive_non_bot_returns_true_when_alive_player) {
-    game->incomes[game->turn] = 1000;
+    game->incomes[game->turn] = GOLD_SCALE;
 
     ASSERT_TRUE(exists_alive_non_bot(game));
 }
 
 TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_alive_bot) {
-    game->incomes[game->turn] = 1000;
+    game->incomes[game->turn] = GOLD_SCALE;
     bitarray_set(game->bots, game->turn);
 
     ASSERT_FALSE(exists_alive_non_bot(game));
@@ -109,7 +109,7 @@ TEST_F(game_fixture, turn_next_plays_bot_turn) {
     game->map[0][2] = TILE_PLAINS;
     game->map[0][3] = TILE_CITY;
     game->territory[0][3] = 2;
-    game->incomes[2] = 1000;
+    game->incomes[2] = GOLD_SCALE;
 
     turn_next(game);
 
