@@ -157,7 +157,12 @@ void units_set_enabled(struct units* const units, const player_t player,
     }
 }
 
-// Clears all units of a player
+void units_disable_non_turn(struct units* const units, player_t turn) {
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
+        if (player != turn)
+            units_set_enabled(units, player, false);
+}
+
 void units_delete_player(struct units* const units, const player_t player) {
     assert(player < PLAYERS_CAPACITY);
 
@@ -189,6 +194,11 @@ const struct unit* units_const_get_by_safe(const struct units* const units,
         return NULL;
 
     return units_const_get_by(units, unit);
+}
+
+bool units_exists(const struct units* const units, const grid_t x,
+                  const grid_t y) {
+    return units->grid[y][x] != NULL_UNIT;
 }
 
 struct unit* units_get_at(struct units* const units, const grid_t x,
@@ -296,11 +306,6 @@ health_t units_merge_health(const struct unit* const source,
         return HEALTH_MAX;
     else
         return merged_health;
-}
-
-bool units_exists(const struct units* const units, const grid_t x,
-                  const grid_t y) {
-    return units->grid[y][x] != NULL_UNIT;
 }
 
 bool units_is_direct(const model_t model) {

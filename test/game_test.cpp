@@ -78,6 +78,21 @@ TEST_F(game_fixture, game_load_computes_income) {
     remove(filename);
 }
 
+TEST_F(game_fixture, game_load_disables_unit) {
+    using namespace std;
+    const auto filename = "game3.txt";
+    {
+        ofstream file(filename);
+        file << "map C\ninfantry 1 0 0";
+    }
+
+    ASSERT_FALSE(game_load(game, filename));
+
+    ASSERT_FALSE(units_const_get_at(&game->units, 0, 0)->enabled);
+
+    remove(filename);
+}
+
 TEST_F(game_fixture, game_save_returns_true_when_invalid_filename) {
     ASSERT_TRUE(game_save(nullptr, ""));
 }

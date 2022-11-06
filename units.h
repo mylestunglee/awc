@@ -55,6 +55,7 @@ void units_move(struct units* const, const unit_t, const grid_t, const grid_t);
 #endif
 void units_move_selection(struct units* const, const grid_t, const grid_t);
 void units_set_enabled(struct units* const, const player_t, const bool);
+void units_disable_non_turn(struct units* const, player_t);
 void units_delete_player(struct units* const, const player_t);
 #ifdef EXPOSE_UNITS_INTERNALS
 struct unit* units_get_by(struct units* const, const unit_t);
@@ -63,6 +64,7 @@ const struct unit* units_const_get_by(const struct units* const, const unit_t);
 const struct unit* units_const_get_by_safe(const struct units* const,
                                            const unit_t);
 #endif
+bool units_exists(const struct units* const, const grid_t, const grid_t);
 struct unit* units_get_at(struct units* const, const grid_t, const grid_t);
 const struct unit* units_const_get_at(const struct units* const, const grid_t,
                                       const grid_t);
@@ -72,6 +74,10 @@ const struct unit* units_const_get_at_safe(const struct units* const,
 struct unit* units_get_first(struct units* const, const player_t);
 const struct unit* units_const_get_first(const struct units* const,
                                          const player_t);
+#ifdef EXPOSE_UNITS_INTERNALS
+unit_t index_by_pointer(const struct units* const, const struct unit* const);
+struct unit* units_get_by_safe(struct units* const, const unit_t);
+#endif
 struct unit* units_get_next(struct units* const, const struct unit* const);
 const struct unit* units_const_get_next(const struct units* const,
                                         const struct unit* const);
@@ -86,16 +92,8 @@ bool units_has_selection(const struct units* const);
 void units_disable_selection(struct units* const);
 bool units_mergable(const struct unit* const, const struct unit* const);
 health_t units_merge_health(const struct unit* const, const struct unit* const);
-bool units_exists(const struct units* const, const grid_t, const grid_t);
 bool units_is_direct(const model_t);
 bool units_is_ranged(const model_t);
 bool units_update_capture_progress(struct units* const, const health_t);
-
-#ifdef EXPOSE_UNITS_INTERNALS
-
-unit_t index_by_pointer(const struct units* const, const struct unit* const);
-struct unit* units_get_by_safe(struct units* const, const unit_t);
-
-#endif
 
 #endif

@@ -186,7 +186,7 @@ TEST_F(units_fixture, load_unit_when_valid_inserts_default_enabled_unit) {
     ASSERT_TRUE(unit);
     ASSERT_EQ(unit->player, 0);
     ASSERT_EQ(unit->health, 7);
-    ASSERT_TRUE(unit->enabled);
+    ASSERT_FALSE(unit->enabled);
 }
 
 TEST(file_test, load_unit_when_invalid_enabled) {

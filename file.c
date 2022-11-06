@@ -164,7 +164,7 @@ bool load_unit(const char* const command, const char* const params,
 
     bool enabled;
     if (enabled_buffer[0] == '\0')
-        enabled = player == 0;
+        enabled = false;
     else if (!strcmp(enabled_buffer, "enabled"))
         enabled = true;
     else if (!strcmp(enabled_buffer, "disabled"))
