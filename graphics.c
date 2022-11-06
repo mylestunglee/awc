@@ -493,11 +493,11 @@ void print_build_text(const struct game* const game) {
     assert(tile >= TERRIAN_CAPACITY);
     const tile_t capturable = tile - TERRIAN_CAPACITY;
 
-    // TODO: print only buildable
     wprintf(L"build mode:");
     for (model_t model = buildable_models[capturable];
          model < buildable_models[capturable + 1]; ++model) {
-        wprintf(L" %s=" MODEL_FORMAT, model_names[model], model + 1);
+        if (game->golds[game->turn] >= models_cost[model])
+            wprintf(L" %s=" MODEL_FORMAT, model_names[model], model + 1);
     }
     wprintf(L"\n");
 }
