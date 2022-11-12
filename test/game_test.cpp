@@ -97,6 +97,16 @@ TEST_F(game_fixture, game_save_returns_true_when_invalid_filename) {
     ASSERT_TRUE(game_save(nullptr, ""));
 }
 
+TEST_F(game_fixture, game_deselect_clears_selection_and_labels) {
+    insert_selected_unit();
+    game->dirty_labels = true;
+
+    game_deselect(game);
+
+    ASSERT_FALSE(units_has_selection(&game->units));
+    ASSERT_FALSE(game->dirty_labels);
+}
+
 TEST_F(game_fixture, calc_damage_between_two_infantry) {
     insert_unit({.x = 0, .health = HEALTH_MAX});
     insert_unit({.x = 1, .health = HEALTH_MAX});
@@ -300,8 +310,16 @@ TEST_F(game_fixture, game_is_buildable_returns_true_when_buildable) {
     game->turn = 5;
     game->territory[3][2] = 5;
     game->map[3][2] = TILE_FACTORY;
+    game->golds[5] = GOLD_SCALE;
 
     ASSERT_TRUE(game_is_buildable(game));
+}
+
+TEST_F(game_fixture, game_is_buildable_returns_false_when_unaffordable) {
+    game->territory[3][2] = 5;
+    game->map[3][2] = TILE_FACTORY;
+
+    ASSERT_FALSE(game_is_buildable(game));
 }
 
 TEST_F(game_fixture, game_is_buildable_returns_false_at_void_tile) {

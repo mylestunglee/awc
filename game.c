@@ -142,16 +142,23 @@ bool game_is_buildable(const struct game* const game) {
     // 2. There is no unit on the tile
     // 3. The capturable has buildable units
     // 4. No unit is selected
+    // 5. Has enough money to buy a unit
 
     if (game->territory[game->y][game->x] != game->turn)
         return false;
 
     const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
-    return !units_exists(&game->units, game->x, game->y) &&
-           buildable_models[capturable] < buildable_models[capturable + 1] &&
-           !units_has_selection(&game->units) &&
-           units_is_insertable(&game->units);
+    for (model_t model = buildable_models[capturable];
+         model < buildable_models[capturable + 1]; ++model)
+        if (game->golds[game->turn] >= models_cost[model])
+            return !units_exists(&game->units, game->x, game->y) &&
+                   buildable_models[capturable] <
+                       buildable_models[capturable + 1] &&
+                   !units_has_selection(&game->units) &&
+                   units_is_insertable(&game->units);
+
+    return false;
 }
 
 // A player is alive iff:
