@@ -62,8 +62,8 @@ void realise_allocations(struct game* const game,
             const tile_t capturable =
                 game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
-            for (model_t model = buildable_models[capturable];
-                 model < buildable_models[capturable + 1]; ++model) {
+            for (model_t model = capturable_buildable_models[capturable];
+                 model < capturable_buildable_models[capturable + 1]; ++model) {
                 if (allocations[model] == 0)
                     continue;
 

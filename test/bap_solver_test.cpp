@@ -22,7 +22,7 @@ TEST_F(bap_solver_fixture, bap_solve_when_null_input) {
 TEST_F(bap_solver_fixture, bap_solve_when_allocatable) {
     inputs.enemy_distribution[MODEL_INFANTRY] = 1;
     inputs.capturables[CAPTURABLE_FACTORY] = 1;
-    inputs.budget = models_cost[MODEL_INFANTRY];
+    inputs.budget = model_cost[MODEL_INFANTRY];
 
     solve();
 

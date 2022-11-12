@@ -101,10 +101,10 @@ TEST_F(game_fixture, action_attack_returns_false_where_counter_damage_kills) {
 }
 
 TEST_F(game_fixture, action_build_returns_true_when_model_is_unbuildable) {
-    game->golds[game->turn] = GOLD_SCALE;
+    game->golds[0] = GOLD_SCALE;
     game->x = 2;
     game->y = 3;
-    game->territory[3][2] = game->turn;
+    game->territory[3][2] = 0;
     game->map[3][2] = TILE_CITY;
 
     ASSERT_TRUE(action_build(game, MODEL_INFANTRY));
@@ -113,17 +113,17 @@ TEST_F(game_fixture, action_build_returns_true_when_model_is_unbuildable) {
 TEST_F(game_fixture, action_build_returns_true_when_model_is_unaffordable) {
     game->x = 2;
     game->y = 3;
-    game->territory[3][2] = game->turn;
+    game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
 
     ASSERT_TRUE(action_build(game, MODEL_INFANTRY));
 }
 
 TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
-    game->golds[game->turn] = GOLD_SCALE;
+    game->golds[0] = GOLD_SCALE;
     game->x = 2;
     game->y = 3;
-    game->territory[3][2] = game->turn;
+    game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
 
     ASSERT_FALSE(action_build(game, MODEL_INFANTRY));
@@ -163,14 +163,14 @@ TEST_F(game_fixture, action_capture_when_capture_enemy_hq) {
     game->y = 3;
     game->territory[3][2] = 1;
     game->map[3][2] = TILE_HQ;
-    game->incomes[game->turn] = 5000;
+    game->incomes[0] = 5000;
     game->incomes[1] = 5000;
 
     action_capture(game);
 
     ASSERT_EQ(game->incomes[1], 0);
     ASSERT_EQ(game->territory[3][2], game->turn);
-    ASSERT_EQ(game->incomes[game->turn], 6000);
+    ASSERT_EQ(game->incomes[0], 6000);
 }
 
 TEST_F(game_fixture, action_capture_when_capture_enemy_city) {
@@ -188,11 +188,11 @@ TEST_F(game_fixture, action_capture_when_capture_unoccupied_city) {
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = NULL_PLAYER;
-    game->incomes[game->turn] = 5000;
+    game->incomes[0] = 5000;
 
     action_capture(game);
 
-    ASSERT_EQ(game->incomes[game->turn], 6000);
+    ASSERT_EQ(game->incomes[0], 6000);
 }
 
 TEST_F(game_fixture, action_move_returns_false_when_start_capturing) {

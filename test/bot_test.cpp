@@ -114,7 +114,7 @@ TEST_F(game_fixture, find_nearest_capturable_returns_max_energy_when_found) {
 
 TEST_F(game_fixture, find_nearest_capturable_returns_zero_when_unfound) {
     game->map[3][2] = TILE_CITY;
-    game->territory[3][2] = game->turn;
+    game->territory[3][2] = 0;
 
     const auto max_energy = find_nearest_capturable(game);
 
@@ -440,7 +440,7 @@ TEST_F(game_fixture, bot_play_interacts_units) {
 TEST_F(game_fixture, bot_play_build_units) {
     game->map[0][0] = TILE_FACTORY;
     game->territory[0][0] = 0;
-    game->golds[game->turn] = GOLD_SCALE;
+    game->golds[0] = GOLD_SCALE;
 
     bot_play(game);
 

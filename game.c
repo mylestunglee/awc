@@ -62,8 +62,8 @@ health_t calc_damage(const struct game* const game,
     const damage_t attack_max = 100;
 
     const tile_t tile = game->map[attackee->y][attackee->x];
-    const movement_t movement_type = unit_movement_types[attackee->model];
-    return ((damage_t)units_damage[attacker->model][attackee->model] *
+    const movement_t movement_type = model_movement_types[attackee->model];
+    return ((damage_t)model_damage[attacker->model][attackee->model] *
             (damage_t)attacker->health *
             (damage_t)(defense_max - tile_defense[movement_type][tile])) /
            (attack_max * defense_max);
@@ -149,12 +149,12 @@ bool game_is_buildable(const struct game* const game) {
 
     const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
-    for (model_t model = buildable_models[capturable];
-         model < buildable_models[capturable + 1]; ++model)
-        if (game->golds[game->turn] >= models_cost[model])
+    for (model_t model = capturable_buildable_models[capturable];
+         model < capturable_buildable_models[capturable + 1]; ++model)
+        if (game->golds[game->turn] >= model_cost[model])
             return !units_exists(&game->units, game->x, game->y) &&
-                   buildable_models[capturable] <
-                       buildable_models[capturable + 1] &&
+                   capturable_buildable_models[capturable] <
+                       capturable_buildable_models[capturable + 1] &&
                    !units_has_selection(&game->units) &&
                    units_is_insertable(&game->units);
 

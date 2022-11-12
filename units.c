@@ -310,11 +310,11 @@ health_t units_merge_health(const struct unit* const source,
 }
 
 bool units_is_direct(const model_t model) {
-    return models_min_range[model] == 0;
+    return model_min_range[model] == 0;
 }
 
 bool units_is_ranged(const model_t model) {
-    return models_min_range[model] > 0;
+    return model_min_range[model] > 0;
 }
 
 bool units_update_capture_progress(struct units* const units,

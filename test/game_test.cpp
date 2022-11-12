@@ -13,7 +13,7 @@ TEST_F(game_fixture, are_turns_empty_returns_false_when_unit_exists) {
 }
 
 TEST_F(game_fixture, are_turns_empty_returns_false_when_gold_exists) {
-    game->golds[game->turn] = GOLD_SCALE;
+    game->golds[0] = GOLD_SCALE;
 
     ASSERT_FALSE(are_turns_empty(game));
 }
@@ -23,19 +23,19 @@ TEST_F(game_fixture, are_turns_empty_returns_true_when_turns_are_empty) {
 }
 
 TEST_F(game_fixture, skip_turns_adds_golds) {
-    game->incomes[game->turn] = GOLD_SCALE;
+    game->incomes[0] = GOLD_SCALE;
 
     skip_turns(game);
 
-    ASSERT_EQ(game->golds[game->turn], GOLD_SCALE);
+    ASSERT_EQ(game->golds[0], GOLD_SCALE);
 }
 
 TEST_F(game_fixture, skip_empty_turns_adds_golds) {
-    game->incomes[game->turn] = GOLD_SCALE;
+    game->incomes[0] = GOLD_SCALE;
 
     skip_empty_turns(game);
 
-    ASSERT_EQ(game->golds[game->turn], GOLD_SCALE);
+    ASSERT_EQ(game->golds[0], GOLD_SCALE);
 }
 
 TEST_F(game_fixture, game_load_resets_state) {
@@ -333,7 +333,7 @@ TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_unit) {
 }
 
 TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_income) {
-    game->incomes[game->turn] = GOLD_SCALE;
+    game->incomes[0] = GOLD_SCALE;
 
     ASSERT_TRUE(game_is_alive(game, game->turn));
 }
@@ -361,14 +361,13 @@ TEST_F(game_fixture, game_is_friendly_returns_false_when_other) {
 }
 
 TEST_F(game_fixture, game_remove_player_makes_player_dead) {
-    game->turn = 2;
-    insert_unit({.player = game->turn});
-    game->territory[5][3] = game->turn;
-    game->incomes[game->turn] = GOLD_SCALE;
+    insert_unit({.player = 2});
+    game->territory[5][3] = 2;
+    game->incomes[2] = GOLD_SCALE;
 
-    game_remove_player(game, game->turn);
+    game_remove_player(game, 2);
 
-    ASSERT_FALSE(units_is_owner(&game->units, game->turn));
+    ASSERT_FALSE(units_is_owner(&game->units, 2));
     ASSERT_EQ(game->territory[5][3], NULL_PLAYER);
-    ASSERT_EQ(game->incomes[game->turn], 0);
+    ASSERT_EQ(game->incomes[2], 0);
 }

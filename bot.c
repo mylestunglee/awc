@@ -25,7 +25,7 @@ void simulate_attack(struct game* const game, health_t* const damage,
     const grid_t y = game->y;
     const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
     const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
-    const movement_t movement = unit_movement_types[attacker->model];
+    const movement_t movement = model_movement_types[attacker->model];
     health_t max_defense = 0;
     health_t max_energy = 0;
 
@@ -73,9 +73,9 @@ const struct unit* find_attackee(struct game* const game,
             const struct unit* const attackee =
                 units_const_get_at(&game->units, game->x, game->y);
             const gold_t damage_metric =
-                (gold_t)damage * models_cost[attackee->model];
+                (gold_t)damage * model_cost[attackee->model];
             const gold_t counter_damage_metric =
-                (gold_t)counter_damage * models_cost[attacker_model];
+                (gold_t)counter_damage * model_cost[attacker_model];
             const gold_t metric = damage_metric - counter_damage_metric;
 
             if (metric > best_metric) {
@@ -187,12 +187,12 @@ energy_t find_nearest_attackable_attackee_ranged(
     const struct unit* const attackee, energy_t max_energy,
     grid_t* const nearest_x, grid_t* const nearest_y) {
 
-    const grid_wide_t max_range = models_max_range[attacker_model];
+    const grid_wide_t max_range = model_max_range[attacker_model];
 
     for (grid_wide_t j = -max_range; j <= max_range; ++j)
         for (grid_wide_t i = -max_range; i <= max_range; ++i) {
             const grid_wide_t distance = abs(i) + abs(j);
-            if (models_min_range[attacker_model] <= distance &&
+            if (model_min_range[attacker_model] <= distance &&
                 distance <= max_range) {
                 game->x = (grid_wide_t)(attackee->x) + i;
                 game->y = (grid_wide_t)(attackee->y) + j;
@@ -254,7 +254,7 @@ energy_t find_nearest_attackable(struct game* const game,
             units_const_get_first(&game->units, player);
         while (attackee) {
             // Attackee is attackable
-            if (units_damage[attacker_model][attackee->model] > 0)
+            if (model_damage[attacker_model][attackee->model] > 0)
                 max_energy = find_nearest_attackable_attackee(
                     game, attacker_model, attackee, max_energy, nearest_x,
                     nearest_y);
@@ -306,7 +306,7 @@ void move_towards_target(struct game* const game, const model_t model,
 
     // Restrict accessible energy to one turn
     const energy_t accessible_energy =
-        list_back_peek(list).energy - unit_movement_ranges[model];
+        list_back_peek(list).energy - model_movement_ranges[model];
 
     while (!list_empty(list) &&
            list_back_peek(list).energy >= accessible_energy) {

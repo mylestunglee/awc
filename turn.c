@@ -20,7 +20,7 @@ void repair_units(struct game* const game) {
 
             unit->health += heal;
             game->golds[game->turn] -=
-                (models_cost[unit->model] * (gold_t)heal) / (gold_t)HEALTH_MAX;
+                (model_cost[unit->model] * (gold_t)heal) / (gold_t)HEALTH_MAX;
         }
 
         unit = units_get_next(&game->units, unit);

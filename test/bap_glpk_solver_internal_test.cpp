@@ -209,7 +209,7 @@ TEST_F(bap_glpk_solver_internal_fixture, set_budget_submatrix) {
 
     set_budget_submatrix(inputs, temps);
 
-    ASSERT_EQ(temps->matrix_values[1], models_cost[MODEL_INFANTRY]);
+    ASSERT_EQ(temps->matrix_values[1], model_cost[MODEL_INFANTRY]);
     ASSERT_EQ(temps->curr_index, 9);
 }
 

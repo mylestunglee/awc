@@ -126,7 +126,7 @@ TEST_F(
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_marks_when_damagable_enemy_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    ASSERT_NE(units_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
+    ASSERT_NE(model_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
     insert_unit({.x = 2, .y = 3, .player = 1});
 
     grid_explore_mark_attackable_tile(game, 2, 3, MODEL_INFANTRY, 0, false);
@@ -137,7 +137,7 @@ TEST_F(game_fixture,
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_undamagable_enemy_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    ASSERT_EQ(units_damage[MODEL_MISSLES][MODEL_INFANTRY], 0);
+    ASSERT_EQ(model_damage[MODEL_MISSLES][MODEL_INFANTRY], 0);
     insert_unit({.x = 2, .y = 3, .player = 1});
 
     grid_explore_mark_attackable_tile(game, 2, 3, MODEL_MISSLES, 0, false);
@@ -148,7 +148,7 @@ TEST_F(game_fixture,
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_friendly_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    ASSERT_NE(units_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
+    ASSERT_NE(model_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
     insert_unit({.x = 2, .y = 3, .player = 1});
     bitmatrix_set(game->alliances, 0, 1);
 
@@ -286,7 +286,7 @@ TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
 
 TEST_F(game_fixture, is_node_accessible_returns_false_when_ship_on_bridge) {
     ASSERT_NE(MOVEMENT_TYPE_SHIP, 0);
-    ASSERT_EQ(unit_movement_types[MODEL_SUBMARINE], MOVEMENT_TYPE_SHIP);
+    ASSERT_EQ(model_movement_types[MODEL_SUBMARINE], MOVEMENT_TYPE_SHIP);
     game->map[3][2] = TILE_BRIDGE;
     insert_unit({.model = MODEL_SUBMARINE});
     struct list_node node = {.x = 2, .y = 3};

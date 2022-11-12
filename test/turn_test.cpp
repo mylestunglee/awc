@@ -7,13 +7,13 @@
 
 TEST_F(game_fixture, repair_units_increases_unit_health) {
     insert_unit({.x = 2, .y = 3});
-    game->territory[3][2] = game->turn;
+    game->territory[3][2] = 0;
 
     repair_units(game);
 
     ASSERT_EQ(units_const_get_first(&game->units, game->turn)->health,
               HEAL_RATE);
-    ASSERT_EQ(game->golds[game->turn], -GOLD_SCALE * HEAL_RATE / HEALTH_MAX);
+    ASSERT_EQ(game->golds[0], -GOLD_SCALE * HEAL_RATE / HEALTH_MAX);
 }
 
 TEST_F(game_fixture, repair_units_ignores_unit_not_on_territory) {
@@ -21,29 +21,29 @@ TEST_F(game_fixture, repair_units_ignores_unit_not_on_territory) {
 
     repair_units(game);
 
-    ASSERT_EQ(game->golds[game->turn], 0);
+    ASSERT_EQ(game->golds[0], 0);
 }
 
 TEST_F(game_fixture, repair_units_caps_at_maximum_health) {
     insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX - 1});
-    game->territory[3][2] = game->turn;
+    game->territory[3][2] = 0;
 
     repair_units(game);
 
     ASSERT_EQ(units_const_get_first(&game->units, game->turn)->health,
               HEALTH_MAX);
-    ASSERT_EQ(game->golds[game->turn], -GOLD_SCALE / HEALTH_MAX);
+    ASSERT_EQ(game->golds[0], -GOLD_SCALE / HEALTH_MAX);
 }
 
 TEST_F(game_fixture, start_turn) {
     insert_unit({.x = 2, .y = 3});
-    game->territory[3][2] = game->turn;
-    game->incomes[game->turn] = GOLD_SCALE;
+    game->territory[3][2] = 0;
+    game->incomes[0] = GOLD_SCALE;
 
     start_turn(game);
 
     ASSERT_TRUE(units_const_get_first(&game->units, game->turn)->enabled);
-    ASSERT_EQ(game->golds[game->turn],
+    ASSERT_EQ(game->golds[0],
               GOLD_SCALE - GOLD_SCALE * HEAL_RATE / HEALTH_MAX);
 }
 
@@ -76,13 +76,13 @@ TEST_F(game_fixture, next_alive_turn_skips_dead_player) {
 }
 
 TEST_F(game_fixture, exists_alive_non_bot_returns_true_when_alive_player) {
-    game->incomes[game->turn] = GOLD_SCALE;
+    game->incomes[0] = GOLD_SCALE;
 
     ASSERT_TRUE(exists_alive_non_bot(game));
 }
 
 TEST_F(game_fixture, exists_alive_non_bot_returns_false_when_alive_bot) {
-    game->incomes[game->turn] = GOLD_SCALE;
+    game->incomes[0] = GOLD_SCALE;
     bitarray_set(game->bots, game->turn);
 
     ASSERT_FALSE(exists_alive_non_bot(game));
