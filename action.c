@@ -71,17 +71,8 @@ bool action_build(struct game* const game, const model_t model) {
     if (!game_is_buildable(game))
         return true;
 
-    const gold_t cost = model_cost[model];
-    const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
+    game->golds[game->turn] -= model_cost[model];
 
-    if (model < capturable_buildable_models[capturable] ||
-        model >= capturable_buildable_models[capturable + 1] ||
-        game->golds[game->turn] < cost)
-        return true;
-
-    game->golds[game->turn] -= cost;
-
-    // Error may occur when units is full
     const struct unit unit = {.x = game->x,
                               .y = game->y,
                               .player = game->turn,

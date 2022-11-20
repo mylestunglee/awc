@@ -111,15 +111,6 @@ TEST_F(game_fixture, action_build_returns_true_when_model_is_unbuildable) {
     ASSERT_TRUE(action_build(game, MODEL_INFANTRY));
 }
 
-TEST_F(game_fixture, action_build_returns_true_when_model_is_unaffordable) {
-    game->x = 2;
-    game->y = 3;
-    game->territory[3][2] = 0;
-    game->map[3][2] = TILE_FACTORY;
-
-    ASSERT_TRUE(action_build(game, MODEL_INFANTRY));
-}
-
 TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
     game->golds[0] = GOLD_SCALE;
     game->x = 2;
