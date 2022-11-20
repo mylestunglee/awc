@@ -43,8 +43,7 @@ TEST_F(game_fixture, start_turn) {
     start_turn(game);
 
     ASSERT_TRUE(units_const_get_first(&game->units, game->turn)->enabled);
-    ASSERT_EQ(game->golds[0],
-              GOLD_SCALE - GOLD_SCALE * HEAL_RATE / HEALTH_MAX);
+    ASSERT_EQ(game->golds[0], GOLD_SCALE - GOLD_SCALE * HEAL_RATE / HEALTH_MAX);
 }
 
 TEST_F(game_fixture, end_turn) {

@@ -152,7 +152,7 @@ bool game_is_buildable(const struct game* const game) {
     for (model_t model = capturable_buildable_models[capturable];
          model < capturable_buildable_models[capturable + 1]; ++model)
         if (game->golds[game->turn] >= model_cost[model])
-            return !units_exists(&game->units, game->x, game->y) &&
+            return !units_exists_at(&game->units, game->x, game->y) &&
                    capturable_buildable_models[capturable] <
                        capturable_buildable_models[capturable + 1] &&
                    !units_has_selection(&game->units) &&

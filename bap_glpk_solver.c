@@ -35,7 +35,8 @@ bool allocation_exists(const struct bap_inputs* const inputs,
 bool b_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
                   const index_t j) {
     FOR_CAPTURABLE
-    if (capturable_buildable_models[k] <= i && i < capturable_buildable_models[k + 1] &&
+    if (capturable_buildable_models[k] <= i &&
+        i < capturable_buildable_models[k + 1] &&
         inputs->enemy_distribution[j] > 0 && model_damage[i][j] > 0)
         return allocation_exists(inputs, k);
 
@@ -269,7 +270,8 @@ void set_allocation_submatrix(const struct bap_inputs* const inputs,
     FOR_CAPTURABLE
     if (allocation_exists(inputs, k)) {
         index_t column = temps->b_column_index;
-        for (index_t i = capturable_buildable_models[k]; i < capturable_buildable_models[k + 1]; ++i)
+        for (index_t i = capturable_buildable_models[k];
+             i < capturable_buildable_models[k + 1]; ++i)
             FOR_MODEL(j)
         if (b_i_j_exists(inputs, i, j)) {
             sparse_matrix_set(temps, row, column, 1.0);

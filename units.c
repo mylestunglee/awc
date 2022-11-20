@@ -145,7 +145,6 @@ void units_move_selection(struct units* const units, const grid_t x,
     units_move(units, units->selected, x, y);
 }
 
-// Sets enabled property for each unit of a player
 void units_set_enabled(struct units* const units, const player_t player,
                        const bool enabled) {
     assert(player < PLAYERS_CAPACITY);
@@ -197,8 +196,8 @@ const struct unit* units_const_get_by_safe(const struct units* const units,
     return units_const_get_by(units, unit);
 }
 
-bool units_exists(const struct units* const units, const grid_t x,
-                  const grid_t y) {
+bool units_exists_at(const struct units* const units, const grid_t x,
+                     const grid_t y) {
     return units->grid[y][x] != NULL_UNIT;
 }
 
@@ -313,9 +312,7 @@ bool units_is_direct(const model_t model) {
     return model_min_range[model] == 0;
 }
 
-bool units_is_ranged(const model_t model) {
-    return model_min_range[model] > 0;
-}
+bool units_is_ranged(const model_t model) { return model_min_range[model] > 0; }
 
 bool units_update_capture_progress(struct units* const units,
                                    const health_t progress) {
@@ -323,9 +320,10 @@ bool units_update_capture_progress(struct units* const units,
 
     assert(selected->capture_progress < CAPTURE_COMPLETION);
     selected->capture_progress += progress;
-    if (selected->capture_progress >= CAPTURE_COMPLETION) {
-        selected->capture_progress = 0;
-        return true;
-    }
-    return false;
+
+    if (selected->capture_progress < CAPTURE_COMPLETION)
+        return false;
+
+    selected->capture_progress = 0;
+    return true;
 }

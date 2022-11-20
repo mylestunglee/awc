@@ -223,7 +223,7 @@ TEST_F(units_fixture, load_units_when_valid_unit) {
 
     ASSERT_TRUE(load_units("infantry", params.c_str(), units));
 
-    ASSERT_TRUE(units_exists(units, 3, 5));
+    ASSERT_TRUE(units_exists_at(units, 3, 5));
 }
 
 TEST(file_test, load_units_when_invalid_unit) {

@@ -182,8 +182,9 @@ bool action_select(struct game* const game) {
 }
 
 bool action_highlight(struct game* const game) {
-    const bool highlightable = units_exists(&game->units, game->x, game->y) &&
-                               !units_has_selection(&game->units);
+    const bool highlightable =
+        units_exists_at(&game->units, game->x, game->y) &&
+        !units_has_selection(&game->units);
 
     if (highlightable)
         grid_explore(game, true);

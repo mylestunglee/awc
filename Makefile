@@ -4,7 +4,7 @@ CFLAGS = -g -Wall -Wextra -Wpedantic -Wunused-macros -Wstrict-prototypes -Wshado
 LIBRARIES = -lglpk
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
-REPORTS_DIRECTORY = reports
+COVERAGE_REPORTS_DIRECTORY = coverage_reports
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) $(LIBRARIES) -c $< -o $@
@@ -30,7 +30,7 @@ doc:
 	doxygen Doxyfile
 
 clean: clean_test
-	rm -rf $(TARGET) $(OBJECTS) $(REPORTS_DIRECTORY)
+	rm -rf $(TARGET) $(OBJECTS) $(COVERAGE_REPORTS_DIRECTORY)
 
 run_test:
 	$(MAKE) -C test run
@@ -59,13 +59,13 @@ clean_test:
 %_test_coverage/report/index.html: %_test_coverage/coverage.info %_test_coverage/report
 	genhtml $< --output-directory $*_test_coverage/report
 
-$(REPORTS_DIRECTORY):
-	mkdir -p $(REPORTS_DIRECTORY)
+$(COVERAGE_REPORTS_DIRECTORY):
+	mkdir -p $(COVERAGE_REPORTS_DIRECTORY)
 
-$(REPORTS_DIRECTORY)/%_test_coverage_report: $(REPORTS_DIRECTORY) %_test_coverage/report/index.html
+$(COVERAGE_REPORTS_DIRECTORY)/%_test_coverage_report: $(COVERAGE_REPORTS_DIRECTORY) %_test_coverage/report/index.html
 	mv $*_test_coverage/report $@
 	rm -r $*_test_coverage
 
-COVERAGE_REPORTS = $(patsubst test/%_test.cpp, $(REPORTS_DIRECTORY)/%_test_coverage_report, $(wildcard test/*_test.cpp) test/all_test.cpp)
+COVERAGE_REPORTS = $(patsubst test/%_test.cpp, $(COVERAGE_REPORTS_DIRECTORY)/%_test_coverage_report, $(wildcard test/*_test.cpp) test/all_test.cpp)
 
-coverage_reports: $(COVERAGE_REPORTS)
+make_coverage_reports: $(COVERAGE_REPORTS)

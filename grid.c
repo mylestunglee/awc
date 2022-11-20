@@ -237,7 +237,7 @@ void grid_explore_recursive(struct game* const game,
     struct list* const list = &game->list;
 
     list_initialise(&game->list);
-    assert(units_exists(&game->units, game->x, game->y));
+    assert(units_exists_at(&game->units, game->x, game->y));
     assert(scalar > 0);
 
     // Use cursor instead of selected property because we want to highlight

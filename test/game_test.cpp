@@ -316,6 +316,9 @@ TEST_F(game_fixture, game_is_buildable_returns_true_when_buildable) {
 }
 
 TEST_F(game_fixture, game_is_buildable_returns_false_when_unaffordable) {
+    game->x = 2;
+    game->y = 3;
+    game->turn = 5;
     game->territory[3][2] = 5;
     game->map[3][2] = TILE_FACTORY;
 

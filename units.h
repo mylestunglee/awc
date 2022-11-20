@@ -64,7 +64,7 @@ const struct unit* units_const_get_by(const struct units* const, const unit_t);
 const struct unit* units_const_get_by_safe(const struct units* const,
                                            const unit_t);
 #endif
-bool units_exists(const struct units* const, const grid_t, const grid_t);
+bool units_exists_at(const struct units* const, const grid_t, const grid_t);
 struct unit* units_get_at(struct units* const, const grid_t, const grid_t);
 const struct unit* units_const_get_at(const struct units* const, const grid_t,
                                       const grid_t);

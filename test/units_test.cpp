@@ -1,4 +1,6 @@
 #define EXPOSE_UNITS_INTERNALS
+#include "../unit_constants.h"
+#include "test_constants.hpp"
 #include "units_fixture.hpp"
 
 TEST_F(units_fixture, units_initialise_sets_start) {
@@ -38,7 +40,7 @@ TEST_F(units_fixture, units_initialise_clears_grid) {
 
     units_initialise(units);
 
-    ASSERT_FALSE(units_exists(units, 2, 3));
+    ASSERT_FALSE(units_exists_at(units, 2, 3));
 }
 
 TEST_F(units_fixture, units_is_insertable_returns_true_when_empty) {
@@ -187,7 +189,7 @@ TEST_F(units_fixture, units_delete_unsets_grid) {
 
     units_delete(units, units->grid[3][2]);
 
-    ASSERT_FALSE(units_exists(units, 2, 3));
+    ASSERT_FALSE(units_exists_at(units, 2, 3));
 }
 
 TEST_F(units_fixture, units_delete_at_unsets_grid) {
@@ -198,7 +200,7 @@ TEST_F(units_fixture, units_delete_at_unsets_grid) {
 
     units_delete_at(units, 2, 3);
 
-    ASSERT_FALSE(units_exists(units, 2, 3));
+    ASSERT_FALSE(units_exists_at(units, 2, 3));
 }
 
 TEST_F(units_fixture, units_delete_selected_unsets_grid) {
@@ -210,7 +212,7 @@ TEST_F(units_fixture, units_delete_selected_unsets_grid) {
 
     units_delete_selected(units);
 
-    ASSERT_FALSE(units_exists(units, 2, 3));
+    ASSERT_FALSE(units_exists_at(units, 2, 3));
 }
 
 TEST_F(units_fixture, units_move_repositions_unit) {
@@ -222,7 +224,7 @@ TEST_F(units_fixture, units_move_repositions_unit) {
 
     units_move(units, index, 5, 7);
 
-    ASSERT_FALSE(units_exists(units, 2, 3));
+    ASSERT_FALSE(units_exists_at(units, 2, 3));
     ASSERT_EQ(units->grid[7][5], index);
 }
 
@@ -235,7 +237,7 @@ TEST_F(units_fixture, units_move_to_same_position) {
     auto index = units->grid[3][2];
     units_move(units, index, 2, 3);
 
-    ASSERT_TRUE(units_exists(units, 2, 3));
+    ASSERT_TRUE(units_exists_at(units, 2, 3));
 }
 
 TEST_F(units_fixture, units_move_selection_repositions_unit) {
@@ -247,7 +249,7 @@ TEST_F(units_fixture, units_move_selection_repositions_unit) {
 
     units_move_selection(units, 5, 7);
 
-    ASSERT_TRUE(units_exists(units, 5, 7));
+    ASSERT_TRUE(units_exists_at(units, 5, 7));
 }
 
 TEST_F(units_fixture, units_set_enabled_sets_enabled) {
@@ -264,6 +266,17 @@ TEST_F(units_fixture, units_set_enabled_sets_enabled) {
     ASSERT_TRUE(units->data[units->grid[7][3]].enabled);
 }
 
+TEST_F(units_fixture, units_disable_non_turn_disables_unit) {
+    struct unit unit {
+        .x = 2, .y = 3, .enabled = true
+    };
+    units_insert(units, &unit);
+
+    units_disable_non_turn(units, 1);
+
+    ASSERT_FALSE(units_const_get_at(units, 2, 3)->enabled);
+}
+
 TEST_F(units_fixture, units_delete_player_deletes_all_player_units) {
     struct unit unit {
         .x = 3, .y = 5, .player = 2
@@ -275,6 +288,179 @@ TEST_F(units_fixture, units_delete_player_deletes_all_player_units) {
     units_delete_player(units, 2);
 
     ASSERT_EQ(units->size, 0);
+}
+
+TEST_F(units_fixture, units_get_by_returns_unit) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    units_get_by(units, 0)->enabled = true;
+
+    ASSERT_TRUE(units_const_get_at(units, 2, 3)->enabled);
+}
+
+TEST_F(units_fixture, units_get_by_safe_returns_nullptr) {
+    ASSERT_EQ(units_get_by_safe(units, NULL_UNIT), nullptr);
+}
+
+TEST_F(units_fixture, units_get_by_safe_returns_unit) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    units_get_by_safe(units, 0)->enabled = true;
+
+    ASSERT_TRUE(units_const_get_at(units, 2, 3)->enabled);
+}
+
+TEST_F(units_fixture, units_const_get_by_safe_returns_nullptr) {
+    ASSERT_EQ(units_const_get_by_safe(units, NULL_UNIT), nullptr);
+}
+
+TEST_F(units_fixture, units_const_get_by_safe_returns_unit) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    ASSERT_EQ(units_const_get_by_safe(units, 0), units_get_by(units, 0));
+}
+
+TEST_F(units_fixture, units_exists_at_returns_true_when_unit_at_position) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    ASSERT_TRUE(units_exists_at(units, 2, 3));
+}
+
+TEST_F(units_fixture, units_get_at_returns_unit) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    units_get_at(units, 2, 3)->enabled = true;
+
+    ASSERT_TRUE(units_const_get_at(units, 2, 3)->enabled);
+}
+
+TEST_F(units_fixture, units_const_get_at_safe_returns_unit) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    ASSERT_EQ(units_const_get_at_safe(units, 2, 3), units_get_by(units, 0));
+}
+
+TEST_F(units_fixture, units_get_first_returns_unit) {
+    ASSERT_EQ(units_get_first(units, 0), nullptr);
+}
+
+TEST_F(units_fixture, units_const_get_first_returns_unit) {
+    ASSERT_EQ(units_const_get_first(units, 0), nullptr);
+}
+
+TEST_F(units_fixture, index_by_pointer_returns_index) {
+    ASSERT_EQ(index_by_pointer(units, units_get_by(units, 0)), 0);
+}
+
+TEST_F(units_fixture, units_get_next_returns_unit) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+    unit.y = 5;
+    units_insert(units, &unit);
+
+    units_get_next(units, units_const_get_at(units, 2, 5))->enabled = true;
+
+    ASSERT_TRUE(units_const_get_at(units, 2, 3)->enabled);
+}
+
+TEST_F(units_fixture, units_const_get_next_returns_unit) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+    unit.y = 5;
+    units_insert(units, &unit);
+
+    ASSERT_EQ(units_const_get_next(units, units_const_get_at(units, 2, 5)),
+              units_const_get_at(units, 2, 3));
+}
+
+TEST_F(
+    units_fixture,
+    units_const_get_next_cyclic_returns_first_unit_when_no_next_unit_exists) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    ASSERT_EQ(
+        units_const_get_next_cyclic(units, units_const_get_at(units, 2, 3)),
+        units_const_get_at(units, 2, 3));
+}
+
+TEST_F(units_fixture,
+       units_const_get_next_cyclic_returns_next_unit_when_next_unit_exists) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+    unit.y = 5;
+    units_insert(units, &unit);
+
+    ASSERT_EQ(
+        units_const_get_next_cyclic(units, units_const_get_at(units, 2, 5)),
+        units_const_get_at(units, 2, 3));
+}
+
+TEST_F(units_fixture, units_is_owner_returns_true_when_owns) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    ASSERT_TRUE(units_is_owner(units, 0));
+}
+
+TEST_F(units_fixture, units_is_owner_returns_false_when_does_not_owns) {
+    ASSERT_FALSE(units_is_owner(units, 0));
+}
+
+TEST_F(units_fixture, units_has_selection_returns_true_when_selection_exists) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+
+    units_select_at(units, 2, 3);
+
+    ASSERT_TRUE(units_has_selection(units));
+}
+
+TEST_F(units_fixture,
+       units_has_selection_returns_false_when_no_selection_exists) {
+    ASSERT_FALSE(units_has_selection(units));
+}
+
+TEST_F(units_fixture, units_disable_selection) {
+    struct unit unit {
+        .x = 2, .y = 3, .enabled = true
+    };
+    units_insert(units, &unit);
+    units_select_at(units, 2, 3);
+
+    units_disable_selection(units);
+
+    ASSERT_FALSE(units_const_get_selected(units)->enabled);
 }
 
 TEST(units_test, merge_health_returns_added_health) {
@@ -297,4 +483,46 @@ TEST(units_test, merge_health_bounds_overflow) {
     };
 
     ASSERT_EQ(units_merge_health(&source, &target), HEALTH_MAX);
+}
+
+TEST(units_test, units_is_direct_returns_true_for_infantry) {
+    ASSERT_TRUE(units_is_direct(MODEL_INFANTRY));
+}
+
+TEST(units_test, units_is_direct_returns_false_for_artillery) {
+    ASSERT_FALSE(units_is_direct(MODEL_ARTILLERY));
+}
+
+TEST(units_test, units_is_ranged_returns_true_for_artillery) {
+    ASSERT_TRUE(units_is_ranged(MODEL_ARTILLERY));
+}
+
+TEST(units_test, units_is_ranged_returns_false_for_infantry) {
+    ASSERT_FALSE(units_is_ranged(MODEL_INFANTRY));
+}
+
+TEST_F(units_fixture,
+       units_update_capture_progress_returns_false_and_adds_capture_progress) {
+    struct unit unit {
+        .x = 2, .y = 3
+    };
+    units_insert(units, &unit);
+    units_select_at(units, 2, 3);
+
+    ASSERT_FALSE(units_update_capture_progress(units, 1));
+
+    ASSERT_EQ(units_const_get_at(units, 2, 3)->capture_progress, 1);
+}
+
+TEST_F(units_fixture,
+       units_update_capture_progress_returns_true_and_resets_capture_progress) {
+    struct unit unit {
+        .x = 2, .y = 3, .capture_progress = CAPTURE_COMPLETION - 1
+    };
+    units_insert(units, &unit);
+    units_select_at(units, 2, 3);
+
+    ASSERT_TRUE(units_update_capture_progress(units, 1));
+
+    ASSERT_EQ(units_const_get_at(units, 2, 3)->capture_progress, 0);
 }
