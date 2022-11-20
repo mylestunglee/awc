@@ -63,11 +63,11 @@ TEST_F(game_fixture,
 }
 
 TEST_F(game_fixture, action_attack_returns_false_where_ranged_unit_kills) {
-    insert_selected_unit({.x = 2,
-                          .y = 3,
-                          .model = MODEL_ARTILLERY,
-                          .health = HEALTH_MAX,
-                          .enabled = true});
+    const auto* const attacker = insert_selected_unit({.x = 2,
+                                                       .y = 3,
+                                                       .model = MODEL_ARTILLERY,
+                                                       .health = HEALTH_MAX,
+                                                       .enabled = true});
     insert_unit({.x = 5, .y = 7, .health = 1});
     game->x = 5;
     game->y = 7;
@@ -79,6 +79,7 @@ TEST_F(game_fixture, action_attack_returns_false_where_ranged_unit_kills) {
 
     ASSERT_FALSE(units_exists_at(&game->units, 5, 7));
     ASSERT_FALSE(units_has_selection(&game->units));
+    ASSERT_FALSE(attacker->enabled);
 }
 
 TEST_F(game_fixture, action_attack_returns_false_where_counter_damage_kills) {

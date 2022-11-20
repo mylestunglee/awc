@@ -42,6 +42,8 @@ bool action_attack(struct game* const game) {
 
     if (units_is_direct(attacker->model))
         (void)move_selected_unit(game, game->prev_x, game->prev_y);
+    else
+        units_disable_selection(&game->units);
 
     // Apply damage
     if (damage >= attackee->health) {

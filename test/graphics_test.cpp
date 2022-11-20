@@ -410,6 +410,7 @@ TEST_F(game_fixture, render_tile_shows_highlightable_capturable) {
 }
 
 TEST_F(game_fixture, render_tile_shows_arrows) {
+    insert_selected_unit();
     wchar_t expected_symbol = 0;
     uint8_t expected_style = '\x00';
     wchar_t actual_symbol = 0;

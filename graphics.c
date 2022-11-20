@@ -387,7 +387,8 @@ bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
     }
 
     // Show arrows highlighting position to attack unit
-    if (attackable && x == game->prev_x && y == game->prev_y)
+    if (attackable && x == game->prev_x && y == game->prev_y &&
+        units_is_direct(units_const_get_selected(&game->units)->model))
         render_attack_arrows(game, tile_x, symbol, style);
     else if (highlightable)
         render_highlight(game->labels[y][x], symbol, style);
