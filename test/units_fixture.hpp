@@ -1,7 +1,7 @@
 #ifndef UNITS_FIXTURE_H
 #define UNITS_FIXTURE_H
 
-#include "../units.h"
+#include "../src/units.h"
 #include <gtest/gtest.h>
 #include <memory>
 

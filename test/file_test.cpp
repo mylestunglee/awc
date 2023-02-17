@@ -1,6 +1,6 @@
 #define EXPOSE_FILE_INTERNALS
-#include "../constants.h"
-#include "../file.h"
+#include "../src/constants.h"
+#include "../src/file.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 #include "units_fixture.hpp"
@@ -359,9 +359,7 @@ TEST(file_test, save_map_when_empty_row) {
 
 TEST(file_test, save_unit_no_capture_progress_and_no_health) {
     file_fixture file;
-    const struct unit unit {
-        .x = 5, .y = 7, .health = HEALTH_MAX, .enabled = true
-    };
+    const struct unit unit { .x = 5, .y = 7, .health = HEALTH_MAX };
 
     save_unit(&unit, file.ref());
 
@@ -370,7 +368,7 @@ TEST(file_test, save_unit_no_capture_progress_and_no_health) {
 
 TEST(file_test, save_unit_no_capture_progress_and_no_enabled) {
     file_fixture file;
-    const struct unit unit { .x = 5, .y = 7, .health = 2, .enabled = true };
+    const struct unit unit { .x = 5, .y = 7, .health = 2 };
 
     save_unit(&unit, file.ref());
 
@@ -449,7 +447,7 @@ TEST(file_test, save_teams) {
     file_fixture file;
     uint8_t alliances[BITMATRIX_SIZE(PLAYERS_CAPACITY)];
 
-    alliances[0] = (1 << 1) + (1 << 2) + (1 << 7);
+    alliances[0] = (1 << 1) + (1 << 2) + (1 << 5);
 
     save_teams(alliances, file.ref());
 
@@ -472,7 +470,7 @@ TEST_F(game_fixture, save_game) {
         if (c == '\n')
             ++new_lines;
 
-    ASSERT_EQ(new_lines, 7);
+    ASSERT_EQ(new_lines, 6);
 }
 
 TEST_F(game_fixture, file_save_returns_true_when_invalid_filename) {
@@ -482,7 +480,7 @@ TEST_F(game_fixture, file_save_returns_true_when_invalid_filename) {
 TEST_F(game_fixture, file_save_returns_false_when_successful) {
     ASSERT_FALSE(file_save(game, "savegame"));
 
-    ASSERT_EQ(std::filesystem::file_size("savegame"), 7);
+    ASSERT_EQ(std::filesystem::file_size("savegame"), 0);
 
     remove("savegame");
 }

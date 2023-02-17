@@ -1,13 +1,11 @@
 #define EXPOSE_PARSE_INTERNALS
-#include "../constants.h"
-#include "../parse.h"
+#include "../src/constants.h"
+#include "../src/parse.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 #include <filesystem>
 
-TEST(parse_test, parse_error_returns_true) {
-    ASSERT_TRUE(parse_error(nullptr));
-}
+TEST(parse_test, parse_quit_returns_true) { ASSERT_TRUE(parse_quit(nullptr)); }
 
 TEST(parse_test, parse_nothing_returns_false) {
     ASSERT_FALSE(parse_nothing(nullptr));

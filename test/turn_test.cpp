@@ -1,7 +1,7 @@
 #define EXPOSE_TURN_INTERNALS
-#include "../bitarray.h"
-#include "../constants.h"
-#include "../turn.h"
+#include "../src/bitarray.h"
+#include "../src/constants.h"
+#include "../src/turn.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 

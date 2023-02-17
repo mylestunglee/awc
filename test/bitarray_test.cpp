@@ -1,7 +1,7 @@
-#include "../constants.h"
+#include "../src/constants.h"
 #include <gtest/gtest.h>
 #define EXPOSE_UNITS_INTERNALS
-#include "../bitarray.h"
+#include "../src/bitarray.h"
 
 TEST(bitarray, bitarray_set) {
     uint8_t data = '\x00';

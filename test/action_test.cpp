@@ -1,6 +1,6 @@
 #define EXPOSE_ACTION_INTERNALS
-#include "../action.h"
-#include "../constants.h"
+#include "../src/action.h"
+#include "../src/constants.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 

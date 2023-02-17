@@ -1,7 +1,7 @@
 #define EXPOSE_GRAPHICS_INTERNALS
-#include "../constants.h"
-#include "../graphics.h"
-#include "../unit_constants.h"
+#include "../src/constants.h"
+#include "../src/graphics.h"
+#include "../src/unit_constants.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 #include "units_fixture.hpp"

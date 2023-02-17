@@ -38,7 +38,6 @@ void skip_empty_turns(struct game* const game) {
 bool game_load(struct game* const game, const char* const filename) {
     game_initialise(game);
     const bool error = file_load(game, filename);
-    grid_correct_territory(game->territory, game->map);
     grid_compute_incomes(game->territory, game->incomes);
     skip_empty_turns(game);
     units_disable_non_turn(&game->units, game->turn);

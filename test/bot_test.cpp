@@ -1,7 +1,7 @@
 #define EXPOSE_BOT_INTERNALS
-#include "../bot.h"
-#include "../constants.h"
-#include "../unit_constants.h"
+#include "../src/bot.h"
+#include "../src/constants.h"
+#include "../src/unit_constants.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 

@@ -2,9 +2,7 @@
 #define BAP_BASE_SOLVER_FIXTURE_HPP
 
 #include "../src/bap.h"
-#include "../src/list.h"
 #include <gtest/gtest.h>
-#include <memory>
 
 struct bap_base_solver_fixture : public ::testing::Test {
     struct bap_inputs inputs = {0};

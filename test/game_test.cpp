@@ -1,7 +1,7 @@
 #define EXPOSE_GAME_INTERNALS
-#include "../bitarray.h"
-#include "../constants.h"
-#include "../game.h"
+#include "../src/bitarray.h"
+#include "../src/constants.h"
+#include "../src/game.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 #include <fstream>
@@ -51,13 +51,12 @@ TEST_F(game_fixture, game_load_sets_map) {
     const auto filename = "game1.txt";
     {
         ofstream file(filename);
-        file << "map \"\nterritory 0 0 0";
+        file << "map \"";
     }
 
     ASSERT_FALSE(game_load(game, filename));
 
     ASSERT_EQ(game->map[0][0], TILE_PLAINS);
-    ASSERT_EQ(game->territory[0][0], NULL_PLAYER);
 
     remove(filename);
 }
@@ -108,7 +107,7 @@ TEST_F(game_fixture, game_deselect_clears_selection_and_labels) {
 }
 
 TEST_F(game_fixture, calc_damage_between_two_infantry) {
-    insert_unit({.x = 0, .health = HEALTH_MAX});
+    insert_unit({.health = HEALTH_MAX});
     insert_unit({.x = 1, .health = HEALTH_MAX});
     game->map[0][1] = TILE_PLAINS;
 

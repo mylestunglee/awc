@@ -12,7 +12,7 @@ bool load_turn(const char* const command, const char* const params,
     if (strcmp(command, "turn"))
         return false;
 
-    return sscanf(params, TURN_FORMAT, turn) == 1;
+    return sscanf(params, PLAYER_FORMAT, turn) == 1;
 }
 
 bool load_map(const char* const command, const char* const params,
@@ -155,6 +155,7 @@ bool load_unit(const char* const command, const char* const params,
         return false;
 
     health_t health = HEALTH_MAX;
+
     if (health_buffer[0] != '\0' &&
         sscanf(health_buffer, HEALTH_FORMAT, &health) != 1)
         return false;
@@ -180,7 +181,9 @@ bool load_unit(const char* const command, const char* const params,
                               .player = player,
                               .model = model,
                               .health = health,
+                              .capture_progress = capture_progress,
                               .enabled = enabled};
+
     units_insert(units, &unit);
 
     return true;
@@ -238,7 +241,8 @@ bool file_load(struct game* const game, const char* const filename) {
 }
 
 void save_turn(const player_t turn, FILE* const file) {
-    fprintf(file, "turn " TURN_FORMAT "\n", turn);
+    if (turn != 0)
+        fprintf(file, "turn " PLAYER_FORMAT "\n", turn);
 }
 
 grid_wide_t calc_row_length(const tile_t row[GRID_SIZE]) {
@@ -278,7 +282,7 @@ void save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file) {
 
 void save_unit(const struct unit* const unit, FILE* const file) {
     if (unit->capture_progress == 0) {
-        if (unit->player == 0) {
+        if (!unit->enabled) {
             if (unit->health == HEALTH_MAX)
                 fprintf(file,
                         MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
@@ -298,7 +302,7 @@ void save_unit(const struct unit* const unit, FILE* const file) {
                                       " " GRID_FORMAT " " HEALTH_FORMAT
                                       " " ENABLED_FORMAT "\n",
                     model_names[unit->model], unit->player, unit->x, unit->y,
-                    unit->health, unit->enabled ? "enabled" : "disabled");
+                    unit->health, unit->enabled ? "enabled" : "");
     } else
         fprintf(file,
                 MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT

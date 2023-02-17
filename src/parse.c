@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <ctype.h>
 
-bool parse_error(struct game* const game) {
+bool parse_quit(struct game* const game) {
     (void)game;
     return true;
 }
@@ -66,7 +66,8 @@ bool parse_load_5(struct game* const game) {
 }
 
 bool parse_save_1(struct game* const game) {
-    return game_save(game, "state1.txt");
+    game_save(game, "state1.txt");
+    return false;
 }
 
 bool parse_save_2(struct game* const game) {
@@ -134,7 +135,7 @@ bool (*parsers[256])(struct game* const);
 void parse_initialise(void) {
     uint8_t input = 0;
     do {
-        parsers[input] = isprint(input) ? &parse_nothing : &parse_error;
+        parsers[input] = isprint(input) ? &parse_nothing : &parse_quit;
     } while (++input);
 
     parsers['1'] = &parse_build_1;

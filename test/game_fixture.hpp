@@ -1,8 +1,8 @@
 #ifndef GAME_FIXTURE_HPP
 #define GAME_FIXTURE_HPP
 
+#include "../src/game.h"
 #include <gtest/gtest.h>
-#include "../game.h"
 #include <memory>
 
 class game_fixture : public ::testing::Test {

@@ -1,5 +1,5 @@
-#include "../bap_solver.h"
-#include "../unit_constants.h"
+#include "../src/bap_solver.h"
+#include "../src/unit_constants.h"
 #include "bap_base_solver_fixture.hpp"
 #include "test_constants.hpp"
 #include <gtest/gtest.h>

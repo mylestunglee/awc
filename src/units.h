@@ -4,15 +4,15 @@
 #include "definitions.h"
 #include <stdbool.h>
 
-typedef uint16_t capture_progress_t;
-typedef uint8_t health_t;
-typedef uint16_t health_wide_t;
-typedef uint8_t model_t;
-typedef uint8_t unit_t;
-
 #define HEALTH_MAX 100
 #define UNITS_CAPACITY 255
 #define NULL_UNIT UNITS_CAPACITY
+
+typedef uint8_t model_t;
+typedef uint8_t health_t;
+typedef uint16_t health_wide_t;
+typedef uint8_t capture_progress_t;
+typedef uint8_t unit_t;
 
 struct unit {
     grid_t x;
@@ -20,7 +20,7 @@ struct unit {
     player_t player;
     model_t model;
     health_t health;
-    health_t capture_progress;
+    capture_progress_t capture_progress;
     bool enabled;
 };
 

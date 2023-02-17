@@ -1,4 +1,4 @@
-#include "../list.h"
+#include "../src/list.h"
 #include <gtest/gtest.h>
 
 class list_fixture : public ::testing::Test {

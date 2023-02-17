@@ -27,7 +27,7 @@ static const uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
                                          '^', '\\', '/', '[', ']', '-', '='};
 
 static const uint8_t player_styles[PLAYERS_CAPACITY + 1] = {
-    '\xf4', '\xf1', '\xf3', '\xf8', '\xf8', '\xf8'};
+    '\xf4', '\xf1', '\xf3', '\xf2', '\xf8'};
 
 static const uint8_t tile_styles[TERRIAN_CAPACITY] = {
     '\x80', '\xa2', '\x32', '\x13', '\x3b',
@@ -463,8 +463,16 @@ void reset_black(void) { wprintf(L"%c[30;40m", '\x1b'); }
 void reset_style(void) { wprintf(L"%c[0m", '\x1b'); }
 
 void print_normal_text(const struct game* const game) {
-    wprintf(L"turn=" TURN_FORMAT " gold=" GOLD_FORMAT " tile=%s", game->turn,
-            game->golds[game->turn], tile_names[game->map[game->y][game->x]]);
+    wprintf(L"turn=");
+    for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
+        if (game_is_alive(game, player)) {
+            if (player == game->turn)
+                wprintf(L"[" PLAYER_FORMAT "]", player);
+            else
+                wprintf(L"" PLAYER_FORMAT, player);
+        }
+    wprintf(L" gold=" GOLD_FORMAT " tile=%s", game->golds[game->turn],
+            tile_names[game->map[game->y][game->x]]);
 
     {
         const player_t territory = game->territory[game->y][game->x];

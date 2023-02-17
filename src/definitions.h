@@ -14,6 +14,6 @@ typedef uint8_t player_t;
 #define TERRIAN_CAPACITY (tile_t)10
 #define CAPTURABLE_CAPACITY (tile_t)5
 #define TILE_CAPACITY (TERRIAN_CAPACITY + CAPTURABLE_CAPACITY)
-#define PLAYERS_CAPACITY (player_t)5
+#define PLAYERS_CAPACITY (player_t)4
 
 #endif

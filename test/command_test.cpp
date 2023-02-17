@@ -1,5 +1,5 @@
-#include "../constants.h"
-#include "../parse.h"
+#include "../src/constants.h"
+#include "../src/parse.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 

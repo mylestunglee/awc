@@ -39,25 +39,6 @@ void grid_clear_player_territory(tile_t map[GRID_SIZE][GRID_SIZE],
     } while (++y);
 }
 
-// Normalise invalid map territory state
-void grid_correct_territory(player_t territory[GRID_SIZE][GRID_SIZE],
-                            tile_t map[GRID_SIZE][GRID_SIZE]) {
-
-    grid_t y = 0;
-    do {
-        grid_t x = 0;
-        do {
-            if (territory[y][x] > PLAYERS_CAPACITY ||
-                map[y][x] < TERRIAN_CAPACITY)
-                territory[y][x] = NULL_PLAYER;
-            if (map[y][x] > TILE_CAPACITY)
-                map[y][x] = TILE_VOID;
-        } while (++x);
-    } while (++y);
-
-    grid_clear_player_territory(map, territory, NULL_PLAYER);
-}
-
 void grid_compute_incomes(player_t territory[GRID_SIZE][GRID_SIZE],
                           gold_t incomes[PLAYERS_CAPACITY]) {
     grid_t y = 0;
@@ -159,11 +140,13 @@ bool is_node_accessible(const struct game* const game,
                         const struct list_node* const node) {
     const struct unit* const source =
         units_const_get_at(&game->units, game->x, game->y);
+    assert(source);
     const struct unit* const target =
         units_const_get_at_safe(&game->units, node->x, node->y);
     const bool unoccupied = !target;
     const bool init_tile = source == target;
     const tile_t tile = game->map[node->y][node->x];
+    // NOLINTNEXTLINE
     const bool ship_on_bridge =
         tile == TILE_BRIDGE &&
         model_movement_types[source->model] == MOVEMENT_TYPE_SHIP;

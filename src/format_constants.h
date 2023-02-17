@@ -10,12 +10,11 @@
 #define ROW_FORMAT "%256s"
 #define MODEL_NAME_FORMAT "%-12s"
 #define MODEL_FORMAT "%hhu"
-#define TURN_FORMAT "%hhu"
 #define HEALTH_WIDE_FORMAT "%hu"
 #define GOLD_FORMAT "%i"
 #define ENABLED_FORMAT "%8s"
 #define TILE_FORMAT "%hhu"
-#define CAPTURE_COMPLETION_FORMAT "%hu"
+#define CAPTURE_COMPLETION_FORMAT "%hhu"
 
 static const uint8_t tile_symbols[TILE_CAPACITY] = {
     '.', '"', 'Y', '^', ':', '~', '*', '\'', '-', '=', 'C', 'F', 'A', 'S', 'H'};

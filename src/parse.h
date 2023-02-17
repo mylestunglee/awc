@@ -6,7 +6,7 @@
 struct game;
 
 #ifdef EXPOSE_PARSE_INTERNALS
-bool parse_error(struct game* const);
+bool parse_quit(struct game* const);
 bool parse_nothing(struct game* const);
 bool parse_build(struct game* const, const model_t offset);
 bool parse_build_1(struct game* const);

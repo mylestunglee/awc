@@ -1,4 +1,4 @@
-#include "../console.h"
+#include "../src/console.h"
 #include <gtest/gtest.h>
 
 TEST(console_coverage_test, getch) { ASSERT_EQ(getch(), 0); }

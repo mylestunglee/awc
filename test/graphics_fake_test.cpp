@@ -1,6 +1,6 @@
 #define EXPOSE_GRAPHICS_INTERNALS
-#include "../constants.h"
-#include "../graphics.h"
+#include "../src/constants.h"
+#include "../src/graphics.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 
@@ -28,6 +28,7 @@ TEST(graphics_coverage_test, reset_style) { reset_style(); }
 TEST_F(game_fixture, print_normal_text) {
     game->territory[0][0] = 0;
     insert_unit();
+    ++game->incomes[1];
 
     print_normal_text(game);
 }

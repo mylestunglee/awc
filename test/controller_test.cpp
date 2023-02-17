@@ -1,4 +1,4 @@
-#include "../controller.h"
+#include "../src/controller.h"
 #include "game_fixture.hpp"
 
 TEST_F(game_fixture, controller_run_quit) {

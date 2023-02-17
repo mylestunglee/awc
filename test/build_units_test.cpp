@@ -1,7 +1,7 @@
 #define EXPOSE_BUILD_UNITS_INTERNAL
-#include "../build_units.h"
-#include "../constants.h"
-#include "../unit_constants.h"
+#include "../src/build_units.h"
+#include "../src/constants.h"
+#include "../src/unit_constants.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 
@@ -52,14 +52,14 @@ TEST_F(game_fixture, inputs_initialise) {
 
 TEST_F(game_fixture, realise_allocations_builds_one_unit) {
     grid_wide_t allocations[MODEL_CAPACITY] = {0};
-    allocations[MODEL_INFANTRY] = 1;
+    allocations[MODEL_ARTILLERY] = 1;
     game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
-    game->golds[0] = model_cost[MODEL_INFANTRY];
+    game->golds[0] = model_cost[MODEL_ARTILLERY];
 
     realise_allocations(game, allocations);
 
-    ASSERT_EQ(allocations[MODEL_INFANTRY], 0);
+    ASSERT_EQ(allocations[MODEL_ARTILLERY], 0);
     ASSERT_EQ(game->golds[0], 0);
 }
 

@@ -9,4 +9,4 @@ html
 latex
 reports
 .vscode
-coverage_reports
+*_test_coverage

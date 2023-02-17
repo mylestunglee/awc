@@ -1,8 +1,8 @@
 #define EXPOSE_GRID_INTERNALS
-#include "../bitarray.h"
-#include "../constants.h"
-#include "../grid.h"
-#include "../unit_constants.h"
+#include "../src/bitarray.h"
+#include "../src/constants.h"
+#include "../src/grid.h"
+#include "../src/unit_constants.h"
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 
@@ -63,43 +63,6 @@ TEST_F(grid_fixture, grid_clear_player_territory_sets_player_hqs_into_cities) {
     grid_clear_player_territory(map, territory, 2);
 
     ASSERT_EQ(map[3][5], TILE_CITY);
-}
-
-TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_players) {
-    ASSERT_LT(PLAYERS_CAPACITY, 101);
-    territory[2][3] = 101;
-
-    grid_correct_territory(territory, map);
-
-    ASSERT_EQ(territory[2][3], NULL_PLAYER);
-}
-
-TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_tiles) {
-    ASSERT_LT(TILE_CAPACITY, 101);
-    map[2][3] = 101;
-
-    grid_correct_territory(territory, map);
-
-    ASSERT_EQ(map[2][3], TILE_VOID);
-}
-
-TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_hqs) {
-    ASSERT_LT(PLAYERS_CAPACITY, 101);
-    map[2][3] = TILE_HQ;
-    territory[2][3] = 101;
-
-    grid_correct_territory(territory, map);
-
-    ASSERT_EQ(map[2][3], TILE_CITY);
-    ASSERT_EQ(territory[2][3], NULL_PLAYER);
-}
-
-TEST_F(grid_fixture, grid_correct_territory_santitises_invalid_capturables) {
-    territory[2][3] = 0;
-
-    grid_correct_territory(territory, map);
-
-    ASSERT_EQ(territory[2][3], NULL_PLAYER);
 }
 
 TEST_F(grid_fixture, grid_compute_incomes_computes_incomes) {
@@ -213,7 +176,7 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        is_node_unexplorable_returns_true_when_blocked_by_enemy_unit) {
-    insert_unit({.x = 0, .y = 0});
+    insert_unit();
     insert_unit({.x = 2, .y = 3, .player = 1});
     struct list_node node = {.x = 2, .y = 3};
 
@@ -224,7 +187,7 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        is_node_unexplorable_returns_false_when_blocked_by_passable_unit) {
-    insert_unit({.x = 0, .y = 0});
+    insert_unit();
     insert_unit({.x = 2, .y = 3, .player = 1, .model = MODEL_HELICOPTER});
     struct list_node node = {.x = 2, .y = 3};
 
@@ -234,7 +197,7 @@ TEST_F(game_fixture,
 }
 
 TEST_F(game_fixture, is_node_unexplorable_returns_true_when_visited) {
-    insert_unit({.x = 0, .y = 0});
+    insert_unit();
     game->energies[3][2] = 7;
     struct list_node node = {.energy = 5, .x = 2, .y = 3};
 
@@ -244,7 +207,7 @@ TEST_F(game_fixture, is_node_unexplorable_returns_true_when_visited) {
 }
 
 TEST_F(game_fixture, is_node_unexplorable_returns_false_when_explorable) {
-    insert_unit({.x = 0, .y = 0});
+    insert_unit();
     game->map[3][2] = TILE_PLAINS;
     struct list_node node = {.x = 2, .y = 3};
     auto unexplorable = is_node_unexplorable(game, &node, 0);
@@ -275,8 +238,8 @@ TEST_F(game_fixture, is_node_accessible_returns_true_when_mergable) {
 }
 
 TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
+    insert_unit({.health = HEALTH_MAX});
     insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
-    insert_unit({.x = 0, .y = 0, .health = HEALTH_MAX});
     struct list_node node = {.x = 2, .y = 3};
 
     auto accessible = is_node_accessible(game, &node);
@@ -359,7 +322,7 @@ TEST_F(game_fixture,
 }
 
 TEST_F(game_fixture, explore_node_does_not_explore_occupied_tile) {
-    insert_unit({.x = 0, .y = 0});
+    insert_unit();
     insert_unit({.x = 2, .y = 3, .player = 1});
     struct list_node node = {.energy = 5, .x = 2, .y = 3};
 

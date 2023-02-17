@@ -9,14 +9,14 @@ TEST_SOURCES = $(filter-out all_test.cpp, $(wildcard *_test.cpp))
 TARGETS = $(patsubst %_test.cpp, %_test, $(TEST_SOURCES))
 FIXTURE_OBJECTS = $(patsubst %_fixture.cpp, %_fixture.o, $(wildcard *_fixture.cpp))
 TEST_OBJECTS = $(patsubst %_test.cpp, %_test.o, $(TEST_SOURCES))
-SOURCE_OBJECTS = $(patsubst ../%.c, %.o, $(filter-out ../main.c, $(wildcard ../*.c)))
-HEADERS = $(wildcard ../*.h)
+SOURCE_OBJECTS = $(patsubst ../src/%.c, %.o, $(filter-out ../src/main.c, $(wildcard ../src/*.c)))
+HEADERS = $(wildcard ../src/*.h)
 
 .PRECIOUS: $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS)
 
-default: $(TARGETS)
+default: $(TARGETS) all_test
 
-%.o: ../%.c $(HEADERS)
+%.o: ../src/%.c $(HEADERS)
 	$(CXX) $(CXX_FLAGS) $(LIBRARIES) -c $< -o $@
 
 all_test.cpp: $(TEST_SOURCES)
@@ -41,3 +41,6 @@ run: all_test
 
 clean:
 	rm -f $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS) all_test.cpp all_test
+
+format:
+	clang-format -style=file -i *.cpp *.hpp
