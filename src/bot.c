@@ -55,7 +55,7 @@ void simulate_attack(struct game* const game, health_t* const damage,
 const struct unit* find_attackee(struct game* const game,
                                  const model_t attacker_model) {
     const struct unit* best_attackee = NULL;
-    gold_t best_metric = SHRT_MIN;
+    money_t best_metric = SHRT_MIN;
     grid_t best_prev_x = game->prev_x;
     grid_t best_prev_y = game->prev_y;
 
@@ -72,11 +72,11 @@ const struct unit* find_attackee(struct game* const game,
 
             const struct unit* const attackee =
                 units_const_get_at(&game->units, game->x, game->y);
-            const gold_t damage_metric =
-                (gold_t)damage * model_cost[attackee->model];
-            const gold_t counter_damage_metric =
-                (gold_t)counter_damage * model_cost[attacker_model];
-            const gold_t metric = damage_metric - counter_damage_metric;
+            const money_t damage_metric =
+                (money_t)damage * model_cost[attackee->model];
+            const money_t counter_damage_metric =
+                (money_t)counter_damage * model_cost[attacker_model];
+            const money_t metric = damage_metric - counter_damage_metric;
 
             if (metric > best_metric) {
                 best_metric = metric;

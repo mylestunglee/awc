@@ -397,7 +397,7 @@ TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_constrained_by_budget) {
 TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_selects_most_effective_unit) {
     inputs.enemy_distribution[MODEL_HELICOPTER] = 1;
     inputs.capturables[CAPTURABLE_AIRPORT] = 1;
-    inputs.budget = 100 * GOLD_SCALE;
+    inputs.budget = 100 * MONEY_SCALE;
     ASSERT_EQ(solve(), 0);
     ASSERT_EQ(outputs[MODEL_FIGHTER], 1);
 }
@@ -407,7 +407,7 @@ TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_distributes_ratio_across_units) {
     inputs.enemy_distribution[MODEL_HELICOPTER] = 1;
     inputs.enemy_distribution[MODEL_SUBMARINE] = 1;
     inputs.capturables[CAPTURABLE_AIRPORT] = 1;
-    inputs.budget = 100 * GOLD_SCALE;
+    inputs.budget = 100 * MONEY_SCALE;
     ASSERT_EQ(solve(), 0);
     ASSERT_EQ(outputs[MODEL_FIGHTER], 1);
 }

@@ -80,26 +80,26 @@ TEST(file_test, load_bot_when_valid_sets_bots) {
     ASSERT_EQ(bots, '\x01' << 2);
 }
 
-TEST(file_test, load_gold_when_invalid_command) {
-    ASSERT_FALSE(load_gold("", "", nullptr));
+TEST(file_test, load_money_when_invalid_command) {
+    ASSERT_FALSE(load_money("", "", nullptr));
 }
 
-TEST(file_test, load_gold_when_invalid_params) {
-    ASSERT_FALSE(load_gold("gold", "", nullptr));
+TEST(file_test, load_money_when_invalid_params) {
+    ASSERT_FALSE(load_money("money", "", nullptr));
 }
 
-TEST(file_test, load_gold_when_invalid_player) {
+TEST(file_test, load_money_when_invalid_player) {
     const auto params = std::to_string(NULL_PLAYER) + " 0"s;
 
-    ASSERT_FALSE(load_gold("gold", params.c_str(), nullptr));
+    ASSERT_FALSE(load_money("money", params.c_str(), nullptr));
 }
 
-TEST(file_test, load_gold_when_valid_sets_bots) {
-    gold_t golds[PLAYERS_CAPACITY];
+TEST(file_test, load_money_when_valid_sets_bots) {
+    money_t monies[PLAYERS_CAPACITY];
 
-    ASSERT_TRUE(load_gold("gold", "2 3", golds));
+    ASSERT_TRUE(load_money("money", "2 3", monies));
 
-    ASSERT_EQ(golds[2], 3);
+    ASSERT_EQ(monies[2], 3);
 }
 
 TEST(file_test, load_team_when_invalid_command) {
@@ -424,14 +424,14 @@ TEST(file_test, save_territory) {
     ASSERT_EQ(file.data(), "territory 0   2   3\n");
 }
 
-TEST(file_test, save_golds) {
+TEST(file_test, save_monies) {
     file_fixture file;
-    gold_t golds[PLAYERS_CAPACITY] = {0};
-    golds[2] = 3;
+    money_t monies[PLAYERS_CAPACITY] = {0};
+    monies[2] = 3;
 
-    save_golds(golds, file.ref());
+    save_monies(monies, file.ref());
 
-    ASSERT_EQ(file.data(), "gold 2 3\n");
+    ASSERT_EQ(file.data(), "money 2 3\n");
 }
 
 TEST(file_test, save_bots) {
@@ -459,7 +459,7 @@ TEST_F(game_fixture, save_game) {
     game->map[0][0] = TILE_PLAINS;
     insert_unit();
     game->territory[0][0] = 0;
-    game->golds[0] = 1;
+    game->monies[0] = 1;
     bitarray_set(game->bots, 0);
     bitmatrix_set(game->alliances, 0, 1);
 

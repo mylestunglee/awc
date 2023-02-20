@@ -13,6 +13,6 @@
 #define TILE_CITY (tile_t)10
 #define TILE_HQ (tile_t)14
 
-#define GOLD_SCALE 1000
+#define MONEY_SCALE 1000
 
 #endif

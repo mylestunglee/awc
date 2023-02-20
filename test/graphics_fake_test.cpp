@@ -44,7 +44,7 @@ TEST_F(game_fixture, print_attack_text) {
 
 TEST_F(game_fixture, print_build_text) {
     game->map[0][0] = TILE_FACTORY;
-    game->golds[0] = GOLD_SCALE;
+    game->monies[0] = MONEY_SCALE;
 
     print_build_text(game);
 }

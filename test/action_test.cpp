@@ -102,7 +102,7 @@ TEST_F(game_fixture, action_attack_returns_false_where_counter_damage_kills) {
 }
 
 TEST_F(game_fixture, action_build_returns_true_when_model_is_unbuildable) {
-    game->golds[0] = GOLD_SCALE;
+    game->monies[0] = MONEY_SCALE;
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = 0;
@@ -112,7 +112,7 @@ TEST_F(game_fixture, action_build_returns_true_when_model_is_unbuildable) {
 }
 
 TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
-    game->golds[0] = GOLD_SCALE;
+    game->monies[0] = MONEY_SCALE;
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = 0;

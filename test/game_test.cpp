@@ -12,8 +12,8 @@ TEST_F(game_fixture, are_turns_empty_returns_false_when_unit_exists) {
     ASSERT_FALSE(are_turns_empty(game));
 }
 
-TEST_F(game_fixture, are_turns_empty_returns_false_when_gold_exists) {
-    game->golds[0] = GOLD_SCALE;
+TEST_F(game_fixture, are_turns_empty_returns_false_when_money_exists) {
+    game->monies[0] = MONEY_SCALE;
 
     ASSERT_FALSE(are_turns_empty(game));
 }
@@ -22,20 +22,20 @@ TEST_F(game_fixture, are_turns_empty_returns_true_when_turns_are_empty) {
     ASSERT_TRUE(are_turns_empty(game));
 }
 
-TEST_F(game_fixture, skip_turns_adds_golds) {
-    game->incomes[0] = GOLD_SCALE;
+TEST_F(game_fixture, skip_turns_adds_monies) {
+    game->incomes[0] = MONEY_SCALE;
 
     skip_turns(game);
 
-    ASSERT_EQ(game->golds[0], GOLD_SCALE);
+    ASSERT_EQ(game->monies[0], MONEY_SCALE);
 }
 
-TEST_F(game_fixture, skip_empty_turns_adds_golds) {
-    game->incomes[0] = GOLD_SCALE;
+TEST_F(game_fixture, skip_empty_turns_adds_monies) {
+    game->incomes[0] = MONEY_SCALE;
 
     skip_empty_turns(game);
 
-    ASSERT_EQ(game->golds[0], GOLD_SCALE);
+    ASSERT_EQ(game->monies[0], MONEY_SCALE);
 }
 
 TEST_F(game_fixture, game_load_resets_state) {
@@ -71,8 +71,8 @@ TEST_F(game_fixture, game_load_computes_income) {
 
     ASSERT_FALSE(game_load(game, filename));
 
-    ASSERT_EQ(game->incomes[0], GOLD_SCALE);
-    ASSERT_EQ(game->golds[0], GOLD_SCALE);
+    ASSERT_EQ(game->incomes[0], MONEY_SCALE);
+    ASSERT_EQ(game->monies[0], MONEY_SCALE);
 
     remove(filename);
 }
@@ -309,7 +309,7 @@ TEST_F(game_fixture, game_is_buildable_returns_true_when_buildable) {
     game->turn = 5;
     game->territory[3][2] = 5;
     game->map[3][2] = TILE_FACTORY;
-    game->golds[5] = GOLD_SCALE;
+    game->monies[5] = MONEY_SCALE;
 
     ASSERT_TRUE(game_is_buildable(game));
 }
@@ -335,7 +335,7 @@ TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_unit) {
 }
 
 TEST_F(game_fixture, game_is_alive_returns_true_when_player_has_income) {
-    game->incomes[0] = GOLD_SCALE;
+    game->incomes[0] = MONEY_SCALE;
 
     ASSERT_TRUE(game_is_alive(game, game->turn));
 }
@@ -365,7 +365,7 @@ TEST_F(game_fixture, game_is_friendly_returns_false_when_other) {
 TEST_F(game_fixture, game_remove_player_makes_player_dead) {
     insert_unit({.player = 2});
     game->territory[5][3] = 2;
-    game->incomes[2] = GOLD_SCALE;
+    game->incomes[2] = MONEY_SCALE;
 
     game_remove_player(game, 2);
 

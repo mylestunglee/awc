@@ -11,7 +11,7 @@
 #define MODEL_NAME_FORMAT "%-12s"
 #define MODEL_FORMAT "%hhu"
 #define HEALTH_WIDE_FORMAT "%hu"
-#define GOLD_FORMAT "%i"
+#define MONEY_FORMAT "%i"
 #define ENABLED_FORMAT "%8s"
 #define TILE_FORMAT "%hhu"
 #define CAPTURE_COMPLETION_FORMAT "%hhu"

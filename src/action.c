@@ -71,7 +71,7 @@ bool action_build(struct game* const game, const model_t model) {
     if (!game_is_buildable(game))
         return true;
 
-    game->golds[game->turn] -= model_cost[model];
+    game->monies[game->turn] -= model_cost[model];
 
     const struct unit unit = {.x = game->x,
                               .y = game->y,
@@ -111,10 +111,10 @@ void action_capture(struct game* const game) {
     if (game->map[game->y][game->x] == TILE_HQ)
         game_remove_player(game, loser);
     else if (loser != NULL_PLAYER)
-        game->incomes[loser] -= GOLD_SCALE;
+        game->incomes[loser] -= MONEY_SCALE;
 
     game->territory[game->y][game->x] = game->turn;
-    game->incomes[game->turn] += GOLD_SCALE;
+    game->incomes[game->turn] += MONEY_SCALE;
 }
 
 bool action_move(struct game* const game) {

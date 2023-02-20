@@ -67,7 +67,7 @@ TEST_F(grid_fixture, grid_clear_player_territory_sets_player_hqs_into_cities) {
 
 TEST_F(grid_fixture, grid_compute_incomes_computes_incomes) {
     ASSERT_NE(NULL_PLAYER, 2);
-    gold_t incomes[PLAYERS_CAPACITY] = {0};
+    money_t incomes[PLAYERS_CAPACITY] = {0};
     territory[3][5] = 2;
     territory[3][6] = 2;
     territory[3][7] = 2;

@@ -471,7 +471,7 @@ void print_normal_text(const struct game* const game) {
             else
                 wprintf(L"" PLAYER_FORMAT, player);
         }
-    wprintf(L" gold=" GOLD_FORMAT " tile=%s", game->golds[game->turn],
+    wprintf(L" money=" MONEY_FORMAT " tile=%s", game->monies[game->turn],
             tile_names[game->map[game->y][game->x]]);
 
     {
@@ -505,7 +505,7 @@ void print_build_text(const struct game* const game) {
     wprintf(L"build mode:");
     for (model_t model = capturable_buildable_models[capturable];
          model < capturable_buildable_models[capturable + 1]; ++model) {
-        if (game->golds[game->turn] >= model_cost[model])
+        if (game->monies[game->turn] >= model_cost[model])
             wprintf(L" %s=" MODEL_FORMAT, model_names[model], model + 1);
     }
     wprintf(L"\n");

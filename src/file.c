@@ -76,21 +76,21 @@ bool load_bot(const char* const command, const char* const params,
     return true;
 }
 
-bool load_gold(const char* const command, const char* const params,
-               gold_t golds[PLAYERS_CAPACITY]) {
-    if (strcmp(command, "gold"))
+bool load_money(const char* const command, const char* const params,
+               money_t monies[PLAYERS_CAPACITY]) {
+    if (strcmp(command, "money"))
         return false;
 
     player_t player;
-    gold_t gold;
+    money_t money;
 
-    if (sscanf(params, PLAYER_FORMAT GOLD_FORMAT, &player, &gold) != 2)
+    if (sscanf(params, PLAYER_FORMAT MONEY_FORMAT, &player, &money) != 2)
         return false;
 
     if (player >= PLAYERS_CAPACITY)
         return false;
 
-    golds[player] = gold;
+    monies[player] = money;
 
     return true;
 }
@@ -204,7 +204,7 @@ bool load_command(struct game* const game, const char* const command,
            load_map(command, params, y, game->map) ||
            load_territory(command, params, game->territory) ||
            load_bot(command, params, game->bots) ||
-           load_gold(command, params, game->golds) ||
+           load_money(command, params, game->monies) ||
            load_team(command, params, game->alliances) ||
            load_units(command, params, &game->units);
 }
@@ -339,11 +339,11 @@ void save_territory(const player_t territory[GRID_SIZE][GRID_SIZE],
     } while (++y);
 }
 
-void save_golds(const gold_t golds[PLAYERS_CAPACITY], FILE* const file) {
+void save_monies(const money_t monies[PLAYERS_CAPACITY], FILE* const file) {
     for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
-        if (golds[player])
-            fprintf(file, "gold " PLAYER_FORMAT " " GOLD_FORMAT "\n", player,
-                    golds[player]);
+        if (monies[player])
+            fprintf(file, "money " PLAYER_FORMAT " " MONEY_FORMAT "\n", player,
+                    monies[player]);
 }
 
 void save_bots(const uint8_t* const bots, FILE* const file) {
@@ -407,7 +407,7 @@ void save_game(const struct game* const game, FILE* const file) {
     save_map(game->map, file);
     save_units(&game->units, file);
     save_territory(game->territory, file);
-    save_golds(game->golds, file);
+    save_monies(game->monies, file);
     save_bots(game->bots, file);
     save_teams(game->alliances, file);
 }

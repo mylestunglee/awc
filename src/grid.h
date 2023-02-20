@@ -10,7 +10,7 @@ void grid_clear_player_territory(tile_t[GRID_SIZE][GRID_SIZE],
                                  player_t[GRID_SIZE][GRID_SIZE],
                                  const player_t);
 void grid_compute_incomes(player_t[GRID_SIZE][GRID_SIZE],
-                          gold_t[PLAYERS_CAPACITY]);
+                          money_t[PLAYERS_CAPACITY]);
 #ifdef EXPOSE_GRID_INTERNALS
 void grid_explore_mark_attackable_tile(struct game* const, const grid_t,
                                        const grid_t, const model_t,

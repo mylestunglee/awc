@@ -18,7 +18,7 @@ TEST_F(game_fixture, parse_bulid_returns_false_and_is_unsuccessful) {
 }
 
 TEST_F(game_fixture, parse_bulid_returns_false_and_is_successful) {
-    game->golds[0] = GOLD_SCALE;
+    game->monies[0] = MONEY_SCALE;
     game->x = 2;
     game->y = 3;
     game->territory[3][2] = 0;

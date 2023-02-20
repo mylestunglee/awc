@@ -440,7 +440,7 @@ TEST_F(game_fixture, bot_play_interacts_units) {
 TEST_F(game_fixture, bot_play_build_units) {
     game->map[0][0] = TILE_FACTORY;
     game->territory[0][0] = 0;
-    game->golds[0] = GOLD_SCALE;
+    game->monies[0] = MONEY_SCALE;
 
     bot_play(game);
 

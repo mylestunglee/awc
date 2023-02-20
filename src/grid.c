@@ -40,14 +40,14 @@ void grid_clear_player_territory(tile_t map[GRID_SIZE][GRID_SIZE],
 }
 
 void grid_compute_incomes(player_t territory[GRID_SIZE][GRID_SIZE],
-                          gold_t incomes[PLAYERS_CAPACITY]) {
+                          money_t incomes[PLAYERS_CAPACITY]) {
     grid_t y = 0;
     do {
         grid_t x = 0;
         do {
             const player_t player = territory[y][x];
             if (player != NULL_PLAYER)
-                incomes[player] += GOLD_SCALE;
+                incomes[player] += MONEY_SCALE;
         } while (++x);
     } while (++y);
 }

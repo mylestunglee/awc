@@ -5,13 +5,13 @@
 #include "list.h"
 #include "units.h"
 
-typedef int32_t gold_t;
+typedef int32_t money_t;
 
 struct game {
     struct units units;
     struct list list;
-    gold_t golds[PLAYERS_CAPACITY];
-    gold_t incomes[PLAYERS_CAPACITY];
+    money_t monies[PLAYERS_CAPACITY];
+    money_t incomes[PLAYERS_CAPACITY];
     energy_t energies[GRID_SIZE][GRID_SIZE];
     tile_t map[GRID_SIZE][GRID_SIZE];
     uint8_t labels[GRID_SIZE][GRID_SIZE];

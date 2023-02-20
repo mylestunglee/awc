@@ -29,7 +29,7 @@ TEST_F(game_fixture, inputs_initialise_capturables) {
     struct bap_inputs inputs = {0};
     game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
-    game->golds[0] = GOLD_SCALE;
+    game->monies[0] = MONEY_SCALE;
 
     inputs_initialise_capturables(game, &inputs);
 
@@ -41,13 +41,13 @@ TEST_F(game_fixture, inputs_initialise) {
     insert_unit({.health = 2});
     game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
-    game->golds[0] = 5 * GOLD_SCALE;
+    game->monies[0] = 5 * MONEY_SCALE;
 
     inputs_initialise(game, &inputs);
 
     ASSERT_EQ(inputs.friendly_distribution[MODEL_INFANTRY], 2);
     ASSERT_EQ(inputs.capturables[CAPTURABLE_FACTORY], 1);
-    ASSERT_EQ(inputs.budget, 5 * GOLD_SCALE);
+    ASSERT_EQ(inputs.budget, 5 * MONEY_SCALE);
 }
 
 TEST_F(game_fixture, realise_allocations_builds_one_unit) {
@@ -55,12 +55,12 @@ TEST_F(game_fixture, realise_allocations_builds_one_unit) {
     allocations[MODEL_ARTILLERY] = 1;
     game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
-    game->golds[0] = model_cost[MODEL_ARTILLERY];
+    game->monies[0] = model_cost[MODEL_ARTILLERY];
 
     realise_allocations(game, allocations);
 
     ASSERT_EQ(allocations[MODEL_ARTILLERY], 0);
-    ASSERT_EQ(game->golds[0], 0);
+    ASSERT_EQ(game->monies[0], 0);
 }
 
 TEST_F(game_fixture, realise_allocations_builds_no_units_when_no_allocations) {
@@ -88,9 +88,9 @@ TEST_F(game_fixture, realise_allocations_builds_no_units_when_full) {
 TEST_F(game_fixture, build_units) {
     game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
-    game->golds[0] = model_cost[MODEL_INFANTRY];
+    game->monies[0] = model_cost[MODEL_INFANTRY];
 
     build_units(game);
 
-    ASSERT_EQ(game->golds[0], 0);
+    ASSERT_EQ(game->monies[0], 0);
 }

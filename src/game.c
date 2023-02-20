@@ -19,7 +19,7 @@ bool are_turns_empty(const struct game* const game) {
         return false;
 
     for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
-        if (game->golds[player] > 0)
+        if (game->monies[player] > 0)
             return false;
 
     return true;
@@ -27,7 +27,7 @@ bool are_turns_empty(const struct game* const game) {
 
 void skip_turns(struct game* const game) {
     for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
-        game->golds[player] += game->incomes[player];
+        game->monies[player] += game->incomes[player];
 }
 
 void skip_empty_turns(struct game* const game) {
@@ -150,7 +150,7 @@ bool game_is_buildable(const struct game* const game) {
 
     for (model_t model = capturable_buildable_models[capturable];
          model < capturable_buildable_models[capturable + 1]; ++model)
-        if (game->golds[game->turn] >= model_cost[model])
+        if (game->monies[game->turn] >= model_cost[model])
             return !units_exists_at(&game->units, game->x, game->y) &&
                    capturable_buildable_models[capturable] <
                        capturable_buildable_models[capturable + 1] &&

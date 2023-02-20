@@ -47,7 +47,7 @@ void inputs_initialise(struct game* const game,
                        struct bap_inputs* const inputs) {
     inputs_initialise_distributions(game, inputs);
     inputs_initialise_capturables(game, inputs);
-    inputs->budget = game->golds[game->turn];
+    inputs->budget = game->monies[game->turn];
 }
 
 void realise_allocations(struct game* const game,

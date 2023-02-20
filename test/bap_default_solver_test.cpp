@@ -10,7 +10,7 @@ struct bap_default_solver_fixture : public bap_base_solver_fixture {
 
 TEST_F(bap_default_solver_fixture,
        bap_default_solve_when_bounded_by_capturables) {
-    inputs.budget = 3 * GOLD_SCALE;
+    inputs.budget = 3 * MONEY_SCALE;
     inputs.capturables[CAPTURABLE_FACTORY] = 2;
 
     solve();
@@ -19,7 +19,7 @@ TEST_F(bap_default_solver_fixture,
 }
 
 TEST_F(bap_default_solver_fixture, bap_default_solve_when_bounded_by_budget) {
-    inputs.budget = 2 * GOLD_SCALE;
+    inputs.budget = 2 * MONEY_SCALE;
     inputs.capturables[CAPTURABLE_FACTORY] = 3;
 
     solve();

@@ -40,7 +40,7 @@ static const movement_t model_movement_types[MODEL_CAPACITY] = {
 static const uint8_t unit_pass_type[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 0, 0, 0,
                                                        0, 1, 1, 1, 2, 2, 2};
 
-static const gold_t model_cost[MODEL_CAPACITY] = {
+static const money_t model_cost[MODEL_CAPACITY] = {
     1000,  3000, 4000,  7000,  16000, 6000,  15000, 8000,
     12000, 9000, 22000, 20000, 20000, 18000, 28000};
 
