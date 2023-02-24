@@ -3,15 +3,14 @@
 
 #include "game.h"
 
-static const health_t tile_defense[MOVEMENT_TYPES_CAPACITY][TILE_CAPACITY] = {
+#define PASS_TYPES_CAPACITY 3
+
+static const health_t pass_tile_defenses[PASS_TYPES_CAPACITY][TILE_CAPACITY] = {
     {0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
-    {0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
-    {0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 4},
-    {0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 4},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0}};
 
-static const health_t model_damage[MODEL_CAPACITY][MODEL_CAPACITY] = {
+static const health_t model_damages[MODEL_CAPACITY][MODEL_CAPACITY] = {
     {55, 45, 12, 5, 1, 15, 25, 5, 25, 7, 0, 0, 0, 0, 0},
     {65, 55, 85, 55, 15, 70, 85, 65, 85, 9, 0, 0, 0, 0, 0},
     {70, 65, 35, 6, 1, 45, 55, 4, 28, 10, 0, 0, 0, 0, 0},
@@ -35,12 +34,15 @@ static const model_t capturable_buildable_models[CAPTURABLE_CAPACITY + 1] = {
 
 typedef uint8_t movement_t;
 
-static const movement_t model_movement_types[MODEL_CAPACITY] = {
+static const movement_t model_movements[MODEL_CAPACITY] = {
     0, 1, 2, 3, 3, 3, 2, 3, 2, 4, 4, 4, 5, 5, 5};
-static const uint8_t unit_pass_type[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 0, 0, 0,
+
+typedef uint8_t pass_t;
+
+static const uint8_t model_passes[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 0, 0, 0,
                                                        0, 1, 1, 1, 2, 2, 2};
 
-static const money_t model_cost[MODEL_CAPACITY] = {
+static const money_t model_costs[MODEL_CAPACITY] = {
     1000,  3000, 4000,  7000,  16000, 6000,  15000, 8000,
     12000, 9000, 22000, 20000, 20000, 18000, 28000};
 
@@ -48,7 +50,7 @@ static const energy_t model_movement_ranges[MODEL_CAPACITY] = {
     3, 2, 8, 6, 5, 5, 5, 6, 5, 6, 9, 7, 5, 6, 5};
 
 static const energy_t
-    movement_type_cost[MOVEMENT_TYPES_CAPACITY][TILE_CAPACITY] = {
+    movement_tile_costs[MOVEMENT_TYPES_CAPACITY][TILE_CAPACITY] = {
         {0, 1, 1, 2, 1, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1},
         {0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
         {0, 2, 3, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
@@ -56,9 +58,9 @@ static const energy_t
         {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         {0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0}};
 
-static const grid_t model_min_range[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 2, 3, 0,
+static const grid_t model_min_ranges[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 2, 3, 0,
                                                        2, 0, 0, 0, 0, 0, 2};
-static const grid_t model_max_range[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 3, 6, 0,
+static const grid_t model_max_ranges[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 3, 6, 0,
                                                        5, 0, 0, 0, 0, 0, 7};
 
 #define UNIT_CAPTURABLE_UPPER_BOUND (model_t)2

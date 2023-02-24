@@ -12,7 +12,7 @@
 bool a_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
                   const index_t j) {
     return inputs->friendly_distribution[i] > 0 &&
-           inputs->enemy_distribution[j] > 0 && model_damage[i][j] > 0;
+           inputs->enemy_distribution[j] > 0 && model_damages[i][j] > 0;
 }
 
 bool a_i_exists(const struct bap_inputs* const inputs, const index_t i) {
@@ -37,7 +37,7 @@ bool b_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
     FOR_CAPTURABLE
     if (capturable_buildable_models[k] <= i &&
         i < capturable_buildable_models[k + 1] &&
-        inputs->enemy_distribution[j] > 0 && model_damage[i][j] > 0)
+        inputs->enemy_distribution[j] > 0 && model_damages[i][j] > 0)
         return allocation_exists(inputs, k);
 
     return false;
@@ -288,14 +288,14 @@ void set_budget_submatrix(const struct bap_inputs* const inputs,
     FOR_MODEL(j)
     if (b_i_j_exists(inputs, i, j)) {
         sparse_matrix_set(temps, temps->budget_row_index, column,
-                          model_cost[i]);
+                          model_costs[i]);
         ++column;
     }
 }
 
 double calc_surplus_submatrix_value(const struct bap_inputs* const inputs,
                                     const index_t i, const index_t j) {
-    return (double)model_damage[i][j] * (units_is_ranged(i) ? 0.5 : 1.0) /
+    return (double)model_damages[i][j] * (units_is_ranged(i) ? 0.5 : 1.0) /
            (double)inputs->enemy_distribution[j];
 }
 

@@ -505,7 +505,7 @@ void print_build_text(const struct game* const game) {
     wprintf(L"build mode:");
     for (model_t model = capturable_buildable_models[capturable];
          model < capturable_buildable_models[capturable + 1]; ++model) {
-        if (game->monies[game->turn] >= model_cost[model])
+        if (game->monies[game->turn] >= model_costs[model])
             wprintf(L" %s=" MODEL_FORMAT, model_names[model], model + 1);
     }
     wprintf(L"\n");

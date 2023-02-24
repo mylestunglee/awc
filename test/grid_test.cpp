@@ -89,7 +89,7 @@ TEST_F(
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_marks_when_damagable_enemy_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    ASSERT_NE(model_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
+    ASSERT_NE(model_damages[MODEL_INFANTRY][MODEL_INFANTRY], 0);
     insert_unit({.x = 2, .y = 3, .player = 1});
 
     grid_explore_mark_attackable_tile(game, 2, 3, MODEL_INFANTRY, 0, false);
@@ -100,7 +100,7 @@ TEST_F(game_fixture,
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_undamagable_enemy_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    ASSERT_EQ(model_damage[MODEL_MISSLES][MODEL_INFANTRY], 0);
+    ASSERT_EQ(model_damages[MODEL_MISSLES][MODEL_INFANTRY], 0);
     insert_unit({.x = 2, .y = 3, .player = 1});
 
     grid_explore_mark_attackable_tile(game, 2, 3, MODEL_MISSLES, 0, false);
@@ -111,7 +111,7 @@ TEST_F(game_fixture,
 TEST_F(game_fixture,
        grid_explore_mark_attackable_tile_unmarked_when_friendly_unit) {
     ASSERT_GE(PLAYERS_CAPACITY, 2);
-    ASSERT_NE(model_damage[MODEL_INFANTRY][MODEL_INFANTRY], 0);
+    ASSERT_NE(model_damages[MODEL_INFANTRY][MODEL_INFANTRY], 0);
     insert_unit({.x = 2, .y = 3, .player = 1});
     bitmatrix_set(game->alliances, 0, 1);
 
@@ -249,7 +249,7 @@ TEST_F(game_fixture, is_node_accessible_returns_false_when_tile_is_occuiped) {
 
 TEST_F(game_fixture, is_node_accessible_returns_false_when_ship_on_bridge) {
     ASSERT_NE(MOVEMENT_TYPE_SHIP, 0);
-    ASSERT_EQ(model_movement_types[MODEL_SUBMARINE], MOVEMENT_TYPE_SHIP);
+    ASSERT_EQ(model_movements[MODEL_SUBMARINE], MOVEMENT_TYPE_SHIP);
     game->map[3][2] = TILE_BRIDGE;
     insert_unit({.model = MODEL_SUBMARINE});
     struct list_node node = {.x = 2, .y = 3};
@@ -260,7 +260,7 @@ TEST_F(game_fixture, is_node_accessible_returns_false_when_ship_on_bridge) {
 }
 
 TEST_F(game_fixture, explore_adjacent_tiles_explores_adjacent_tiles) {
-    ASSERT_EQ(movement_type_cost[0][TILE_PLAINS], 1);
+    ASSERT_EQ(movement_tile_costs[0][TILE_PLAINS], 1);
 
     bool north_explored = false;
     bool east_explored = false;
@@ -297,7 +297,7 @@ TEST_F(game_fixture, explore_adjacent_tiles_explores_adjacent_tiles) {
 
 TEST_F(game_fixture,
        explore_adjacent_tiles_does_not_explore_unaccessible_tiles) {
-    ASSERT_EQ(movement_type_cost[0][TILE_VOID], 0);
+    ASSERT_EQ(movement_tile_costs[0][TILE_VOID], 0);
     struct list_node node = {.energy = 5, .x = 2, .y = 3};
 
     explore_adjacent_tiles(game, &node, 0);
@@ -307,7 +307,7 @@ TEST_F(game_fixture,
 
 TEST_F(game_fixture,
        explore_adjacent_tiles_does_not_explore_tiles_with_depleted_energy) {
-    ASSERT_EQ(movement_type_cost[0][TILE_PLAINS], 1);
+    ASSERT_EQ(movement_tile_costs[0][TILE_PLAINS], 1);
 
     game->map[2][2] = TILE_PLAINS;
     game->map[3][3] = TILE_PLAINS;

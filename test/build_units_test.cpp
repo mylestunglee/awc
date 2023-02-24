@@ -55,7 +55,7 @@ TEST_F(game_fixture, realise_allocations_builds_one_unit) {
     allocations[MODEL_ARTILLERY] = 1;
     game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
-    game->monies[0] = model_cost[MODEL_ARTILLERY];
+    game->monies[0] = model_costs[MODEL_ARTILLERY];
 
     realise_allocations(game, allocations);
 
@@ -88,7 +88,7 @@ TEST_F(game_fixture, realise_allocations_builds_no_units_when_full) {
 TEST_F(game_fixture, build_units) {
     game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
-    game->monies[0] = model_cost[MODEL_INFANTRY];
+    game->monies[0] = model_costs[MODEL_INFANTRY];
 
     build_units(game);
 

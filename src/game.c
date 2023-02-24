@@ -61,10 +61,10 @@ health_t calc_damage(const struct game* const game,
     const damage_t attack_max = 100;
 
     const tile_t tile = game->map[attackee->y][attackee->x];
-    const movement_t movement_type = model_movement_types[attackee->model];
-    return ((damage_t)model_damage[attacker->model][attackee->model] *
+    const pass_t pass = model_passes[attackee->model];
+    return ((damage_t)model_damages[attacker->model][attackee->model] *
             (damage_t)attacker->health *
-            (damage_t)(defense_max - tile_defense[movement_type][tile])) /
+            (damage_t)(defense_max - pass_tile_defenses[pass][tile])) /
            (attack_max * defense_max);
 }
 
@@ -150,7 +150,7 @@ bool game_is_buildable(const struct game* const game) {
 
     for (model_t model = capturable_buildable_models[capturable];
          model < capturable_buildable_models[capturable + 1]; ++model)
-        if (game->monies[game->turn] >= model_cost[model])
+        if (game->monies[game->turn] >= model_costs[model])
             return !units_exists_at(&game->units, game->x, game->y) &&
                    capturable_buildable_models[capturable] <
                        capturable_buildable_models[capturable + 1] &&

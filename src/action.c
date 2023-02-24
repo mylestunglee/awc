@@ -71,7 +71,7 @@ bool action_build(struct game* const game, const model_t model) {
     if (!game_is_buildable(game))
         return true;
 
-    game->monies[game->turn] -= model_cost[model];
+    game->monies[game->turn] -= model_costs[model];
 
     const struct unit unit = {.x = game->x,
                               .y = game->y,

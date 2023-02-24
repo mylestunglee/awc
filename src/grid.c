@@ -65,7 +65,7 @@ void grid_explore_mark_attackable_tile(struct game* const game, const grid_t x,
         const bool friendly =
             bitmatrix_get(game->alliances, player, unit->player);
         const bool self = game->x == x && game->y == y;
-        const bool undamagable = model_damage[model][unit->model] == 0;
+        const bool undamagable = model_damages[model][unit->model] == 0;
         if (self || friendly || undamagable)
             return;
     }
@@ -100,8 +100,8 @@ void grid_explore_mark_attackable_ranged(struct game* const game,
     if (!units_is_ranged(model))
         return;
 
-    const grid_wide_t min_range = model_min_range[model];
-    const grid_wide_t max_range = model_max_range[model];
+    const grid_wide_t min_range = model_min_ranges[model];
+    const grid_wide_t max_range = model_max_ranges[model];
 
     for (grid_wide_t j = -max_range; j <= max_range; ++j)
         for (grid_wide_t i = -max_range; i <= max_range; ++i) {
@@ -126,7 +126,7 @@ bool is_node_unexplorable(const struct game* const game,
             !bitmatrix_get(game->alliances, player, target->player);
         const bool noninit_tile = source != target;
         const bool unpassable =
-            unit_pass_type[source->model] == unit_pass_type[target->model];
+            model_passes[source->model] == model_passes[target->model];
 
         if (unfriendly && noninit_tile && unpassable)
             return true;
@@ -149,7 +149,7 @@ bool is_node_accessible(const struct game* const game,
     // NOLINTNEXTLINE
     const bool ship_on_bridge =
         tile == TILE_BRIDGE &&
-        model_movement_types[source->model] == MOVEMENT_TYPE_SHIP;
+        model_movements[source->model] == MOVEMENT_TYPE_SHIP;
     return init_tile ||
            ((unoccupied || units_mergable(source, target)) && !ship_on_bridge);
 }
@@ -167,8 +167,8 @@ void explore_adjacent_tiles(struct game* const game,
         const grid_t x_i = adjacent_x[i];
         const grid_t y_i = adjacent_y[i];
         const tile_t tile = game->map[y_i][x_i];
-        const movement_t movement = model_movement_types[model];
-        const energy_t cost = movement_type_cost[movement][tile];
+        const movement_t movement = model_movements[model];
+        const energy_t cost = movement_tile_costs[movement][tile];
 
         if (cost == 0)
             continue;
@@ -207,7 +207,7 @@ void clear_energies(energy_t energies[GRID_SIZE][GRID_SIZE]) {
 }
 
 energy_t init_exploration_energy(const energy_t scalar, const model_t model) {
-    const movement_t movement_type = model_movement_types[model];
+    const movement_t movement_type = model_movements[model];
     return scalar * model_movement_ranges[movement_type] + 1;
 }
 

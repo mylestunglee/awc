@@ -25,7 +25,7 @@ void simulate_attack(struct game* const game, health_t* const damage,
     const grid_t y = game->y;
     const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
     const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
-    const movement_t movement = model_movement_types[attacker->model];
+    const pass_t pass = model_passes[attacker->model];
     health_t max_defense = 0;
     health_t max_energy = 0;
 
@@ -33,7 +33,7 @@ void simulate_attack(struct game* const game, health_t* const damage,
         const grid_t x_i = adjacent_x[i];
         const grid_t y_i = adjacent_y[i];
         const tile_t tile = game->map[y_i][x_i];
-        const health_t defense = tile_defense[movement][tile];
+        const health_t defense = pass_tile_defenses[pass][tile];
         const energy_t energy = game->energies[y_i][x_i];
 
         if (game->labels[y_i][x_i] & ACCESSIBLE_BIT &&
@@ -73,9 +73,9 @@ const struct unit* find_attackee(struct game* const game,
             const struct unit* const attackee =
                 units_const_get_at(&game->units, game->x, game->y);
             const money_t damage_metric =
-                (money_t)damage * model_cost[attackee->model];
+                (money_t)damage * model_costs[attackee->model];
             const money_t counter_damage_metric =
-                (money_t)counter_damage * model_cost[attacker_model];
+                (money_t)counter_damage * model_costs[attacker_model];
             const money_t metric = damage_metric - counter_damage_metric;
 
             if (metric > best_metric) {
@@ -187,12 +187,12 @@ energy_t find_nearest_attackable_attackee_ranged(
     const struct unit* const attackee, energy_t max_energy,
     grid_t* const nearest_x, grid_t* const nearest_y) {
 
-    const grid_wide_t max_range = model_max_range[attacker_model];
+    const grid_wide_t max_range = model_max_ranges[attacker_model];
 
     for (grid_wide_t j = -max_range; j <= max_range; ++j)
         for (grid_wide_t i = -max_range; i <= max_range; ++i) {
             const grid_wide_t distance = abs(i) + abs(j);
-            if (model_min_range[attacker_model] <= distance &&
+            if (model_min_ranges[attacker_model] <= distance &&
                 distance <= max_range) {
                 game->x = (grid_wide_t)(attackee->x) + i;
                 game->y = (grid_wide_t)(attackee->y) + j;
@@ -254,7 +254,7 @@ energy_t find_nearest_attackable(struct game* const game,
             units_const_get_first(&game->units, player);
         while (attackee) {
             // Attackee is attackable
-            if (model_damage[attacker_model][attackee->model] > 0)
+            if (model_damages[attacker_model][attackee->model] > 0)
                 max_energy = find_nearest_attackable_attackee(
                     game, attacker_model, attackee, max_energy, nearest_x,
                     nearest_y);
