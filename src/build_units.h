@@ -9,8 +9,7 @@ void accumulate_distribution(const struct game* const, const player_t,
                              health_wide_t[MODEL_CAPACITY]);
 void inputs_initialise_distributions(const struct game* const,
                                      struct bap_inputs* const);
-void inputs_initialise_capturables(struct game* const,
-                                   struct bap_inputs* const);
+void inputs_initialise_buildings(struct game* const, struct bap_inputs* const);
 void inputs_initialise(struct game* const, struct bap_inputs* const);
 void realise_allocations(struct game* const,
                          grid_wide_t allocations[MODEL_CAPACITY]);

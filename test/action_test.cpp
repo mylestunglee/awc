@@ -131,7 +131,7 @@ TEST_F(game_fixture, action_build_returns_false_when_model_is_buildable) {
     ASSERT_EQ(unit->capture_progress, 0);
 }
 
-TEST_F(game_fixture, can_selected_unit_capture_returns_true_when_capturable) {
+TEST_F(game_fixture, can_selected_unit_capture_returns_true_when_building) {
     insert_selected_unit({.x = 2, .y = 3});
     game->x = 2;
     game->y = 3;
@@ -141,8 +141,7 @@ TEST_F(game_fixture, can_selected_unit_capture_returns_true_when_capturable) {
     ASSERT_TRUE(can_selected_unit_capture(game));
 }
 
-TEST_F(game_fixture,
-       can_selected_unit_capture_returns_false_when_uncapturable) {
+TEST_F(game_fixture, can_selected_unit_capture_returns_false_when_unbuilding) {
     insert_selected_unit({.x = 2, .y = 3});
     game->x = 2;
     game->y = 3;

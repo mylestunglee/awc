@@ -139,7 +139,7 @@ TEST_F(game_fixture, calc_tile_style_gets_terrian_style) {
     ASSERT_EQ(calc_tile_style(game, 2, 3), '\xa2');
 }
 
-TEST_F(game_fixture, calc_tile_style_gets_capturable_style) {
+TEST_F(game_fixture, calc_tile_style_gets_building_style) {
     game->map[3][2] = TILE_CITY;
     game->territory[3][2] = 1;
 
@@ -387,7 +387,7 @@ TEST_F(game_fixture, render_tile_shows_terrian) {
     ASSERT_EQ(style, '\xa2');
 }
 
-TEST_F(game_fixture, render_tile_shows_unhighlightable_capturable) {
+TEST_F(game_fixture, render_tile_shows_unhighlightable_building) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     game->map[3][2] = TILE_CITY;
@@ -398,7 +398,7 @@ TEST_F(game_fixture, render_tile_shows_unhighlightable_capturable) {
     ASSERT_EQ(style, '\xf8');
 }
 
-TEST_F(game_fixture, render_tile_shows_highlightable_capturable) {
+TEST_F(game_fixture, render_tile_shows_highlightable_building) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     game->map[3][2] = TILE_CITY;

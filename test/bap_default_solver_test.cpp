@@ -9,9 +9,9 @@ struct bap_default_solver_fixture : public bap_base_solver_fixture {
 };
 
 TEST_F(bap_default_solver_fixture,
-       bap_default_solve_when_bounded_by_capturables) {
+       bap_default_solve_when_bounded_by_buildings) {
     inputs.budget = 3 * MONEY_SCALE;
-    inputs.capturables[CAPTURABLE_FACTORY] = 2;
+    inputs.buildings[BUILDING_FACTORY] = 2;
 
     solve();
 
@@ -20,7 +20,7 @@ TEST_F(bap_default_solver_fixture,
 
 TEST_F(bap_default_solver_fixture, bap_default_solve_when_bounded_by_budget) {
     inputs.budget = 2 * MONEY_SCALE;
-    inputs.capturables[CAPTURABLE_FACTORY] = 3;
+    inputs.buildings[BUILDING_FACTORY] = 3;
 
     solve();
 

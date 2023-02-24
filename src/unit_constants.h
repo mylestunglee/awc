@@ -27,7 +27,7 @@ static const health_t model_damages[MODEL_CAPACITY][MODEL_CAPACITY] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 115, 55, 65, 90, 0, 0},
     {95, 90, 90, 85, 55, 80, 85, 85, 90, 0, 0, 0, 0, 95, 50}};
 
-static const model_t capturable_buildable_models[CAPTURABLE_CAPACITY + 1] = {
+static const model_t building_buildable_models[BUILDING_CAPACITY + 1] = {
     0, 0, 9, 12, MODEL_CAPACITY, MODEL_CAPACITY};
 
 #define CAPTURE_COMPLETION 200 // double HEALTH_MAX
@@ -63,7 +63,7 @@ static const grid_t model_min_ranges[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 2, 3, 0,
 static const grid_t model_max_ranges[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 3, 6, 0,
                                                         5, 0, 0, 0, 0, 0, 7};
 
-#define UNIT_CAPTURABLE_UPPER_BOUND (model_t)2
+#define UNIT_BUILDING_UPPER_BOUND (model_t)2
 #define MOVEMENT_TYPE_SHIP 5
 
 #endif

@@ -8,7 +8,7 @@ typedef int16_t index_t;
 
 #define SPARSE_MATRIX_LENGTH                                                   \
     (1 + MODEL_CAPACITY +                                                      \
-     (CAPTURABLE_CAPACITY + 1) * MODEL_CAPACITY * MODEL_CAPACITY +             \
+     (BUILDING_CAPACITY + 1) * MODEL_CAPACITY * MODEL_CAPACITY +               \
      3 * MODEL_CAPACITY * MODEL_CAPACITY * MODEL_CAPACITY)
 
 struct bap_glpk_temps {

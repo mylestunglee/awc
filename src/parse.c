@@ -19,8 +19,8 @@ bool parse_build(struct game* const game, const model_t offset) {
     if (game->map[game->y][game->x] < TERRIAN_CAPACITY)
         return false;
 
-    const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
-    const model_t model = offset + capturable_buildable_models[capturable];
+    const tile_t building = game->map[game->y][game->x] - TERRIAN_CAPACITY;
+    const model_t model = offset + building_buildable_models[building];
 
     return action_build(game, model);
 }

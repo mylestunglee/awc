@@ -12,8 +12,8 @@ typedef uint8_t player_t;
 #define MODEL_CAPACITY (uint8_t)15
 #define MOVEMENT_TYPES_CAPACITY (uint8_t)6
 #define TERRIAN_CAPACITY (tile_t)10
-#define CAPTURABLE_CAPACITY (tile_t)5
-#define TILE_CAPACITY (TERRIAN_CAPACITY + CAPTURABLE_CAPACITY)
+#define BUILDING_CAPACITY (tile_t)5
+#define TILE_CAPACITY (TERRIAN_CAPACITY + BUILDING_CAPACITY)
 #define PLAYERS_CAPACITY (player_t)4
 
 #endif

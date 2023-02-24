@@ -137,23 +137,23 @@ bool game_is_attackable(const struct game* const game) {
 
 bool game_is_buildable(const struct game* const game) {
     // The state is buildable iff:
-    // 1. The player owns the selected capturable
+    // 1. The player owns the selected building
     // 2. There is no unit on the tile
-    // 3. The capturable has buildable units
+    // 3. The building has buildable units
     // 4. No unit is selected
     // 5. Has enough money to buy a unit
 
     if (game->territory[game->y][game->x] != game->turn)
         return false;
 
-    const tile_t capturable = game->map[game->y][game->x] - TERRIAN_CAPACITY;
+    const tile_t building = game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
-    for (model_t model = capturable_buildable_models[capturable];
-         model < capturable_buildable_models[capturable + 1]; ++model)
+    for (model_t model = building_buildable_models[building];
+         model < building_buildable_models[building + 1]; ++model)
         if (game->monies[game->turn] >= model_costs[model])
             return !units_exists_at(&game->units, game->x, game->y) &&
-                   capturable_buildable_models[capturable] <
-                       capturable_buildable_models[capturable + 1] &&
+                   building_buildable_models[building] <
+                       building_buildable_models[building + 1] &&
                    !units_has_selection(&game->units) &&
                    units_is_insertable(&game->units);
 

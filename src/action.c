@@ -93,18 +93,18 @@ bool can_selected_unit_capture(const struct game* const game) {
 
     // The moved unit can capture iff:
     // 1. The unit is a infantry or a mech
-    // 2. The tile is capturable
+    // 2. The tile is building
     // 3. The tile is owned by an enemy
-    return unit->model < UNIT_CAPTURABLE_UPPER_BOUND &&
+    return unit->model < UNIT_BUILDING_UPPER_BOUND &&
            game->map[game->y][game->x] >= TERRIAN_CAPACITY &&
            !game_is_friendly(game, game->territory[game->y][game->x]);
 }
 
-// Occurs when unit captures enemy capturable
+// Occurs when unit captures enemy building
 void action_capture(struct game* const game) {
     const player_t loser = game->territory[game->y][game->x];
 
-    // Cannot recapture friendly capturable
+    // Cannot recapture friendly building
     assert(loser != game->turn);
 
     // If the enemy loses their HQ

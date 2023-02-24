@@ -4,8 +4,8 @@
 constexpr tile_t TILE_PLAINS = 1;
 constexpr tile_t TILE_FACTORY = 11;
 
-constexpr tile_t CAPTURABLE_FACTORY = 1;
-constexpr tile_t CAPTURABLE_AIRPORT = 2;
+constexpr tile_t BUILDING_FACTORY = 1;
+constexpr tile_t BUILDING_AIRPORT = 2;
 
 constexpr model_t MODEL_INFANTRY = 0;
 constexpr model_t MODEL_ARTILLERY = 5;

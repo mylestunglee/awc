@@ -55,7 +55,7 @@ TEST_F(bap_glpk_solver_fixture, constant_functions_when_single_distribution) {
 }
 
 TEST_F(bap_glpk_solver_fixture, constant_functions_when_single_allocation) {
-    inputs.capturables[CAPTURABLE_FACTORY] = 1;
+    inputs.buildings[BUILDING_FACTORY] = 1;
     inputs.enemy_distribution[MODEL_INFANTRY] = 1;
 
     ASSERT_TRUE(b_i_j_exists(&inputs, MODEL_INFANTRY, MODEL_INFANTRY));
@@ -126,7 +126,7 @@ TEST_F(bap_glpk_solver_internal_fixture, set_distribution_rows) {
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_allocation_rows) {
-    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->buildings[BUILDING_FACTORY] = 1;
     inputs->enemy_distribution[MODEL_INFANTRY] = 1;
     glp_add_rows(problem, 1);
 
@@ -219,7 +219,7 @@ TEST_F(bap_glpk_solver_internal_fixture, set_a_columns) {
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_b_columns) {
-    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->buildings[BUILDING_FACTORY] = 1;
     inputs->enemy_distribution[MODEL_INFANTRY] = 1;
     glp_add_cols(problem, 8);
 
@@ -288,7 +288,7 @@ TEST_F(bap_glpk_solver_internal_fixture, set_distribution_submatrix) {
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_allocation_submatrix) {
-    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->buildings[BUILDING_FACTORY] = 1;
     inputs->enemy_distribution[MODEL_INFANTRY] = 1;
 
     set_allocation_submatrix(inputs, temps);
@@ -298,7 +298,7 @@ TEST_F(bap_glpk_solver_internal_fixture, set_allocation_submatrix) {
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_budget_submatrix) {
-    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->buildings[BUILDING_FACTORY] = 1;
     inputs->enemy_distribution[MODEL_INFANTRY] = 1;
 
     set_budget_submatrix(inputs, temps);
@@ -315,7 +315,7 @@ TEST_F(bap_glpk_solver_internal_fixture, calc_surplus_submatrix_value) {
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_surplus_submatrix) {
-    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->buildings[BUILDING_FACTORY] = 1;
     inputs->friendly_distribution[MODEL_INFANTRY] = 1;
     inputs->enemy_distribution[MODEL_INFANTRY] = 1;
     temps->surplus_row_start_index = 2;
@@ -330,7 +330,7 @@ TEST_F(bap_glpk_solver_internal_fixture, set_surplus_submatrix) {
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_matrix) {
-    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->buildings[BUILDING_FACTORY] = 1;
     inputs->friendly_distribution[MODEL_INFANTRY] = 1;
     inputs->enemy_distribution[MODEL_INFANTRY] = 1;
 
@@ -357,7 +357,7 @@ TEST_F(bap_glpk_solver_internal_fixture, bap_glpk_temps_preinitialise) {
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, bap_glpk_temps_initialise) {
-    inputs->capturables[CAPTURABLE_FACTORY] = 1;
+    inputs->buildings[BUILDING_FACTORY] = 1;
     inputs->friendly_distribution[MODEL_INFANTRY] = 1;
     inputs->enemy_distribution[MODEL_INFANTRY] = 1;
 
@@ -372,15 +372,15 @@ TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_null_problem) {
 
 TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_single_infantry) {
     inputs.enemy_distribution[MODEL_INFANTRY] = 1;
-    inputs.capturables[CAPTURABLE_FACTORY] = 1;
+    inputs.buildings[BUILDING_FACTORY] = 1;
     inputs.budget = model_costs[MODEL_INFANTRY];
     ASSERT_EQ(solve(), 0);
     ASSERT_EQ(outputs[MODEL_INFANTRY], 1);
 }
 
-TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_constrained_by_capturables) {
+TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_constrained_by_buildings) {
     inputs.enemy_distribution[MODEL_INFANTRY] = 1;
-    inputs.capturables[CAPTURABLE_FACTORY] = 2;
+    inputs.buildings[BUILDING_FACTORY] = 2;
     inputs.budget = 3 * model_costs[MODEL_INFANTRY];
     ASSERT_EQ(solve(), 0);
     ASSERT_EQ(outputs[MODEL_INFANTRY], 2);
@@ -388,7 +388,7 @@ TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_constrained_by_capturables) {
 
 TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_constrained_by_budget) {
     inputs.enemy_distribution[MODEL_INFANTRY] = 1;
-    inputs.capturables[CAPTURABLE_FACTORY] = 3;
+    inputs.buildings[BUILDING_FACTORY] = 3;
     inputs.budget = 2 * model_costs[MODEL_INFANTRY];
     ASSERT_EQ(solve(), 0);
     ASSERT_EQ(outputs[MODEL_INFANTRY], 2);
@@ -396,7 +396,7 @@ TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_constrained_by_budget) {
 
 TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_selects_most_effective_unit) {
     inputs.enemy_distribution[MODEL_HELICOPTER] = 1;
-    inputs.capturables[CAPTURABLE_AIRPORT] = 1;
+    inputs.buildings[BUILDING_AIRPORT] = 1;
     inputs.budget = 100 * MONEY_SCALE;
     ASSERT_EQ(solve(), 0);
     ASSERT_EQ(outputs[MODEL_FIGHTER], 1);
@@ -406,7 +406,7 @@ TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_distributes_ratio_across_units) {
     inputs.friendly_distribution[MODEL_SUBMARINE] = 1;
     inputs.enemy_distribution[MODEL_HELICOPTER] = 1;
     inputs.enemy_distribution[MODEL_SUBMARINE] = 1;
-    inputs.capturables[CAPTURABLE_AIRPORT] = 1;
+    inputs.buildings[BUILDING_AIRPORT] = 1;
     inputs.budget = 100 * MONEY_SCALE;
     ASSERT_EQ(solve(), 0);
     ASSERT_EQ(outputs[MODEL_FIGHTER], 1);

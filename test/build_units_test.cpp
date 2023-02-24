@@ -25,15 +25,15 @@ TEST_F(game_fixture, inputs_initialise_distributions) {
     ASSERT_EQ(inputs.enemy_distribution[MODEL_INFANTRY], 3);
 }
 
-TEST_F(game_fixture, inputs_initialise_capturables) {
+TEST_F(game_fixture, inputs_initialise_buildings) {
     struct bap_inputs inputs = {0};
     game->territory[3][2] = 0;
     game->map[3][2] = TILE_FACTORY;
     game->monies[0] = MONEY_SCALE;
 
-    inputs_initialise_capturables(game, &inputs);
+    inputs_initialise_buildings(game, &inputs);
 
-    ASSERT_EQ(inputs.capturables[CAPTURABLE_FACTORY], 1);
+    ASSERT_EQ(inputs.buildings[BUILDING_FACTORY], 1);
 }
 
 TEST_F(game_fixture, inputs_initialise) {
@@ -46,7 +46,7 @@ TEST_F(game_fixture, inputs_initialise) {
     inputs_initialise(game, &inputs);
 
     ASSERT_EQ(inputs.friendly_distribution[MODEL_INFANTRY], 2);
-    ASSERT_EQ(inputs.capturables[CAPTURABLE_FACTORY], 1);
+    ASSERT_EQ(inputs.buildings[BUILDING_FACTORY], 1);
     ASSERT_EQ(inputs.budget, 5 * MONEY_SCALE);
 }
 

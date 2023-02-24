@@ -6,7 +6,7 @@
 struct bap_inputs {
     health_wide_t friendly_distribution[MODEL_CAPACITY];
     health_wide_t enemy_distribution[MODEL_CAPACITY];
-    grid_wide_t capturables[CAPTURABLE_CAPACITY];
+    grid_wide_t buildings[BUILDING_CAPACITY];
     money_t budget;
 };
 

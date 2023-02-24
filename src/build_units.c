@@ -27,8 +27,8 @@ void inputs_initialise_distributions(const struct game* const game,
     }
 }
 
-void inputs_initialise_capturables(struct game* const game,
-                                   struct bap_inputs* const inputs) {
+void inputs_initialise_buildings(struct game* const game,
+                                 struct bap_inputs* const inputs) {
     game->y = 0;
     do {
         game->x = 0;
@@ -36,9 +36,9 @@ void inputs_initialise_capturables(struct game* const game,
             if (!game_is_buildable(game))
                 continue;
 
-            const tile_t capturable =
+            const tile_t building =
                 game->map[game->y][game->x] - TERRIAN_CAPACITY;
-            ++inputs->capturables[capturable];
+            ++inputs->buildings[building];
         } while (++game->x);
     } while (++game->y);
 }
@@ -46,7 +46,7 @@ void inputs_initialise_capturables(struct game* const game,
 void inputs_initialise(struct game* const game,
                        struct bap_inputs* const inputs) {
     inputs_initialise_distributions(game, inputs);
-    inputs_initialise_capturables(game, inputs);
+    inputs_initialise_buildings(game, inputs);
     inputs->budget = game->monies[game->turn];
 }
 
@@ -59,11 +59,11 @@ void realise_allocations(struct game* const game,
             if (!game_is_buildable(game))
                 continue;
 
-            const tile_t capturable =
+            const tile_t building =
                 game->map[game->y][game->x] - TERRIAN_CAPACITY;
 
-            for (model_t model = capturable_buildable_models[capturable];
-                 model < capturable_buildable_models[capturable + 1]; ++model) {
+            for (model_t model = building_buildable_models[building];
+                 model < building_buildable_models[building + 1]; ++model) {
                 if (allocations[model] == 0)
                     continue;
 

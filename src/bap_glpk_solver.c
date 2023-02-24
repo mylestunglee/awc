@@ -6,7 +6,7 @@
 
 #define FOR_MODEL(variable)                                                    \
     for (index_t variable = 0; variable < MODEL_CAPACITY; ++variable)
-#define FOR_CAPTURABLE for (tile_t k = 0; k < CAPTURABLE_CAPACITY; ++k)
+#define FOR_BUILDING for (tile_t k = 0; k < BUILDING_CAPACITY; ++k)
 #define SYMBOLIC_NAME_LENGTH 16
 
 bool a_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
@@ -28,15 +28,15 @@ bool a_j_exists(const struct bap_inputs* const inputs, const index_t j) {
 }
 
 bool allocation_exists(const struct bap_inputs* const inputs,
-                       const index_t capturable) {
-    return inputs->capturables[capturable] > 0;
+                       const index_t building) {
+    return inputs->buildings[building] > 0;
 }
 
 bool b_i_j_exists(const struct bap_inputs* const inputs, const index_t i,
                   const index_t j) {
-    FOR_CAPTURABLE
-    if (capturable_buildable_models[k] <= i &&
-        i < capturable_buildable_models[k + 1] &&
+    FOR_BUILDING
+    if (building_buildable_models[k] <= i &&
+        i < building_buildable_models[k + 1] &&
         inputs->enemy_distribution[j] > 0 && model_damages[i][j] > 0)
         return allocation_exists(inputs, k);
 
@@ -75,7 +75,7 @@ index_t count_distribution_rows(const struct bap_inputs* const inputs) {
 
 index_t count_allocation_rows(const struct bap_inputs* const inputs) {
     index_t count = 0;
-    FOR_CAPTURABLE
+    FOR_BUILDING
     if (allocation_exists(inputs, k))
         ++count;
     return count;
@@ -125,10 +125,9 @@ void set_distribution_rows(const struct bap_inputs* const inputs,
 void set_allocation_rows(const struct bap_inputs* const inputs,
                          struct bap_glpk_temps* const temps) {
     temps->allocation_row_index = temps->curr_index;
-    FOR_CAPTURABLE
+    FOR_BUILDING
     if (allocation_exists(inputs, k))
-        set_next_row(temps, 'a', k, GLP_UP, 0.0,
-                     (double)inputs->capturables[k]);
+        set_next_row(temps, 'a', k, GLP_UP, 0.0, (double)inputs->buildings[k]);
 }
 
 void set_budget_row(const struct bap_inputs* const inputs,
@@ -267,11 +266,11 @@ void set_distribution_submatrix(struct bap_glpk_temps* const temps) {
 void set_allocation_submatrix(const struct bap_inputs* const inputs,
                               struct bap_glpk_temps* const temps) {
     index_t row = temps->allocation_row_index;
-    FOR_CAPTURABLE
+    FOR_BUILDING
     if (allocation_exists(inputs, k)) {
         index_t column = temps->b_column_index;
-        for (index_t i = capturable_buildable_models[k];
-             i < capturable_buildable_models[k + 1]; ++i)
+        for (index_t i = building_buildable_models[k];
+             i < building_buildable_models[k + 1]; ++i)
             FOR_MODEL(j)
         if (b_i_j_exists(inputs, i, j)) {
             sparse_matrix_set(temps, row, column, 1.0);

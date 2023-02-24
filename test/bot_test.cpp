@@ -95,7 +95,7 @@ TEST_F(game_fixture, update_max_energy_returns_current_energy) {
     ASSERT_EQ(updated_y, 0);
 }
 
-TEST_F(game_fixture, find_nearest_capturable_returns_max_energy_when_found) {
+TEST_F(game_fixture, find_nearest_building_returns_max_energy_when_found) {
     game->map[3][2] = TILE_CITY;
     game->territory[3][2] = 1;
     game->energies[3][2] = 5;
@@ -105,23 +105,23 @@ TEST_F(game_fixture, find_nearest_capturable_returns_max_energy_when_found) {
     game->energies[3][4] = 7;
     game->labels[3][4] = ACCESSIBLE_BIT;
 
-    const auto max_energy = find_nearest_capturable(game);
+    const auto max_energy = find_nearest_building(game);
 
     ASSERT_EQ(max_energy, 7);
     ASSERT_EQ(game->x, 4);
     ASSERT_EQ(game->y, 3);
 }
 
-TEST_F(game_fixture, find_nearest_capturable_returns_zero_when_unfound) {
+TEST_F(game_fixture, find_nearest_building_returns_zero_when_unfound) {
     game->map[3][2] = TILE_CITY;
     game->territory[3][2] = 0;
 
-    const auto max_energy = find_nearest_capturable(game);
+    const auto max_energy = find_nearest_building(game);
 
     ASSERT_EQ(max_energy, 0);
 }
 
-TEST_F(game_fixture, handle_capture_when_uncapturable_unit) {
+TEST_F(game_fixture, handle_capture_when_unbuilding_unit) {
     const auto* const unit =
         insert_unit({.model = MODEL_ARTILLERY, .enabled = true});
 
@@ -130,7 +130,7 @@ TEST_F(game_fixture, handle_capture_when_uncapturable_unit) {
     ASSERT_TRUE(unit->enabled);
 }
 
-TEST_F(game_fixture, handle_capture_when_no_capturable_exists) {
+TEST_F(game_fixture, handle_capture_when_no_building_exists) {
     const auto* const unit = insert_unit({.enabled = true});
 
     handle_capture(game, unit->model);
@@ -138,7 +138,7 @@ TEST_F(game_fixture, handle_capture_when_no_capturable_exists) {
     ASSERT_TRUE(unit->enabled);
 }
 
-TEST_F(game_fixture, handle_capture_when_capturable_exists) {
+TEST_F(game_fixture, handle_capture_when_building_exists) {
     game->map[3][2] = TILE_CITY;
     game->territory[3][2] = 1;
     game->energies[3][2] = 5;
@@ -274,7 +274,7 @@ TEST_F(game_fixture, find_nearest_target_when_attackable_target) {
     ASSERT_EQ(nearest_y, 3);
 }
 
-TEST_F(game_fixture, find_nearest_target_when_capturable_target) {
+TEST_F(game_fixture, find_nearest_target_when_building_target) {
     grid_t nearest_x = 0;
     grid_t nearest_y = 0;
     game->map[3][2] = TILE_CITY;
@@ -290,7 +290,7 @@ TEST_F(game_fixture, find_nearest_target_when_capturable_target) {
 }
 
 TEST_F(game_fixture,
-       find_nearest_target_favours_capturable_over_attackable_target) {
+       find_nearest_target_favours_building_over_attackable_target) {
     grid_t nearest_x = 0;
     grid_t nearest_y = 0;
     insert_unit({.x = 2, .y = 3, .player = 1});

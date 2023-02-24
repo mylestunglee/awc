@@ -8,7 +8,7 @@ const struct unit* find_attackee(struct game* const, const model_t);
 void handle_attack(struct game* const, const model_t);
 energy_t update_max_energy(const struct game* const, const energy_t,
                            grid_t* const, grid_t* const);
-energy_t find_nearest_capturable(struct game* const);
+energy_t find_nearest_building(struct game* const);
 void handle_capture(struct game* const, const model_t);
 void handle_local(struct game* const, const struct unit* const);
 energy_t find_nearest_attackable_attackee_ranged(struct game* const,

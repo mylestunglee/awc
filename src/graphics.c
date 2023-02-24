@@ -50,37 +50,36 @@ static const uint8_t
         {{'\x2a', '\xfa', '\x20'}, {'\x92', '\x2c', '\xe0'}},
         {{'\x88', '\xf8', '\x80'}, {'\x92', '\x22', '\xa0'}}};
 
-static const uint8_t
-    capturable_textures[CAPTURABLE_CAPACITY][tile_height]
-                       [(tile_width + 1) / 2] = {
-                           {
-                               {'\x00', '\xb1', '\xfc', '\x00'},
-                               {'\x00', '\xb1', '\xb1', '\x1c'},
-                               {'\xb1', '\x1c', '\xb1', '\x1c'},
-                               {'\xb1', '\x1c', '\x00', '\x00'},
-                           },
-                           {
-                               {'\x00', '\x00', '\x00', '\x00'},
-                               {'\xb9', '\x2b', '\xf2', '\xac'},
-                               {'\xb1', '\x11', '\x11', '\x1c'},
-                               {'\xb1', '\x11', '\x11', '\x1c'},
-                           },
-                           {
-                               {'\x00', '\x00', '\x9f', '\xa0'},
-                               {'\x00', '\x00', '\xc1', '\xb0'},
-                               {'\x22', '\x22', '\xc1', '\xb2'},
-                               {'\xb1', '\x11', '\x11', '\x1c'},
-                           },
-                           {
-                               {'\x00', '\x00', '\x00', '\x00'},
-                               {'\x00', '\x00', '\xbc', '\xfc'},
-                               {'\x22', '\x22', '\xbc', '\x1c'},
-                               {'\xb1', '\x11', '\x11', '\x1c'},
-                           },
-                           {{'\x00', '\xbe', '\xfc', '\x00'},
-                            {'\x00', '\xb1', '\x1c', '\x00'},
-                            {'\xb1', '\x11', '\x11', '\x1c'},
-                            {'\xb1', '\x11', '\x11', '\x1c'}}};
+static const uint8_t building_textures[BUILDING_CAPACITY][tile_height]
+                                      [(tile_width + 1) / 2] = {
+                                          {
+                                              {'\x00', '\xb1', '\xfc', '\x00'},
+                                              {'\x00', '\xb1', '\xb1', '\x1c'},
+                                              {'\xb1', '\x1c', '\xb1', '\x1c'},
+                                              {'\xb1', '\x1c', '\x00', '\x00'},
+                                          },
+                                          {
+                                              {'\x00', '\x00', '\x00', '\x00'},
+                                              {'\xb9', '\x2b', '\xf2', '\xac'},
+                                              {'\xb1', '\x11', '\x11', '\x1c'},
+                                              {'\xb1', '\x11', '\x11', '\x1c'},
+                                          },
+                                          {
+                                              {'\x00', '\x00', '\x9f', '\xa0'},
+                                              {'\x00', '\x00', '\xc1', '\xb0'},
+                                              {'\x22', '\x22', '\xc1', '\xb2'},
+                                              {'\xb1', '\x11', '\x11', '\x1c'},
+                                          },
+                                          {
+                                              {'\x00', '\x00', '\x00', '\x00'},
+                                              {'\x00', '\x00', '\xbc', '\xfc'},
+                                              {'\x22', '\x22', '\xbc', '\x1c'},
+                                              {'\xb1', '\x11', '\x11', '\x1c'},
+                                          },
+                                          {{'\x00', '\xbe', '\xfc', '\x00'},
+                                           {'\x00', '\xb1', '\x1c', '\x00'},
+                                           {'\xb1', '\x11', '\x11', '\x1c'},
+                                           {'\xb1', '\x11', '\x11', '\x1c'}}};
 
 static const char* const tile_names[TILE_CAPACITY] = {
     "void", "plains",  "forest",  "mountains", "beach",
@@ -172,7 +171,7 @@ bool render_capture_progress_bar(const struct units* const units,
                                  const grid_t tile_x, const grid_t tile_y,
                                  wchar_t* const symbol, uint8_t* const style) {
 
-    // Display health bar on the bottom of capturable
+    // Display health bar on the bottom of building
     if (tile_y != 0)
         return false;
 
@@ -379,7 +378,7 @@ bool render_tile(const struct game* const game, const grid_t x, const grid_t y,
     } else {
         // If texture is transparent, texture is highlightable
         highlightable = decode_texture(
-            capturable_textures[tile - TERRIAN_CAPACITY][tile_y][tile_x / 2],
+            building_textures[tile - TERRIAN_CAPACITY][tile_y][tile_x / 2],
             tile_x % 2 != 0, game->territory[y][x], symbol, style);
 
         if (highlightable)
@@ -500,11 +499,11 @@ void print_attack_text(const struct game* const game) {
 void print_build_text(const struct game* const game) {
     const tile_t tile = game->map[game->y][game->x];
     assert(tile >= TERRIAN_CAPACITY);
-    const tile_t capturable = tile - TERRIAN_CAPACITY;
+    const tile_t building = tile - TERRIAN_CAPACITY;
 
     wprintf(L"build mode:");
-    for (model_t model = capturable_buildable_models[capturable];
-         model < capturable_buildable_models[capturable + 1]; ++model) {
+    for (model_t model = building_buildable_models[building];
+         model < building_buildable_models[building + 1]; ++model) {
         if (game->monies[game->turn] >= model_costs[model])
             wprintf(L" %s=" MODEL_FORMAT, model_names[model], model + 1);
     }

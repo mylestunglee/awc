@@ -122,7 +122,7 @@ energy_t update_max_energy(const struct game* const game,
     return max_energy;
 }
 
-energy_t find_nearest_capturable(struct game* const game) {
+energy_t find_nearest_building(struct game* const game) {
     grid_t nearest_x = 0;
     grid_t nearest_y = 0;
     // Maximise remaining energy to find nearest
@@ -149,10 +149,10 @@ energy_t find_nearest_capturable(struct game* const game) {
 }
 
 void handle_capture(struct game* const game, const model_t model) {
-    if (model >= UNIT_CAPTURABLE_UPPER_BOUND)
+    if (model >= UNIT_BUILDING_UPPER_BOUND)
         return;
 
-    const bool found = find_nearest_capturable(game) > 0;
+    const bool found = find_nearest_building(game) > 0;
 
     if (!found)
         return;
@@ -273,26 +273,26 @@ bool find_nearest_target(struct game* const game, const model_t attacker_model,
     const energy_t attackee_target_energy = find_nearest_attackable(
         game, attacker_model, &attackee_target_x, &attackee_target_y);
 
-    energy_t capturable_energy = 0;
+    energy_t building_energy = 0;
 
-    if (attacker_model < UNIT_CAPTURABLE_UPPER_BOUND) {
-        capturable_energy = find_nearest_capturable(game);
-        const grid_t capturable_x = game->x;
-        const grid_t capturable_y = game->y;
+    if (attacker_model < UNIT_BUILDING_UPPER_BOUND) {
+        building_energy = find_nearest_building(game);
+        const grid_t building_x = game->x;
+        const grid_t building_y = game->y;
 
-        if (attackee_target_energy > capturable_energy) {
+        if (attackee_target_energy > building_energy) {
             *nearest_x = attackee_target_x;
             *nearest_y = attackee_target_y;
         } else {
-            *nearest_x = capturable_x;
-            *nearest_y = capturable_y;
+            *nearest_x = building_x;
+            *nearest_y = building_y;
         }
     } else {
         *nearest_x = attackee_target_x;
         *nearest_y = attackee_target_y;
     }
 
-    return attackee_target_energy > 0 || capturable_energy > 0;
+    return attackee_target_energy > 0 || building_energy > 0;
 }
 
 void move_towards_target(struct game* const game, const model_t model,
