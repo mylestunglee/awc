@@ -77,7 +77,7 @@ bool load_bot(const char* const command, const char* const params,
 }
 
 bool load_money(const char* const command, const char* const params,
-               money_t monies[PLAYERS_CAPACITY]) {
+                money_t monies[PLAYERS_CAPACITY]) {
     if (strcmp(command, "money"))
         return false;
 

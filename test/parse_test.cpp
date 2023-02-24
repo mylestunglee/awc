@@ -187,8 +187,8 @@ TEST_F(game_fixture, parse_action_deselect_returns_false) {
     ASSERT_FALSE(units_has_selection(&game->units));
 }
 
-TEST(parse_test, parse_command_returns_true) {
+TEST(parse_test, parse_command_returns_false) {
     parse_initialise();
 
-    ASSERT_TRUE(parse_command(nullptr, '\0'));
+    ASSERT_FALSE(parse_command(nullptr, '\0'));
 }

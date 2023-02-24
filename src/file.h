@@ -12,7 +12,8 @@ bool load_map(const char* const, const char* const, grid_t* const,
 bool load_territory(const char* const, const char* const,
                     player_t[GRID_SIZE][GRID_SIZE]);
 bool load_bot(const char* const, const char* const, uint8_t* const);
-bool load_money(const char* const, const char* const, money_t[PLAYERS_CAPACITY]);
+bool load_money(const char* const, const char* const,
+                money_t[PLAYERS_CAPACITY]);
 bool load_team(const char* const, char*, uint8_t* const);
 bool load_unit(const char* const, const char* const, const model_t,
                struct units* const);

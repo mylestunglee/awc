@@ -134,10 +134,20 @@ bool (*parsers[256])(struct game* const);
 
 void parse_initialise(void) {
     uint8_t input = 0;
-    do {
-        parsers[input] = isprint(input) ? &parse_nothing : &parse_quit;
-    } while (++input);
+    do
+        parsers[input] = &parse_nothing;
+    while (++input);
 
+    parsers['w'] = &parse_pan_up;
+    parsers['a'] = &parse_pan_left;
+    parsers['s'] = &parse_pan_down;
+    parsers['d'] = &parse_pan_right;
+    parsers[' '] = &parse_action;
+    parsers['n'] = &parse_next_turn;
+    parsers['m'] = &action_hover_next_unit;
+    parsers['k'] = &action_self_destruct;
+    parsers['K'] = &action_surrender;
+    parsers['q'] = &parse_quit;
     parsers['1'] = &parse_build_1;
     parsers['2'] = &parse_build_2;
     parsers['3'] = &parse_build_3;
@@ -158,15 +168,6 @@ void parse_initialise(void) {
     parsers['*'] = &parse_save_3;
     parsers['('] = &parse_save_4;
     parsers[')'] = &parse_save_5;
-    parsers['n'] = &parse_next_turn;
-    parsers['w'] = &parse_pan_up;
-    parsers['a'] = &parse_pan_left;
-    parsers['s'] = &parse_pan_down;
-    parsers['d'] = &parse_pan_right;
-    parsers['m'] = &action_hover_next_unit;
-    parsers['k'] = &action_self_destruct;
-    parsers['K'] = &action_surrender;
-    parsers[' '] = &parse_action;
 }
 
 bool parse_command(struct game* const game, const uint8_t input) {

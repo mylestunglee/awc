@@ -6,7 +6,7 @@
 #define PASS_TYPES_CAPACITY 3
 
 static const health_t pass_tile_defenses[PASS_TYPES_CAPACITY][TILE_CAPACITY] = {
-    {0, 1, 2, 4, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 4},
+    {0, 1, 2, 4, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 4},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0}};
 
@@ -40,7 +40,7 @@ static const movement_t model_movements[MODEL_CAPACITY] = {
 typedef uint8_t pass_t;
 
 static const uint8_t model_passes[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 0, 0, 0,
-                                                       0, 1, 1, 1, 2, 2, 2};
+                                                     0, 1, 1, 1, 2, 2, 2};
 
 static const money_t model_costs[MODEL_CAPACITY] = {
     1000,  3000, 4000,  7000,  16000, 6000,  15000, 8000,
@@ -59,9 +59,9 @@ static const energy_t
         {0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0}};
 
 static const grid_t model_min_ranges[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 2, 3, 0,
-                                                       2, 0, 0, 0, 0, 0, 2};
+                                                        2, 0, 0, 0, 0, 0, 2};
 static const grid_t model_max_ranges[MODEL_CAPACITY] = {0, 0, 0, 0, 0, 3, 6, 0,
-                                                       5, 0, 0, 0, 0, 0, 7};
+                                                        5, 0, 0, 0, 0, 0, 7};
 
 #define UNIT_CAPTURABLE_UPPER_BOUND (model_t)2
 #define MOVEMENT_TYPE_SHIP 5

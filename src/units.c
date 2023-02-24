@@ -312,7 +312,9 @@ bool units_is_direct(const model_t model) {
     return model_min_ranges[model] == 0;
 }
 
-bool units_is_ranged(const model_t model) { return model_min_ranges[model] > 0; }
+bool units_is_ranged(const model_t model) {
+    return model_min_ranges[model] > 0;
+}
 
 bool units_update_capture_progress(struct units* const units,
                                    const health_t progress) {

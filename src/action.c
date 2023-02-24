@@ -137,7 +137,6 @@ bool action_self_destruct(struct game* const game) {
         return true;
 
     units_delete_selected(&game->units);
-    assert(game->dirty_labels);
     game_deselect(game);
     return false;
 }
