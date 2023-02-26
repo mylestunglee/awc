@@ -9,7 +9,7 @@ HEADERS = $(wildcard *.h)
 	$(CC) $(CFLAGS) $(LIBRARIES) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
-.PHONY: default clean test run_test clean_test coverage_reports
+.PHONY: default format tidy clean
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBRARIES) -o $@
@@ -21,9 +21,6 @@ format:
 
 tidy:
 	clang-tidy -header-filter=.* -system-headers -checks=-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling *.c -fix --
-
-doc:
-	doxygen Doxyfile
 
 clean:
 	rm -rf $(TARGET) $(OBJECTS)

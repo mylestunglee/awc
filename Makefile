@@ -1,20 +1,12 @@
-make:
+.PHONY: default all test format clean coverage_reports
+
+default:
 	$(MAKE) -C src
 
-test:
-	$(MAKE) -C test
-
-format:
-	$(MAKE) -C src format
-	$(MAKE) -C test format
+all: default format doc coverage_reports
 
 doc:
 	doxygen Doxyfile
-
-clean:
-	$(MAKE) -C src clean
-	$(MAKE) -C test clean
-	rm -rf *_test_coverage html latex
 
 %_test_coverage/executable: src/*.c src/*.h test/*.cpp test/*.hpp
 	cp -r test $*_test_coverage
@@ -34,3 +26,15 @@ clean:
 
 coverage_reports: $(patsubst test/%_test.cpp, %_test_coverage/report/index.html, $(wildcard test/*_test.cpp) test/all_test.cpp)
 	bash summarise_coverage_reports.sh | column -t
+
+format:
+	$(MAKE) -C src format
+	$(MAKE) -C test format
+
+test:
+	$(MAKE) -C test run
+
+clean:
+	$(MAKE) -C src clean
+	$(MAKE) -C test clean
+	rm -rf *_test_coverage doc

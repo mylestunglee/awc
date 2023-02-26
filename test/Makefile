@@ -3,7 +3,7 @@ CXX = g++
 CXX_FLAGS = -g -Wall -Wextra -Wpedantic -Wshadow -Wno-missing-field-initializers -funsigned-char -std=c++2a
 LIBRARIES = -lgtest_main -lgtest -lglpk -lpthread
 
-.PHONY: default clean run
+.PHONY: default run format clean
 
 TEST_SOURCES = $(filter-out all_test.cpp, $(wildcard *_test.cpp))
 TARGETS = $(patsubst %_test.cpp, %_test, $(TEST_SOURCES))
@@ -39,8 +39,8 @@ all_test.cpp: $(TEST_SOURCES)
 run: all_test
 	./$<
 
-clean:
-	rm -f $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS) all_test.cpp all_test
-
 format:
 	clang-format -style=file -i *.cpp *.hpp
+
+clean:
+	rm -f $(TARGETS) $(FIXTURE_OBJECTS) $(TEST_OBJECTS) all_test.cpp all_test state*.txt
