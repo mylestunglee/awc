@@ -1,7 +1,7 @@
 TARGET = test
 CXX = g++
-CXX_FLAGS = -g -Wall -Wextra -Wpedantic -Wshadow -Wno-missing-field-initializers -funsigned-char -std=c++2a
-LIBRARIES = -lgtest_main -lgtest -lglpk -lpthread
+CXX_FLAGS += -funsigned-char -g -std=c++2a -Wall -Wextra -Wno-missing-field-initializers -Wpedantic -Wshadow
+LIBRARIES += -lglpk -lgtest -lgtest_main -lpthread
 
 .PHONY: default run format clean
 
