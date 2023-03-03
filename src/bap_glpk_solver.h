@@ -14,12 +14,10 @@ typedef int16_t index_t;
 struct bap_glpk_temps {
     glp_prob* problem;
     index_t curr_index;
-    index_t a_column_start_index;
-    index_t a_column_end_index;
+    index_t a_column_index;
     index_t b_column_index;
     index_t z_column_index;
-    index_t distribution_row_start_index;
-    index_t distribution_row_end_index;
+    index_t distribution_row_index;
     index_t allocation_row_index;
     index_t budget_row_index;
     index_t surplus_row_start_index;
@@ -79,7 +77,8 @@ void create_columns(const struct bap_inputs* const,
 
 void sparse_matrix_set(struct bap_glpk_temps* const, const int, const int,
                        const double);
-void set_distribution_submatrix(struct bap_glpk_temps* const);
+void set_distribution_submatrix(const struct bap_inputs* const,
+                                struct bap_glpk_temps* const);
 void set_allocation_submatrix(const struct bap_inputs* const,
                               struct bap_glpk_temps* const);
 void set_budget_submatrix(const struct bap_inputs* const,

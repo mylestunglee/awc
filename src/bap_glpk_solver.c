@@ -112,14 +112,13 @@ void set_next_row(struct bap_glpk_temps* const temps, const char variable_name,
 
 void set_distribution_rows(const struct bap_inputs* const inputs,
                            struct bap_glpk_temps* const temps) {
-    temps->distribution_row_start_index = temps->curr_index;
+    temps->distribution_row_index = temps->curr_index;
     FOR_MODEL(i)
     if (a_i_exists(inputs, i)) {
         const double units =
             (double)inputs->friendly_distribution[i] / (double)HEALTH_MAX;
         set_next_row(temps, 'd', i, GLP_FX, units, units);
     }
-    temps->distribution_row_end_index = temps->curr_index;
 }
 
 void set_allocation_rows(const struct bap_inputs* const inputs,
@@ -203,7 +202,7 @@ void set_next_matrix_column(struct bap_glpk_temps* const temps,
 
 void set_a_columns(const struct bap_inputs* const inputs,
                    struct bap_glpk_temps* const temps) {
-    temps->a_column_start_index = temps->curr_index;
+    temps->a_column_index = temps->curr_index;
     FOR_MODEL(i)
     FOR_MODEL(j)
     if (a_i_j_exists(inputs, i, j))
@@ -211,7 +210,6 @@ void set_a_columns(const struct bap_inputs* const inputs,
                                (double)inputs->friendly_distribution[i] /
                                    (double)HEALTH_MAX,
                                GLP_CV);
-    temps->a_column_end_index = temps->curr_index;
 }
 
 void set_b_columns(const struct bap_inputs* const inputs,
@@ -254,13 +252,21 @@ void sparse_matrix_set(struct bap_glpk_temps* const temps, const int row,
     ++temps->curr_index;
 }
 
-void set_distribution_submatrix(struct bap_glpk_temps* const temps) {
-    for (index_t row = temps->distribution_row_start_index;
-         row < temps->distribution_row_end_index; ++row)
-        for (index_t column = temps->a_column_start_index;
-             column < temps->a_column_end_index; ++column) {
-            sparse_matrix_set(temps, row, column, 1.0);
+void set_distribution_submatrix(const struct bap_inputs* const inputs,
+                                struct bap_glpk_temps* const temps) {
+    index_t row = temps->distribution_row_index;
+    FOR_MODEL(d_i)
+    if (a_i_exists(inputs, d_i)) {
+        index_t column = temps->a_column_index;
+        FOR_MODEL(a_i)
+        FOR_MODEL(a_j)
+        if (a_i_j_exists(inputs, a_i, a_j)) {
+            if (d_i == a_i)
+                sparse_matrix_set(temps, row, column, 1.0);
+            ++column;
         }
+        ++row;
+    }
 }
 
 void set_allocation_submatrix(const struct bap_inputs* const inputs,
@@ -300,7 +306,7 @@ double calc_surplus_submatrix_value(const struct bap_inputs* const inputs,
 
 void set_surplus_submatrix(const struct bap_inputs* const inputs,
                            struct bap_glpk_temps* const temps) {
-    index_t a_column = temps->a_column_start_index;
+    index_t a_column = temps->a_column_index;
     index_t b_column = temps->b_column_index;
     FOR_MODEL(i) {
         index_t row = temps->surplus_row_start_index;
@@ -329,7 +335,7 @@ void set_surplus_submatrix(const struct bap_inputs* const inputs,
 void set_matrix(const struct bap_inputs* const inputs,
                 struct bap_glpk_temps* const temps) {
     temps->curr_index = 1;
-    set_distribution_submatrix(temps);
+    set_distribution_submatrix(inputs, temps);
     set_allocation_submatrix(inputs, temps);
     set_budget_submatrix(inputs, temps);
     set_surplus_submatrix(inputs, temps);
@@ -362,8 +368,7 @@ int glpk_solve(struct bap_glpk_temps* const temps) {
 void parse_results(const struct bap_inputs* const inputs,
                    const struct bap_glpk_temps* const temps,
                    grid_wide_t outputs[MODEL_CAPACITY]) {
-    memset(outputs, 0, sizeof(grid_wide_t) * MODEL_CAPACITY);
-    index_t column = temps->a_column_start_index;
+    index_t column = temps->b_column_index;
 
     FOR_MODEL(i)
     FOR_MODEL(j)

@@ -116,13 +116,12 @@ TEST_F(bap_glpk_solver_internal_fixture, set_distribution_rows) {
 
     set_distribution_rows(inputs, temps);
 
-    ASSERT_EQ(temps->distribution_row_start_index, 1);
+    ASSERT_EQ(temps->distribution_row_index, 1);
     ASSERT_EQ(strcmp(glp_get_row_name(problem, 1), "d_0"), 0);
     ASSERT_EQ(glp_get_row_type(problem, 1), GLP_FX);
     ASSERT_EQ(glp_get_row_lb(problem, 1), 1.0);
     ASSERT_EQ(glp_get_row_ub(problem, 1), 1.0);
     ASSERT_EQ(temps->curr_index, 2);
-    ASSERT_EQ(temps->distribution_row_end_index, 2);
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_allocation_rows) {
@@ -209,13 +208,12 @@ TEST_F(bap_glpk_solver_internal_fixture, set_a_columns) {
 
     set_a_columns(inputs, temps);
 
-    ASSERT_EQ(temps->a_column_start_index, 1);
+    ASSERT_EQ(temps->a_column_index, 1);
     ASSERT_EQ(strcmp(glp_get_col_name(problem, 1), "A_0_0"), 0);
     ASSERT_EQ(glp_get_col_type(problem, 1), GLP_DB);
     ASSERT_EQ(glp_get_col_ub(problem, 1), 1.0);
     ASSERT_EQ(glp_get_col_kind(problem, 1), GLP_CV);
     ASSERT_EQ(temps->curr_index, 2);
-    ASSERT_EQ(temps->a_column_end_index, 2);
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_b_columns) {
@@ -276,12 +274,12 @@ TEST_F(bap_glpk_solver_internal_fixture, sparse_matrix_set) {
 }
 
 TEST_F(bap_glpk_solver_internal_fixture, set_distribution_submatrix) {
-    temps->distribution_row_start_index = 2;
-    temps->distribution_row_end_index = 3;
-    temps->a_column_start_index = 5;
-    temps->a_column_end_index = 6;
+    inputs->friendly_distribution[MODEL_INFANTRY] = 1;
+    inputs->enemy_distribution[MODEL_INFANTRY] = 1;
+    temps->distribution_row_index = 2;
+    temps->a_column_index = 3;
 
-    set_distribution_submatrix(temps);
+    set_distribution_submatrix(inputs, temps);
 
     ASSERT_EQ(temps->matrix_values[1], 1.0);
     ASSERT_EQ(temps->curr_index, 2);
@@ -403,7 +401,7 @@ TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_selects_most_effective_unit) {
 }
 
 TEST_F(bap_glpk_solver_fixture, bap_glpk_solve_distributes_ratio_across_units) {
-    inputs.friendly_distribution[MODEL_SUBMARINE] = 1;
+    inputs.friendly_distribution[MODEL_SUBMARINE] = 2 * HEALTH_MAX;
     inputs.enemy_distribution[MODEL_HELICOPTER] = 1;
     inputs.enemy_distribution[MODEL_SUBMARINE] = 1;
     inputs.buildings[BUILDING_AIRPORT] = 1;
