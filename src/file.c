@@ -134,46 +134,41 @@ bool load_team(const char* const command, char* params,
 }
 
 bool load_unit(const char* const command, const char* const params,
-               const model_t model, struct units* const units) {
+               const model_t model, struct units* const units,
+               struct list* const list) {
     if (strcmp(command, model_names[model]))
         return false;
 
     player_t player;
     grid_t x, y;
-    char health_buffer[4] = "";
+    health_t health = HEALTH_MAX;
     char enabled_buffer[9] = "";
     capture_progress_t capture_progress = 0;
 
     if (sscanf(params,
-               PLAYER_FORMAT GRID_FORMAT GRID_FORMAT
-               "%4s" ENABLED_FORMAT CAPTURE_COMPLETION_FORMAT,
-               &player, &x, &y, health_buffer, enabled_buffer,
-               &capture_progress) < 3)
+               PLAYER_FORMAT GRID_FORMAT GRID_FORMAT HEALTH_FORMAT
+                   ENABLED_FORMAT CAPTURE_COMPLETION_FORMAT,
+               &player, &x, &y, &health, enabled_buffer, &capture_progress) < 3)
         return false;
 
     if (player >= PLAYERS_CAPACITY)
         return false;
 
-    health_t health = HEALTH_MAX;
-
-    if (health_buffer[0] != '\0' &&
-        sscanf(health_buffer, HEALTH_FORMAT, &health) != 1)
-        return false;
-
     if (health > HEALTH_MAX)
         return false;
 
-    bool enabled;
-    if (enabled_buffer[0] == '\0')
-        enabled = false;
-    else if (!strcmp(enabled_buffer, "enabled"))
+    if (!units_is_insertable(units))
+        return false;
+
+    bool enabled = false;
+    if (enabled_buffer[0] == '\0') {
+        struct list_node node = {.x = x, .y = y};
+        list_insert(list, &node);
+    } else if (!strcmp(enabled_buffer, "enabled"))
         enabled = true;
     else if (!strcmp(enabled_buffer, "disabled"))
         enabled = false;
     else
-        return false;
-
-    if (!units_is_insertable(units))
         return false;
 
     const struct unit unit = {.x = x,
@@ -190,26 +185,37 @@ bool load_unit(const char* const command, const char* const params,
 }
 
 bool load_units(const char* const command, const char* const params,
-                struct units* const units) {
+                struct units* const units, struct list* const list) {
     for (model_t model = 0; model < MODEL_CAPACITY; ++model)
-        if (load_unit(command, params, model, units))
+        if (load_unit(command, params, model, units, list))
             return true;
 
     return false;
 }
 
 bool load_command(struct game* const game, const char* const command,
-                  char* const params, grid_t* const y) {
+                  char* const params) {
     return load_turn(command, params, &game->turn) ||
-           load_map(command, params, y, game->map) ||
+           load_map(command, params, &game->y, game->map) ||
            load_territory(command, params, game->territory) ||
            load_bot(command, params, game->bots) ||
            load_money(command, params, game->monies) ||
            load_team(command, params, game->alliances) ||
-           load_units(command, params, &game->units);
+           load_units(command, params, &game->units, &game->list);
+}
+
+void resolve_optional_unit_enabled(struct game* const game) {
+    while (!list_empty(&game->list)) {
+        const struct list_node node = list_front_pop(&game->list);
+        struct unit* const unit = units_get_at(&game->units, node.x, node.y);
+        unit->enabled = game->turn == unit->player;
+    }
 }
 
 bool file_load(struct game* const game, const char* const filename) {
+    assert(game->y == 0);
+    assert(list_empty(&game->list));
+
     FILE* const file = fopen(filename, "r");
 
     if (!file)
@@ -218,7 +224,6 @@ bool file_load(struct game* const game, const char* const filename) {
     const char* const delim = " ";
     const uint16_t buffer_size = 4096;
     char line[buffer_size];
-    grid_t y = 0;
     bool error = false;
 
     while (fgets(line, buffer_size, file)) {
@@ -230,12 +235,14 @@ bool file_load(struct game* const game, const char* const filename) {
 
         if (command == NULL)
             continue;
-        else if (load_command(game, command, params, &y))
+        else if (load_command(game, command, params))
             continue;
         else
             // Parse remaining lines
             error = true;
     }
+
+    resolve_optional_unit_enabled(game);
 
     return fclose(file) < 0 || error;
 }
@@ -280,9 +287,10 @@ void save_map(const tile_t map[GRID_SIZE][GRID_SIZE], FILE* const file) {
     }
 }
 
-void save_unit(const struct unit* const unit, FILE* const file) {
+void save_unit(const struct unit* const unit, const player_t turn,
+               FILE* const file) {
     if (unit->capture_progress == 0) {
-        if (!unit->enabled) {
+        if (unit->enabled == (turn == unit->player)) {
             if (unit->health == HEALTH_MAX)
                 fprintf(file,
                         MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
@@ -302,7 +310,7 @@ void save_unit(const struct unit* const unit, FILE* const file) {
                                       " " GRID_FORMAT " " HEALTH_FORMAT
                                       " " ENABLED_FORMAT "\n",
                     model_names[unit->model], unit->player, unit->x, unit->y,
-                    unit->health, unit->enabled ? "enabled" : "");
+                    unit->health, unit->enabled ? "enabled" : "disabled");
     } else
         fprintf(file,
                 MODEL_NAME_FORMAT " " PLAYER_FORMAT " " GRID_FORMAT
@@ -314,11 +322,12 @@ void save_unit(const struct unit* const unit, FILE* const file) {
                 unit->capture_progress);
 }
 
-void save_units(const struct units* const units, FILE* const file) {
+void save_units(const struct units* const units, const player_t turn,
+                FILE* const file) {
     for (player_t player = 0; player < PLAYERS_CAPACITY; ++player) {
         const struct unit* unit = units_const_get_first(units, player);
         while (unit) {
-            save_unit(unit, file);
+            save_unit(unit, turn, file);
             unit = units_const_get_next(units, unit);
         }
     }
@@ -405,7 +414,7 @@ void save_teams(const uint8_t* const alliances, FILE* const file) {
 void save_game(const struct game* const game, FILE* const file) {
     save_turn(game->turn, file);
     save_map(game->map, file);
-    save_units(&game->units, file);
+    save_units(&game->units, game->turn, file);
     save_territory(game->territory, file);
     save_monies(game->monies, file);
     save_bots(game->bots, file);
