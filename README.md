@@ -1,13 +1,13 @@
 # awc
 
-`awc` is a minimal _Advanced Wars 2_ clone designed with the following  in mind:
+`awc` is a minimal _Advanced Wars 2_ clone designed with the following in mind:
 
 - Highly structured C program
 - Highly interfaceable text IO
 	+ Easy to replay actions and edit maps
 - Open source
 	+ Highly configurable constants and technical constraints can be remodelled
-- Small feature set for high bot compatibility
+- Small feature set for high compatibility with bot capabilities
 
 ```html
 aaa<b>a</b>
@@ -15,30 +15,14 @@ aaa<b>a</b>
 
 ## Features
 
-`awc` adds and removes features compared to _Advanced Wars 2_:
+`awc` adds features compared to _Advanced Wars 2_:
 
-- Allow merging and attacking in same unit operation
-- different units type do not block movement
-- new bridge tile: that allow ships to pass but not block bridges
-- world wraps in 256x256 grid
-- 255 shared unit capacity
-- different unit types (land/air/sea) cannot block each over
-- bots can play against each other
-
-lost features over Advanced Wars 2:
-- no characters
-- no ammo for units/different damages for a unit
-- no transports
-- no fog/submarine diving
-
-configurable:
-
-features:
-- extracted maps from Advanced Wars 2
-
-technical limitations:
-- maximum of 4 players (bot and non-bot)
-- these limitations can be modified by changing constant
+- Improved unit mechanics by enabling merging and attacking in same turn
+- Bridge tile allows ships to pass but ships cannot stay
+- Increased maximum map size to 256×256
+- Increased shared unit capacity to 255
+- Different unit types (land/air/sea) cannot block movement
+- Up to four players and bots can play against each other
 
 
 ## Usage
