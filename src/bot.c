@@ -340,7 +340,7 @@ void handle_nonlocal(struct game* const game, struct unit* const unit) {
         assert(!error);
     } else {
         assert(game->dirty_labels);
-        grid_clear_labels(game);
+        game_deselect(game);
     }
 }
 
@@ -355,8 +355,6 @@ void interact_unit(struct game* const game, struct unit* const unit) {
 
     if (unit->enabled)
         handle_nonlocal(game, unit);
-
-    units_clear_selection(&game->units);
 }
 
 void interact_units(struct game* const game) {
