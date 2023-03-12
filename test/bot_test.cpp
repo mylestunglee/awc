@@ -446,3 +446,14 @@ TEST_F(game_fixture, bot_play_build_units) {
 
     ASSERT_EQ(game->units.size, 1);
 }
+
+TEST_F(game_fixture, bot_play_does_not_change_x_y) {
+    insert_unit({.enabled = true});
+    game->x = 2;
+    game->y = 3;
+
+    bot_play(game);
+
+    ASSERT_EQ(game->x, 2);
+    ASSERT_EQ(game->y, 3);
+}

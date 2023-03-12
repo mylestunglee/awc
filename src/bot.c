@@ -103,7 +103,8 @@ void handle_attack(struct game* const game, const model_t attacker_model) {
     game->x = attackee->x;
     game->y = attackee->y;
 
-    action_attack(game);
+    const bool error = action_attack(game);
+    assert(!error);
 }
 
 energy_t update_max_energy(const struct game* const game,
@@ -368,7 +369,13 @@ void interact_units(struct game* const game) {
 }
 
 void bot_play(struct game* const game) {
+    grid_t game_x = game->x;
+    grid_t game_y = game->y;
+
     grid_clear_labels(game);
     interact_units(game);
     build_units(game);
+
+    game->x = game_x;
+    game->y = game_y;
 }
