@@ -242,6 +242,7 @@ bool file_load(struct game* const game, const char* const filename) {
             error = true;
     }
 
+    game->y = 0;
     resolve_optional_unit_enabled(game);
 
     return fclose(file) < 0 || error;

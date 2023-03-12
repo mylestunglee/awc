@@ -244,45 +244,45 @@ TEST_F(game_fixture, load_command_returns_false_when_invalid_command) {
     ASSERT_FALSE(load_command(game, "", nullptr));
 }
 
-TEST_F(game_fixture, file_load_returns_false_when_valid_contents) {
-    using namespace std;
-    const auto filename = "file1.txt";
-    {
-        ofstream file(filename);
-        file << "map \"";
+class temporary_file {
+public:
+    temporary_file(const std::string filename, const std::string contents)
+        : filename_(filename) {
+        std::ofstream file(filename_);
+        file << contents;
     }
 
-    ASSERT_FALSE(file_load(game, filename));
+    bool load(struct game* const game) {
+        return file_load(game, filename_.c_str());
+    }
+
+    ~temporary_file() { remove(filename_.c_str()); }
+
+private:
+    const std::string filename_;
+};
+
+TEST_F(game_fixture, file_load_returns_false_when_valid_contents) {
+    temporary_file file("file1.txt", "map \"");
+
+    ASSERT_FALSE(file.load(game));
 
     ASSERT_EQ(game->map[0][0], TILE_PLAINS);
-    remove(filename);
+    ASSERT_EQ(game->y, 0);
 }
 
 TEST_F(game_fixture, file_load_return_false_when_optional_unit_enabled) {
-    using namespace std;
-    const auto filename = "file2.txt";
-    {
-        ofstream file(filename);
-        file << "infantry 2 3 5\nturn 2";
-    }
+    temporary_file file("file2.txt", "infantry 2 3 5\nturn 2");
 
-    ASSERT_FALSE(file_load(game, filename));
+    ASSERT_FALSE(file.load(game));
 
     ASSERT_TRUE(units_const_get_at(&game->units, 3, 5)->enabled);
-    remove(filename);
 }
 
 TEST_F(game_fixture, file_load_returns_true_when_invalid_contents) {
-    using namespace std;
-    const auto filename = "file2.txt";
-    {
-        ofstream file(filename);
-        file << "command \"";
-    }
+    temporary_file file("file3.txt", "command \"");
 
-    ASSERT_TRUE(file_load(game, filename));
-
-    remove(filename);
+    ASSERT_TRUE(file.load(game));
 }
 
 TEST_F(game_fixture, file_load_returns_true_when_file_does_not_exist) {
