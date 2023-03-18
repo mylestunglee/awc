@@ -343,13 +343,33 @@ TEST_F(game_fixture, handle_nonlocal_moves_unit_when_target_exists) {
     ASSERT_FALSE(game->dirty_labels);
 }
 
-TEST_F(game_fixture, handle_nonlocal_does_nothing_when_no_target_exists) {
-    auto* unit = insert_selected_unit();
+TEST_F(game_fixture,
+       handle_nonlocal_does_nothing_to_unit_when_no_target_exists) {
+    auto* unit = insert_selected_unit({.x = 2, .y = 3});
     game->dirty_labels = true;
 
     handle_nonlocal(game, unit);
 
-    ASSERT_FALSE(game->dirty_labels);
+    ASSERT_EQ(unit->x, 2);
+    ASSERT_EQ(unit->y, 3);
+}
+
+TEST_F(game_fixture, is_blocking_enemy_HQ_returns_false_when_friendly_HQ) {
+    auto* unit =
+        insert_unit({.x = 2, .y = 3, .model = MODEL_CAPTURABLE_UPPER_BOUND});
+    game->map[3][2] = TILE_HQ;
+    game->territory[3][2] = 0;
+
+    ASSERT_FALSE(is_blocking_enemy_HQ(game, unit));
+}
+
+TEST_F(game_fixture, is_blocking_enemy_HQ_returns_false_when_enemy_HQ) {
+    auto* unit =
+        insert_unit({.x = 2, .y = 3, .model = MODEL_CAPTURABLE_UPPER_BOUND});
+    game->map[3][2] = TILE_HQ;
+    game->territory[3][2] = 1;
+
+    ASSERT_TRUE(is_blocking_enemy_HQ(game, unit));
 }
 
 TEST_F(game_fixture, interact_unit_when_local_move_is_possible) {
@@ -395,12 +415,24 @@ TEST_F(game_fixture, interact_unit_when_nonlocal_move_is_possible) {
     ASSERT_FALSE(unit->enabled);
 }
 
+TEST_F(game_fixture, interact_unit_self_destructs_when_blocking_enemy_HQ) {
+    auto* unit =
+        insert_unit({.model = MODEL_CAPTURABLE_UPPER_BOUND, .enabled = true});
+    game->map[0][0] = TILE_HQ;
+    game->territory[0][0] = 1;
+
+    interact_unit(game, unit);
+
+    ASSERT_FALSE(units_is_owner(&game->units, 0));
+}
+
 TEST_F(game_fixture, interact_unit_maintains_enabled_when_move_is_impossible) {
     auto* unit = insert_unit({.enabled = true});
 
     interact_unit(game, unit);
 
     ASSERT_TRUE(unit->enabled);
+    ASSERT_FALSE(game->dirty_labels);
 }
 
 TEST_F(game_fixture, interact_units) {

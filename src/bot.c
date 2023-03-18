@@ -150,7 +150,7 @@ energy_t find_nearest_building(struct game* const game) {
 }
 
 void handle_capture(struct game* const game, const model_t model) {
-    if (model >= UNIT_BUILDING_UPPER_BOUND)
+    if (model >= MODEL_CAPTURABLE_UPPER_BOUND)
         return;
 
     const bool found = find_nearest_building(game) > 0;
@@ -276,7 +276,7 @@ bool find_nearest_target(struct game* const game, const model_t attacker_model,
 
     energy_t building_energy = 0;
 
-    if (attacker_model < UNIT_BUILDING_UPPER_BOUND) {
+    if (attacker_model < MODEL_CAPTURABLE_UPPER_BOUND) {
         building_energy = find_nearest_building(game);
         const grid_t building_x = game->x;
         const grid_t building_y = game->y;
@@ -334,14 +334,19 @@ void handle_nonlocal(struct game* const game, struct unit* const unit) {
     grid_t target_x, target_y;
     bool found = find_nearest_target(game, unit->model, &target_x, &target_y);
 
-    if (found) {
-        move_towards_target(game, unit->model, target_x, target_y);
-        const bool error = action_move(game);
-        assert(!error);
-    } else {
-        assert(game->dirty_labels);
-        game_deselect(game);
-    }
+    if (!found)
+        return;
+
+    move_towards_target(game, unit->model, target_x, target_y);
+    const bool error = action_move(game);
+    assert(!error);
+}
+
+bool is_blocking_enemy_HQ(const struct game* const game,
+                          const struct unit* const unit) {
+    return game->map[unit->y][unit->x] == TILE_HQ &&
+           game->territory[unit->y][unit->x] != unit->player &&
+           unit->model >= MODEL_CAPTURABLE_UPPER_BOUND;
 }
 
 void interact_unit(struct game* const game, struct unit* const unit) {
@@ -355,6 +360,12 @@ void interact_unit(struct game* const game, struct unit* const unit) {
 
     if (unit->enabled)
         handle_nonlocal(game, unit);
+
+    if (unit->enabled && is_blocking_enemy_HQ(game, unit))
+        action_self_destruct(game);
+
+    if (unit->enabled)
+        game_deselect(game);
 }
 
 void interact_units(struct game* const game) {

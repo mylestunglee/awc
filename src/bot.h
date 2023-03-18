@@ -30,6 +30,7 @@ bool find_nearest_target(struct game* const, const model_t, grid_t* const,
 void move_towards_target(struct game* const, const model_t, const grid_t,
                          const grid_t);
 void handle_nonlocal(struct game* const, struct unit* const);
+bool is_blocking_enemy_HQ(const struct game* const, const struct unit* const);
 void interact_unit(struct game* const, struct unit* const);
 void interact_units(struct game* const);
 #endif
