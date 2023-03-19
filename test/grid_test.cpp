@@ -46,21 +46,22 @@ TEST_F(grid_fixture, grid_clear_territory_clears_cell) {
     ASSERT_EQ(territory[3][5], NULL_PLAYER);
 }
 
-TEST_F(grid_fixture, grid_clear_player_territory_clears_player_cell) {
+TEST_F(grid_fixture, grid_transfer_player_territory_clears_player_cell) {
     ASSERT_NE(NULL_PLAYER, 2);
     territory[3][5] = 2;
 
-    grid_clear_player_territory(map, territory, 2);
+    grid_transfer_player_territory(map, territory, 2, NULL_PLAYER);
 
     ASSERT_EQ(territory[3][5], NULL_PLAYER);
 }
 
-TEST_F(grid_fixture, grid_clear_player_territory_sets_player_hqs_into_cities) {
+TEST_F(grid_fixture,
+       grid_transfer_player_territory_sets_player_HQs_into_cities) {
     ASSERT_NE(NULL_PLAYER, 2);
     map[3][5] = TILE_HQ;
     territory[3][5] = 2;
 
-    grid_clear_player_territory(map, territory, 2);
+    grid_transfer_player_territory(map, territory, 2, NULL_PLAYER);
 
     ASSERT_EQ(map[3][5], TILE_CITY);
 }

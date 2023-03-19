@@ -161,7 +161,7 @@ TEST_F(game_fixture, action_capture_when_capture_enemy_hq) {
 
     ASSERT_EQ(game->incomes[1], 0);
     ASSERT_EQ(game->territory[3][2], game->turn);
-    ASSERT_EQ(game->incomes[0], 6000);
+    ASSERT_EQ(game->incomes[0], 10000);
 }
 
 TEST_F(game_fixture, action_capture_when_capture_enemy_city) {

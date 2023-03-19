@@ -6,9 +6,9 @@
 void grid_clear_uint8(uint8_t[GRID_SIZE][GRID_SIZE]);
 void grid_clear_labels(struct game* const);
 void grid_clear_territory(player_t[GRID_SIZE][GRID_SIZE]);
-void grid_clear_player_territory(tile_t[GRID_SIZE][GRID_SIZE],
-                                 player_t[GRID_SIZE][GRID_SIZE],
-                                 const player_t);
+void grid_transfer_player_territory(tile_t[GRID_SIZE][GRID_SIZE],
+                                    player_t[GRID_SIZE][GRID_SIZE],
+                                    const player_t, const player_t);
 void grid_compute_incomes(player_t[GRID_SIZE][GRID_SIZE],
                           money_t[PLAYERS_CAPACITY]);
 #ifdef EXPOSE_GRID_INTERNALS

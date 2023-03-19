@@ -103,18 +103,20 @@ bool can_selected_unit_capture(const struct game* const game) {
 // Occurs when unit captures enemy building
 void action_capture(struct game* const game) {
     const player_t loser = game->territory[game->y][game->x];
+    const player_t winner = game->turn;
 
     // Cannot recapture friendly building
-    assert(loser != game->turn);
+    assert(loser != winner);
 
     // If the enemy loses their HQ
     if (game->map[game->y][game->x] == TILE_HQ)
-        game_remove_player(game, loser);
-    else if (loser != NULL_PLAYER)
-        game->incomes[loser] -= MONEY_SCALE;
-
-    game->territory[game->y][game->x] = game->turn;
-    game->incomes[game->turn] += MONEY_SCALE;
+        game_remove_player(game, loser, winner);
+    else {
+        if (loser != NULL_PLAYER)
+            game->incomes[loser] -= MONEY_SCALE;
+        game->incomes[winner] += MONEY_SCALE;
+        game->territory[game->y][game->x] = winner;
+    }
 }
 
 bool action_move(struct game* const game) {
@@ -153,7 +155,7 @@ bool action_surrender(struct game* const game) {
     if (!at_least_two_alive_players(game))
         return true;
 
-    game_remove_player(game, game->turn);
+    game_remove_player(game, game->turn, NULL_PLAYER);
     turn_next(game);
     return false;
 }

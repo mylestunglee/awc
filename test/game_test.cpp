@@ -367,7 +367,7 @@ TEST_F(game_fixture, game_remove_player_makes_player_dead) {
     game->territory[5][3] = 2;
     game->incomes[2] = MONEY_SCALE;
 
-    game_remove_player(game, 2);
+    game_remove_player(game, 2, NULL_PLAYER);
 
     ASSERT_FALSE(units_is_owner(&game->units, 2));
     ASSERT_EQ(game->territory[5][3], NULL_PLAYER);

@@ -176,8 +176,10 @@ bool game_is_friendly(const struct game* const game, const player_t player) {
     return bitmatrix_get(game->alliances, game->turn, player);
 }
 
-void game_remove_player(struct game* const game, const player_t player) {
-    units_delete_player(&game->units, player);
-    grid_clear_player_territory(game->map, game->territory, player);
-    game->incomes[player] = 0;
+void game_remove_player(struct game* const game, const player_t loser,
+                        const player_t winner) {
+    units_delete_player(&game->units, loser);
+    grid_transfer_player_territory(game->map, game->territory, loser, winner);
+    game->incomes[winner] += game->incomes[loser];
+    game->incomes[loser] = 0;
 }

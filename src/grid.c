@@ -22,16 +22,16 @@ void grid_clear_territory(player_t territory[GRID_SIZE][GRID_SIZE]) {
     memset(territory, NULL_PLAYER, GRID_SIZE * GRID_SIZE);
 }
 
-void grid_clear_player_territory(tile_t map[GRID_SIZE][GRID_SIZE],
-                                 player_t territory[GRID_SIZE][GRID_SIZE],
-                                 const player_t player) {
-
+void grid_transfer_player_territory(tile_t map[GRID_SIZE][GRID_SIZE],
+                                    player_t territory[GRID_SIZE][GRID_SIZE],
+                                    const player_t loser,
+                                    const player_t winner) {
     grid_t y = 0;
     do {
         grid_t x = 0;
         do
-            if (territory[y][x] == player) {
-                territory[y][x] = NULL_PLAYER;
+            if (territory[y][x] == loser) {
+                territory[y][x] = winner;
                 if (map[y][x] == TILE_HQ)
                     map[y][x] = TILE_CITY;
             }
