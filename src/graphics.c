@@ -466,9 +466,9 @@ void print_normal_text(const struct game* const game) {
     for (player_t player = 0; player < PLAYERS_CAPACITY; ++player)
         if (game_is_alive(game, player)) {
             if (player == game->turn)
-                wprintf(L"[" PLAYER_FORMAT "]", player);
+                wprintf(L"[" PLAYER_FORMAT "]", player + 1);
             else
-                wprintf(L"" PLAYER_FORMAT, player);
+                wprintf(L"" PLAYER_FORMAT, player + 1);
         }
     wprintf(L" money=" MONEY_FORMAT " tile=%s", game->monies[game->turn],
             tile_names[game->map[game->y][game->x]]);
