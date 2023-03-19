@@ -38,7 +38,7 @@ TEST(graphics_test, render_block_with_half_completion_is_half_full) {
     wchar_t symbol = 0;
     uint8_t style = '\x00';
     render_block(50, 4, &symbol, &style);
-    ASSERT_EQ(symbol, L'▌');
+    ASSERT_EQ(symbol, L'|');
     ASSERT_EQ(style, '\xb0');
 }
 

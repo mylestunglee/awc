@@ -88,19 +88,22 @@ static const char* const tile_names[TILE_CAPACITY] = {
 
 void graphics_initialise() { setlocale(LC_CTYPE, "C.UTF-8"); }
 
+#define BLOCK_SYMBOL_COUNT 3
+
 void render_block(const uint32_t percent, const grid_t tile_x,
                   wchar_t* const symbol, uint8_t* const style) {
     const uint8_t styles[] = {'\x90', '\xb0', '\xa0'};
     const uint8_t inverted_styles[] = {'\x09', '\x0B', '\x0A'};
-    const uint8_t style_index = (3 * percent) / 100;
+    const uint8_t style_index = (BLOCK_SYMBOL_COUNT * percent) / 100;
 
-    const wchar_t block_symbols[] = {L'▏', L'▎', L'▍', L'▌', L'▋', L'▊', L'▉'};
+    const wchar_t block_symbols[] = {L'[', L'|', L']'};
     const int8_t steps =
-        ((8 * unit_width + 1) * percent) / 100 - 8 * (tile_x - unit_left) - 1;
+        (((BLOCK_SYMBOL_COUNT + 1) * unit_width + 1) * percent) / 100 -
+        (BLOCK_SYMBOL_COUNT + 1) * (tile_x - unit_left) - 1;
     if (steps < 0) {
         *style = styles[style_index];
         *symbol = ' ';
-    } else if (steps < 7) {
+    } else if (steps < BLOCK_SYMBOL_COUNT) {
         *style = styles[style_index];
         *symbol = block_symbols[steps];
     } else {
@@ -346,17 +349,17 @@ void render_attack_arrows(const struct game* const game, const grid_t tile_x,
     } else {
         if ((grid_t)(game->prev_x + 1) == game->x) {
             assert(game->prev_y == game->y);
-            *symbol = L'▶';
+            *symbol = L'>';
         } else if ((grid_t)(game->prev_x - 1) == game->x) {
             assert(game->prev_y == game->y);
-            *symbol = L'◀';
+            *symbol = L'<';
         } else if ((grid_t)(game->prev_y + 1) == game->y) {
             assert(game->prev_x == game->x);
-            *symbol = L'▼';
+            *symbol = L'v';
         } else {
             assert((grid_t)(game->prev_y - 1) == game->y);
             assert(game->prev_x == game->x);
-            *symbol = L'▲';
+            *symbol = L'^';
         }
 
         // Set foreground colour to attackable style
