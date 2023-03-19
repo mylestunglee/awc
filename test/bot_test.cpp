@@ -5,56 +5,74 @@
 #include "game_fixture.hpp"
 #include "test_constants.hpp"
 
-TEST_F(game_fixture, simulate_attack_when_ranged) {
-    insert_selected_unit({.model = MODEL_ARTILLERY, .health = HEALTH_MAX});
+TEST_F(game_fixture, calc_attack_metric_calculates_attack_metric) {
+    insert_selected_unit({.health = HEALTH_MAX});
     insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
     game->x = 2;
     game->y = 3;
 
-    health_t damage, expected_counter_damage, actual_counter_damage;
-    game_calc_damage(game, &damage, &expected_counter_damage);
-
-    simulate_attack(game, &damage, &actual_counter_damage);
-
-    ASSERT_EQ(actual_counter_damage, expected_counter_damage);
-    ASSERT_EQ(game->prev_x, 0);
-    ASSERT_EQ(game->prev_y, 0);
+    ASSERT_EQ(calc_attack_metric(game), 31000);
 }
 
-TEST_F(game_fixture, simulate_attack_sets_prev_position_when_direct) {
+TEST_F(game_fixture, calc_attack_metric_subtracts_merge_health_overflow) {
     insert_selected_unit({.health = HEALTH_MAX});
     insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
+    insert_unit({.x = 1, .y = 3, .health = 31});
     game->x = 2;
     game->y = 3;
     game->prev_x = 1;
     game->prev_y = 3;
 
-    health_t damage, expected_counter_damage, actual_counter_damage;
-    game_calc_damage(game, &damage, &expected_counter_damage);
+    ASSERT_EQ(calc_attack_metric(game), 0);
+}
 
+TEST_F(game_fixture, find_best_prev_position_when_ranged) {
+    insert_selected_unit({.model = MODEL_ARTILLERY, .health = HEALTH_MAX});
+    insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
+    game->x = 2;
+    game->y = 3;
+
+    grid_t prev_x = 0;
+    grid_t prev_y = 0;
+    ASSERT_EQ(find_best_prev_position(game, MODEL_ARTILLERY, &prev_x, &prev_y),
+              90000);
+
+    ASSERT_EQ(prev_x, 0);
+    ASSERT_EQ(prev_y, 0);
+}
+
+TEST_F(game_fixture, find_best_prev_position_when_direct) {
+    insert_selected_unit({.model = MODEL_INFANTRY, .health = HEALTH_MAX});
+    insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX});
+    game->x = 2;
+    game->y = 3;
     game->labels[3][1] = ACCESSIBLE_BIT;
-    game->energies[3][1] = 1;
-    game->prev_x = 0;
-    game->prev_y = 0;
+    game->labels[3][3] = ACCESSIBLE_BIT;
 
-    simulate_attack(game, &damage, &actual_counter_damage);
+    grid_t prev_x = 0;
+    grid_t prev_y = 0;
+    ASSERT_EQ(find_best_prev_position(game, MODEL_INFANTRY, &prev_x, &prev_y),
+              31000);
 
-    ASSERT_EQ(actual_counter_damage, expected_counter_damage);
-    ASSERT_EQ(game->prev_x, 1);
-    ASSERT_EQ(game->prev_y, 3);
+    ASSERT_EQ(prev_x, 3);
+    ASSERT_EQ(prev_y, 3);
 }
 
 TEST_F(game_fixture, find_attackee_maximises_metric) {
     insert_selected_unit();
-    insert_unit({.x = 3, .health = HEALTH_MAX});
-    const auto* const expected_attackee =
-        insert_unit({.x = 5, .health = HEALTH_MAX / 2});
-    game->labels[0][3] = ATTACKABLE_BIT;
-    game->labels[0][5] = ATTACKABLE_BIT;
+    insert_unit({.x = 2, .y = 3, .health = HEALTH_MAX / 2});
+    insert_unit({.x = 2, .y = 5, .health = HEALTH_MAX});
+    game->labels[3][1] = ACCESSIBLE_BIT;
+    game->labels[5][1] = ACCESSIBLE_BIT;
+    game->labels[3][2] = ATTACKABLE_BIT;
+    game->labels[5][2] = ATTACKABLE_BIT;
 
-    auto actual_attackee = find_attackee(game, MODEL_INFANTRY);
+    ASSERT_FALSE(find_attackee(game, MODEL_INFANTRY));
 
-    ASSERT_EQ(actual_attackee, expected_attackee);
+    ASSERT_EQ(game->x, 2);
+    ASSERT_EQ(game->y, 3);
+    ASSERT_EQ(game->prev_x, 1);
+    ASSERT_EQ(game->prev_y, 3);
 }
 
 TEST_F(game_fixture, handle_attack_reduces_attackee_health) {
@@ -433,6 +451,20 @@ TEST_F(game_fixture, interact_unit_maintains_enabled_when_move_is_impossible) {
 
     ASSERT_TRUE(unit->enabled);
     ASSERT_FALSE(game->dirty_labels);
+}
+
+TEST_F(game_fixture, interact_unit_sidesteps_merge) {
+    auto* unit = insert_unit({.x = 0, .health = 60, .enabled = true});
+    insert_unit({.x = 1, .health = 50});
+    insert_unit({.x = 2, .player = 1, .health = HEALTH_MAX});
+    for (auto y = 0; y < 2; ++y)
+        for (auto x = 0; x < 3; ++x)
+            game->map[y][x] = TILE_PLAINS;
+
+    interact_unit(game, unit);
+
+    ASSERT_EQ(unit->x, 2);
+    ASSERT_EQ(unit->y, 1);
 }
 
 TEST_F(game_fixture, interact_units) {

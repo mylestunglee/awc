@@ -300,9 +300,11 @@ bool units_mergable(const struct unit* const source,
 health_t units_merge_health(const struct unit* const source,
                             const struct unit* const target) {
     assert(units_mergable(source, target));
-    health_wide_t merged_health =
-        (health_wide_t)source->health + (health_wide_t)target->health;
-    if (merged_health > (health_wide_t)HEALTH_MAX)
+    assert(source->health <= HEALTH_MAX);
+    assert(target->health <= HEALTH_MAX);
+
+    const health_t merged_health = source->health + target->health;
+    if (merged_health > HEALTH_MAX)
         return HEALTH_MAX;
     else
         return merged_health;

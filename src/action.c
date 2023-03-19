@@ -14,7 +14,7 @@ health_t move_selected_unit(struct game* const game, const grid_t x,
         units_const_get_at_safe(&game->units, x, y);
 
     health_t result = source->health;
-    if (source != target && target) {
+    if (target && source != target) {
         source->health = units_merge_health(source, target);
         if (target->enabled)
             result = source->health;

@@ -3,61 +3,78 @@
 #include "build_units.h"
 #include "constants.h"
 #include "game.h"
+#include "graphics.h"
 #include "grid.h"
 #include "unit_constants.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
 
-// Finds prev position to attack unit at cursor with best defense over minimal
-// distance
-void simulate_attack(struct game* const game, health_t* const damage,
-                     health_t* const counter_damage) {
+money_t calc_attack_metric(struct game* const game) {
     const struct unit* const attacker = units_const_get_selected(&game->units);
+    const struct unit* const attackee =
+        units_const_get_at(&game->units, game->x, game->y);
 
-    if (units_is_ranged(attacker->model)) {
-        game_calc_damage(game, damage, counter_damage);
-        return;
+    health_t damage, counter_damage;
+    game_calc_damage(game, &damage, &counter_damage);
+
+    // Consider merge overflow health
+    if (units_is_direct(attacker->model)) {
+        const struct unit* const adjacent =
+            units_const_get_at_safe(&game->units, game->prev_x, game->prev_y);
+        if (adjacent && attacker != adjacent)
+            counter_damage += attacker->health + adjacent->health -
+                              units_merge_health(attacker, adjacent);
     }
 
-    const tile_t original_tile = game->map[attacker->y][attacker->x];
+    const money_t damage_metric =
+        (money_t)damage * model_costs[attackee->model];
+    const money_t counter_damage_metric =
+        (money_t)counter_damage * model_costs[attacker->model];
+    return damage_metric - counter_damage_metric;
+}
+
+money_t find_best_prev_position(struct game* const game,
+                                const model_t attacker_model,
+                                grid_t* const prev_x, grid_t* const prev_y) {
+    if (units_is_ranged(attacker_model))
+        return calc_attack_metric(game);
+
     const grid_t x = game->x;
     const grid_t y = game->y;
     const grid_t adjacent_x[] = {(grid_t)(x + 1), x, (grid_t)(x - 1), x};
     const grid_t adjacent_y[] = {y, (grid_t)(y - 1), y, (grid_t)(y + 1)};
-    const pass_t pass = model_passes[attacker->model];
-    health_t max_defense = 0;
-    health_t max_energy = 0;
+    money_t max_attack_metric = INT_MIN;
 
     for (uint8_t i = 0; i < 4; ++i) {
         const grid_t x_i = adjacent_x[i];
         const grid_t y_i = adjacent_y[i];
-        const tile_t tile = game->map[y_i][x_i];
-        const health_t defense = pass_tile_defenses[pass][tile];
-        const energy_t energy = game->energies[y_i][x_i];
 
-        if (game->labels[y_i][x_i] & ACCESSIBLE_BIT &&
-            (defense > max_defense ||
-             (defense == max_defense && energy > max_energy))) {
-            max_defense = defense;
-            max_energy = energy;
-            game->map[attacker->y][attacker->x] = tile;
-            game->prev_x = x_i;
-            game->prev_y = y_i;
-        }
+        if (!(game->labels[y_i][x_i] & ACCESSIBLE_BIT))
+            continue;
+
+        game->prev_x = x_i;
+        game->prev_y = y_i;
+        money_t attack_metric = calc_attack_metric(game);
+
+        if (attack_metric <= max_attack_metric)
+            continue;
+
+        max_attack_metric = attack_metric;
+        *prev_x = x_i;
+        *prev_y = y_i;
     }
 
-    game_calc_damage(game, damage, counter_damage);
-    game->map[attacker->y][attacker->x] = original_tile;
+    return max_attack_metric;
 }
 
 // Finds best attackee while setting prev position
-const struct unit* find_attackee(struct game* const game,
-                                 const model_t attacker_model) {
-    const struct unit* best_attackee = NULL;
-    money_t best_metric = SHRT_MIN;
-    grid_t best_prev_x = game->prev_x;
-    grid_t best_prev_y = game->prev_y;
+bool find_attackee(struct game* const game, const model_t attacker_model) {
+    money_t best_attack_metric = INT_MIN;
+    grid_t best_prev_x = 0;
+    grid_t best_prev_y = 0;
+    grid_t best_x = 0;
+    grid_t best_y = 0;
 
     game->y = 0;
     do {
@@ -67,44 +84,37 @@ const struct unit* find_attackee(struct game* const game,
             if (!(game->labels[game->y][game->x] & ATTACKABLE_BIT))
                 continue;
 
-            health_t damage, counter_damage;
-            simulate_attack(game, &damage, &counter_damage);
+            grid_t prev_x, prev_y;
+            const money_t attack_metric =
+                find_best_prev_position(game, attacker_model, &prev_x, &prev_y);
 
-            const struct unit* const attackee =
-                units_const_get_at(&game->units, game->x, game->y);
-            const money_t damage_metric =
-                (money_t)damage * model_costs[attackee->model];
-            const money_t counter_damage_metric =
-                (money_t)counter_damage * model_costs[attacker_model];
-            const money_t metric = damage_metric - counter_damage_metric;
+            if (attack_metric <= best_attack_metric)
+                continue;
 
-            if (metric > best_metric) {
-                best_metric = metric;
-                best_attackee = attackee;
-                best_prev_x = game->prev_x;
-                best_prev_y = game->prev_y;
-            }
+            best_attack_metric = attack_metric;
+            best_x = game->x;
+            best_y = game->y;
+            best_prev_x = prev_x;
+            best_prev_y = prev_y;
         } while (++game->x);
     } while (++game->y);
 
-    // Restore prev position from best simulate_attack
+    game->x = best_x;
+    game->y = best_y;
     game->prev_x = best_prev_x;
     game->prev_y = best_prev_y;
 
-    return best_attackee;
+    return best_attack_metric == INT_MIN;
 }
 
 void handle_attack(struct game* const game, const model_t attacker_model) {
-    const struct unit* const attackee = find_attackee(game, attacker_model);
+    const bool find_error = find_attackee(game, attacker_model);
 
-    if (attackee == NULL)
+    if (find_error)
         return;
 
-    game->x = attackee->x;
-    game->y = attackee->y;
-
-    const bool error = action_attack(game);
-    assert(!error);
+    const bool attack_error = action_attack(game);
+    assert(!attack_error);
 }
 
 energy_t update_max_energy(const struct game* const game,
