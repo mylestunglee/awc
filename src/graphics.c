@@ -8,20 +8,21 @@
 #include <stdlib.h>
 #include <wchar.h>
 
-#define tile_width 8
-#define tile_height 4
-#define unit_left 2
-#define unit_top 1
-#define unit_width 5
-#define unit_height 2
+#define TILE_WIDTH 8
+#define TILE_HEIGHT 4
+#define UNIT_LEFT 2
+#define UNIT_TOP 1
+#define UNIT_WIDTH 5
+#define UNIT_HEIGHT 2
 
-#define unit_right (unit_left + unit_width - 1)
-#define unit_bottom (unit_top + unit_height - 1)
+#define UNIT_RIGHT (UNIT_LEFT + UNIT_WIDTH - 1)
+#define UNIT_BOTTOM (UNIT_TOP + UNIT_HEIGHT - 1)
 
-#define accessible_style '\xe0'
-#define attackable_style '\x90'
-#define accessible_attackable_style '\xd0'
-#define buildable_style '\xf0'
+#define ACCESSIBLE_STYLE '\xe0'
+#define ATTACKABLE_STYLE '\x90'
+#define ACCESSIBLE_ATTACKABLE_STYLE '\xd0'
+#define BUILDABLE_STYLE '\xf0'
+#define BLOCK_SYMBOL_COUNT 3
 
 static const uint8_t unit_symbols[14] = {' ', '_',  'o', 'x', '<', '>', 'v',
                                          '^', '\\', '/', '[', ']', '-', '='};
@@ -33,7 +34,7 @@ static const uint8_t tile_styles[TERRIAN_CAPACITY] = {
     '\x80', '\xa2', '\x32', '\x13', '\x3b',
     '\xc4', '\xd4', '\x4c', '\x78', '\x78'};
 static const uint8_t
-    unit_textures[MODEL_CAPACITY][unit_height][(unit_width + 1) / 2] = {
+    unit_textures[MODEL_CAPACITY][UNIT_HEIGHT][(UNIT_WIDTH + 1) / 2] = {
         {{'\x03', '\xf3', '\x00'}, {'\x08', '\x88', '\x00'}},
         {{'\x0E', '\xfe', '\x00'}, {'\x08', '\x88', '\x00'}},
         {{'\x0A', '\xfd', '\x00'}, {'\x03', '\x33', '\x00'}},
@@ -50,8 +51,8 @@ static const uint8_t
         {{'\x2a', '\xfa', '\x20'}, {'\x92', '\x2c', '\xe0'}},
         {{'\x88', '\xf8', '\x80'}, {'\x92', '\x22', '\xa0'}}};
 
-static const uint8_t building_textures[BUILDING_CAPACITY][tile_height]
-                                      [(tile_width + 1) / 2] = {
+static const uint8_t building_textures[BUILDING_CAPACITY][TILE_HEIGHT]
+                                      [(TILE_WIDTH + 1) / 2] = {
                                           {
                                               {'\x00', '\xb1', '\xfc', '\x00'},
                                               {'\x00', '\xb1', '\xb1', '\x1c'},
@@ -88,8 +89,6 @@ static const char* const tile_names[TILE_CAPACITY] = {
 
 void graphics_initialise() { setlocale(LC_CTYPE, "C.UTF-8"); }
 
-#define BLOCK_SYMBOL_COUNT 3
-
 void render_block(const uint32_t percent, const grid_t tile_x,
                   wchar_t* const symbol, uint8_t* const style) {
     const uint8_t styles[] = {'\x90', '\xb0', '\xa0'};
@@ -98,8 +97,8 @@ void render_block(const uint32_t percent, const grid_t tile_x,
 
     const wchar_t block_symbols[] = {L'[', L'|', L']'};
     const int8_t steps =
-        (((BLOCK_SYMBOL_COUNT + 1) * unit_width + 1) * percent) / 100 -
-        (BLOCK_SYMBOL_COUNT + 1) * (tile_x - unit_left) - 1;
+        (((BLOCK_SYMBOL_COUNT + 1) * UNIT_WIDTH + 1) * percent) / 100 -
+        (BLOCK_SYMBOL_COUNT + 1) * (tile_x - UNIT_LEFT) - 1;
     if (steps < 0) {
         *style = styles[style_index];
         *symbol = ' ';
@@ -118,18 +117,18 @@ void render_percentage(const uint32_t percent, const grid_t tile_x,
     const wchar_t left_digit = '0' + percent / 10;
     const wchar_t right_digit = '0' + percent % 10;
     if (percent >= 50) {
-        if (tile_x == unit_left) {
+        if (tile_x == UNIT_LEFT) {
             assert(*symbol == ' ');
             *symbol = left_digit;
-        } else if (tile_x == unit_left + 1) {
+        } else if (tile_x == UNIT_LEFT + 1) {
             assert(*symbol == ' ');
             *symbol = right_digit;
         }
     } else {
-        if (tile_x == unit_right - 1) {
+        if (tile_x == UNIT_RIGHT - 1) {
             assert(*symbol == ' ');
             *symbol = left_digit;
-        } else if (tile_x == unit_right) {
+        } else if (tile_x == UNIT_RIGHT) {
             assert(*symbol == ' ');
             *symbol = right_digit;
         }
@@ -148,10 +147,10 @@ bool render_unit_health_bar(const struct units* const units, const grid_t x,
                             uint8_t* const style) {
 
     // Display health bar on the bottom of unit
-    if (tile_y != tile_height - 1)
+    if (tile_y != TILE_HEIGHT - 1)
         return false;
 
-    if (tile_x < unit_left || tile_x > unit_right)
+    if (tile_x < UNIT_LEFT || tile_x > UNIT_RIGHT)
         return false;
 
     const struct unit* const unit = units_const_get_at_safe(units, x, y);
@@ -178,7 +177,7 @@ bool render_capture_progress_bar(const struct units* const units,
     if (tile_y != 0)
         return false;
 
-    if (tile_x < unit_left || tile_x >= unit_left + unit_width)
+    if (tile_x < UNIT_LEFT || tile_x >= UNIT_LEFT + UNIT_WIDTH)
         return false;
 
     const struct unit* const unit =
@@ -207,11 +206,11 @@ uint8_t calc_tile_style(const struct game* const game, const grid_t x,
 
 uint8_t calc_action_style(const bool attackable, const bool buildable) {
     if (attackable)
-        return attackable_style;
+        return ATTACKABLE_STYLE;
     else if (buildable)
-        return buildable_style;
+        return BUILDABLE_STYLE;
     else
-        return accessible_style;
+        return ACCESSIBLE_STYLE;
 }
 
 uint8_t calc_selection_style(const struct game* const game, const grid_t x,
@@ -224,9 +223,9 @@ uint8_t calc_selection_style(const struct game* const game, const grid_t x,
 bool calc_selection_symbol(const grid_t tile_x, const grid_t tile_y,
                            wchar_t* const symbol) {
     const bool top = tile_y == 0;
-    const bool bottom = tile_y == tile_height - 1;
+    const bool bottom = tile_y == TILE_HEIGHT - 1;
     const bool left = tile_x == 0;
-    const bool right = tile_x == tile_width - 1;
+    const bool right = tile_x == TILE_WIDTH - 1;
 
     if (!(top || bottom || left || right))
         return false;
@@ -292,8 +291,8 @@ bool render_unit(const struct units* const units, const grid_t x,
                  wchar_t* const symbol, uint8_t* const style) {
 
     // Out of bounds
-    if (unit_left > tile_x || tile_x > unit_right || unit_top > tile_y ||
-        tile_y > unit_bottom)
+    if (UNIT_LEFT > tile_x || tile_x > UNIT_RIGHT || UNIT_TOP > tile_y ||
+        tile_y > UNIT_BOTTOM)
         return false;
 
     const struct unit* const unit = units_const_get_at_safe(units, x, y);
@@ -301,8 +300,8 @@ bool render_unit(const struct units* const units, const grid_t x,
         return false;
 
     const bool transparent = decode_texture(
-        unit_textures[unit->model][tile_y - unit_top][(tile_x - unit_left) / 2],
-        (tile_x - unit_left) % 2 != 0, unit->player, symbol, style);
+        unit_textures[unit->model][tile_y - UNIT_TOP][(tile_x - UNIT_LEFT) / 2],
+        (tile_x - UNIT_LEFT) % 2 != 0, unit->player, symbol, style);
 
     if (transparent)
         return false;
@@ -330,13 +329,13 @@ void render_highlight(const uint8_t label, wchar_t* const symbol,
     // Set foreground style
     switch (label) {
     case ACCESSIBLE_BIT:
-        *style |= accessible_style;
+        *style |= ACCESSIBLE_STYLE;
         break;
     case ATTACKABLE_BIT:
-        *style |= attackable_style;
+        *style |= ATTACKABLE_STYLE;
         break;
     case ACCESSIBLE_BIT | ATTACKABLE_BIT:
-        *style |= accessible_attackable_style;
+        *style |= ACCESSIBLE_ATTACKABLE_STYLE;
         break;
     }
 }
@@ -363,7 +362,7 @@ void render_attack_arrows(const struct game* const game, const grid_t tile_x,
         }
 
         // Set foreground colour to attackable style
-        *style = (*style & '\x0f') | attackable_style;
+        *style = (*style & '\x0f') | ATTACKABLE_STYLE;
     }
 }
 
@@ -532,19 +531,19 @@ void graphics_render(const struct game* const game) {
 
     int console_width, console_height;
     get_console_size(&console_width, &console_height);
-    const grid_t screen_width = console_width / tile_width;
-    const grid_t screen_height = console_height / tile_height;
+    const grid_t screen_width = console_width / TILE_WIDTH;
+    const grid_t screen_height = console_height / TILE_HEIGHT;
     const grid_t screen_left = game->x - screen_width / 2 + 1;
     const grid_t screen_right = game->x + screen_width / 2 + 1;
     const grid_t screen_top = game->y - screen_height / 2;
     const grid_t screen_bottom = game->y + screen_height / 2;
 
     for (grid_t y = screen_top; y != screen_bottom; ++y) {
-        for (uint8_t tile_y = 0; tile_y < tile_height; ++tile_y) {
+        for (uint8_t tile_y = 0; tile_y < TILE_HEIGHT; ++tile_y) {
             reset_black();
             uint8_t prev_style = '\x00';
             for (grid_t x = screen_left; x != screen_right; ++x) {
-                for (uint8_t tile_x = 0; tile_x < tile_width; ++tile_x)
+                for (uint8_t tile_x = 0; tile_x < TILE_WIDTH; ++tile_x)
                     prev_style = apply_pixel(game, x, y, tile_x, tile_y,
                                              attackable, buildable, prev_style);
             }
