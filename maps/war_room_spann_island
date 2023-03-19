@@ -1,12 +1,12 @@
 map ~~~~~~~~~~~~~~~
-map ~~"Y-----"YF"F~
+map ~~"Y--=--"YF"F~
 map ~""Y-Y~"-C""HF~
 map ~CC--~~~-"^"-F~
 map ~""-"~~~-C^C-"~
 map ~F--C~~Y-----C~
-map ~FH""""YY"~~-~~
+map ~FH""""YY"~~=~~
 map ~~FF""""""~~""~
-map ~~~~^C^YC"-"CC~
+map ~~~~^C^YC"="CC~
 map ~~~~~~~~~~~~~~~
 territory   1  11   1
 territory   1  13   1
