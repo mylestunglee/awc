@@ -73,8 +73,8 @@ bool find_attackee(struct game* const game, const model_t attacker_model) {
     money_t best_attack_metric = INT_MIN;
     grid_t best_prev_x = 0;
     grid_t best_prev_y = 0;
-    grid_t best_x = 0;
-    grid_t best_y = 0;
+    grid_t best_x = game->x;
+    grid_t best_y = game->y;
 
     game->y = 0;
     do {
@@ -134,8 +134,8 @@ energy_t update_max_energy(const struct game* const game,
 }
 
 energy_t find_nearest_building(struct game* const game) {
-    grid_t nearest_x = 0;
-    grid_t nearest_y = 0;
+    grid_t nearest_x = game->x;
+    grid_t nearest_y = game->y;
     // Maximise remaining energy to find nearest
     energy_t max_energy = 0;
     game->y = 0;
