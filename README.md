@@ -39,6 +39,7 @@ These installation steps have been tested for _Ubuntu 22.04 LTS_. If you are run
 | Command | Description |
 | --- | --- |
 | `make` | Builds the game binary. |
+| `make debug` | Builds the game binary with debug symbols for `gdb`. |
 | `make doc` | Generates _Doxgygen_ documentation visualising call graphs and dependency graphs. |
 | `make coverage_tests` | Builds all tests and generates code coverage statistics for each test.` |
 | `make format` | Lints all source and test code. |

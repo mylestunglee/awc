@@ -2,7 +2,10 @@
 .SECONDARY:
 
 default:
-	$(MAKE) -C src
+	$(MAKE) -C src CFLAGS=-O2
+
+debug:
+	$(MAKE) -C src CFLAGS=-g
 
 all: default format doc coverage_reports
 
