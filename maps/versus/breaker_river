@@ -5,12 +5,12 @@ map "-FA"~~~~~~~~~"AF-"
 map "-F"~~~~~~~~~~~"F-Y
 map "-Y~~~~~~~~~~~~~"-"
 map Y-Y~~Y"YC~CY"Y~~"-Y
-map Y-"~~"C-----F"~~"-Y
-map Y-------Y~Y-------Y
-map Y-"~~"F-----C"~~"-Y
+map Y-"~~"C--=--F"~~"-Y
+map Y--==---Y~Y---==--Y
+map Y-"~~"F--=--C"~~"-Y
 map Y-Y~~Y"YC~CY"Y~~"-"
-map Y-"~~~-~~~~~-~~~"-"
-map "-"~~~-~~~~~-~~~"-"
+map Y-"~~~=~~~~~=~~~"-"
+map "-"~~~=~~~~~=~~~"-"
 map YH""^Y"^Y^^""Y^"YHY
 map Y""^YCAY"""YACY^YY"
 territory   0   1   1
