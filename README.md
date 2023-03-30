@@ -9,9 +9,9 @@
 	+ Highly configurable constants and technical constraints can be remodelled
 - Small feature set for high compatibility with bot capabilities
 
-```html
-aaa<b>a</b>
-```
+![Replay of two bots in Spann Island](./replay_slow.gif)
+
+Play `replay_fast.mp4` for a more detailed simulation.
 
 ## Features
 
