@@ -173,7 +173,7 @@ with the following constaints:
 | artillery | `^^^`<br>`o=o` | 6000 | Ranged (2 → 3) | Tread | 5 | No |
 | rockets | `^^^^^`<br>`ooooo` | 15000 | Ranged (3 → 6) | Wheel | 5 | No |
 | antiair | `///`<br>`o=o` | 8000 | Direct | Tread | 6 | No |
-| missles | `//////`<br>`ooooo` | 12000 | Ranged (2 → 5) | Wheel | 5 | No |
+| missles | `/////`<br>`ooooo` | 12000 | Ranged (2 → 5) | Wheel | 5 | No |
 | battlecopter | `=x=`<br>` [ ]=` | 9000 | Direct | Air | 6 | No |
 | fighter | `\    `<br>`<\ ]=` | 22000 | Direct | Air | 9 | No |
 | bomber | `\    `<br>`<vvv>` | 20000 | Direct | Air | 7 | No |
