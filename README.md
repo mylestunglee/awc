@@ -115,7 +115,7 @@ For a given unit, the bot scans any targets in the current turn. If enemy units 
 At the end of a bot turn, the bot tries to find which unit models should be built.
 The problem is formalised as a mixed-integer programming problem.
 The objective is to maximise the potential damage.
-If the potential damage cannot be maximised, then then the maximum number of infantry is built.
+If the potential damage cannot be maximised, then the maximum number of infantry is built.
 
 Let:
 | Variable | Description |
@@ -132,7 +132,7 @@ Let:
 The objective is formalised as:
 `z = max_B min_j (∑_i A_i_j (d_i + ∑_i B_i_k)) / d'_j`
 
-with the following constaints:
+with the following constraints:
 
 | Constraint | Description |
 | --- | --- |
